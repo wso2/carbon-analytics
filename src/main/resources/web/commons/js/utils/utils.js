@@ -30,14 +30,14 @@ define(['require', 'jquery'],
         };
 
 
-        Utils.prototype.retrieveSiddhiAppNames = function (successCallback, errorCallback) {
+        Utils.prototype.retrieveSiddhiAppNames = function (successCallback, errorCallback, context) {
             $.ajax({
                 async: true,
                 url: rest_client_constants.editorUrl + "/artifact/listSiddhiApps",
                 type: rest_client_constants.HTTP_GET,
                 success: function (data) {
                     if (typeof successCallback === 'function')
-                        successCallback(data)
+                        successCallback(data, context)
                 },
                 error: function (msg) {
                     if (typeof errorCallback === 'function')

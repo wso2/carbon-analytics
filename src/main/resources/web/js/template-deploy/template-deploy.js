@@ -35,6 +35,10 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                 container: Handlebars.compile($('#template-deploy-side-panel-template').html()),
             };
 
+            if (!localStorage.getItem('templatedAttributeList')) {
+                localStorage.setItem('templatedAttributeList', JSON.stringify({}));
+            }
+
             console.log(CompletionEngine);
         };
 
@@ -49,95 +53,176 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                     self._application.commandManager.dispatch(self._options.command.id);
                 }
 
-                $('#template-app-name-select').on('change', function (e) {
-                    self.populateTemplateAttributes(e.target.value);
-                });
-
-                self._application.utils.retrieveSiddhiAppNames(self.populateTemplateApps, self.handleErrorMsg);
-
+                self._application.utils.retrieveSiddhiAppNames(self.populateTemplateApps, self.handleErrorMsg, self);
 
             });
 
-            $('#fill-and-send').on('click', function () {
-                console.log("ahhaha");
-
-            });
+            $("#refreshAttributes").on("click", function (e) {
+                self._application.utils.retrieveSiddhiAppNames(self.populateTemplateApps, self.handleErrorMsg, self);
+            })
 
         };
 
-        TemplateDeploy.prototype.populateTemplateApps = function (data) {
-            console.log(data);
-            $('#template-app-name-select').empty();
-            if (data.length > 0) {
-                $('#template-attr-table-body').empty().append(
-                    '<tr>' +
-                    '   <td><label style="opacity: 0.6">Please select a Siddhi app with template place holders</label></td>\n' +
-                    '</tr>');
+        TemplateDeploy.prototype.populateTemplateApps = function (data, context) {
+            var self = context;
+            var templateAttrList = [];
+            var unusedTemplateAttr = [];
 
-                $('#template-app-name-select')
-                    .append('<option value="-1" disabled="" selected="selected">-- No Siddhi app selected. --</option>');
-                data.forEach(function (el) {
-                    $('#template-app-name-select')
-                        .append('<option>' + el.siddhiAppName + '</option>');
+            data.forEach(function (app) {
+                var openServiceURL = self._application.config.services.workspace.endpoint + "/read";
+                var path = "workspace" + self._application.getPathSeperator() + app.siddhiAppName + '.siddhi';
+
+                $.ajax({
+                    url: openServiceURL,
+                    type: "POST",
+                    data: path,
+                    contentType: "text/plain; charset=utf-8",
+                    async: false,
+                    success: function (data, textStatus, xhr) {
+                        var attributes = data.content.match(/\${([^(\\$\\|\\{\\]+)}/g);
+                        if (attributes && attributes.length > 0) {
+                            templateAttrList = _.uniq(templateAttrList.concat(attributes));
+
+
+                        } else {
+                            // alerts.info("No template placeholders found in the Siddhi App.");
+                        }
+
+                    },
+                    error: function (res, errorCode, error) {
+                        var msg = _.isString(error) ? error : res.statusText;
+                        if (isJsonString(res.responseText)) {
+                            var resObj = JSON.parse(res.responseText);
+                            if (_.has(resObj, 'Error')) {
+                                msg = _.get(resObj, 'Error');
+                            }
+                        }
+                        alerts.error(msg);
+                    }
+                });
+            });
+
+            templateAttrList.sort();
+
+            var localStorageTemplatedAttributes = JSON.parse(localStorage.getItem('templatedAttributeList'));
+
+            console.log("localStorage", _.differenceWith(templateAttrList,
+                Object.keys(localStorageTemplatedAttributes), _.isEqual));
+
+            if (localStorageTemplatedAttributes) {
+                unusedTemplateAttr = _.differenceWith(Object.keys(localStorageTemplatedAttributes),
+                    templateAttrList, _.isEqual);
+
+            }
+
+            self.showAttributes(self, templateAttrList, unusedTemplateAttr);
+        };
+
+        TemplateDeploy.prototype.showAttributes = function (context, templateAttrList, unusedTemplateAttr) {
+            var self = context;
+            var localStorageTemplatedAttributes = JSON.parse(localStorage.getItem('templatedAttributeList'));
+            console.log(templateAttrList, unusedTemplateAttr);
+
+            if (templateAttrList.length > 0) {
+                $("#used-template-attr-container").removeClass('hidden');
+                $("#template-attr-table-body").empty();
+
+                templateAttrList.forEach(function (attr) {
+                    if (!localStorageTemplatedAttributes[attr]) {
+                        localStorageTemplatedAttributes[attr] = "";
+                    }
+
+                    $("#template-attr-table-body").append(
+                        '<tr>' +
+                        '   <td>' +
+                        '       <label>' + attr + '</label>' +
+                        '       <input id="' + justGetName(attr) + '-input" type="text" class="form-control" data-element-type="attribute" name="item-attr" data-type="STRING" aria-required="true" value="' + localStorageTemplatedAttributes[attr] + '">' +
+                        '   </td>' +
+                        '</tr>'
+                    );
+
+                    $("#" + justGetName(attr) + "-input").on('keyup', function (e) {
+                        let attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
+                        attrLocalStore['${' + e.target.id.split('-input')[0] + '}'] = e.target.value;
+
+                        localStorage.setItem("templatedAttributeList", JSON.stringify(attrLocalStore));
+                    })
                 });
             } else {
-                $('#template-app-name-select')
-                    .append('<option value="-1" disabled="" selected="selected">-- No saved Siddhi Apps available. --</option>');
+                $("#used-template-attr-container").addClass('hidden');
             }
+
+            if (unusedTemplateAttr.length > 0) {
+                $("#unused-template-attr-container").removeClass('hidden');
+                $("#unused-template-attr-table-body").empty();
+
+                unusedTemplateAttr.forEach(function (attr) {
+                    $("#unused-template-attr-table-body").append(
+                        '<tr>' +
+                        '   <td>' +
+                        '       <label>' + attr + '</label>' +
+                        '       <input id="' + justGetName(attr) + '-input" type="text" class="form-control" data-element-type="attribute" name="item-attr" data-type="STRING" aria-required="true" value="' + localStorageTemplatedAttributes[attr] + '">' +
+                        '   </td>' +
+                        '   <td>' +
+                        '       <button type="button" class="btn btn-secondary" id="' + justGetName(attr) + '-clear" style="margin-top: 26px">' +
+                        '           X' +
+                        '       </button>' +
+                        '   </td>' +
+                        '</tr>'
+                    );
+
+                    $("#" + justGetName(attr) + "-input").on('keyup', function (e) {
+                        let attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
+                        attrLocalStore['${' + e.target.id.split('-input')[0] + '}'] = e.target.value;
+
+                        localStorage.setItem("templatedAttributeList", JSON.stringify(attrLocalStore));
+                    });
+
+                    $("#" + justGetName(attr) + "-clear").on('click', function (e) {
+                        console.log(e);
+                        let attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
+                        delete attrLocalStore['${' + e.target.id.split('-clear')[0] + '}'];
+
+                        localStorage.setItem("templatedAttributeList", JSON.stringify(attrLocalStore));
+                        self._application.utils.retrieveSiddhiAppNames(self.populateTemplateApps, self.handleErrorMsg, self);
+                    });
+                });
+
+                $("#unused-template-clear").on('click', function () {
+                    let unusedTemplateAttrs = unusedTemplateAttr;
+                    let attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
+
+                    unusedTemplateAttrs.forEach(function (elem) {
+                        delete attrLocalStore[elem];
+                    });
+
+                    localStorage.setItem("templatedAttributeList", JSON.stringify(attrLocalStore));
+                    self._application.utils.retrieveSiddhiAppNames(self.populateTemplateApps, self.handleErrorMsg, self);
+                });
+            } else {
+                $("#unused-template-attr-container").addClass('hidden');
+            }
+
+            if (templateAttrList.length === 0 && unusedTemplateAttr === 0) {
+                $("#unused-template-attr-container").addClass('hidden');
+                $("#used-template-attr-container").addClass('hidden');
+            } else {
+                $("#template-attr-info").addClass('hidden');
+            }
+
+            localStorage.setItem('templatedAttributeList', JSON.stringify(localStorageTemplatedAttributes));
         };
 
-        TemplateDeploy.prototype.populateTemplateAttributes = function (fileName) {
-            var self = this;
 
-            var openServiceURL = self._application.config.services.workspace.endpoint + "/read";
-            var path = "workspace" + self._application.getPathSeperator() + fileName + '.siddhi';
+        function justGetName(name) {
+            var textMatch = name.match("\\$\\{(.*?)\\}");
 
-            $.ajax({
-                url: openServiceURL,
-                type: "POST",
-                data: path,
-                contentType: "text/plain; charset=utf-8",
-                async: false,
-                success: function (data, textStatus, xhr) {
-                    console.log('awa');
-                    var attr = data.content.match(/\${([^(\\$\\|\\{\\]+)}/g);
-                    $('#template-attr-table-body').empty();
-                    if (attr && attr.length > 0) {
-                        var tbody = $('#template-attr-table-body');
-                        attr.forEach(function (attr) {
-                            tbody.append(
-                                '<tr>' +
-                                '   <td>' +
-                                '       <label>' + attr + '</label>' +
-                                '       <input type="text" class="form-control" data-element-type="attribute" name="item-attr" data-type="STRING" aria-required="true">' +
-                                '   </td>' +
-                                '</tr>');
-                        });
-
-                    } else {
-                        // alerts.info("No template placeholders found in the Siddhi App.");
-                        $('#template-attr-table-body').append(
-                            '<tr>' +
-                            '   <td>' +
-                            '       <label style="opacity: 0.6">Coudn\'t find any template placeholders in the siddhi app</label>' +
-                            '   </td>' +
-                            '</tr>');
-                    }
-
-                },
-                error: function (res, errorCode, error) {
-                    var msg = _.isString(error) ? error : res.statusText;
-                    if (isJsonString(res.responseText)) {
-                        var resObj = JSON.parse(res.responseText);
-                        if (_.has(resObj, 'Error')) {
-                            msg = _.get(resObj, 'Error');
-                        }
-                    }
-                    alerts.error(msg);
-                }
-            });
-
-        };
+            if (textMatch) {
+                return textMatch[1];
+            } else {
+                return '';
+            }
+        }
 
         function isJsonString(str) {
             try {

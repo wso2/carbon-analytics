@@ -29,7 +29,8 @@
     <link href="/editor/commons/css/jquery-ui-timepicker-addon.css" rel="stylesheet" type="text/css"/>
     <link href="/editor/commons/css/simulator.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" type="text/css" href="/editor/commons/css/notification.css"/>
-    <link rel="stylesheet" type="text/css" href="/editor/commons/lib/perfect-scrollbar-1.4.0/css/perfect-scrollbar.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="/editor/commons/lib/perfect-scrollbar-1.4.0/css/perfect-scrollbar.css"/>
 
     <!--Enjoy Hint CSS-->
 
@@ -63,8 +64,8 @@
     <link rel="stylesheet" type="text/css" href="/editor/commons/lib/overlay_scroll/css/OverlayScrollbars.min.css"/>
 
     <!-- SmartWizard CSS -->
-    <link rel="stylesheet" type="text/css" href="/editor/commons/lib/smartWizard/css/smart_wizard.css" />
-    <link rel="stylesheet" type="text/css" href="/editor/css/export-docker-kubernetes.css" />
+    <link rel="stylesheet" type="text/css" href="/editor/commons/lib/smartWizard/css/smart_wizard.css"/>
+    <link rel="stylesheet" type="text/css" href="/editor/css/export-docker-kubernetes.css"/>
 
     <title>Siddhi Editor</title>
 </head>
@@ -77,7 +78,8 @@
     <div id="header-container" class="container-fluid">
         <div class="pull-left brand float-remove-xs text-center-xs">
             <a href="#">
-                <img src="/editor/commons/lib/theme-wso2-2.0.0/images/logo-editor-inverse.svg" alt="Siddhi" title="Siddhi"
+                <img src="/editor/commons/lib/theme-wso2-2.0.0/images/logo-editor-inverse.svg" alt="Siddhi"
+                     title="Siddhi"
                      class="logo">
             </a>
         </div>
@@ -293,11 +295,11 @@
                 </div>
                 <div class="popover-footer">
                     <button type="button" class="btn btn-xs btn_yes" tabindex="-1">Yes</button>
-                    <button type="button"class="btn btn-xs btn_no" tabindex="-1">No</button>
+                    <button type="button" class="btn btn-xs btn_no" tabindex="-1">No</button>
                 </div>
             </div>
             <!-- End: pop-over-design-view -->
-            <div class = "overlayed-container"></div>
+            <div class="overlayed-container"></div>
             <!-- End: design-view-grid-container -->
         </div>
         <!-- End: design view container -->
@@ -1049,40 +1051,40 @@
     </div>
 </div>
 
-<script id = "attribute-form-template" type = "text/x-handlebars-template">
+<script id="attribute-form-template" type="text/x-handlebars-template">
     <div class="attributes-container">
         <label>Attributes</label>
         <ul>
-            <div id = "attribute-div">
+            <div id="attribute-div">
                 {{#each this}}
-                <li class = "attribute clearfix">
-                    <div class = "clearfix">
-                        <div class = "attr-content">
-                            <input type = "text" value = "{{name}}" class = "attr-name"/>
-                            <select class = "attr-type">
-                                <option value = "string"> string </option>
-                                <option value = "int"> int </option>
-                                <option value = "long"> long </option>
-                                <option value = "float"> float </option>
-                                <option value = "double"> double </option>
-                                <option value = "bool"> bool </option>
-                                <option value = "object"> object </option>
+                <li class="attribute clearfix">
+                    <div class="clearfix">
+                        <div class="attr-content">
+                            <input type="text" value="{{name}}" class="attr-name"/>
+                            <select class="attr-type">
+                                <option value="string"> string</option>
+                                <option value="int"> int</option>
+                                <option value="long"> long</option>
+                                <option value="float"> float</option>
+                                <option value="double"> double</option>
+                                <option value="bool"> bool</option>
+                                <option value="object"> object</option>
                             </select>
                         </div>
-                        <div class = "attr-nav"></div>
+                        <div class="attr-nav"></div>
                     </div>
-                    <label class = "error-message"></label>
+                    <label class="error-message"></label>
                 </li>
                 {{/each}}
             </div>
         </ul>
-        <button id="btn-add-attribute" class="btn btn-default"> + Attribute </button>
+        <button id="btn-add-attribute" class="btn btn-default"> + Attribute</button>
     </div>
 </script>
 
-<script id = "annotation-form-template" type = "text/x-handlebars-template">
+<script id="annotation-form-template" type="text/x-handlebars-template">
     <label>Annotations</label>
-    <div id = "annotation-div">
+    <div id="annotation-div">
         {{#if this}}
         <ul>
             {{#each this}}
@@ -1091,31 +1093,33 @@
         </ul>
         {{/if}}
     </div>
-    <button id = "btn-add-annotation" class = "btn btn-default"> + Annotation </button>
-    <button id = "btn-add-key-val" class = "btn btn-default" style = "display: none"> + Property </button>
-    <button id = "btn-del-annotation" class = "btn btn-default" style = "display: none"> Delete </button>
+    <button id="btn-add-annotation" class="btn btn-default"> + Annotation</button>
+    <button id="btn-add-key-val" class="btn btn-default" style="display: none"> + Property</button>
+    <button id="btn-del-annotation" class="btn btn-default" style="display: none"> Delete</button>
 </script>
 
-<script id = "recursiveAnnotationPartial" type = "text/template">
+<script id="recursiveAnnotationPartial" type="text/template">
     {{#if predefined}}
-    <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "{{class}}"> {{name}}
+    <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="{{class}}"> {{name}}
         <ul>
             {{#each elements}}
-            <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class="{{class}}"> {{name}}
+            <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="{{class}}"> {{name}}
                 <ul>
-                    <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
-                        class = "annotation-value"> {{defaultValue}} </li>
+                    <li data-jstree='{"icon":"/editor/commons/images/value.png"}'
+                        class="annotation-value"> {{defaultValue}}
+                    </li>
                 </ul>
             </li>
             {{/each}}
             {{else}}
-            <li data-jstree = '{"icon":"/editor/commons/images/annotation.png"}' class = "annotation"> {{name}}
+            <li data-jstree='{"icon":"/editor/commons/images/annotation.png"}' class="annotation"> {{name}}
                 <ul>
                     {{#each elements}}
-                    <li data-jstree = '{"icon":"/editor/commons/images/properties.png"}' class = "annotation-key"> {{key}}
+                    <li data-jstree='{"icon":"/editor/commons/images/properties.png"}' class="annotation-key"> {{key}}
                         <ul>
-                            <li data-jstree = '{"icon":"/editor/commons/images/value.png"}'
-                                class = "annotation-value"> {{value}} </li>
+                            <li data-jstree='{"icon":"/editor/commons/images/value.png"}'
+                                class="annotation-value"> {{value}}
+                            </li>
                         </ul>
                     </li>
                     {{/each}}
@@ -1131,7 +1135,7 @@
 </script>
 
 <script id="predefined-annotation-form-template" type="text/template">
-    <div class = "define-predefined-annotations">
+    <div class="define-predefined-annotations">
         {{#if this}}
         <div>
             {{#each this}}
@@ -1148,17 +1152,17 @@
     <div id="{{name}}-annotation">
         {{#if optional}}
         {{#if isChecked}}
-        <label class = "annotation-name optional-annotation">
-            <input type = "checkbox" class = "annotation-checkbox" checked> @{{name}}
+        <label class="annotation-name optional-annotation">
+            <input type="checkbox" class="annotation-checkbox" checked> @{{name}}
         </label>
         {{else}}
-        <label class = "annotation-name optional-annotation">
-            <input type = "checkbox" class = "annotation-checkbox"> @{{name}}
+        <label class="annotation-name optional-annotation">
+            <input type="checkbox" class="annotation-checkbox"> @{{name}}
         </label>
         {{/if}}
         {{else}}
-        <label class = "mandatory-annotation-symbol"> * </label>
-        <label class = "annotation-name mandatory-annotation">
+        <label class="mandatory-annotation-symbol"> * </label>
+        <label class="annotation-name mandatory-annotation">
             @{{name}}
         </label>
         {{/if}}
@@ -1167,7 +1171,7 @@
             {{else}}
             <div class="annotation-content" style="display: none">
                 {{/if}}
-                <div id = "{{name}}-options-div" class="annotation-options"> </div>
+                <div id="{{name}}-options-div" class="annotation-options"></div>
                 {{#if annotations}}
                 {{#each annotations}}
                 <div class="sub-annotation predefined-annotation">
@@ -1188,7 +1192,7 @@
 
     {{#ifSourceOrSink id}}
     <select id="{{id}}-type">
-        <option style = "display:none" disabled selected value > -- select a type -- </option>
+        <option style="display:none" disabled selected value> -- select a type --</option>
         {{else}}
         <select id="{{id}}-type">
             {{/ifSourceOrSink}}
@@ -1199,62 +1203,62 @@
         </select>
 </script>
 
-<script id = "source-sink-store-options-template" type = "text/template">
+<script id="source-sink-store-options-template" type="text/template">
     {{#if options}}
     <h4> Options </h4>
-    <div id = "{{id}}-options">
+    <div id="{{id}}-options">
         {{#ifSourceOrSinkOrStore id}}
-        <div class = "sub-{{id}}-options-div">
+        <div class="sub-{{id}}-options-div">
             {{/ifSourceOrSinkOrStore}}
             {{#each options}}
-            <div class = "option">
+            <div class="option">
                 {{#if optional}}
                 {{#if value}}
-                <div class = "clearfix">
-                    <label class = "option-name optional-option">
-                        <input type = "checkbox" class = "option-checkbox" checked> {{name}}
+                <div class="clearfix">
+                    <label class="option-name optional-option">
+                        <input type="checkbox" class="option-checkbox" checked> {{name}}
                     </label>
-                    <i class = "fw fw-info">
-                        <span style = "display:none"> {{description}} </span>
+                    <i class="fw fw-info">
+                        <span style="display:none"> {{description}} </span>
                     </i>
                 </div>
-                <div class = "clearfix">
-                    <input class = "option-value" type = "text" value = "{{value}}">
+                <div class="clearfix">
+                    <input class="option-value" type="text" value="{{value}}">
                 </div>
                 {{else}}
                 <div class="clearfix">
-                    <label class = "option-name optional-option">
-                        <input type = "checkbox" class = "option-checkbox"> {{name}}
+                    <label class="option-name optional-option">
+                        <input type="checkbox" class="option-checkbox"> {{name}}
                     </label>
-                    <i class = "fw fw-info">
-                        <span style = "display:none"> {{description}} </span>
+                    <i class="fw fw-info">
+                        <span style="display:none"> {{description}} </span>
                     </i>
                 </div>
                 <div class="clearfix">
-                    <input class = "option-value" type = "text" value="{{defaultValue}}" style ="display:none">
+                    <input class="option-value" type="text" value="{{defaultValue}}" style="display:none">
                 </div>
                 {{/if}}
-                <label class = "error-message"></label>
+                <label class="error-message"></label>
                 {{else}}
                 <div class="clearfix">
-                    <span class = "mandatory-symbol"> * </span>
-                    <label class = "option-name mandatory-option">
+                    <span class="mandatory-symbol"> * </span>
+                    <label class="option-name mandatory-option">
                         {{name}}
                     </label>
                     <i class="fw fw-info">
                         <span style="display:none"> {{description}} </span>
                     </i>
                 </div>
-                <div class = "clearfix">
-                    <input class = "option-value" type = "text" value = "{{value}}">
+                <div class="clearfix">
+                    <input class="option-value" type="text" value="{{value}}">
                 </div>
-                <label class = "error-message"></label>
+                <label class="error-message"></label>
                 {{/if}}
             </div>
             {{#ifSourceOrSinkOrStore ../id}}
             {{#if (isDivisor (sum @index 1) ../options)}}
         </div>
-        <div class = "sub-{{../id}}-options-div">
+        <div class="sub-{{../id}}-options-div">
             {{/if}}
             {{/ifSourceOrSinkOrStore}}
             {{/each}}
@@ -1263,72 +1267,73 @@
         {{/ifSourceOrSinkOrStore}}
         {{/if}}
     </div>
-    <div class = "customized-options" id = "customized-{{id}}-options">
+    <div class="customized-options" id="customized-{{id}}-options">
         <h4> Customized Options </h4>
-        <ul class = "cust-options">
+        <ul class="cust-options">
             {{#each customizedOptions}}
             <li class="option">
-                <div class = "clearfix">
+                <div class="clearfix">
                     <label> option.key </label>
                     <input type="text" class="cust-option-key" value="{{name}}">
                 </div>
-                <label class = "error-message"> </label>
-                <div class = "clearfix">
+                <label class="error-message"> </label>
+                <div class="clearfix">
                     <label> option.value </label>
-                    <input type = "text" class = "cust-option-value" value = "{{value}}">
-                    <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                    <input type="text" class="cust-option-value" value="{{value}}">
+                    <a class="btn-del-option"> <i class="fw fw-delete"> </i></a>
                 </div>
-                <label class = "error-message"></label>
+                <label class="error-message"></label>
             </li>
             {{/each}}
         </ul>
-        <button type = "button" class = "btn btn-default btn-add-options" id = "btn-add-{{id}}-options"> </button>
+        <button type="button" class="btn btn-default btn-add-options" id="btn-add-{{id}}-options"></button>
     </div>
 </script>
 
-<script id = "source-sink-map-attribute-template" type = "text/template">
-    <div id = "mapper-attributes">
+<script id="source-sink-map-attribute-template" type="text/template">
+    <div id="mapper-attributes">
         {{#ifId id "sink"}}
         <div class="clearfix" id="stream-attributes"></div>
         {{/ifId}}
-        <div class = "attribute-labels clearfix">
-            {{#if attributes.0.key }} <label class = "attribute-mapping-label"> Key </label> {{/if}}
-            <label class = "attribute-mapping-label"> Value </label>
+        <div class="attribute-labels clearfix">
+            {{#if attributes.0.key }} <label class="attribute-mapping-label"> Key </label> {{/if}}
+            <label class="attribute-mapping-label"> Value </label>
         </div>
         <div id="attributes">
             {{#each attributes}}
-            <div class = "attribute">
-                <div class = "clearfix">
+            <div class="attribute">
+                <div class="clearfix">
                     {{#if key}}
                     {{#ifId ../id "sink"}}
-                    <input type = "text" value = "{{key}}" class = "attr-key"/>
+                    <input type="text" value="{{key}}" class="attr-key"/>
                     {{else}}
-                    <input type = "text" value = "{{key}}" class = "attr-key" readonly/>
+                    <input type="text" value="{{key}}" class="attr-key" readonly/>
                     {{/ifId}}
-                    <input type = "text" value = "{{value}}" class = "attr-value"/>
+                    <input type="text" value="{{value}}" class="attr-value"/>
                     {{else}}
-                    <textarea class = "attr-value"> {{value}} </textarea>
+                    <textarea class="attr-value"> {{value}} </textarea>
                     {{/if}}
                 </div>
-                <label class = "error-message"></label>
+                <label class="error-message"></label>
             </div>
             {{/each}}
         </div>
-        <button type="button" class="btn btn-default" id="btn-add-payload-map" style="display:none"> + Key Value</button>
+        <button type="button" class="btn btn-default" id="btn-add-payload-map" style="display:none"> + Key Value
+        </button>
     </div>
 </script>
 
-<script id = "primary-index-annotation-template" type = "text/template">
+<script id="primary-index-annotation-template" type="text/template">
     <h4> Annotations </h4>
-    <div id = "primary-index-annotations">
+    <div id="primary-index-annotations">
         {{#each this}}
-        <div class = "clearfix annotation">
+        <div class="clearfix annotation">
             <div class="clearfix">
-                <label class = "annotation-name">
+                <label class="annotation-name">
                     {{#if isChecked}}
-                    <input type = "checkbox" class="annotation-checkbox" checked> @{{name}}
+                    <input type="checkbox" class="annotation-checkbox" checked> @{{name}}
                     {{else}}
-                    <input type = "checkbox" class="annotation-checkbox"> @{{name}}
+                    <input type="checkbox" class="annotation-checkbox"> @{{name}}
                     {{/if}}
                 </label>
             </div>
@@ -1339,16 +1344,16 @@
                     {{/if}}
                     <ul>
                         {{#each values}}
-                        <li class = "clearfix primary-index-annotation-value">
+                        <li class="clearfix primary-index-annotation-value">
                             <div class="clearfix">
-                                <input type = "text" value = "{{value}}" class = "annotation-value"/>
-                                <a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i></a>
+                                <input type="text" value="{{value}}" class="annotation-value"/>
+                                <a class="btn-del-annot-value"> <i class="fw fw-delete"> </i></a>
                             </div>
                             <label class="error-message"></label>
                         </li>
                         {{/each}}
                     </ul>
-                    <button type = "button" class = "btn btn-default btn-add-annot-value"> + Value </button>
+                    <button type="button" class="btn btn-default btn-add-annot-value"> + Value</button>
                 </div>
             </div>
             {{/each}}
@@ -1356,7 +1361,7 @@
     </div>
 </script>
 
-<script id="window-function-unknown-parameters-template" type = "text/template">
+<script id="window-function-unknown-parameters-template" type="text/template">
     {{#if predefinedParameters}}
     <div class="display-predefined-parameters">
         <div class="clearfix collapse-div" data-toggle="collapse" href="#predefined-param-content"
@@ -1364,16 +1369,16 @@
             <label class="parameter-label"> Supported Parameters </label>
             <a class="collapse-icon"> </a>
         </div>
-        <div class = "collapse" id ="predefined-param-content">
+        <div class="collapse" id="predefined-param-content">
             {{#each predefinedParameters}}
             <div class="predefined-param">
                 {{#if optional}}
-                <label class = "predefined-param-name clearfix"> {{name}}
+                <label class="predefined-param-name clearfix"> {{name}}
                     <span class="optional-label"> (optional) </span>
                 </label>
                 {{else}}
-                <label class = "clearfix predefined-param-name"> {{name}}
-                    <span class = "optional-label"> (mandatory)</span>
+                <label class="clearfix predefined-param-name"> {{name}}
+                    <span class="optional-label"> (mandatory)</span>
                 </label>
                 {{/if}}
                 <label class="clearfix predefined-param-desc"> {{description}} </label>
@@ -1384,40 +1389,40 @@
     {{/if}}
 
     {{#if parameters}}
-        <h4> Parameters </h4>
-    <div id = "{{id}}-unknown-parameters">
-        <div class = "sub-{{id}}-parameter-div">
+    <h4> Parameters </h4>
+    <div id="{{id}}-unknown-parameters">
+        <div class="sub-{{id}}-parameter-div">
             {{#each parameters}}
-            <div class = "parameter" id="{{name}}">
+            <div class="parameter" id="{{name}}">
                 {{#if optional}}
-                <div class = "clearfix">
-                    <label class = "parameter-name optional-parameter"> {{name}} </label>
+                <div class="clearfix">
+                    <label class="parameter-name optional-parameter"> {{name}} </label>
                 </div>
                 {{else}}
                 <div class="clearfix">
-                    <span class = "mandatory-symbol"> * </span>
-                    <label class = "parameter-name mandatory-parameter"> {{name}} </label>
+                    <span class="mandatory-symbol"> * </span>
+                    <label class="parameter-name mandatory-parameter"> {{name}} </label>
                 </div>
                 {{/if}}
                 {{#if isMultiValue}}
-                    <div class = "clearfix param-content attribute-param">
+                <div class="clearfix param-content attribute-param">
                     {{#each value}}
-                        <div class="attribute-param-value">
-                            <input class = "parameter-value" type = "text" value = "{{this}}">
-                            <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
-                        </div>
+                    <div class="attribute-param-value">
+                        <input class="parameter-value" type="text" value="{{this}}">
+                        <a class="btn-del-option"> <i class="fw fw-delete"> </i></a>
+                    </div>
                     {{/each}}
-                    </div>
+                </div>
                 {{else}}
-                    <div class = "clearfix param-content">
-                    <input class = "parameter-value" type = "text" value = "{{value}}">
-                    </div>
+                <div class="clearfix param-content">
+                    <input class="parameter-value" type="text" value="{{value}}">
+                </div>
                 {{/if}}
-                <label class = "error-message"></label>
+                <label class="error-message"></label>
             </div>
             {{#if (isDivisor (sum @index 1) ../parameters)}}
-                </div>
-                <div class = "sub-{{../id}}-parameter-div">
+        </div>
+        <div class="sub-{{../id}}-parameter-div">
             {{/if}}
             {{/each}}
         </div>
@@ -1425,24 +1430,24 @@
     {{/if}}
 </script>
 
-<script id="window-function-parameters-template" type = "text/template">
+<script id="window-function-parameters-template" type="text/template">
     {{#if parameters}}
     <h4> Parameters </h4>
-    <div id = "{{id}}-parameters">
-        <div class = "sub-{{id}}-parameter-div">
+    <div id="{{id}}-parameters">
+        <div class="sub-{{id}}-parameter-div">
             {{#each parameters}}
-            <div class = "parameter" id="{{name}}-parameter">
+            <div class="parameter" id="{{name}}-parameter">
                 {{#if optional}}
-                <div class = "clearfix">
-                    <label class = "parameter-name optional-parameter">{{name}} </label>
-                    <i class = "fw fw-info">
-                        <span style = "display:none"> {{description}} </span>
+                <div class="clearfix">
+                    <label class="parameter-name optional-parameter">{{name}} </label>
+                    <i class="fw fw-info">
+                        <span style="display:none"> {{description}} </span>
                     </i>
                 </div>
                 {{else}}
                 <div class="clearfix">
-                    <span class = "mandatory-symbol"> * </span>
-                    <label class = "parameter-name mandatory-parameter">
+                    <span class="mandatory-symbol"> * </span>
+                    <label class="parameter-name mandatory-parameter">
                         {{name}}
                     </label>
                     <i class="fw fw-info">
@@ -1450,25 +1455,25 @@
                     </i>
                 </div>
                 {{/if}}
-                    {{#if isMultiValue}}
-                    <div class = "param-content attribute-param clearfix">
+                {{#if isMultiValue}}
+                <div class="param-content attribute-param clearfix">
                     {{#each value}}
-                        <div class="attribute-param-value">
-                            <input class = "parameter-value" type = "text" value = "{{this}}">
-                            <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
-                        </div>
+                    <div class="attribute-param-value">
+                        <input class="parameter-value" type="text" value="{{this}}">
+                        <a class="btn-del-option"> <i class="fw fw-delete"> </i></a>
+                    </div>
                     {{/each}}
-                    </div>
-                    {{else}}
-                    <div class = "param-content clearfix">
-                    <input class = "parameter-value" type = "text" value = "{{value}}">
-                    </div>
-                    {{/if}}
-                <label class = "error-message"></label>
+                </div>
+                {{else}}
+                <div class="param-content clearfix">
+                    <input class="parameter-value" type="text" value="{{value}}">
+                </div>
+                {{/if}}
+                <label class="error-message"></label>
             </div>
             {{#if (isDivisor (sum @index 1) ../parameters)}}
         </div>
-        <div class = "sub-{{../id}}-parameter-div">
+        <div class="sub-{{../id}}-parameter-div">
             {{/if}}
             {{/each}}
         </div>
@@ -1476,19 +1481,19 @@
     {{/if}}
 </script>
 
-<script id="partition-by-template" type = "text/template">
+<script id="partition-by-template" type="text/template">
     <label> Partition By </label>
     <div class="clearfix">
-        <label class = "partition-by-label"> Expression </label>
-        <label class = "partition-by-label"> Stream Name </label>
+        <label class="partition-by-label"> Expression </label>
+        <label class="partition-by-label"> Stream Name </label>
     </div>
-    <div id = "partition-by-content">
+    <div id="partition-by-content">
         {{#each this}}
         <div class="partition-key">
             <div class="clearfix">
-                <div class="partition-expression"> {{> renderDropDown streamAttributes}} </div>
+                <div class="partition-expression"> {{> renderDropDown streamAttributes}}</div>
                 <div class="partition-stream-name">
-                    <input type = "text" class="partition-by-stream-name" value="{{streamName}}" readonly>
+                    <input type="text" class="partition-by-stream-name" value="{{streamName}}" readonly>
                 </div>
             </div>
             <label class="error-message"></label>
@@ -1497,12 +1502,12 @@
     </div>
 </script>
 
-<script id="aggregate-projection-template" type = "text/template">
+<script id="aggregate-projection-template" type="text/template">
     <label class="clearfix"> <span class="mandatory-symbol"> * </span> Select </label>
     <select class="attribute-selection-type clearfix">
-        <option style = "display:none" disabled selected value> -- select a value --</option>
-        <option value="all"> All Attributes </option>
-        <option value="user_defined"> User Defined Attributes </option>
+        <option style="display:none" disabled selected value> -- select a value --</option>
+        <option value="all"> All Attributes</option>
+        <option value="user_defined"> User Defined Attributes</option>
     </select>
     <label class="error-message"> Value is required </label>
     <div class="define-user-defined-attributes">
@@ -1511,24 +1516,24 @@
             <li class="attribute">
                 <div class="clearfix">
                     <div class="clearfix">
-                        <input type="text" class = "attribute-expression name" value="{{this}}">
-                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                        <input type="text" class="attribute-expression name" value="{{this}}">
+                        <a class="btn-del-option"> <i class="fw fw-delete"> </i></a>
                     </div>
-                    <label class = "error-message"></label>
+                    <label class="error-message"></label>
                 </div>
             </li>
             {{/each}}
         </ul>
-        <button class="btn btn-default btn-add-user-defined-attribute"> + Attribute </button>
+        <button class="btn btn-default btn-add-user-defined-attribute"> + Attribute</button>
     </div>
 </script>
 
-<script id="query-projection-template" type = "text/template">
+<script id="query-projection-template" type="text/template">
     <label class="clearfix"> <span class="mandatory-symbol"> * </span> Select </label>
     <select class="attribute-selection-type clearfix">
-        <option style = "display:none" disabled selected value> ---- select a value ----</option>
-        <option value="all"> All Attributes </option>
-        <option value="user_defined"> User Defined Attributes </option>
+        <option style="display:none" disabled selected value> ---- select a value ----</option>
+        <option value="all"> All Attributes</option>
+        <option value="user_defined"> User Defined Attributes</option>
     </select>
     <label class="error-message"> Value is required </label>
     <div class="define-user-defined-attributes">
@@ -1541,10 +1546,10 @@
             <li class="attribute">
                 <div class="clearfix">
                     <div class="clearfix">
-                        <input type="text" class = "attribute-expression" value="{{expression}}">
-                        <input type = "text" class = "attribute-as" value="{{as}}" readonly>
+                        <input type="text" class="attribute-expression" value="{{expression}}">
+                        <input type="text" class="attribute-as" value="{{as}}" readonly>
                     </div>
-                    <label class = "error-message"></label>
+                    <label class="error-message"></label>
                 </div>
             </li>
             {{/each}}
@@ -1552,17 +1557,17 @@
     </div>
 </script>
 
-<script id = "drop-down-template" type="text/template">
+<script id="drop-down-template" type="text/template">
     <select class="{{id}}-selection">
-        <option style = "display:none" disabled selected value> -- select a value --</option>
+        <option style="display:none" disabled selected value> -- select a value --</option>
         {{#each options}}
-        <option value="{{this}}"> {{this}} </option>
+        <option value="{{this}}"> {{this}}</option>
         {{/each}}
     </select>
 </script>
 
-<script id="group-by-template" type = "text/template">
-    <label> <input type = "checkbox" class="group-by-checkbox"> Group By Attributes </label>
+<script id="group-by-template" type="text/template">
+    <label> <input type="checkbox" class="group-by-checkbox"> Group By Attributes </label>
     <div class="group-by-content order-group-by-content">
         <ul class="group-by-attributes">
             {{#each groupBy}}
@@ -1572,19 +1577,19 @@
                         <div class="define-attribute-drop-down">
                             {{> renderDropDown ../possibleGroupByAttributes}}
                         </div>
-                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                        <a class="btn-del-option"> <i class="fw fw-delete"> </i></a>
                     </div>
                 </div>
                 <label class="error-message"> </label>
             </li>
             {{/each}}
         </ul>
-        <button class="btn btn-default btn-add-group-by-attribute"> + Attribute </button>
+        <button class="btn btn-default btn-add-group-by-attribute"> + Attribute</button>
     </div>
 </script>
 
 <script id="order-by-template" type="text/template">
-    <label> <input type = "checkbox" class="order-by-checkbox"> Order By Attributes </label>
+    <label> <input type="checkbox" class="order-by-checkbox"> Order By Attributes </label>
     <div class="order-by-content order-group-by-content">
         <ul class="order-by-attributes">
             {{#each orderBy}}
@@ -1596,10 +1601,10 @@
                         </div>
                         <div class="define-order-del">
                             <select class="order-selection">
-                                <option value="asc"> asc </option>
-                                <option value="desc"> desc </option>
+                                <option value="asc"> asc</option>
+                                <option value="desc"> desc</option>
                             </select>
-                            <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                            <a class="btn-del-option"> <i class="fw fw-delete"> </i></a>
                         </div>
                     </div>
                 </div>
@@ -1607,11 +1612,11 @@
             </li>
             {{/each}}
         </ul>
-        <button class="btn btn-default btn-add-order-by-attribute"> + Attribute </button>
+        <button class="btn btn-default btn-add-order-by-attribute"> + Attribute</button>
     </div>
 </script>
 
-<script id="aggregation-by-interval-template" type = "text/template">
+<script id="aggregation-by-interval-template" type="text/template">
     <div class="interval-content">
         <div class="clearfix">
             {{#each this}}
@@ -1620,7 +1625,7 @@
             </label>
             {{#if (isDivisor (sum @index 1) ../this)}}
         </div>
-        <div class = "interval-content">
+        <div class="interval-content">
             {{/if}}
             {{/each}}
         </div>
@@ -1628,8 +1633,8 @@
     </div>
 </script>
 
-<script id="aggregation-form-template" type = "text/template">
-    <div class = "aggregation-form-container">
+<script id="aggregation-form-template" type="text/template">
+    <div class="aggregation-form-container">
         <h3> Aggregation Meta Information </h3>
         <div id="aggregation-name-div" class="aggregation-info">
             <label> <span class="mandatory-symbol"> * </span> Name </label>
@@ -1638,46 +1643,46 @@
         </div>
         <div id="aggregation-from-div" class="aggregation-info">
             <label> From </label>
-            <input type = "text" id="aggregation-from" class="clearfix name" value="{{from}}" readonly>
+            <input type="text" id="aggregation-from" class="clearfix name" value="{{from}}" readonly>
         </div>
         <div id="define-aggregate-annotations">
             <h4> Annotations </h4>
             <div class="define-store-annotation">
-                <label><input type = "checkbox" class="store-annotation-checkbox"> @store </label>
-                <div class = "store-content">
-                    <div id="define-store"> </div>
-                    <div id = "define-rdbms-type"> </div>
-                    <div id ="store-options-div"> </div>
+                <label><input type="checkbox" class="store-annotation-checkbox"> @store </label>
+                <div class="store-content">
+                    <div id="define-store"></div>
+                    <div id="define-rdbms-type"></div>
+                    <div id="store-options-div"></div>
                 </div>
             </div>
-            <div class="define-index-annotation"> </div>
-            <div class ="define-predefined-aggregation-annotation"> </div>
-            <div class="define-user-defined-annotations"> </div>
+            <div class="define-index-annotation"></div>
+            <div class="define-predefined-aggregation-annotation"></div>
+            <div class="define-user-defined-annotations"></div>
         </div>
     </div>
-    <div class = "aggregation-form-container">
+    <div class="aggregation-form-container">
         <h3> Projection </h3>
-        <div class = "define-select"> </div>
-        <div class="define-group-by-attributes"> </div>
+        <div class="define-select"></div>
+        <div class="define-group-by-attributes"></div>
     </div>
-    <div class = "aggregation-form-container">
-        <div id = "define-aggregate-by">
+    <div class="aggregation-form-container">
+        <div id="define-aggregate-by">
             <h3> Aggregation Criteria </h3>
-            <div id ="aggregate-by-time-period" class="aggregate-by-content">
-                <h4> <span class="mandatory-symbol"> * </span> By Time Period </h4>
+            <div id="aggregate-by-time-period" class="aggregate-by-content">
+                <h4><span class="mandatory-symbol"> * </span> By Time Period </h4>
                 <select class="aggregate-by-time-period-selection">
-                    <option value="interval"> Interval </option>
-                    <option value="range"> Range </option>
+                    <option value="interval"> Interval</option>
+                    <option value="range"> Range</option>
                 </select>
             </div>
-            <div class="aggregate-by-time-period-content"> </div>
+            <div class="aggregate-by-time-period-content"></div>
             <div id="aggregate-by-attribute" class="aggregate-by-content">
                 <div class="clearfix">
                     <label>
-                        <input type = "checkbox" id="aggregate-by-attribute-checkbox"> By Attribute
+                        <input type="checkbox" id="aggregate-by-attribute-checkbox"> By Attribute
                     </label>
-                    <i class = "fw fw-info">
-                        <span style = "display:none"> Attribute of timestamp is required </span>
+                    <i class="fw fw-info">
+                        <span style="display:none"> Attribute of timestamp is required </span>
                     </i>
                 </div>
                 <div class="aggregate-by-attribute-content clearfix">
@@ -1689,28 +1694,28 @@
     </div>
 </script>
 
-<script id="join-query-form-template" type = "text/template">
-    <div class = "join-query-form-container">
+<script id="join-query-form-template" type="text/template">
+    <div class="join-query-form-container">
         <h3> Query Meta Information </h3>
         <div class="query-name-div">
             <label> Name </label>
-            <input type="text"  class="clearfix query-name name" value="{{name}}">
+            <input type="text" class="clearfix query-name name" value="{{name}}">
             <label class="error-message"> </label>
         </div>
-        <div class ="define-annotations">
+        <div class="define-annotations">
             <h4> Annotations </h4>
-            <div class ="define-predefined-annotations"> </div>
+            <div class="define-predefined-annotations"></div>
             <div class="define-user-defined-annotations"></div>
         </div>
     </div>
-    <div class = "join-query-form-container">
+    <div class="join-query-form-container">
         <h3> Input </h3>
         <div class="query-input-container">
             <div class="define-left-source define-source"></div>
             <div class="define-join-type">
                 <div class="join-type-div">
                     <label class="clearfix"> Join Type </label>
-                    <div class="define-join-type-selection clearfix"> </div>
+                    <div class="define-join-type-selection clearfix"></div>
                     <label class="error-message"> Value is required </label>
                 </div>
             </div>
@@ -1720,17 +1725,18 @@
                     <input type="checkbox" class="on-condition-checkbox query-checkbox"> On Condition
                 </label>
                 <div class="on-condition-content query-content">
-                    <input type="text"  class="clearfix name on-condition-value query-content-value symbol-syntax-required-value">
+                    <input type="text"
+                           class="clearfix name on-condition-value query-content-value symbol-syntax-required-value">
                     <label class="error-message"> </label>
                 </div>
             </div>
-            <div class="define-aggregate-per-within-condition"> </div>
+            <div class="define-aggregate-per-within-condition"></div>
         </div>
     </div>
-    <div class = "join-query-form-container">
+    <div class="join-query-form-container">
         <h3> Projection </h3>
-        <div class = "define-select"> </div>
-        <div class="define-group-by-attributes"> </div>
+        <div class="define-select"></div>
+        <div class="define-group-by-attributes"></div>
         <div class="define-having-condition define-content">
             <label>
                 <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
@@ -1743,25 +1749,25 @@
         </div>
     </div>
     <div class="join-query-form-container">
-        <div class="define-query-output"> </div>
+        <div class="define-query-output"></div>
     </div>
 </script>
 
-<script id="query-output-template" type = "text/template">
+<script id="query-output-template" type="text/template">
     <h3> Output </h3>
-    <div class="define-order-by-attributes"> </div>
+    <div class="define-order-by-attributes"></div>
     {{#each outputConfig}}
-    <div class = "define-{{name}} define-content">
+    <div class="define-{{name}} define-content">
         <div class="clearfix">
             <label>
                 <input type="checkbox" class="{{name}}-checkbox query-checkbox"> {{addTitle name}}
             </label>
-            <i class = "fw fw-info">
-                <span style = "display:none"> {{description}} </span>
+            <i class="fw fw-info">
+                <span style="display:none"> {{description}} </span>
             </i>
         </div>
         <div class="{{name}}-content query-content">
-            <input type="text"  class="clearfix {{name}}-value query-content-value name">
+            <input type="text" class="clearfix {{name}}-value query-content-value name">
             <label class="error-message"> </label>
         </div>
     </div>
@@ -1771,12 +1777,12 @@
     </div>
     <div class="define-query-into define-output-content">
         <label> Into </label>
-        <input type = "text" class="clearfix name query-into" value="{{into}}" readonly>
+        <input type="text" class="clearfix name query-into" value="{{into}}" readonly>
     </div>
-    <div class="define-output-events define-output-content"> </div>
+    <div class="define-output-events define-output-content"></div>
 </script>
 
-<script id="store-query-output-template" type = "text/template">
+<script id="store-query-output-template" type="text/template">
     <div class="define-query-operation-types">
         {{> renderDropDown possibleOperations}}
     </div>
@@ -1785,8 +1791,8 @@
         <label> <input type="checkbox" class="set-checkbox"> Set </label>
         <div class="set-content">
             <div class="clearfix">
-                <label class = "set-attribute-label"> Attribute </label>
-                <label class = "set-attribute-label"> Value </label>
+                <label class="set-attribute-label"> Attribute </label>
+                <label class="set-attribute-label"> Value </label>
             </div>
             <ul class="set-condition">
                 {{#each set}}
@@ -1794,13 +1800,13 @@
                     <div class="clearfix">
                         <input type="text" class="setAttribute" value="{{attribute}}">
                         <input type="text" class="setValue" value="{{value}}">
-                        <a class = "btn-del-option"> <i class = "fw fw-delete"> </i></a>
+                        <a class="btn-del-option"> <i class="fw fw-delete"> </i></a>
                     </div>
                     <label class="error-message"> </label>
                 </li>
                 {{/each}}
             </ul>
-            <button class="btn btn-default btn-add-set"> + Set </button>
+            <button class="btn btn-default btn-add-set"> + Set</button>
         </div>
     </div>
 
@@ -1811,55 +1817,55 @@
     </div>
 </script>
 
-<script id="query-source-form-template" type = "text/template">
+<script id="query-source-form-template" type="text/template">
     <div class="clearfix collapse-div" data-toggle="collapse" href="#join-{{type}}-content"
          aria-controls="join-{{type}}-content" aria-expanded="false">
         <label> {{addTitle type}}</label>
         <a class="collapse-icon"> </a>
     </div>
-    <div class = "{{type}}-source-content collapse join-source-content" id ="join-{{type}}-content">
+    <div class="{{type}}-source-content collapse join-source-content" id="join-{{type}}-content">
         <div class="input-from">
             <label class="clearfix"> <span class="mandatory-symbol"> * </span> Input From </label>
-            <div class="input-from-drop-down"> </div>
+            <div class="input-from-drop-down"></div>
         </div>
         <div class="define-as define-content">
             <label>
                 <input type="checkbox" class="source-as-checkbox query-checkbox"> As
             </label>
             <div class="source-as-content query-content">
-                <input type="text"  class="clearfix as-content-value query-content-value">
+                <input type="text" class="clearfix as-content-value query-content-value">
                 <label class="error-message"> </label>
             </div>
         </div>
         <div class="define-unidirectional">
-            <label class = "clearfix">
+            <label class="clearfix">
                 <input type="checkbox" class="is-unidirectional-checkbox"> Is Unidirectional
             </label>
             <label class="error-message"></label>
         </div>
         <div class="define-stream-handler">
             <label> <input type="checkbox" class="stream-handler-checkbox"> Stream Handler </label>
-            <div class="define-stream-handler-section"> </div>
-            <div class = "define-stream-handler-buttons">
-                <button class="btn btn-default btn-add-filter"> + Filter </button>
-                <button class="btn btn-default btn-add-function"> + Function </button>
-                <button class="btn btn-default btn-add-window"> + Window </button>
+            <div class="define-stream-handler-section"></div>
+            <div class="define-stream-handler-buttons">
+                <button class="btn btn-default btn-add-filter"> + Filter</button>
+                <button class="btn btn-default btn-add-function"> + Function</button>
+                <button class="btn btn-default btn-add-window"> + Window</button>
             </div>
         </div>
     </div>
 </script>
 
-<script id="pattern-sequence-query-form-template" type = "text/template">
+<script id="pattern-sequence-query-form-template" type="text/template">
     <div class="pattern-sequence-query-form-container">
         <h3> Query Meta Information</h3>
         <div class="query-name-div">
             <label> Name </label>
-            <input type="text"  class="clearfix query-name name" value="{{name}}">
+            <input type="text" class="clearfix query-name name" value="{{name}}">
             <label class="error-message"> </label>
         </div>
-        <div class ="define-annotations">
+        <div class="define-annotations">
             <h4> Annotations </h4>
-            <div class ="define-predefined-annotations"> </div>
+            <div class="define-predefined-annotations"></div>
             <div class="define-user-defined-annotations"></div>
         </div>
     </div>
@@ -1869,8 +1875,8 @@
             <div class="define-conditions">
                 <label class="clearfix"> <span class="mandatory-symbol"> * </span> Conditions </label>
                 <div class="condition-container">
-                    <ul class="nav nav-tabs"> </ul>
-                    <div class="tab-content"> </div>
+                    <ul class="nav nav-tabs"></ul>
+                    <div class="tab-content"></div>
                 </div>
             </div>
             <div class="define-logic-statement define-content">
@@ -1882,10 +1888,10 @@
             </div>
         </div>
     </div>
-    <div class = "pattern-sequence-query-form-container">
+    <div class="pattern-sequence-query-form-container">
         <h3> Projection </h3>
-        <div class = "define-select"> </div>
-        <div class="define-group-by-attributes"> </div>
+        <div class="define-select"></div>
+        <div class="define-group-by-attributes"></div>
         <div class="define-having-condition define-content">
             <label>
                 <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
@@ -1898,12 +1904,12 @@
         </div>
     </div>
     <div class="pattern-sequence-query-form-container">
-        <div class="define-query-output"> </div>
+        <div class="define-query-output"></div>
     </div>
 </script>
 
-<script id ="stream-handler-form-template" type = "text/template">
-    <ul class = "stream-handler-list">
+<script id="stream-handler-form-template" type="text/template">
+    <ul class="stream-handler-list">
         {{#each streamHandlerList}}
         <li class="define-stream-handler-content">
             <div>
@@ -1912,14 +1918,14 @@
                     <label class="clearfix">
                         <span class="mandatory-symbol"> * </span> Type <a class="collapse-icon"> </a>
                     </label>
-                    <div class = "define-stream-handler-type"> {{> renderDropDown ../types}} </div>
+                    <div class="define-stream-handler-type"> {{> renderDropDown ../types}}</div>
                 </div>
                 <div class="collapse" id="{{@index}}-{{../className}}-stream-handler-content">
                     <div class="clearfix">
-                        <div class = "define-stream-handler-type-content"> </div>
-                        <div class = "attr-nav"> </div>
+                        <div class="define-stream-handler-type-content"></div>
+                        <div class="attr-nav"></div>
                     </div>
-                    <label class = "error-message"> </label>
+                    <label class="error-message"> </label>
                 </div>
             </div>
         </li>
@@ -1927,17 +1933,18 @@
     </ul>
 </script>
 
-<script id="pattern-sequence-condition-navigation-form-template" type = "text/template">
+<script id="pattern-sequence-condition-navigation-form-template" type="text/template">
     <li class="condition-navigation">
         <a href=".define-{{conditionId}}-source" data-toggle="tab"> {{conditionId}}
-            <button type="button" class="close btn-del-condition" name="delete" data-form-type="single" aria-label="Close">
+            <button type="button" class="close btn-del-condition" name="delete" data-form-type="single"
+                    aria-label="Close">
                 <i class="fw fw-cancel"></i>
             </button>
         </a>
     </li>
 </script>
 
-<script id="pattern-sequence-condition-content-form-template" type = "text/template">
+<script id="pattern-sequence-condition-content-form-template" type="text/template">
     <div class="ws-tab-pane condition-content define-source define-{{condition.conditionId}}-source">
         <div class="define-source">
             <label class="clearfix"> Condition ID </label>
@@ -1950,49 +1957,49 @@
             </div>
             <div class="define-stream-handler">
                 <label> <input type="checkbox" class="stream-handler-checkbox"> Stream Handler </label>
-                <div class="define-stream-handler-section"> </div>
-                <div class = "define-stream-handler-buttons">
-                    <button class="btn btn-default btn-add-filter"> + Filter </button>
-                    <button class="btn btn-default btn-add-function"> + Function </button>
+                <div class="define-stream-handler-section"></div>
+                <div class="define-stream-handler-buttons">
+                    <button class="btn btn-default btn-add-filter"> + Filter</button>
+                    <button class="btn btn-default btn-add-function"> + Function</button>
                 </div>
             </div>
         </div>
     </div>
 </script>
 
-<script id = "window-filter-projection-query-form-template" type="text/template">
+<script id="window-filter-projection-query-form-template" type="text/template">
     <div class="query-form-container">
         <h3> Query Meta Information </h3>
         <div class="query-name-div">
             <label> Name </label>
-            <input type="text"  class="clearfix query-name name" value="{{name}}">
+            <input type="text" class="clearfix query-name name" value="{{name}}">
             <label class="error-message"> </label>
         </div>
         <div class="query-from-div">
             <label> From </label>
-            <input type = "text" class="clearfix name query-from" value="{{from}}" readonly>
+            <input type="text" class="clearfix name query-from" value="{{from}}" readonly>
         </div>
         <div class="define-query-source define-source">
             <div class="define-stream-handler">
                 <label> <input type="checkbox" class="stream-handler-checkbox"> Stream Handler </label>
-                <div class="define-stream-handler-section"> </div>
-                <div class = "define-stream-handler-buttons">
-                    <button class="btn btn-default btn-add-filter"> + Filter </button>
-                    <button class="btn btn-default btn-add-function"> + Function </button>
-                    <button class="btn btn-default btn-add-window"> + Window </button>
+                <div class="define-stream-handler-section"></div>
+                <div class="define-stream-handler-buttons">
+                    <button class="btn btn-default btn-add-filter"> + Filter</button>
+                    <button class="btn btn-default btn-add-function"> + Function</button>
+                    <button class="btn btn-default btn-add-window"> + Window</button>
                 </div>
             </div>
         </div>
-        <div class ="define-annotations">
+        <div class="define-annotations">
             <h4> Annotations </h4>
-            <div class ="define-predefined-annotations"> </div>
+            <div class="define-predefined-annotations"></div>
             <div class="define-user-defined-annotations"></div>
         </div>
     </div>
     <div class="query-form-container">
         <h3> Projection </h3>
-        <div class = "define-select"> </div>
-        <div class="define-group-by-attributes"> </div>
+        <div class="define-select"></div>
+        <div class="define-group-by-attributes"></div>
         <div class="define-having-condition define-content">
             <label>
                 <input type="checkbox" class="having-checkbox query-checkbox"> Having condition
@@ -2005,7 +2012,7 @@
         </div>
     </div>
     <div class="query-form-container">
-        <div class="define-query-output"> </div>
+        <div class="define-query-output"></div>
     </div>
 </script>
 
@@ -2085,7 +2092,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal" id="saveSettingsButton">Close</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="saveSettingsButton">Close
+                </button>
             </div>
         </div>
     </div>
@@ -2153,21 +2161,33 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden='true'>&times;</span>
                 </button>
-                <h4 class="modal-title file-dialog-title text-center" id="whereToStart">Welcome to the Siddhi Editor Tour Guide</h4>
+                <h4 class="modal-title file-dialog-title text-center" id="whereToStart">Welcome to the Siddhi Editor
+                    Tour Guide</h4>
                 <hr class="style1">
                 <div class="divider"></div>
             </div>
             <div class="modal-body">
-                <div class="text-center"><p>For the complete tour from application design to test simulation, click <b>Complete Tour.</b>
-                    <br>To skip the application creation tour and move on to the test simulation tour, click <b>Simulation Tour.</b>
-                    <br>To use samples, click <b>Samples.</b> You can always try the guide using <b>Tools menu.</b></p><br></div>
+                <div class="text-center"><p>For the complete tour from application design to test simulation, click <b>Complete
+                    Tour.</b>
+                    <br>To skip the application creation tour and move on to the test simulation tour, click <b>Simulation
+                        Tour.</b>
+                    <br>To use samples, click <b>Samples.</b> You can always try the guide using <b>Tools menu.</b></p>
+                    <br></div>
                 <div class="row">
                     <div class="col-sm-4">
-                        <button class="btn btn-block btn-lg btn-primary tour-guide-button" id="fullGuide">Complete tour</button></div>
+                        <button class="btn btn-block btn-lg btn-primary tour-guide-button" id="fullGuide">Complete
+                            tour
+                        </button>
+                    </div>
                     <div class="col-sm-4">
-                        <button class="btn btn-block btn-lg btn-primary tour-guide-button" id="simulationGuide">Simulation tour</button></div>
+                        <button class="btn btn-block btn-lg btn-primary tour-guide-button" id="simulationGuide">
+                            Simulation tour
+                        </button>
+                    </div>
                     <div class="col-sm-4">
-                        <button class="btn btn-block btn-lg btn-primary tour-guide-button" id="sampleGuide">Samples</button></div>
+                        <button class="btn btn-block btn-lg btn-primary tour-guide-button" id="sampleGuide">Samples
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2240,13 +2260,13 @@
             <h3>Operators</h3>
             <div class="form-group">
                 <input type="text" class="form-control" id="operator-search-input-field"
-                       placeholder="Search operators..." />
+                       placeholder="Search operators..."/>
             </div>
             <div class="results nano">
                 <div class="result-content nano-content"></div>
             </div>
         </div>
-        <input type="text" class="copyable-text" />
+        <input type="text" class="copyable-text"/>
     </div>
 </script>
 
@@ -2257,37 +2277,71 @@
             <h3>Deploy Siddhi App Template</h3>
 
             <form role="form" class="single-event-form" data-form-type="single" data-toggle="loading"
-              data-loading-style="overlay" data-loading-text="Sending event">
-            <div class="form-group">
-                <label>
-                    Select Templated App Name
-                </label>
-                <select name="template-siddhi-app-name" class="form-control" id="template-app-name-select">
+                  data-loading-style="overlay" data-loading-text="Sending event">
+                <div class="form-group">
+                    <button type="button" class="btn btn-primary"  id="refreshAttributes"
+                        style="right: 10px; top: 10px; position: absolute"
+                    >
+                        <i class="fw fw-refresh fw-lg"></i>
+                    </button>
 
-                </select>
-
-                <div id="template-attr-container" class="form-group">
-                    <table class="table table-responsive" id="template-attr-table">
-                        <thead>
+                    <div id="used-template-attr-container" class="form-group hidden">
+                        <label>
+                            Template Variables used in Apps
+                        </label>
+                        <table class="table table-responsive" id="template-attr-table">
+                            <thead>
                             <th width="100%">
-                                <label>Template Attributes</label>
                             </th>
-                        </thead>
-                        <tbody id="template-attr-table-body">
-                            <tr>
-                                <td><label style="opacity: 0.6">Please select a Siddhi app with template place holders</label></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                            </thead>
+                            <tbody id="template-attr-table-body">
 
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary" name="send" id="fill-and-send">
-                    Set
-                </button>
-            </div>
-        </form>
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                    <div id="unused-template-attr-container" class="form-group hidden">
+
+                        <label>
+                            Unused Template variables
+                        </label>
+
+                        <table class="table table-responsive" id="unused-template-attr-table">
+                            <thead>
+                            <th width="85%">
+                                <button type="button" class="btn btn-primary" id="unused-template-clear"
+                                        style="right: 20px; position: absolute; height: 28px"
+                                >
+                                    Clear all
+                                </button>
+                            </th>
+                            <th width="15%">
+
+                            </th>
+                            </thead>
+                            <tbody id="unused-template-attr-table-body">
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="template-attr-info" class="form-group">
+                        <table class="table table-responsive">
+                            <thead>
+                            <th width="100%">
+                            </th>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><label style="opacity: 0.6">No template attributes are defined</label></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </form>
         </div>
     </div>
 </script>
@@ -2346,7 +2400,7 @@
             <i class="fw fw-cancel about-dialog-close"></i>
         </button>
         <h3 class="modal-title" id="operator-name" data-index="{{index}}">{{fqn}}</h3>
-        <hr />
+        <hr/>
     </div>
     <div class="modal-body add-margin-top-2x add-margin-bottom-2x">
         <div class="operator-details-content nano">
@@ -2402,7 +2456,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <input type="text" class="copyable-text" />
+        <input type="text" class="copyable-text"/>
         <span class="copy-status-msg" style="display: none">Copied to Clipboard!</span>
         <button type="button" class="btn btn-primary" id="btn-copy-to-clipboard">
             <i class="fw fw-copy"></i> Copy to Clipboard
@@ -2429,18 +2483,30 @@
                 <hr class='export-dialog-hr'>
             </div>
             <div class='modal-body'>
-                <div id='export-form' class="clearfix" >
+                <div id='export-form' class="clearfix">
                     <ul id="form-steps" class="k8_export_header_item">
-                        <li><a href="#step-1" class="link-disabled">Step 1<br/><small>Select Siddhi Apps</small></a></li>
-                        <li><a href="#step-2" class="link-disabled">Step 2<br/><small>Template Siddhi Apps</small></a></li>
-                        <li><a href="#step-3" class="link-disabled">Step 3<br/><small>Update Siddhi Runner<br/>Configurations</small></a></li>
-                        <li><a href="#step-4" class="link-disabled">Step 4<br/><small>Populate arguments <br/>template</small></a></li>
-                        <li><a href="#step-5" class="link-disabled">Step 5<br/><small>Bundle additional <br/>dependencies</small></a></li>
+                        <li><a href="#step-1" class="link-disabled">Step 1<br/>
+                            <small>Select Siddhi Apps</small>
+                        </a></li>
+                        <li><a href="#step-2" class="link-disabled">Step 2<br/>
+                            <small>Template Siddhi Apps</small>
+                        </a></li>
+                        <li><a href="#step-3" class="link-disabled">Step 3<br/>
+                            <small>Update Siddhi Runner<br/>Configurations</small>
+                        </a></li>
+                        <li><a href="#step-4" class="link-disabled">Step 4<br/>
+                            <small>Populate arguments <br/>template</small>
+                        </a></li>
+                        <li><a href="#step-5" class="link-disabled">Step 5<br/>
+                            <small>Bundle additional <br/>dependencies</small>
+                        </a></li>
                     </ul>
                     <div id="form-containers">
                         <div id="step-1" class="export-selector">
                             <div class='export-siddhi-app-list' id='siddhi-app-list' style='display: block'>
-                                <div id='select-siddhi-app' class='step-description openDockerWizardError-container'>Select Siddhi Apps to export</div>
+                                <div id='select-siddhi-app' class='step-description openDockerWizardError-container'>
+                                    Select Siddhi Apps to export
+                                </div>
                                 <div class='form-group'>
                                     <div class='export-dialog-form-scrollable-block-list'>
                                         <div id='siddiAppsTree'></div>
@@ -2448,19 +2514,19 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="step-2" >
+                        <div id="step-2">
                             <div class="step-description">Use ${...} format to template siddhi apps</div>
                             <div id='siddhi-app-template-container-id'
                                  style='display: block'>
                             </div>
                         </div>
-                        <div id="step-3" >
+                        <div id="step-3">
                             <div class="step-description">Use ${...} format to template the configurations</div>
                             <div class='config-template-container' id='config-template-container-id'
                                  style='display: block'>
                             </div>
                         </div>
-                        <div id="step-4" >
+                        <div id="step-4">
                             <div id="fill-template-container-id">
                             </div>
                         </div>
@@ -2631,7 +2697,7 @@
             siddhiAppSelectorDialog: "js/export-deployment-artifacts/siddhiapp-selector-dialog",
             templateConfigDialog: "js/export-deployment-artifacts/template-config-dialog",
             fillTemplateValueDialog: "js/export-deployment-artifacts/fill-template-value-dialog",
-            kubernetesConfigDialog : "js/export-deployment-artifacts/kubernetes-config-dialog"
+            kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog"
         },
         map: {
             "*": {
@@ -2845,8 +2911,8 @@
                             name: "execGroup",
                             defaultValue: "group-1",
                             description: "The name of the execution group. Elements with the same execution group are " +
-                            "executed in the same siddhi application. Elements with different execution group are executed " +
-                            "in separate siddhi Application per execution group",
+                                "executed in the same siddhi application. Elements with different execution group are executed " +
+                                "in separate siddhi Application per execution group",
                             optional: true,
                             type: ["STRING"]
                         },
@@ -2854,7 +2920,7 @@
                             name: "parallel",
                             defaultValue: "1",
                             description: "The number of instances in which the execution element must be executed in parallel." +
-                            "If there is a mismatch in the parallel instances specified for an execution group, an exception occurs.",
+                                "If there is a mismatch in the parallel instances specified for an execution group, an exception occurs.",
                             optional: true,
                             type: ["INT"]
 
@@ -2867,26 +2933,26 @@
                 {
                     name: "limit",
                     description: "When events are emitted as a batch, limit allows to limit the number\n" +
-                    " of events in the batch from the defined offset."
+                        " of events in the batch from the defined offset."
                 },
                 {
                     name: "offset",
                     description: "When events are emitted as a batch, offset allows to offset beginning\n" +
-                    " of the output event batch."
+                        " of the output event batch."
                 },
                 {
                     name: "rate-limiting",
                     description: "It allows queries to output events periodically based on a specified\n" +
-                    "condition."
+                        "condition."
                 }
             ],
             query_operators: ["==", ">=", ">", "<=", "<", "AND", "OR", "NOT", "IN", "IS NULL"],
             output_rate_limit_keywords: ["snapshot", "every", "within", "events", "ALL", "LAST", "FIRST"],
             logic_statement_keywords: ["for", "every", "within"],
             join_types: ["join", "left_outer_join", "right_outer_join", "full_outer_join"],
-            stream_handler_types: ["filter", "function","window"],
+            stream_handler_types: ["filter", "function", "window"],
             query_output_operations: ["insert", "delete", "update", "update_or_insert_into"],
-            stream_handler_types_without_window: ["filter","function"],
+            stream_handler_types_without_window: ["filter", "function"],
             trigger: [
                 {
                     name: "start",
@@ -2936,24 +3002,24 @@
                             name: "pool.properties",
                             optional: true,
                             description: "Any pool parameters for the database connection must be specified as " +
-                            "key-value pairs.",
+                                "key-value pairs.",
                             defaultValue: "null"
                         },
                         {
                             name: "table.name",
                             optional: true,
                             description: "The name with which the event table should be persisted in the store." +
-                            " If no name is specified via this parameter, the event table is persisted with " +
-                            "the same name as the Siddhi table.",
+                                " If no name is specified via this parameter, the event table is persisted with " +
+                                "the same name as the Siddhi table.",
                             defaultValue: "The table name defined in the Siddhi App query."
                         },
                         {
                             name: "field.length",
                             optional: true,
                             description: "The number of characters that the values for fields of the 'STRING' type in" +
-                            " the table definition must contain. Each required field must be provided as a " +
-                            "comma-separated list of key-value pairs in the [field.name:length] format." +
-                            "If this is not specified, the default number of characters specific to the database type is considered.",
+                                " the table definition must contain. Each required field must be provided as a " +
+                                "comma-separated list of key-value pairs in the [field.name:length] format." +
+                                "If this is not specified, the default number of characters specific to the database type is considered.",
                             defaultValue: "The table name defined in the Siddhi App query."
                         }
 
@@ -2967,33 +3033,33 @@
                             name: "datasource",
                             optional: false,
                             description: "The name of the Carbon datasource that should be used for creating the " +
-                            "connection with the database. If this is found, neither the pool properties nor the " +
-                            "JNDI resource name described above are taken into account and the connection is " +
-                            "attempted via Carbon datasources instead. ",
+                                "connection with the database. If this is found, neither the pool properties nor the " +
+                                "JNDI resource name described above are taken into account and the connection is " +
+                                "attempted via Carbon datasources instead. ",
                             defaultValue: ""
                         },
                         {
                             name: "pool.properties",
                             optional: true,
                             description: "Any pool parameters for the database connection must be specified as " +
-                            "key-value pairs.",
+                                "key-value pairs.",
                             defaultValue: "null"
                         },
                         {
                             name: "table.name",
                             optional: true,
                             description: "The name with which the event table should be persisted in the store." +
-                            " If no name is specified via this parameter, the event table is persisted with " +
-                            "the same name as the Siddhi table.",
+                                " If no name is specified via this parameter, the event table is persisted with " +
+                                "the same name as the Siddhi table.",
                             defaultValue: "The table name defined in the Siddhi App query."
                         },
                         {
                             name: "field.length",
                             optional: true,
                             description: "The number of characters that the values for fields of the 'STRING' type in" +
-                            " the table definition must contain. Each required field must be provided as a " +
-                            "comma-separated list of key-value pairs in the [field.name:length] format." +
-                            "If this is not specified, the default number of characters specific to the database type is considered.",
+                                " the table definition must contain. Each required field must be provided as a " +
+                                "comma-separated list of key-value pairs in the [field.name:length] format." +
+                                "If this is not specified, the default number of characters specific to the database type is considered.",
                             defaultValue: "The table name defined in the Siddhi App query."
                         }
                     ]
@@ -3005,32 +3071,32 @@
                             name: "jndi.resource",
                             optional: false,
                             description: "The name of the JNDI resource through which the connection is attempted. " +
-                            "If this is found, the pool properties described above are not taken into account and " +
-                            "the connection is attempted via JNDI lookup instead.",
+                                "If this is found, the pool properties described above are not taken into account and " +
+                                "the connection is attempted via JNDI lookup instead.",
                             defaultValue: ""
                         },
                         {
                             name: "pool.properties",
                             optional: true,
                             description: "Any pool parameters for the database connection must be specified as " +
-                            "key-value pairs.",
+                                "key-value pairs.",
                             defaultValue: "null"
                         },
                         {
                             name: "table.name",
                             optional: true,
                             description: "The name with which the event table should be persisted in the store." +
-                            " If no name is specified via this parameter, the event table is persisted with " +
-                            "the same name as the Siddhi table.",
+                                " If no name is specified via this parameter, the event table is persisted with " +
+                                "the same name as the Siddhi table.",
                             defaultValue: "The table name defined in the Siddhi App query."
                         },
                         {
                             name: "field.length",
                             optional: true,
                             description: "The number of characters that the values for fields of the 'STRING' type in" +
-                            " the table definition must contain. Each required field must be provided as a " +
-                            "comma-separated list of key-value pairs in the [field.name:length] format." +
-                            "If this is not specified, the default number of characters specific to the database type is considered.",
+                                " the table definition must contain. Each required field must be provided as a " +
+                                "comma-separated list of key-value pairs in the [field.name:length] format." +
+                                "If this is not specified, the default number of characters specific to the database type is considered.",
                             defaultValue: "The table name defined in the Siddhi App query."
                         }
 
@@ -3038,8 +3104,8 @@
 
                 }
             ],
-            services:   {
-                workspace:  {
+            services: {
+                workspace: {
                     endpoint: window.location.protocol + "//" + window.location.host + '/editor/workspace'
                 },
                 deploymentConfigs: {
@@ -3048,8 +3114,7 @@
             },
             alerts: {
                 container: "#alerts-container",
-                cssClass: {
-                }
+                cssClass: {}
             },
             menu_bar: {
                 container: "#menu-bar-container",
@@ -3095,7 +3160,7 @@
                     id: "revert_icon-siddhi-app"
                 }
             },
-            event_simulator : {
+            event_simulator: {
                 container: ".sidebar-left",
                 activateBtn: '.event-simulator-activate-btn',
                 separator: '.sidebar-left-separator',
@@ -3103,7 +3168,7 @@
                 leftOffset: 40,
                 separatorOffset: 5,
                 defaultWidth: 380,
-                resizeLimits:{
+                resizeLimits: {
                     minX: 200,
                     maxX: 800
                 },
@@ -3128,7 +3193,7 @@
                     id: "add-single-simulator"
                 }
             },
-            operator_finder : {
+            operator_finder: {
                 container: '.sidebar-left',
                 activateBtn: '.operator-finder-activate-btn',
                 separator: '.sidebar-left-separator',
@@ -3136,7 +3201,7 @@
                 leftOffset: 40,
                 separatorOffset: 5,
                 defaultWidth: 380,
-                resizeLimits:{
+                resizeLimits: {
                     minX: 200,
                     maxX: 800
                 },
@@ -3155,7 +3220,7 @@
                     }
                 }
             },
-            template_deploy : {
+            template_deploy: {
                 container: '.sidebar-left',
                 activateBtn: '.template-deploy-activate-btn',
                 separator: '.sidebar-left-separator',
@@ -3163,7 +3228,7 @@
                 leftOffset: 40,
                 separatorOffset: 5,
                 defaultWidth: 380,
-                resizeLimits:{
+                resizeLimits: {
                     minX: 200,
                     maxX: 800
                 },
@@ -3203,7 +3268,7 @@
                 leftOffset: 40,
                 separatorOffset: 5,
                 defaultWidth: 290,
-                resizeLimits:{
+                resizeLimits: {
                     minX: 200,
                     maxX: 800
                 },
@@ -3213,15 +3278,15 @@
                     openFolderButton: 'btn  btn-default open-folder-button'
                 }
             },
-            settings_dialog:{
+            settings_dialog: {
                 selector: "#modalSettings",
                 submit_button: "#saveSettingsButton"
             },
-            sample_event_dialog:{
+            sample_event_dialog: {
                 selector: "#modalSampleEvent",
                 submit_button: "#generateSampleEventButton"
             },
-            query_store_api:{
+            query_store_api: {
                 selector: "#modalStoreQuery",
                 submit_button: "#executeQuery"
             },
@@ -3387,7 +3452,7 @@
                                 scroll_margin: '20',
                                 mode: 'ace/mode/siddhi'
                             },
-                            cssClass:{
+                            cssClass: {
                                 text_editor_class: 'text-editor',
                                 outer_box: 'outer-box',
                                 svg_container: 'svg-container',
@@ -3396,13 +3461,13 @@
                                 panel_icon: 'panel-icon',
                                 service_icon: 'fw fw-service fw-inverse',
                                 struct_icon: 'fw fw-struct fw-inverse',
-                                connector_icon:'fw fw-connector fw-inverse',
-                                function_icon:'fw fw-function fw-inverse',
-                                main_function_icon:'fw fw-main-function fw-inverse',
-                                title_link:'collapsed canvas-title',
-                                panel_right_icon:'fw fw-up pull-right right-icon-clickable collapser hoverable',
+                                connector_icon: 'fw fw-connector fw-inverse',
+                                function_icon: 'fw fw-function fw-inverse',
+                                main_function_icon: 'fw fw-main-function fw-inverse',
+                                title_link: 'collapsed canvas-title',
+                                panel_right_icon: 'fw fw-up pull-right right-icon-clickable collapser hoverable',
                                 head_div: 'canvas-heading',
-                                body_div:'panel-collapse collapse',
+                                body_div: 'panel-collapse collapse',
                                 canvas: 'panel-body collapse in',
                                 design_view_drop: 'design-view-hover',
                                 canvas_container: 'canvas-container',
@@ -3417,7 +3482,7 @@
                                 type_struct_icon: 'fw fw-dgm-service fw-inverse',
                                 canvas_heading_new: 'canvas-heading-new'
                             },
-                            dialog_boxes:{
+                            dialog_boxes: {
                                 parser_error: "#parserErrorModel"
                             }
                         }
@@ -3434,7 +3499,6 @@
         app.displayInitialView();
         app.runInitialGuide();
     });
-
 
 
 </script>
