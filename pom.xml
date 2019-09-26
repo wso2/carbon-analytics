@@ -143,12 +143,66 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>extract-dependency</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-dependencies</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <markersDirectory>${project.build.directory}/dependencies/dependency-maven-plugin-markers</markersDirectory>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>com.spotify</groupId>
+                                            <artifactId>docker-client</artifactId>
+                                            <classifier>shaded</classifier>
+                                            <outputDirectory>${project.build.directory}/dependencies/docker-client</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <instructions>
+                                <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                                <Bundle-Name>${project.artifactId}</Bundle-Name>
+                                <Include-Resource>
+                                    META-INF=target/classes/META-INF,
+                                    META-INF/services=${project.build.directory}/dependencies/docker-client/META-INF/services
+                                </Include-Resource>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <properties>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
         <private.package>
+                com.spotify.docker.*,
                 com.kenai.*,
                 org.apache.commons.*,
                 jni.*,
+                jersey.repackaged.com.*
         </private.package>
         <export.package>
             io.siddhi.distribution.editor.core.*,
