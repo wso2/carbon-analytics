@@ -356,7 +356,6 @@ public class EditorMicroservice implements Microservice {
     @Path("/workspace/listFilesInPath")
     @Produces(MediaType.APPLICATION_JSON)
     public Response listFilesInPath(@QueryParam("path") String path) {
-
         try {
             return Response.status(Response.Status.OK)
                     .entity(workspace.listDirectoryFiles(
