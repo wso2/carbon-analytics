@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -111,6 +112,7 @@ public class ExportUtils {
     private DockerConfigs dockerConfigs;
     private ExportAppsRequest exportAppsRequest;
     private String exportType;
+    Path tempDockerDirectoryPath;
     private List<Integer> exposePorts = new ArrayList<>();
 
     ExportUtils(
@@ -141,6 +143,7 @@ public class ExportUtils {
         boolean bundlesAdded = false;
         boolean configChanged = false;
         boolean envChanged = false;
+        boolean buildDocker = false;
         String zipFileName = "siddhi-docker.zip";
         String zipFileRoot = "siddhi-docker/";
         if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
@@ -153,6 +156,23 @@ public class ExportUtils {
         ZipOutputStream zipOutputStream = null;
         ZipEntry dockerFileEntry = new ZipEntry(Paths.get(zipFileRoot, DOCKER_FILE_NAME).toString());
         ZipEntry dockerReadmeEntry = new ZipEntry(Paths.get(zipFileRoot, README_FILE_NAME).toString());
+
+        if (exportAppsRequest.getDockerConfiguration() != null) {
+            UUID uuid = UUID.randomUUID();
+            tempDockerDirectoryPath = Paths.get(RESOURCES_DIR, uuid.toString());
+            if (!Files.exists(tempDockerDirectoryPath)) {
+                if (!new File(tempDockerDirectoryPath.toString()).mkdir()) {
+                    throw new DockerGenerationException(
+                            "Failed to create the sample directory " +
+                                    tempDockerDirectoryPath.toString()
+                    );
+                }
+            }
+            if (Files.isWritable(tempDockerDirectoryPath)) {
+                buildDocker = true;
+            }
+        }
+
         try {
             zipOutputStream = new ZipOutputStream(new FileOutputStream(zipFile));
 
@@ -161,6 +181,16 @@ public class ExportUtils {
                 jarsAdded = true;
                 String jarRootDir = Paths.get(Constants.CARBON_HOME, JARS_DIR).toString();
                 String jarEntryRootDir = Paths.get(zipFileRoot, JARS_DIR).toString();
+                Path tempDockerJarDirPath = Paths.get(tempDockerDirectoryPath.toString(), JARS_DIR);
+                if (buildDocker && !Files.exists(tempDockerJarDirPath)) {
+                    if (!new File(tempDockerJarDirPath.toString()).mkdir()) {
+                        throw new DockerGenerationException(
+                                "Failed to create the sample jars directory " +
+                                        tempDockerJarDirPath.toString()
+                        );
+                    }
+                }
+
                 for (String jar : exportAppsRequest.getJars()) {
                     Path jarPath = Paths.get(jarRootDir, jar);
                     ZipEntry jarEntry = new ZipEntry(Paths.get(jarEntryRootDir, jar).toString());
@@ -169,6 +199,9 @@ public class ExportUtils {
                         byte[] jarData = Files.readAllBytes(jarPath);
                         zipOutputStream.write(jarData, 0, jarData.length);
                         zipOutputStream.closeEntry();
+                        if (buildDocker) {
+                            Files.write(Paths.get(tempDockerJarDirPath.toString(), jar), jarData);
+                        }
                     } else {
                         log.error("JAR file" + jarPath.toString() + " is not readable.");
                     }
@@ -181,6 +214,16 @@ public class ExportUtils {
                 bundlesAdded = true;
                 String bundleRootDir = Paths.get(Constants.CARBON_HOME, BUNDLE_DIR).toString();
                 String bundleEntryRootDir = Paths.get(zipFileRoot, BUNDLE_DIR).toString();
+                Path tempDockerBundleDirPath = Paths.get(tempDockerDirectoryPath.toString(), BUNDLE_DIR);
+                if (buildDocker && !Files.exists(tempDockerBundleDirPath)) {
+                    if (!new File(tempDockerBundleDirPath.toString()).mkdir()) {
+                        throw new DockerGenerationException(
+                                "Failed to create the sample bundles directory " +
+                                        tempDockerBundleDirPath.toString()
+                        );
+                    }
+                }
+
                 for (String bundle : exportAppsRequest.getBundles()) {
                     Path bundlePath = Paths.get(bundleRootDir, bundle);
                     ZipEntry bundleEntry = new ZipEntry(
@@ -192,6 +235,9 @@ public class ExportUtils {
                         byte[] bundleData = Files.readAllBytes(bundlePath);
                         zipOutputStream.write(bundleData, 0, bundleData.length);
                         zipOutputStream.closeEntry();
+                        if (buildDocker) {
+                            Files.write(Paths.get(tempDockerBundleDirPath.toString(), bundle), bundleData);
+                        }
                     } else {
                         log.error("Bundle file" + bundlePath.toString() + " is not readable.");
                     }
@@ -201,6 +247,15 @@ public class ExportUtils {
             // Write Siddhi apps to the zip file
             List<String> userGivenSiddhiApps = new ArrayList<>();
             String appsEntryRootDir = Paths.get(zipFileRoot, APPS_DIR).toString();
+            Path tempDockerAppDirPath = Paths.get(tempDockerDirectoryPath.toString(), APPS_DIR);
+            if (buildDocker && !Files.exists(tempDockerAppDirPath)) {
+                if (!new File(tempDockerAppDirPath.toString()).mkdir()) {
+                    throw new DockerGenerationException(
+                            "Failed to create the sample apps directory " +
+                                    tempDockerAppDirPath.toString()
+                    );
+                }
+            }
             if (exportAppsRequest.getTemplatedSiddhiApps() != null) {
                 for (Map<String, String> app : exportAppsRequest.getTemplatedSiddhiApps()) {
                     String appName = app.get(SIDDHI_APP_NAME_ENTRY);
@@ -213,6 +268,9 @@ public class ExportUtils {
                     byte[] appData = siddhiAppContent.getBytes(StandardCharsets.UTF_8);
                     zipOutputStream.write(appData, 0, appData.length);
                     zipOutputStream.closeEntry();
+                    if (buildDocker) {
+                        Files.write(Paths.get(tempDockerAppDirPath.toString(), appName), appData);
+                    }
                 }
             }
 
@@ -229,6 +287,10 @@ public class ExportUtils {
                         .getBytes(StandardCharsets.UTF_8);
                 zipOutputStream.write(configData, 0, configData.length);
                 zipOutputStream.closeEntry();
+                if (buildDocker) {
+                    Path tempDockerConfigPath = Paths.get(tempDockerDirectoryPath.toString(), CONFIG_FILE);
+                    Files.write(tempDockerConfigPath, configData);
+                }
             }
 
             // Write ENVs to the docker file
@@ -316,6 +378,10 @@ public class ExportUtils {
             byte[] readmeContent = content.getBytes(StandardCharsets.UTF_8);
             zipOutputStream.write(readmeContent, 0, readmeContent.length);
             zipOutputStream.closeEntry();
+            if (buildDocker) {
+                Path tempDockerFilePath = Paths.get(tempDockerDirectoryPath.toString(), DOCKER_FILE_NAME);
+                Files.write(tempDockerFilePath, data);
+            }
 
             // Write the kubernetes file to the zip file
             if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
@@ -369,6 +435,15 @@ public class ExportUtils {
             populatedApps.add(siddhiApp);
         }
         return populatedApps;
+    }
+
+    public Path getTempDockerPath()  {
+        if (tempDockerDirectoryPath != null) {
+            return tempDockerDirectoryPath;
+        } else {
+            return Paths.get("");
+        }
+
     }
 
     /**
@@ -487,6 +562,9 @@ public class ExportUtils {
                 }
             }
 
+            // Set container spec
+            SiddhiProcessContainer siddhiProcessContainer = new SiddhiProcessContainer();
+            boolean changedContainerSpec = false;
             if (this.exportAppsRequest.getTemplatedVariables() != null &&
                     this.exportAppsRequest.getTemplatedVariables().size() > 0) {
                 ArrayList<Env> envs = new ArrayList<Env>();
@@ -498,8 +576,20 @@ public class ExportUtils {
                     );
                     envs.add(env);
                 }
-                SiddhiProcessContainer siddhiProcessContainer = new SiddhiProcessContainer();
                 siddhiProcessContainer.setEnv(envs);
+                siddhiProcessSpec.setContainer(siddhiProcessContainer);
+                changedContainerSpec = true;
+            }
+
+            if (exportAppsRequest.getDockerConfiguration() != null &&
+                    exportAppsRequest.getDockerConfiguration().getImageName() != null) {
+                siddhiProcessContainer.setImage(
+                        exportAppsRequest.getDockerConfiguration().getImageName()
+                );
+                changedContainerSpec = true;
+            }
+
+            if (changedContainerSpec) {
                 siddhiProcessSpec.setContainer(siddhiProcessContainer);
             }
 

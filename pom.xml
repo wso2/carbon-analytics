@@ -136,16 +136,25 @@
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-client</artifactId>
+            <classifier>shaded</classifier>
+        </dependency>
     </dependencies>
 
     <properties>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
-        <Private-Package>
-            io.siddhi.distribution.editor.core.internal,
-            io.siddhi.distribution.editor.core.internal.*,
-        </Private-Package>
+        <private.package>
+                com.kenai.*,
+                org.apache.commons.*,
+                jni.*,
+        </private.package>
         <export.package>
-            io.siddhi.distribution.editor.core.*
+            io.siddhi.distribution.editor.core.*,
+            com.kenai.*,
+            org.apache.commons.*,
+            jni.*,
         </export.package>
         <import.package>
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
