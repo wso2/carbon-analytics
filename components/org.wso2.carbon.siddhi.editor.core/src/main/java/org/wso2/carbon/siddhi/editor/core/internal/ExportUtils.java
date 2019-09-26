@@ -303,7 +303,7 @@ public class ExportUtils {
         data = Files.readAllBytes(dockerFilePath);
         String content = new String(data, StandardCharsets.UTF_8);
 
-        String dockerBaseImgName = "wso2/streaming-integrator:latest";
+        String dockerBaseImgName = Constants.DEFAULT_SI_DOCKER_BASE_IMAGE;
         if (configProvider.getConfigurationObject(Constants.EXPORT_PROPERTIES_NAMESPACE) != null) {
             dockerBaseImgName = (String) ((Map) configProvider
                     .getConfigurationObject(Constants.EXPORT_PROPERTIES_NAMESPACE))
