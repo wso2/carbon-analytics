@@ -18,6 +18,10 @@
 
 package org.wso2.carbon.siddhi.editor.core.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.siddhi.editor.core.commons.configs.DockerConfigs;
 import org.wso2.carbon.siddhi.editor.core.commons.kubernetes.Env;
 import org.wso2.carbon.siddhi.editor.core.commons.kubernetes.KubernetesConfig;
@@ -29,10 +33,6 @@ import org.wso2.carbon.siddhi.editor.core.commons.request.ExportAppsRequest;
 import org.wso2.carbon.siddhi.editor.core.exception.DockerGenerationException;
 import org.wso2.carbon.siddhi.editor.core.exception.KubernetesGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.wso2.carbon.config.ConfigurationException;
-import org.wso2.carbon.config.provider.ConfigProvider;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
@@ -65,17 +65,17 @@ public class ExportUtils {
     private static final String BUNDLES_BLOCK_TEMPLATE = "\\{\\{BUNDLES_BLOCK}}";
     private static final String ENV_BLOCK_TEMPLATE = "\\{\\{ENV_BLOCK}}";
     private static final String APPS_BLOCK_TEMPLATE = "\\{\\{APPS_BLOCK}}";
-    private static final String PRODUCT_VERSION_TEMPLATE = "\\{\\{PRODUCT_VERSION}}";
+    private static final String DOCKER_BASE_IMAGE_TEMPLATE = "\\{\\{INTEGRATOR_BASE_IMAGE_NAME}}";
     private static final String CONFIG_BLOCK_VALUE =
-            "COPY --chown=siddhi_user:siddhi_io \\$\\{CONFIG_FILE}/ \\$\\{USER_HOME}";
+            "COPY --chown=wso2carbon:wso2 \\$\\{CONFIG_FILE}/ \\$\\{USER_HOME}";
     private static final String CONFIG_PARAMETER_VALUE =
-            ", \"-Dconfig=/home/siddhi_user/configurations.yaml\"";
+            ", \"-Dconfig=/home/wso2carbon/configurations.yaml\"";
     private static final String JARS_BLOCK_VALUE =
-            "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_JARS_DIR}/ \\$\\{JARS}";
+            "COPY --chown=wso2carbon:wso2 \\$\\{HOST_JARS_DIR}/ \\$\\{JARS}";
     private static final String BUNDLES_BLOCK_VALUE =
-            "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_BUNDLES_DIR}/ \\$\\{BUNDLES}";
+            "COPY --chown=wso2carbon:wso2 \\$\\{HOST_BUNDLES_DIR}/ \\$\\{BUNDLES}";
     private static final String APPS_BLOCK_VALUE =
-            "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_APPS_DIR}/ \\$\\{APPS}";
+            "COPY --chown=wso2carbon:wso2 \\$\\{HOST_APPS_DIR}/ \\$\\{APPS}";
     private static final String SIDDHI_PROCESS_SPEC_TEMPLATE = "\\{\\{SIDDHI_PROCESS_SPEC}}";
     private static final String SIDDHI_PROCESS_NAME_TEMPLATE = "\\{\\{SIDDHI_PROCESS_NAME}}";
     private static final String SIDDHI_PROCESS_DEFAULT_NAME = "sample-siddhi-process";
@@ -91,12 +91,12 @@ public class ExportUtils {
     private static final String APPS_DIR = "siddhi-files/";
     private static final String CONFIG_FILE = "configurations.yaml";
     private static final String EXPORT_TYPE_KUBERNETES = "kubernetes";
-    private static final String RUNNER_DEPLOYMENT_YAML_FILE = "runner-deployment.yaml";
+    private static final String INTEGRATOR_DEPLOYMENT_YAML_FILE = "streaming-integrator-deployment.yaml";
     private static final String TOOLING_DEPLOYMENT_YAML_FILE = "deployment.yaml";
     private static final String DIRECTORY_CONF = "conf";
-    private static final String DIRECTORY_PROFILE = "tooling";
+    private static final String DIRECTORY_PROFILE = "server";
     private static final String SIDDHI_NAMESPACE = "siddhi";
-    private static final String DATA_SOURCES_NAMESPACE = "dataSources";
+    private static final String DATA_SOURCES_NAMESPACE = "wso2.dataSources";
     private final ConfigProvider configProvider;
     private DockerConfigs dockerConfigs;
     private ExportAppsRequest exportAppsRequest;
@@ -127,11 +127,11 @@ public class ExportUtils {
         boolean bundlesAdded = false;
         boolean configChanged = false;
         boolean envChanged = false;
-        String zipFileName = "siddhi-docker.zip";
-        String zipFileRoot = "siddhi-docker/";
+        String zipFileName = "streaming-integrator-docker.zip";
+        String zipFileRoot = "streaming-integrator-docker/";
         if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
-            zipFileName = "siddhi-kubernetes.zip";
-            zipFileRoot = "siddhi-kubernetes/";
+            zipFileName = "streaming-integrator-kubernetes.zip";
+            zipFileRoot = "streaming-integrator-kubernetes/";
         }
         Path dockerFilePath = Paths.get(Constants.RUNTIME_PATH, RESOURCES_DIR, DOCKER_FILE_NAME);
         File zipFile = new File(zipFileName);
@@ -302,8 +302,14 @@ public class ExportUtils {
         }
         data = Files.readAllBytes(dockerFilePath);
         String content = new String(data, StandardCharsets.UTF_8);
-        String productVersion = this.getConfigurations().getProductVersion();
-        content = content.replaceAll(PRODUCT_VERSION_TEMPLATE, productVersion);
+
+        String dockerBaseImgName = "wso2/streaming-integrator:latest";
+        if (configProvider.getConfigurationObject(Constants.EXPORT_PROPERTIES_NAMESPACE) != null) {
+            dockerBaseImgName = (String) ((Map) configProvider
+                    .getConfigurationObject(Constants.EXPORT_PROPERTIES_NAMESPACE))
+                    .get(Constants.DOCKER_BASE_IMAGE_PROPERTY);
+        }
+        content = content.replaceAll(DOCKER_BASE_IMAGE_TEMPLATE, dockerBaseImgName);
 
         if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
             content = content.replaceAll(APPS_BLOCK_TEMPLATE, "");
@@ -492,10 +498,10 @@ public class ExportUtils {
                 DIRECTORY_PROFILE,
                 TOOLING_DEPLOYMENT_YAML_FILE
         );
-        Path runnerConfigFile = Paths.get(
+        Path integratorConfigFile = Paths.get(
                 Constants.RUNTIME_PATH,
                 RESOURCES_DIR,
-                RUNNER_DEPLOYMENT_YAML_FILE
+                INTEGRATOR_DEPLOYMENT_YAML_FILE
         );
         if (!Files.isReadable(toolingConfigFile)) {
             throw new IOException(
@@ -503,9 +509,9 @@ public class ExportUtils {
             );
         }
 
-        if (!Files.isReadable(runnerConfigFile)) {
+        if (!Files.isReadable(integratorConfigFile)) {
             throw new IOException(
-                    "Config file " + runnerConfigFile.toString() + " is not readable."
+                    "Config file " + integratorConfigFile.toString() + " is not readable."
             );
         }
         String toolingDeploymentYamlContent = new String(
@@ -516,7 +522,7 @@ public class ExportUtils {
         );
         String runnerDeploymentYamlContent = new String(
                 Files.readAllBytes(
-                        runnerConfigFile
+                        integratorConfigFile
                 ),
                 StandardCharsets.UTF_8
         );

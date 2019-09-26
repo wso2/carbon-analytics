@@ -1,0 +1,6 @@
+apiVersion: siddhi.io/v1alpha2
+kind: SiddhiProcess
+metadata:
+  name: {{SIDDHI_PROCESS_NAME}}
+
+{{SIDDHI_PROCESS_SPEC}}

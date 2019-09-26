@@ -27,6 +27,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.debugger.SiddhiDebugger;
+import io.siddhi.core.exception.SiddhiAppCreationException;
+import io.siddhi.core.util.SiddhiComponentActivator;
+import io.siddhi.query.api.definition.StreamDefinition;
+import io.siddhi.query.api.exception.SiddhiAppContextException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -67,7 +74,6 @@ import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SampleEventGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
-import org.wso2.carbon.siddhi.editor.core.util.restclients.storequery.StoreQueryAPIHelper;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.ToolTip;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
@@ -76,19 +82,13 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.Deserial
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.restclients.storequery.StoreQueryAPIHelper;
 import org.wso2.carbon.siddhi.editor.core.util.siddhiappdeployer.SiddhiAppDeployerApiHelper;
 import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.streaming.integrator.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
-import io.siddhi.core.SiddhiAppRuntime;
-import io.siddhi.core.SiddhiManager;
-import io.siddhi.core.debugger.SiddhiDebugger;
-import io.siddhi.core.exception.SiddhiAppCreationException;
-import io.siddhi.core.util.SiddhiComponentActivator;
-import io.siddhi.query.api.definition.StreamDefinition;
-import io.siddhi.query.api.exception.SiddhiAppContextException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -1110,10 +1110,10 @@ public class EditorMicroservice implements Microservice {
             ExportAppsRequest exportAppsRequest = new Gson().fromJson(payload, ExportAppsRequest.class);
             ExportUtils exportUtils = new ExportUtils(configProvider, exportAppsRequest, exportType);
             File zipFile = exportUtils.createZipFile();
-            String fileName = "siddhi-docker.zip";
+            String fileName = "streaming-integrator-docker.zip";
             if (exportType != null) {
                 if (exportType.equals(EXPORT_TYPE_KUBERNETES)) {
-                    fileName = "siddhi-kubernetes.zip";
+                    fileName = "streaming-integrator-kubernetes.zip";
                 }
             }
             return Response
