@@ -206,9 +206,6 @@
         </private.package>
         <export.package>
             io.siddhi.distribution.editor.core.*,
-            com.kenai.*,
-            org.apache.commons.*,
-            jni.*,
         </export.package>
         <import.package>
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
