@@ -203,9 +203,10 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                 $("#unused-template-attr-container").addClass('hidden');
             }
 
-            if (templateAttrList.length === 0 && unusedTemplateAttr === 0) {
+            if (templateAttrList.length === 0 && unusedTemplateAttr.length === 0) {
                 $("#unused-template-attr-container").addClass('hidden');
                 $("#used-template-attr-container").addClass('hidden');
+                $("#template-attr-info").removeClass('hidden');
             } else {
                 $("#template-attr-info").addClass('hidden');
             }
