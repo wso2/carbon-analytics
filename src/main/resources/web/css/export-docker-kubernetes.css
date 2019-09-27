@@ -196,7 +196,7 @@ hr.export-dialog-hr {
 }
 
 .export-form-input {
-    padding-left: 0 !important;
+    padding-top: 2px;
 }
 
 .docker-details-row input {
