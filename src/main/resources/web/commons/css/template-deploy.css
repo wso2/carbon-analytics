@@ -145,3 +145,9 @@
     padding: 5px 0;
     margin-bottom: 15px;
 }
+
+.template-refresh-btn {
+    right: 10px;
+    top: 10px;
+    position: absolute;
+}

@@ -21,7 +21,6 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
 
         var TemplateDeploy = function (options) {
             this._options = options;
-            console.log(options);
             this._application = options.application;
             this._activateBtn = $(options.activateBtn);
             this._container = $(options.container);
@@ -39,7 +38,6 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                 localStorage.setItem('templatedAttributeList', JSON.stringify({}));
             }
 
-            console.log(CompletionEngine);
         };
 
         TemplateDeploy.prototype.render = function () {
@@ -106,9 +104,6 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
 
             var localStorageTemplatedAttributes = JSON.parse(localStorage.getItem('templatedAttributeList'));
 
-            console.log("localStorage", _.differenceWith(templateAttrList,
-                Object.keys(localStorageTemplatedAttributes), _.isEqual));
-
             if (localStorageTemplatedAttributes) {
                 unusedTemplateAttr = _.differenceWith(Object.keys(localStorageTemplatedAttributes),
                     templateAttrList, _.isEqual);
@@ -121,7 +116,6 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
         TemplateDeploy.prototype.showAttributes = function (context, templateAttrList, unusedTemplateAttr) {
             var self = context;
             var localStorageTemplatedAttributes = JSON.parse(localStorage.getItem('templatedAttributeList'));
-            console.log(templateAttrList, unusedTemplateAttr);
 
             if (templateAttrList.length > 0) {
                 $("#used-template-attr-container").removeClass('hidden');
@@ -236,7 +230,7 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
 
 
         TemplateDeploy.prototype.handleErrorMsg = function (msg) {
-            // todo: check
+            console.error(msg);
         };
 
 
