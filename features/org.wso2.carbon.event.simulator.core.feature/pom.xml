@@ -206,7 +206,7 @@
                                     <version>${apache.commons.csv.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>org.apache.commons.fileupload</symbolicName>
+                                    <symbolicName>org.apache.commons.commons-fileupload</symbolicName>
                                     <version>${apache.commons.fileupload.version}</version>
                                 </bundle>
                                 <bundle>
