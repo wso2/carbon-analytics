@@ -26,6 +26,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSyntaxException;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.debugger.SiddhiDebugger;
+import io.siddhi.core.exception.SiddhiAppCreationException;
+import io.siddhi.core.util.SiddhiComponentActivator;
+import io.siddhi.query.api.definition.StreamDefinition;
+import io.siddhi.query.api.exception.SiddhiAppContextException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -46,6 +54,7 @@ import org.wso2.carbon.siddhi.editor.core.EditorSiddhiAppRuntimeService;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.request.DockerDownloadRequest;
+import org.wso2.carbon.siddhi.editor.core.commons.request.ExportAppsRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.response.DebugRuntimeResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.GeneralResponse;
@@ -59,12 +68,12 @@ import org.wso2.carbon.siddhi.editor.core.internal.local.LocalFSWorkspace;
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
+import org.wso2.carbon.siddhi.editor.core.util.FileJsonObjectReaderUtil;
 import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SampleEventGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
-import org.wso2.carbon.siddhi.editor.core.util.restclients.storequery.StoreQueryAPIHelper;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.ToolTip;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
@@ -73,19 +82,13 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.Deserial
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.restclients.storequery.StoreQueryAPIHelper;
 import org.wso2.carbon.siddhi.editor.core.util.siddhiappdeployer.SiddhiAppDeployerApiHelper;
 import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.streaming.integrator.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
-import io.siddhi.core.SiddhiAppRuntime;
-import io.siddhi.core.SiddhiManager;
-import io.siddhi.core.debugger.SiddhiDebugger;
-import io.siddhi.core.exception.SiddhiAppCreationException;
-import io.siddhi.core.util.SiddhiComponentActivator;
-import io.siddhi.query.api.definition.StreamDefinition;
-import io.siddhi.query.api.exception.SiddhiAppContextException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -111,6 +114,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -133,6 +137,7 @@ public class EditorMicroservice implements Microservice {
     private static final String STATUS = "status";
     private static final String SUCCESS = "success";
     private ServiceRegistration serviceRegistration;
+    private static final String EXPORT_TYPE_KUBERNETES = "kubernetes";
     private Workspace workspace;
     private ExecutorService executorService = Executors
             .newScheduledThreadPool(5, new ThreadFactoryBuilder()
@@ -285,6 +290,65 @@ public class EditorMicroservice implements Microservice {
         } catch (SiddhiStoreQueryHelperException e) {
             log.error("Cannot execute the store query.", e);
             return Response.serverError().entity("Failed executing the Siddhi query.").build();
+        }
+    }
+
+    @GET
+    @Path("/listDirectoriesInPath")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response filterDirectories(@QueryParam("path") String path,
+                                      @QueryParam("directoryList") String directoryList) {
+        try {
+            List<String> directories = Arrays.stream(
+                    new String(Base64.getDecoder().decode(directoryList), Charset.defaultCharset())
+                            .split(","))
+                    .filter(directory -> directory != null && !directory.trim().isEmpty())
+                    .map(directory -> "\"" + directory + "\"")
+                    .collect(Collectors.toList());
+
+            String baseLocation = Paths.get(Constants.CARBON_HOME).toString();
+            java.nio.file.Path pathLocation = SecurityUtil.resolvePath(
+                    Paths.get(baseLocation).toAbsolutePath(),
+                    Paths.get(new String(Base64.getDecoder().decode(path), Charset.defaultCharset())));
+
+            JsonArray filteredDirectoryFiles = FileJsonObjectReaderUtil.listDirectoryInPath(
+                    pathLocation.toString(), directories);
+
+            JsonObject rootElement = FileJsonObjectReaderUtil.getJsonRootObject(filteredDirectoryFiles);
+
+            return Response.status(Response.Status.OK)
+                    .entity(rootElement)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("/listFilesInPath")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listFilesInRootPath(@QueryParam("path") String path) {
+        try {
+            String location = Paths.get(Constants.CARBON_HOME).toString();
+            java.nio.file.Path pathLocation = SecurityUtil.resolvePath(
+                    Paths.get(location).toAbsolutePath(),
+                    Paths.get(new String(Base64.getDecoder().decode(path), Charset.defaultCharset())));
+
+            return Response.status(Response.Status.OK)
+                    .entity(FileJsonObjectReaderUtil.listFilesInPath(pathLocation, "jar"))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            return Response.serverError().entity("failed." + e.getMessage())
+                    .build();
+        } catch (Throwable ignored) {
+            return Response.serverError().entity("failed")
+                    .build();
         }
     }
 
@@ -1030,6 +1094,71 @@ public class EditorMicroservice implements Microservice {
                     .build();
         }
     }
+
+    /**
+     * Export given Siddhi apps and other configurations to docker or kubernetes artifacts.
+     *
+     * @param exportType Export type (docker or kubernetes
+     * @return Docker or Kubernetes artifacts
+     */
+    @POST
+    @Path("/export")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response exportApps(@QueryParam("type") String exportType, @FormParam("payload") String payload) {
+        try {
+            ExportAppsRequest exportAppsRequest = new Gson().fromJson(payload, ExportAppsRequest.class);
+            ExportUtils exportUtils = new ExportUtils(configProvider, exportAppsRequest, exportType);
+            File zipFile = exportUtils.createZipFile();
+            String fileName = "streaming-integrator-docker.zip";
+            if (exportType != null) {
+                if (exportType.equals(EXPORT_TYPE_KUBERNETES)) {
+                    fileName = "streaming-integrator-kubernetes.zip";
+                }
+            }
+            return Response
+                    .status(Response.Status.OK)
+                    .entity(zipFile)
+                    .header("Content-Disposition", ("attachment; filename=" + fileName))
+                    .build();
+        } catch (JsonSyntaxException e) {
+            log.error("Incorrect configuration format.", e);
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .build();
+        } catch (Exception e) {
+            log.error("Cannot generate export-artifacts archive.", e);
+            return Response
+                    .status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+
+    /**
+     * Export given Siddhi apps and other configurations to docker or kubernetes artifacts.
+     *
+     * @return Docker or Kubernetes artifacts
+     */
+    @GET
+    @Path("/deploymentConfigs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDeploymentConfigs() {
+        ExportUtils exportUtils = new ExportUtils(configProvider);
+        try {
+            JsonObject deploymentHolder = new JsonObject();
+            deploymentHolder.addProperty("deploymentYaml", exportUtils.exportConfigs());
+            return Response
+                    .status(Response.Status.OK)
+                    .entity(deploymentHolder)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            log.error("Cannot read deployment.yaml file", e);
+            return Response
+                    .status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+
 
     /**
      * Get sample event for a particular event stream.

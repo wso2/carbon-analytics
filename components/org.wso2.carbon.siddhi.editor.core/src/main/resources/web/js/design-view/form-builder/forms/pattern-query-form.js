@@ -316,8 +316,8 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryOrderByValue'
                     var conditionIndex = $(this).closest('.condition-navigation').index();
                     var prevCondition = conditionIndex - 1;
                     $('.define-conditions .nav-tabs .condition-navigation:eq(' + prevCondition + ')').addClass('active');
-                    $('.define-conditions .tab-pane:eq(' + prevCondition + ')').addClass('active');
-                    $('.define-conditions .tab-pane:eq(' + conditionIndex + ')').remove();
+                    $('.define-conditions .ws-tab-pane:eq(' + prevCondition + ')').addClass('active');
+                    $('.define-conditions .ws-tab-pane:eq(' + conditionIndex + ')').remove();
                     $(this).closest('li').remove();
                     generateDivRequiringPossibleAttributes(self, partitionId, groupBy);
                     autoCompleteFieldsWithChangingAttributes(self, partitionId, outputAttributesWithElementName);

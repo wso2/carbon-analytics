@@ -2880,7 +2880,9 @@ input[type="button"].btn-block {
 .btn-secondary {
   color: #fff;
   background-color: #617d8b;
-  border-color: #56707c; }
+  border-color: #56707c;
+  margin-left: 10px !important;
+}
   .btn-secondary:focus, .btn-secondary.focus {
     color: #fff;
     background-color: #4c626d;
@@ -3611,7 +3613,7 @@ tbody.collapse.in {
     .nav-tabs.nav-justified > .active > a:focus {
       border-bottom-color: #fff; } }
 
-.tab-content > .tab-pane {
+.tab-content > .ws-tab-pane {
   display: none; }
 .tab-content > .active {
   display: block; }
@@ -3625,7 +3627,7 @@ tbody.collapse.in {
   border-color: #37474F; }
 
 @media (min-width: 768px) {
-  .tab-content > .tab-pane {
+  .tab-content > .ws-tab-pane {
     display: none !important; }
 
   .tab-content > .active {

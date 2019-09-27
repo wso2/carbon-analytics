@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+/*
+ * Copyright (c)  2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,14 +16,23 @@
  * under the License.
  */
 
-define(['file_menu', 'edit_menu', 'run_menu', 'tools_menu', 'deploy_menu', 'export_menu'],
-    function (FileMenu, EditMenu, RunMenu, ToolsMenu, DeployMenu, ExportMenu) {
-        var menuBar = {};
-        menuBar[FileMenu.id] = FileMenu;
-        menuBar[EditMenu.id] = EditMenu;
-        menuBar[RunMenu.id] = RunMenu;
-        menuBar[ToolsMenu.id] = ToolsMenu;
-        menuBar[DeployMenu.id] = DeployMenu;
-        menuBar[ExportMenu.id] = ExportMenu;
-        return menuBar;
-    });
+package org.wso2.carbon.siddhi.editor.core.commons.kubernetes;
+
+/**
+ * App configuration of a Kubernetes Siddhi process.
+ */
+public class SiddhiProcessApp {
+    private String script;
+
+    public SiddhiProcessApp(String script) {
+        this.script = script;
+    }
+
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
+    }
+}

@@ -52,6 +52,10 @@ public class Constants {
     public static final String DEPLOYMENT_PASSWORD = "password";
     public static final String SIDDHI_FILE_LIST = "siddhiFileList";
     public static final String SERVER_LIST = "serverList";
+    public static final String EXPORT_PROPERTIES_NAMESPACE = "export.properties";
+    public static final String DOCKER_BASE_IMAGE_PROPERTY = "dockerBaseImage";
+    public static final String DEFAULT_SI_DOCKER_BASE_IMAGE = "wso2/streaming-integrator:latest";
+
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
     static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregator";
     static final String INCREMENTAL_AGGREGATOR = "IncrementalAggregator";

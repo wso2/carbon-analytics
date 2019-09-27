@@ -305,6 +305,7 @@ hr.file-dialog-hr {
     display: block;
     overflow: hidden;
     width: 100%;
+    padding: 10px;
 }
 
 .server-block {
@@ -418,4 +419,10 @@ hr.file-dialog-hr {
 
 .button-container {
     margin-right: 27px;
+}
+
+.clearfix {
+    display: block;
+    content: "";
+    clear: both;
 }
