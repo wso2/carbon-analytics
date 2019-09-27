@@ -22,57 +22,32 @@ define(['require', 'lodash', 'jquery'],
         var DockerConfigDialog = function (options) {
             this.container = options.templateHeader;
             this.payload = options.payload;
+            this.dockerDetailsForm = options.templateHeader.find('#docker-details')
         };
 
         DockerConfigDialog.prototype.constructor = DockerConfigDialog;
 
         DockerConfigDialog.prototype.render = function () {
-            var self = this;
+            let self = this;
 
-            var imageNameInput = '<div class="form-group">\n' +
-                '          <label>Docker Image Tag:</label>      <input type="text" class="form-control" id="docker-img-name-input-field" ' +
-                'placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">\n' +
-                '            </div>';
-
-            var checkboxs = '<div class="form-group">\n' +
-                '           <input type="checkbox" name="download-docker-artifacts" id="download-docker-artifacts" value="download"> Download artifacts<br>\n' +
-                ' <input type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"> Push to docker registry<br>\n' +
-                '            </div>';
-
-            var dockerProperties = '<div id="properties-id" style="display:none"><form id="docker-properties-form">\n' +
-                '  Docker Username:  <input type="text" name="userName" id="userName"><br>\n' +
-                '  Docker Password:  <input type="text" name="password" id="password"><br>\n' +
-                '  Docker Email:            <input type="text" name="email" id="email"><br>\n' +
-                '</form></div>';
-
-            self.container.append(imageNameInput);
-            self.container.append(checkboxs);
-            self.container.append(dockerProperties);
-
-            $("#docker-push-checkbox").change(function(){
-                if ($(this).prop('checked')==true){
-                    $('#properties-id').css("display", "block");;
+            self.container.find("#docker-push-checkbox").change(function(event){
+                if (event.target.checked){
+                    self.dockerDetailsForm.show();
                 } else {
-                    $('#properties-id').css("display", "none");
+                    self.dockerDetailsForm.hide();
                 }
             });
         };
 
         DockerConfigDialog.prototype.getDockerConfigs = function () {
             var self = this;
-                var templateKeyValue = {};
-                templateKeyValue["imageName"] = self.container.find("#docker-img-name-input-field").val();
-                templateKeyValue["userName"] = self.container.find("#userName").val();
-                templateKeyValue["password"] = self.container.find("#password").val();
-                templateKeyValue["email"] = self.container.find("#email").val();
-                templateKeyValue["downloadDocker"] = self.container.find("#download-docker-artifacts").is(":checked");
-                templateKeyValue["pushDocker"] = self.container.find("#docker-push-checkbox").is(":checked");
+            var templateKeyValue = {};
+            templateKeyValue["imageName"] = self.container.find("#docker-img-name-input-field").val();
+            templateKeyValue["username"] = self.container.find("#username").val();
+            templateKeyValue["password"] = self.container.find("#password").val();
+            templateKeyValue["email"] = self.container.find("#email").val();
+            console.log(templateKeyValue);
             return templateKeyValue;
-        };
-
-
-        DockerConfigDialog.prototype.show = function () {
-            this._fileOpenModal.modal('show');
         };
 
         return DockerConfigDialog;
