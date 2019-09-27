@@ -35,14 +35,14 @@ define(['require', 'lodash', 'jquery'],
                 '            </div>';
 
             var checkboxs = '<div class="form-group">\n' +
-                '           <input type="checkbox" name="download-docker-artifacts" value="download"> Download artifacts<br>\n' +
+                '           <input type="checkbox" name="download-docker-artifacts" id="download-docker-artifacts" value="download"> Download artifacts<br>\n' +
                 ' <input type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"> Push to docker registry<br>\n' +
                 '            </div>';
 
             var dockerProperties = '<div id="properties-id" style="display:none"><form id="docker-properties-form">\n' +
-                '  Docker Username:  <input type="text" name="username" id="username"><br>\n' +
+                '  Docker Username:  <input type="text" name="userName" id="userName"><br>\n' +
                 '  Docker Password:  <input type="text" name="password" id="password"><br>\n' +
-                '  Email:            <input type="text" name="email" id="email"><br>\n' +
+                '  Docker Email:            <input type="text" name="email" id="email"><br>\n' +
                 '</form></div>';
 
             self.container.append(imageNameInput);
@@ -62,10 +62,11 @@ define(['require', 'lodash', 'jquery'],
             var self = this;
                 var templateKeyValue = {};
                 templateKeyValue["imageName"] = self.container.find("#docker-img-name-input-field").val();
-                templateKeyValue["username"] = self.container.find("#username").val();
+                templateKeyValue["userName"] = self.container.find("#userName").val();
                 templateKeyValue["password"] = self.container.find("#password").val();
                 templateKeyValue["email"] = self.container.find("#email").val();
-                console.log(templateKeyValue);
+                templateKeyValue["downloadDocker"] = self.container.find("#download-docker-artifacts").is(":checked");
+                templateKeyValue["pushDocker"] = self.container.find("#docker-push-checkbox").is(":checked");
             return templateKeyValue;
         };
 

@@ -1127,6 +1127,17 @@ public class EditorMicroservice implements Microservice {
     ) {
         String dockerBuilderStatusKey = "";
         try {
+            if (payload == null) {
+                log.error("Form parameter payload cannot be null. Expected payload format: " +
+                        "{'templatedSiddhiApps': ['<SIDDHI-APPS>'], " +
+                        "'configuration': '<SIDDHI-CONFIG-OF-DEPLOYMENT.YAML>', " +
+                        "'templatedVariables': ['<TEMPLATED-VERIABLES>'], " +
+                        "'kubernetesConfiguration': '<K8S-CONFIG>', " +
+                        "'dockerConfiguration': '<DOCKER-CONFIG>'}");
+                return Response
+                        .status(Response.Status.BAD_REQUEST)
+                        .build();
+            }
             ExportAppsRequest exportAppsRequest = new Gson().fromJson(payload, ExportAppsRequest.class);
             ExportUtils exportUtils = new ExportUtils(configProvider, exportAppsRequest, exportType);
             File zipFile = exportUtils.createZipFile();

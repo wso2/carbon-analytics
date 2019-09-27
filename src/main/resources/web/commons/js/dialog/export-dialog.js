@@ -44,7 +44,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         templatedVariables: [],
                         bundles: [],
                         jars: [],
-                        kubernetesConfiguration: ''
+                        kubernetesConfiguration: '',
+                        dockerConfiguration: ''
                     };
                     this._siddhiAppSelector;
                     this._jarsSelectorDialog;
@@ -53,18 +54,19 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this._kubernetesConfigModel;
                     this._fill_template_value_dialog;
                     this._dockerConfigModel;
+                    this._exportUrl;
 
-                    var type;
+                    var exportType;
                     if (isExportDockerFlow) {
-                        type = 'docker';
+                        exportType = 'docker';
                     } else {
-                        type = 'kubernetes';
+                        exportType = 'kubernetes';
                     }
-                    var exportUrl = options.config.baseUrl + "/export?type=" + type;
+                    this._exportUrl = options.config.baseUrl + "/export?exportType=" + exportType;
                     this._btnExportForm =  $('' +
                         '<form id="submit-form" method="post" enctype="application/x-www-form-urlencoded" target="export-download" >' +
                         '<button  type="button" class="btn btn-primary hidden" id="export-btn" data-dismiss="modal" >Export</button>' +
-                        '</form>').attr('action', exportUrl);
+                        '</form>');
 
                 },
 
@@ -226,7 +228,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     if (!this._isExportDockerFlow) {
                         this._payload.kubernetesConfiguration = this._kubernetesConfigModel.getKubernetesConfigs();
                     }
-                    this._dockerConfigModel.getDockerConfigs();
+                    this._payload.dockerConfiguration = this._dockerConfigModel.getDockerConfigs();
                     this._payload.bundles = this._jarsSelectorDialog.getSelected('bundles');
                     this._payload.jars = this._jarsSelectorDialog.getSelected('jars');
 
@@ -235,6 +237,36 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this._btnExportForm.append(payloadInputField);
 
                     $(document.body).append(this._btnExportForm);
+                    var exportUrl = this._exportUrl
+                    var requestType = ""
+                    if (this._payload.dockerConfiguration.downloadDocker && !this._payload.dockerConfiguration.pushDocker) {
+                        requestType = "downloadOnly";
+                        exportUrl = exportUrl + "&requestType=" + requestType;
+                    } else if (!this._payload.dockerConfiguration.downloadDocker && this._payload.dockerConfiguration.pushDocker) {
+                        requestType = "buildOnly";
+                        exportUrl = exportUrl + "&requestType=" + requestType;
+                        $.ajax({
+                            type: "POST",
+                            url: exportUrl,
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                             },
+                            data: {"payload": JSON.stringify(this._payload)},
+                            async: false,
+                            success: function (response) {
+                                result = {status: "success"};
+                            },
+                            error: function (error) {
+                                if (error.responseText) {
+                                    result = {status: "fail", errorMessage: error.responseText};
+                                } else {
+                                    result = {status: "fail", errorMessage: "Error Occurred while processing your request"};
+                                }
+                            }
+                        });
+                        return;
+                    }
+                    this._btnExportForm = this._btnExportForm.attr('action', exportUrl)
                     this._btnExportForm.submit();
                 },
 
