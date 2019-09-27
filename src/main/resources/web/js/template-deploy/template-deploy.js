@@ -165,7 +165,7 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                         '   </td>' +
                         '   <td>' +
                         '       <button type="button" class="btn btn-secondary" id="' + justGetName(attr) + '-clear" style="margin-top: 26px">' +
-                        '           X' +
+                        '           <i class="fw fw-delete fw-lg"></i>' +
                         '       </button>' +
                         '   </td>' +
                         '</tr>'
@@ -181,14 +181,14 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                     $("#" + justGetName(attr) + "-clear").on('click', function (e) {
                         console.log(e);
                         let attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
-                        delete attrLocalStore['${' + e.target.id.split('-clear')[0] + '}'];
+                        delete attrLocalStore['${' + e.currentTarget.id.split('-clear')[0] + '}'];
 
                         localStorage.setItem("templatedAttributeList", JSON.stringify(attrLocalStore));
                         self._application.utils.retrieveSiddhiAppNames(self.populateTemplateApps, self.handleErrorMsg, self);
                     });
                 });
 
-                $("#unused-template-clear").on('click', function () {
+                $("#template-clear-all").on('click', function () {
                     let unusedTemplateAttrs = unusedTemplateAttr;
                     let attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
 
