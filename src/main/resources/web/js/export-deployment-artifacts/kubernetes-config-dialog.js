@@ -129,6 +129,8 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             var self = this;
             var messagingConfig ='';
             var pvConfig = '';
+            var siddhiProcessName = self.templateContainer.find("#sp-name-input-field").val() || 'sample-siddhi-process';
+            var siddhiProcessNameConfig = "siddhiProcessName: ".concat(siddhiProcessName.toString());
             self.editorObjectArrayList.forEach(function(editorObj) {
                 if(self.natsConfigsGiven && editorObj.name == 'messaging') {
                     messagingConfig = editorObj.content.session.getValue().toString();
@@ -137,7 +139,8 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                     pvConfig = editorObj.content.session.getValue().toString();
                 }
             });
-            return messagingConfig + "\n" + pvConfig;
+
+            return siddhiProcessNameConfig + "\n" + messagingConfig + "\n" + pvConfig;
         };
         return KubernetesConfigDialog;
     });
