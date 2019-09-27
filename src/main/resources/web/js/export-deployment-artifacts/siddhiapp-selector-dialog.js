@@ -49,7 +49,7 @@ define(['jquery', 'lodash', 'log', 'file_browser', 'js_tree'],
                 siddhiAppSelectorStep.jstree("open_all");
             });
             fileBrowser.on("selected", function () {
-                openFileWizardError.addClass('step-description');
+                openFileWizardError.css('opacity', '0.6');
                 openFileWizardError.css('background-color', 'transparent');
             });
 
@@ -58,7 +58,7 @@ define(['jquery', 'lodash', 'log', 'file_browser', 'js_tree'],
         SiddhiAppSelectorDialog.prototype.validateSiddhiAppSelection = function () {
             var files = this.fileBrowser.getSelected();
             if (files.length === 0) {
-                this.openFileWizardError.removeClass('step-description');
+                this.openFileWizardError.css('opacity', '1.0');
                 this.openFileWizardError.css('background-color', '#d9534f !important');
                 return false;
             }
