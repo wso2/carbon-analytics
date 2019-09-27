@@ -56,15 +56,19 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             };
             self.editorObjectArrayList.push(obj1);
 
-            self.templateContainer.find('#distributed-with-ext-nats').change(function(event){
-                let kubeConfigEditor = self.templateContainer.find('#kubernetes-messaging-editor-id');
-                if (event.target.checked){
-                    self.natsConfigsGiven = true;
-                    kubeConfigEditor.show();
-                } else {
-                    self.natsConfigsGiven = false;
-                    kubeConfigEditor.hide();
-                }
+            self.templateContainer.find('#distributed-with-ext-nats').change(function(){
+                self.natsConfigsGiven = true;
+                self.templateContainer.find('#kubernetes-messaging-editor-id').show();
+            });
+
+            self.templateContainer.find('#non-distributed').change(function(){
+                self.natsConfigsGiven = false;
+                self.templateContainer.find('#kubernetes-messaging-editor-id').hide();
+            });
+
+            self.templateContainer.find('#distributed-with-nats').change(function(){
+                self.natsConfigsGiven = false;
+                self.templateContainer.find('#kubernetes-messaging-editor-id').hide();
             });
 
             var divId = "kubernetes-pv-editor-id";
@@ -93,15 +97,14 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             };
             self.editorObjectArrayList.push(obj2);
 
-            self.templateContainer.find('#backed-by-pv').change(function(event){
-                let kubePersistenceConfigEditor = self.templateContainer.find('#kubernetes-pv-editor-id');
-                if (event.target.checked){
-                    self.pvConfigsGiven = true;
-                    kubePersistenceConfigEditor.show();
-                } else {
-                    self.pvConfigsGiven = false;
-                    kubePersistenceConfigEditor.hide();
-                }
+            self.templateContainer.find('#stateless').change(function(){
+                self.pvConfigsGiven = false;
+                self.templateContainer.find('#kubernetes-pv-editor-id').hide();
+            });
+
+            self.templateContainer.find('#backed-by-pv').change(function(){
+                self.pvConfigsGiven = true;
+                self.templateContainer.find('#kubernetes-pv-editor-id').show();
             });
         };
 
