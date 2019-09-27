@@ -91,12 +91,38 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             .append('<li><a href="#step-7">Step 7<br/><small>Add Kubernetes Config</small></a></li>');
 
                         form.find('#form-containers')
-                            .append("\n" +
-                                "<div id=\"step-7\" class=\"export-selector\">\n" +
-                                "<div class='kubernetes-configuration-step' id='kubernetes-configuration-step-id'>\n" +
-                                "<div class=\"step-description\">Configure Kubernetes for Siddhi</div>" +
-                                "</div>\n" +
-                                "</div>");
+                            .append(
+                                '<div id="step-7" class="export-selector">' +
+                                '<div class="kubernetes-configuration-step" id="kubernetes-configuration-step-id">' +
+                                '<div class="step-description">Configure Kubernetes for Siddhi</div>' +
+                                '<div>' +
+                                '<div class="form-group">' +
+                                '<div class="clearfix">Siddhi Process Name:</div>' +
+                                '<input type="text" class="form-control" id="sp-name-input-field" placeholder="sample-siddhi-process">' +
+                                '</div>' +
+                                '<div class="form-group">' +
+                                '<div class="clearfix">Deployment types:</div>' +
+                                '<div>' +
+                                '<div class="clearfix">Distributed/Non-distributed</div>' +
+                                '<div class="clearfix"><input type="radio" id="non-distributed" value="non-distributed"> Non distributed deployment</div>' +
+                                '<div class="clearfix"><input type="radio" id="distributed-with-nats" value="distributed-with-nats"> Distributed deployment with NATS</div>' +
+                                '<div class="clearfix">' +
+                                '   <div><input type="radio" id="distributed-with-ext-nats" value="distributed-with-ext-nats"> Distributed deployment with External NATS<div>' +
+                                '   <div class="messaging-config-template-container kubernetes-config-editor" hidden id="kubernetes-messaging-editor-id"></div>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>' +
+                                '<div class="form-group">' +
+                                '<div class="clearfix">Persistence Storage:</div>' +
+                                '<div class="clearfix"><input type="radio" name="persistence" id="stateless" value="stateless"> Stateless</div>' +
+                                '<div class="clearfix">' +
+                                '<div class="clearfix"><input type="radio" name="persistence" id="backed-by-pv" value="backed-by-pv"> Backed by Persistent Volume</div>' +
+                                '<div class="messaging-config-template-container kubernetes-config-editor" hidden id="kubernetes-pv-editor-id"></div>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>');
                     }
 
                     // Toolbar extra buttons

@@ -32,29 +32,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
         KubernetesConfigDialog.prototype.render = function () {
             var self = this;
 
-            var siddhiProcessName = '<div class="form-group">\n' +
-                '          <label>Siddhi Process Name:</label>  <input type="text" class="form-control" id="sp-name-input-field" ' +
-                'placeholder="sample-siddhi-process">\n' +
-                '            </div>';
-
-            var checkboxes = '<div class="form-group">  <label>Deployment types:</label><br>' +
-                '          <label>Distributed/Non-distributed</label><br> ' +
-                '<input type="radio" name="deployment" id="non-distributed" value="non-distributed"> Non distributed deployment<br>\n' +
-                ' <input type="radio" name="deployment" id="distributed-with-nats" value="distributed-with-nats"> Distributed deployment with NATS<br>\n' +
-                ' <input type="radio" name="deployment" id="distributed-with-ext-nats" value="distributed-with-ext-nats"> Distributed deployment with External NATS<br>\n' +
-                '            </div>';
-
-            var persistence =  '<div class="form-group">  <label>Persistence Storage:</label><br>' +
-                '<input type="radio" name="persistence" id="stateless" value="stateless"> Stateless<br>\n' +
-                ' <input type="radio" name="persistence" id="backed-by-pv" value="backed-by-pv"> Backed by Persistent Volume<br>\n' +
-                '            </div>';
-
-            self.templateContainer.append(siddhiProcessName);
-            self.templateContainer.append(checkboxes);
-
             var messagingEdtdivId = "kubernetes-messaging-editor-id";
-            var messagingTemplateEntry = "<div class='messaging-config-template-container' style='display:none' id='".concat(messagingEdtdivId).concat("'></div>");
-            self.templateContainer.append(messagingTemplateEntry);
             this._mainEditor = new SiddhiEditor({
                 divID: messagingEdtdivId,
                 realTimeValidation: false,
@@ -76,21 +54,19 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             };
             self.editorObjectArrayList.push(obj1);
 
-            $("#distributed-with-ext-nats").change(function(){
-                if ($(this).prop('checked')){
+            self.templateContainer.find('#distributed-with-ext-nats').change(function(event){
+                let kubeConfigEditor = self.templateContainer.find('#kubernetes-messaging-editor-id');
+                if (event.target.checked){
                     self.natsConfigsGiven = true;
-                    $('#kubernetes-messaging-editor-id').css({'display': 'block', 'height':'100px'});
+                    kubeConfigEditor.show();
                 } else {
                     self.natsConfigsGiven = false;
-                    $('#kubernetes-messaging-editor-id').css("display", "none");
+                    kubeConfigEditor.hide();
                 }
             });
 
-            self.templateContainer.append(persistence);
 
             var divId = "kubernetes-pv-editor-id";
-            var templateEntry = "<div class='config-template-container' style='display:none' id='".concat(divId).concat("'></div>");
-            self.templateContainer.append(templateEntry);
             this._mainEditor = new SiddhiEditor({
                 divID: divId,
                 realTimeValidation: false,
@@ -114,13 +90,14 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             };
             self.editorObjectArrayList.push(obj2);
 
-            $("#backed-by-pv").change(function(){
-                if ($(this).prop('checked')){
+            self.templateContainer.find('#backed-by-pv').change(function(event){
+                let kubePersistenceConfigEditor = self.templateContainer.find('#kubernetes-pv-editor-id');
+                if (event.target.checked){
                     self.pvConfigsGiven = true;
-                    $('#kubernetes-pv-editor-id').css({'display': 'block', 'height':'150px'});;
-                } else if ($(this).prop('unchecked')) {
+                    kubePersistenceConfigEditor.show();
+                } else {
                     self.pvConfigsGiven = false;
-                    $('#kubernetes-pv-editor-id').css("display", "none");
+                    kubePersistenceConfigEditor.hide();
                 }
             });
         };
