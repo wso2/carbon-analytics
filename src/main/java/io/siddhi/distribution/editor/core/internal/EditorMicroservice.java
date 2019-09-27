@@ -222,8 +222,12 @@ public class EditorMicroservice implements Microservice {
         ValidationRequest validationRequest = new Gson().fromJson(validationRequestString, ValidationRequest.class);
         String jsonString;
         try {
+            String siddhiApp = validationRequest.getSiddhiApp();
+            if (validationRequest.getVariables().size() != 0) {
+                SourceEditorUtils.populateSiddhiAppWithVars(validationRequest.getVariables(), siddhiApp);
+            }
             SiddhiAppRuntime siddhiAppRuntime =
-                    EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(validationRequest.getSiddhiApp());
+                    EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(siddhiApp);
 
             // Status SUCCESS to indicate that the siddhi app is valid
             ValidationSuccessResponse response = new ValidationSuccessResponse(Status.SUCCESS);

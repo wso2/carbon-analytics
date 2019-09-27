@@ -30,6 +30,7 @@ import io.siddhi.distribution.editor.core.commons.request.ExportAppsRequest;
 import io.siddhi.distribution.editor.core.exception.DockerGenerationException;
 import io.siddhi.distribution.editor.core.exception.KubernetesGenerationException;
 import io.siddhi.distribution.editor.core.util.Constants;
+import io.siddhi.distribution.editor.core.util.SourceEditorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
@@ -56,8 +57,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -319,7 +318,12 @@ public class ExportUtils {
             exposePorts.addAll(Arrays.asList(9090, 9443));
             List<String> siddhiApps = userGivenSiddhiApps;
             if (envMap.size() != 0 && !userGivenSiddhiApps.isEmpty()) {
-                siddhiApps = populateAppWithEnvs(envMap, userGivenSiddhiApps);
+                List<String> populatedSiddhiApps = new ArrayList<>();
+                for (String siddhiApp : siddhiApps) {
+                    String populatedSiddhiApp = SourceEditorUtils.populateSiddhiAppWithVars(envMap, siddhiApp);
+                    populatedSiddhiApps.add(populatedSiddhiApp);
+                }
+                siddhiApps = populatedSiddhiApps;
             }
             for (String app : siddhiApps) {
                 try {
@@ -434,28 +438,6 @@ public class ExportUtils {
             }
         }
         return zipFile;
-    }
-
-    private List<String> populateAppWithEnvs(Map<String, String> envMap, List<String> siddhiApps) {
-
-        List<String> populatedApps = new ArrayList<>();
-        for (String siddhiApp : siddhiApps) {
-            if (siddhiApp.contains("$")) {
-                String envPattern = "\\$\\{(\\w+)\\}";
-                Pattern expr = Pattern.compile(envPattern);
-                Matcher matcher = expr.matcher(siddhiApp);
-                while (matcher.find()) {
-                    for (int i = 1; i <= matcher.groupCount(); i++) {
-                        String envValue = envMap.getOrDefault(matcher.group(i), "");
-                        envValue = envValue.replace("\\", "\\\\");
-                        Pattern subexpr = Pattern.compile("\\$\\{" + matcher.group(i) + "\\}");
-                        siddhiApp = subexpr.matcher(siddhiApp).replaceAll(envValue);
-                    }
-                }
-            }
-            populatedApps.add(siddhiApp);
-        }
-        return populatedApps;
     }
 
     /**

@@ -261,6 +261,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 submitToServerForSemanticErrorCheck(
                     {
                         siddhiApp: editorText,
+                        variables: localStorage.getItem("templatedAttributeList"),
                         missingStreams: self.completionEngine.incompleteData.streams,
                         missingInnerStreams: self.completionEngine.incompleteData.partitions,
                         missingAggregationDefinitions: self.completionEngine.incompleteData.aggregationDefinitions
