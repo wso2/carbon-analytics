@@ -2531,26 +2531,24 @@
                         </div>
                         <div id="step-6" class="docker-config">
                             <div class='docker-config-container' id='docker-config-container-id'>
-                                <div class="form-group" id="checkbox-form">
-                                    <input type="checkbox" name="download-docker-artifacts" value="download">Download artifacts<br>
-                                    <input type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"> Push to docker registry<br>
-                                    <div class="form-group" id="docker-details" hidden>
-                                        <div class="form-row">
-                                            <label class="form-cell">Docker Image Tag:</label>
-                                            <input class="form-cell" type="text"  id="docker-img-name-input-field" placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">
-                                        </div>
-                                        <div class="form-row">
-                                            <label class="form-cell">Docker Username:</label>
-                                            <input type="text" name="username" id="username">
-                                        </div>
-                                        <div class="form-row">
-                                            <label class="form-cell">Docker Password:</label>
-                                            <input type="text" name="password" id="password">
-                                        </div>
-                                        <div class="form-row">
-                                            <label class="form-cell">Email:</label>
-                                            <input type="text" name="email" id="email">
-                                        </div>
+                                <input class="docker-checkbox" type="checkbox" name="download-docker-artifacts" value="download"><label class="label-description">Download artifacts</label><br><br>
+                                <input class="docker-checkbox" type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"><label class="label-description">Push to docker registry</label><br>
+                                <div class="docker-details-form" id="docker-details" hidden>
+                                    <div class="docker-details-row">
+                                        <label class="label-description form-input">Docker Image Tag:</label><br>
+                                        <input class="file-dialog-form-control" type="text"  id="docker-img-name-input-field" placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">
+                                    </div>
+                                    <div class="docker-details-row">
+                                        <label class="label-description form-input">Docker Username:</label><br>
+                                        <input class="file-dialog-form-control" type="text" name="username" id="userName">
+                                    </div>
+                                    <div class="docker-details-row">
+                                        <label class="label-description form-input">Docker Password:</label><br>
+                                        <input class="file-dialog-form-control" type="text" name="password" id="password">
+                                    </div>
+                                    <div class="docker-details-row">
+                                        <label class="label-description form-input">Email:</label><br>
+                                        <input class="file-dialog-form-control" type="text" name="email" id="email">
                                     </div>
                                 </div>
                             </div>

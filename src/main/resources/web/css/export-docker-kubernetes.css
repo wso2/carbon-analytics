@@ -164,3 +164,41 @@ hr.export-dialog-hr {
 .link-disabled {
     pointer-events: none;
 }
+
+.docker-config-container {
+    padding-top: 20px;
+    padding-left: 50px;
+}
+
+.label-description {
+    padding-top: 2px;
+    padding-left: 8px;
+}
+
+.docker-config-container input {
+    margin: 0 0 0 !important;
+}
+
+.docker-details-form {
+    margin-top: 10px;
+    margin-left: 50px;
+    padding-left: 10px;
+    padding-top: 10px;
+}
+
+.docker-details-row {
+    padding: 5px;
+}
+
+.docker-details-row .label-description > div {
+    padding-left: 0 !important;
+    min-width: 100px;
+}
+
+.export-form-input {
+    padding-left: 0 !important;
+}
+
+.docker-details-row input {
+    width: 80% !important;
+}
