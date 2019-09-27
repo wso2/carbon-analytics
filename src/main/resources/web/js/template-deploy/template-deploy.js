@@ -173,7 +173,6 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                     });
 
                     $("#" + justGetName(attr) + "-clear").on('click', function (e) {
-                        console.log(e);
                         let attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
                         delete attrLocalStore['${' + e.currentTarget.id.split('-clear')[0] + '}'];
 
@@ -230,7 +229,7 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
 
 
         TemplateDeploy.prototype.handleErrorMsg = function (msg) {
-            console.error(msg);
+            alerts.error(msg);
         };
 
 
