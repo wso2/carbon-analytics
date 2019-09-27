@@ -22,7 +22,8 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
         var KubernetesConfigDialog = function (options) {
             this.app = options.app;
             this.templateContainer = options.templateHeader;
-            this.k8ConfigEditor;
+            this.editorObjectArrayList = [];
+            // this.k8ConfigEditor;
         };
 
         KubernetesConfigDialog.prototype.constructor = KubernetesConfigDialog;
@@ -31,40 +32,112 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             var self = this;
 
             var siddhiProcessName = '<div class="form-group">\n' +
-                '          <label>Docker Image Tag:</label>      <input type="text" class="form-control" id="sp-name-input-field" ' +
-                'placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">\n' +
+                '          <label>Siddhi Process Name:</label>  <input type="text" class="form-control" id="sp-name-input-field" ' +
+                'placeholder="sample-siddhi-process">\n' +
                 '            </div>';
 
-            var checkboxs = '<div class="form-group">\n' +
-                '           <input type="checkbox" name="download-docker-artifacts" value="download"> Download artifacts<br>\n' +
-                ' <input type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"> Push to docker registry<br>\n' +
+            var checkboxes = '<div class="form-group">  <label>Deployment types:</label><br>' +
+                '          <label>Distributed/Non-distributed</label><br> ' +
+                '<input type="radio" name="deployment" id="non-distributed" value="non-distributed"> Non distributed deployment<br>\n' +
+                ' <input type="radio" name="deployment" id="distributed-with-nats" value="distributed-with-nats"> Distributed deployment with NATS<br>\n' +
+                ' <input type="radio" name="deployment" id="distributed-with-ext-nats" value="distributed-with-ext-nats"> Distributed deployment with External NATS<br>\n' +
                 '            </div>';
 
-            var dockerProperties = '<div id="properties-id" style="display:none"><form id="docker-properties-form">\n' +
-                '  Docker Username:  <input type="text" name="username" id="username"><br>\n' +
-                '  Docker Password:  <input type="text" name="password" id="password"><br>\n' +
-                '  Email:            <input type="text" name="email" id="email"><br>\n' +
-                '</form></div>';
+            var persistence =  '<div class="form-group">  <label>Persistence Storage:</label><br>' +
+                '<input type="radio" name="persistence" id="stateless" value="stateless"> Stateless<br>\n' +
+                ' <input type="radio" name="persistence" id="backed-by-pv" value="backed-by-pv"> Backed by Persistent Volume<br>\n' +
+                '            </div>';
+
+            self.templateContainer.append(siddhiProcessName);
+            self.templateContainer.append(checkboxes);
+
+            var messagingEdtdivId = "kubernetes-messaging-editor-id";
+            var messagingTemplateEntry = "<div class='messaging-config-template-container' style='display:none' id='".concat(messagingEdtdivId).concat("'></div>");
+            self.templateContainer.append(messagingTemplateEntry);
+            this._mainEditor = new SiddhiEditor({
+                divID: messagingEdtdivId,
+                realTimeValidation: false,
+                autoCompletion: false
+            });
+
+            var messagingSampleConfig = 'messagingSystem:\n' +
+                '  type: nats\n' +
+                '  # config: \n' +
+                '  #   bootstrapServers: \n' +
+                '  #     - "nats://siddhi-nats:4222"\n' +
+                '  #   streamingClusterId: siddhi-stan';
+            this._editor1 = ace.edit(messagingEdtdivId);
+            this._editor1.getSession().setValue(messagingSampleConfig);
+            this._editor1.resize(true);
+            var obj1 = {
+                name: 'messagingEditor',
+                content: this._editor1
+            };
+            self.editorObjectArrayList.push(obj1);
+
+            $("#distributed-with-ext-nats").change(function(){
+                if ($(this).prop('checked')){
+                    $('#kubernetes-messaging-editor-id').css({'display': 'block', 'height':'100px'});
+                } else {
+                    alert('Option nats-external is unchecked!');
+                    $('#kubernetes-messaging-editor-id').css("display", "none");
+                }
+            });
 
 
-            // var divId = "kubernetes-config-editor-id";
-            // var templateEntry = "<div class= 'config-template-container' id='".concat(divId).concat("'></div>");
-            // self.templateContainer.append(templateEntry);
-            //
-            // this._mainEditor = new SiddhiEditor({
-            //     divID: divId,
-            //     realTimeValidation: false,
-            //     autoCompletion: false
+            // $("#distributed-with-ext-nats").change(function(){
+            //     if ($(this).prop('checked')==true){
+            //         $('#ext-nats-config-id').css("display", "block");;
+            //     } else {
+            //         $('#ext-nats-config-id').css("display", "none");
+            //     }
             // });
-            //
-            // this._editor = ace.edit(divId);
-            // this._editor.resize(true);
-            self.k8ConfigEditor = this._editor;
+            self.templateContainer.append(persistence);
+
+            var divId = "kubernetes-pv-editor-id";
+            var templateEntry = "<div class='config-template-container' style='display:none' id='".concat(divId).concat("'></div>");
+            self.templateContainer.append(templateEntry);
+            this._mainEditor = new SiddhiEditor({
+                divID: divId,
+                realTimeValidation: false,
+                autoCompletion: false
+            });
+
+            var pvSampleConfig = 'persistentVolumeClaim: \n' +
+                '  accessModes: \n' +
+                '    - ReadWriteOnce\n' +
+                '  resources: \n' +
+                '    requests: \n' +
+                '      storage: 1Gi\n' +
+                '  storageClassName: standard\n' +
+                '  volumeMode: Filesystem';
+            this._editor2 = ace.edit(divId);
+            this._editor2.getSession().setValue(pvSampleConfig);
+            this._editor2.resize(true);
+            var obj2 = {
+                name: 'pvEditor',
+                content: this._editor2
+            };
+            self.editorObjectArrayList.push(obj2);
+
+            $("#backed-by-pv").change(function(){
+                if ($(this).prop('checked')){
+                    $('#kubernetes-pv-editor-id').css({'display': 'block', 'height':'150px'});;
+                } else if ($(this).prop('unchecked')) {
+                    alert('Option backed-by-pv is unchecked!');
+                    $('#kubernetes-pv-editor-id').css("display", "none");
+                }
+            });
         };
 
         KubernetesConfigDialog.prototype.getKubernetesConfigs = function () {
             var self = this;
-            return self.k8ConfigEditor.session.getValue();
+            var templateKeyValue = {};
+            templateKeyValue["bootstrapServers"] = self.templateContainer.find("#bootstrapServers").val();
+            templateKeyValue["streamingClusterId"] = self.templateContainer.find("#streamingClusterId").val();
+            console.log(templateKeyValue);
+            return templateKeyValue;
+            // return self.k8ConfigEditor.session.getValue();
         };
         return KubernetesConfigDialog;
     });
