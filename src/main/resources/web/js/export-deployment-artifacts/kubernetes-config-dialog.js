@@ -22,8 +22,9 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
         var KubernetesConfigDialog = function (options) {
             this.app = options.app;
             this.templateContainer = options.templateHeader;
+            this.natsConfigsGiven = false;
+            this.pvConfigsGiven = false;
             this.editorObjectArrayList = [];
-            // this.k8ConfigEditor;
         };
 
         KubernetesConfigDialog.prototype.constructor = KubernetesConfigDialog;
@@ -70,28 +71,21 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             this._editor1.getSession().setValue(messagingSampleConfig);
             this._editor1.resize(true);
             var obj1 = {
-                name: 'messagingEditor',
+                name: 'messaging',
                 content: this._editor1
             };
             self.editorObjectArrayList.push(obj1);
 
             $("#distributed-with-ext-nats").change(function(){
                 if ($(this).prop('checked')){
+                    self.natsConfigsGiven = true;
                     $('#kubernetes-messaging-editor-id').css({'display': 'block', 'height':'100px'});
                 } else {
-                    alert('Option nats-external is unchecked!');
+                    self.natsConfigsGiven = false;
                     $('#kubernetes-messaging-editor-id').css("display", "none");
                 }
             });
 
-
-            // $("#distributed-with-ext-nats").change(function(){
-            //     if ($(this).prop('checked')==true){
-            //         $('#ext-nats-config-id').css("display", "block");;
-            //     } else {
-            //         $('#ext-nats-config-id').css("display", "none");
-            //     }
-            // });
             self.templateContainer.append(persistence);
 
             var divId = "kubernetes-pv-editor-id";
@@ -115,16 +109,17 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             this._editor2.getSession().setValue(pvSampleConfig);
             this._editor2.resize(true);
             var obj2 = {
-                name: 'pvEditor',
+                name: 'persistence',
                 content: this._editor2
             };
             self.editorObjectArrayList.push(obj2);
 
             $("#backed-by-pv").change(function(){
                 if ($(this).prop('checked')){
+                    self.pvConfigsGiven = true;
                     $('#kubernetes-pv-editor-id').css({'display': 'block', 'height':'150px'});;
                 } else if ($(this).prop('unchecked')) {
-                    alert('Option backed-by-pv is unchecked!');
+                    self.pvConfigsGiven = false;
                     $('#kubernetes-pv-editor-id').css("display", "none");
                 }
             });
@@ -132,12 +127,17 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
 
         KubernetesConfigDialog.prototype.getKubernetesConfigs = function () {
             var self = this;
-            var templateKeyValue = {};
-            templateKeyValue["bootstrapServers"] = self.templateContainer.find("#bootstrapServers").val();
-            templateKeyValue["streamingClusterId"] = self.templateContainer.find("#streamingClusterId").val();
-            console.log(templateKeyValue);
-            return templateKeyValue;
-            // return self.k8ConfigEditor.session.getValue();
+            var messagingConfig ='';
+            var pvConfig = '';
+            self.editorObjectArrayList.forEach(function(editorObj) {
+                if(self.natsConfigsGiven && editorObj.name == 'messaging') {
+                    messagingConfig = editorObj.content.session.getValue().toString();
+                }
+                if(self.pvConfigsGiven && editorObj.name == 'persistence') {
+                    pvConfig = editorObj.content.session.getValue().toString();
+                }
+            });
+            return messagingConfig + "\n" + pvConfig;
         };
         return KubernetesConfigDialog;
     });
