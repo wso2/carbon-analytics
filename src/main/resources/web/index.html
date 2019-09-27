@@ -2560,6 +2560,41 @@
     </div>
 </div>
 
+<!-- Step 7 of export dialog -->
+<div id="step-7" class="export-selector">
+    <div class="export-siddhi-app-list" id="kubernetes-configuration-step-id">
+        <div class="step-description">Configure Kubernetes for Siddhi</div>
+        <div class="kube-config-form">
+            <div class="kube-config-row">
+                <div class="clearfix">Siddhi Process Name:</div>
+                <input type="text" class="form-control" id="sp-name-input-field" placeholder="sample-siddhi-process">
+                </div>
+            <div class="kube-config-row">
+                <div class="clearfix">Deployment types:</div>
+                <div>
+                    <div class="clearfix">Distributed/Non-distributed</div>
+                    <div>
+                        <div class="clearfix"><input type="radio" id="non-distributed" value="non-distributed"> Non distributed deployment</div>
+                        <div class="clearfix"><input type="radio" id="distributed-with-nats" value="distributed-with-nats"> Distributed deployment with NATS</div>
+                        <div class="clearfix">
+                            <div><input type="radio" id="distributed-with-ext-nats" value="distributed-with-ext-nats"> Distributed deployment with External NATS</div>
+                            <div class="messaging-config-template-container kubernetes-config-editor" hidden id="kubernetes-messaging-editor-id"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="kube-config-row">
+                <div class="clearfix">Persistence Storage:</div>
+                <div class="clearfix"><input type="radio" name="persistence" id="stateless" value="stateless"> Stateless</div>
+                <div class="clearfix">
+                    <div class="clearfix"><input type="radio" name="persistence" id="backed-by-pv" value="backed-by-pv"> Backed by Persistent Volume</div>
+                    <div class="messaging-config-template-container kubernetes-config-editor" hidden id="kubernetes-pv-editor-id"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
 <script type="text/javascript">
@@ -3504,9 +3539,11 @@
                     }
                 }
             },
-
             export_dialog: {
                 selector: "#openExportModal"
+            },
+            export_kube_step: {
+                selector: "#step-7"
             }
         };
         app = new Application(config);
