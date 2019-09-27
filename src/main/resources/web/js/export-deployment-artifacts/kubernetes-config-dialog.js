@@ -33,6 +33,8 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             var self = this;
 
             var messagingEdtdivId = "kubernetes-messaging-editor-id";
+            var messagingTemplateEntry = "<div class='kubernetes-config-editor' style='display:none' id='".concat(messagingEdtdivId).concat("'></div>");
+            self.templateContainer.find('#distribution-selection').append(messagingTemplateEntry);
             this._mainEditor = new SiddhiEditor({
                 divID: messagingEdtdivId,
                 realTimeValidation: false,
@@ -65,8 +67,9 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                 }
             });
 
-
             var divId = "kubernetes-pv-editor-id";
+            var templateEntry = "<div class='kubernetes-config-editor' style='display:none' id='".concat(divId).concat("'></div>");
+            self.templateContainer.find('#persistent-select').append(templateEntry);
             this._mainEditor = new SiddhiEditor({
                 divID: divId,
                 realTimeValidation: false,

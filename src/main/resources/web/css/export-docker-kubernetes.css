@@ -200,10 +200,51 @@ hr.export-dialog-hr {
 }
 
 .docker-details-row input {
+    height: 30px !important;
     width: 80% !important;
     background-color: #222222 !important;
 }
 
+.export-kube-config-container {
+    display: block;
+    overflow: auto;
+    width: 100%;
+    background-color: #2C2C2C !important;
+    padding: 10px;
+}
+
+.kube-config-form {
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow: auto;
+    width: 100%;
+    background-color: transparent;
+    margin: auto;
+}
+
+.kube-config-row {
+    padding-top: 10px;
+    padding-left: 10px;
+    margin-top: 10px;
+}
+
+.kube-config-sub-row {
+    padding: 10px 10px 5px;
+}
+
+.kube-input-group {
+    padding: 5px 5px 5px 10px;
+}
+
+.siddhi-process-name-input {
+    height: 30px !important;
+    background-color: #222222 !important;
+    margin-top: 2px;
+    width: 80%;
+}
+
 .kubernetes-config-editor {
-    height: 100px !important;
+    height: 150px !important;
+    width: 80%; !important;
+    padding-top: 2px !important;
 }
