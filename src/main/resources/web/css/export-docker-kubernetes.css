@@ -151,8 +151,14 @@ hr.export-dialog-hr {
     height: 98% !important;
 }
 
-.sw-theme-default > ul.step-anchor.k8_export_header_item li {
-    width: 16%;
+.k8_export_header {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.sw-theme-default > ul.step-anchor.k8_export_header li {
+    max-width: 14%;
+    height: 86px;
 }
 
 .link-disabled {
