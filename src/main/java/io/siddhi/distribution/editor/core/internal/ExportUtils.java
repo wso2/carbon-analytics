@@ -322,13 +322,20 @@ public class ExportUtils {
                 siddhiApps = populateAppWithEnvs(envMap, userGivenSiddhiApps);
             }
             for (String app : siddhiApps) {
-                Collection<List<Source>> sources = EditorDataHolder.getSiddhiManager()
-                        .createSiddhiAppRuntime(app).getSources();
-                for (List<Source> sourceList : sources) {
-                    for (Source source : sourceList) {
-                        if (source.getServiceDeploymentInfo() != null) {
-                            exposePorts.add(source.getServiceDeploymentInfo().getPort());
+                try {
+                    Collection<List<Source>> sources = EditorDataHolder.getSiddhiManager()
+                            .createSiddhiAppRuntime(app).getSources();
+                    for (List<Source> sourceList : sources) {
+                        for (Source source : sourceList) {
+                            if (source.getServiceDeploymentInfo() != null) {
+                                exposePorts.add(source.getServiceDeploymentInfo().getPort());
+                            }
                         }
+                    }
+                } catch (Exception ignored) {
+                    //ignoring exception since Siddhi app parsing might fail due to unset variables
+                    if (log.isDebugEnabled()) {
+                        log.error("Exception caught while parsing the exported Siddhi applications.", ignored);
                     }
                 }
             }
