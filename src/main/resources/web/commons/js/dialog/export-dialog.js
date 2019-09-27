@@ -55,14 +55,14 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this._fill_template_value_dialog;
                     this._dockerConfigModel;
                     this._exportUrl;
+                    this._exportType;
 
-                    var exportType;
                     if (isExportDockerFlow) {
-                        exportType = 'docker';
+                        this._exportType = 'docker';
                     } else {
-                        exportType = 'kubernetes';
+                        this._exportType = 'kubernetes';
                     }
-                    this._exportUrl = options.config.baseUrl + "/export?exportType=" + exportType;
+                    this._exportUrl = options.config.baseUrl + "/export?exportType=" + this._exportType;
                     this._btnExportForm =  $('' +
                         '<form id="submit-form" method="post" enctype="application/x-www-form-urlencoded" target="export-download" >' +
                         '<button  type="button" class="btn btn-primary hidden" id="export-btn" data-dismiss="modal" >Export</button>' +
@@ -268,7 +268,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     if (this._payload.dockerConfiguration.downloadDocker && !this._payload.dockerConfiguration.pushDocker) {
                         requestType = "downloadOnly";
                         exportUrl = exportUrl + "&requestType=" + requestType;
-                    } else if (!this._payload.dockerConfiguration.downloadDocker && this._payload.dockerConfiguration.pushDocker) {
+                    } else if (!this._payload.dockerConfiguration.downloadDocker && this._payload.dockerConfiguration.pushDocker && (this._exportType == "docker")) {
                         requestType = "buildOnly";
                         exportUrl = exportUrl + "&requestType=" + requestType;
                         $.ajax({
