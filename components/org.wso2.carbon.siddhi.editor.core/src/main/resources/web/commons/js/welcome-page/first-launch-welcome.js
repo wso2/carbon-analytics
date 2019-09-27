@@ -119,15 +119,15 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 quickLinksPane.append(quickLinkHeader);
 
                 var bodyUlQuickLinkContent = $('<ul class="quick-links col-md-12 col-lg-8">' +
-                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP440/Quick+Start+Guide"' +
+                    '<li class="col-md-4"><a href="https://ei.docs.wso2.com/en/latest/streaming-integrator/quick-start-guide/getting-started-with-si/"' +
                     'target="_blank"><i class="fw fw-list"></i>Quick Start Guide</a></li>' +
-                    '<li class="col-md-4"><a href="https://wso2.github.io/siddhi/documentation/siddhi-4.0/"' +
+                    '<li class="col-md-4"><a href="https://siddhi.io/en/v5.1/docs/"' +
                     'target="_blank"><i class="fw fw-carbon"></i>Siddhi Grammar</a></li>' +
-                    '<li class="col-md-4"><a href="https://stackoverflow.com/questions/tagged/wso2sp"' +
+                    '<li class="col-md-4"><a href="https://stackoverflow.com/questions/tagged/wso2si"' +
                     'target="_blank"><i class="fw fw-info"></i>Q&A</a></li>' +
-                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP440/Tutorials"' +
+                    '<li class="col-md-4"><a href="https://ei.docs.wso2.com/en/7.0.0/streaming-integrator/examples/tutorials-overview"' +
                     'target="_blank"><i class="fw fw-text"></i>Tutorials</a></li>' +
-                    '<li class="col-md-4"><a href="https://docs.wso2.com/display/SP440/Stream+Processor+Documentation"' +
+                    '<li class="col-md-4"><a href="https://ei.docs.wso2.com/en/latest/streaming-integrator/overview/overview/"' +
                     'target="_blank"><i class="fw fw-google-docs"></i>Documentation</a></li>' +
                     '<li class="col-md-4"><a href="http://wso2.com/support/"' +
                     'target="_blank"><i class="fw fw-ringing"></i>Support</a></li></ul>');
