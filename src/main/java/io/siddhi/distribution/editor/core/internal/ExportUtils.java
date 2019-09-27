@@ -437,6 +437,11 @@ public class ExportUtils {
         return populatedApps;
     }
 
+    /**
+     * Return the path of the temporary directory path that created for docker build.
+     *
+     * @return Path
+     */
     public Path getTempDockerPath()  {
         if (tempDockerDirectoryPath != null) {
             return tempDockerDirectoryPath;

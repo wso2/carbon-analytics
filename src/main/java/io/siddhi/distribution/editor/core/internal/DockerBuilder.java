@@ -167,9 +167,9 @@ public class DockerBuilder extends Thread {
             final int statusCode = dockerClient.auth(registryAuth);
             if (statusCode == 200) {
                 dockerClient.push(dockerImageName, message -> {
-                    if (message.status() != null) {
+                    if (message != null && message.status() != null && message.id() != null) {
                         dockerBuilderStatus.setStatus(message.status());
-                        log.info(message.status());
+                        log.info(message.id() + ": " + message.status());
                     }
                 }, registryAuth);
                 isPushed = true;
