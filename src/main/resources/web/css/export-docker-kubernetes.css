@@ -115,6 +115,12 @@ hr.export-dialog-hr {
 .kubernetes-configuration-step {
 
 }
+
+.template-value-elements {
+    margin: 10px;
+    padding: 15px;
+}
+
 .sub-template-value-element-div .option {
     align-items: center;
     padding: 5px;
@@ -125,7 +131,7 @@ hr.export-dialog-hr {
 .sub-template-value-element-div .option input {
     color: #fff !important;
     width: 75%;
-    background-color: #2C2C2C;
+    background-color: #222222;
     border-style: none;
     height: 35px;
     padding-left: 10px;
@@ -157,7 +163,7 @@ hr.export-dialog-hr {
 }
 
 .sw-theme-default > ul.step-anchor.k8_export_header li {
-    max-width: 14%;
+    max-width: 14.28%;
     height: 86px;
 }
 
@@ -166,7 +172,7 @@ hr.export-dialog-hr {
 }
 
 .docker-config-container {
-    padding-top: 20px;
+    padding-top: 40px;
     padding-left: 50px;
 }
 
@@ -190,15 +196,11 @@ hr.export-dialog-hr {
     padding: 5px;
 }
 
-.docker-details-row .label-description > div {
-    padding-left: 0 !important;
-    min-width: 100px;
-}
-
 .export-form-input {
     padding-top: 2px;
 }
 
 .docker-details-row input {
     width: 80% !important;
+    background-color: #222222 !important;
 }

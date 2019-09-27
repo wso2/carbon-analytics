@@ -46,9 +46,12 @@ define(['require', 'lodash', 'jquery'],
             self.findTemplatedKeys(self.deploymentConfig);
 
             var allTemplatedKeysHTMLContent = '<div class="clearfix">' +
-                '<div class="fill-template-value-container template-values-div nano">' +
+                '<div class="template-values-div nano">' +
                 '<div class = "template-value-elements nano-content" id="template-value-elements-div">';
-            var dynamicKeyHTMLContent = "";
+            var dynamicKeyHTMLContent = '<div id="fillTemplateValueError" ' +
+                'class="alert alert-danger" style="display: none">' +
+                'Please provide values for all empty fields' +
+                '</div>';
 
             if (self.templatedKeyList.length == 0) {
                 dynamicKeyHTMLContent = dynamicKeyHTMLContent + '<div id="fillTemplateValueError" class="alert alert-danger">' +
@@ -69,10 +72,7 @@ define(['require', 'lodash', 'jquery'],
             }
 
             allTemplatedKeysHTMLContent = allTemplatedKeysHTMLContent + dynamicKeyHTMLContent + '</div></div>';
-            self.container.append(allTemplatedKeysHTMLContent).append('<div id="fillTemplateValueError" ' +
-                'class="alert alert-danger" style="display: none">' +
-                'Please provide values for all empty fields' +
-                '</div>');
+            self.container.append(allTemplatedKeysHTMLContent);
             $(".nano").nanoScroller();
         };
 

@@ -92,8 +92,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                         form.find('#form-containers')
                             .append("\n" +
-                                "<div id=\"step-7\" >\n" +
-                                "<div class='kubernetes-configuration-step' id='kubernetes-configuration-step-id' style='display: block'>\n" +
+                                "<div id=\"step-7\" class=\"export-selector\">\n" +
+                                "<div class='kubernetes-configuration-step' id='kubernetes-configuration-step-id'>\n" +
                                 "<div class=\"step-description\">Configure Kubernetes for Siddhi</div>" +
                                 "</div>\n" +
                                 "</div>");

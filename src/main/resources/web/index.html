@@ -2515,13 +2515,13 @@
                                  style='display: block'>
                             </div>
                         </div>
-                        <div id="step-4">
+                        <div id="step-4" class="export-selector">
                             <div id="fill-template-container-id">
                             </div>
                         </div>
                         <div id="step-5" class="export-selector">
-                            <div class='export-siddhi-app-list' id='additional-bundles-list' style='display: block'>
-                                Add additional JARS
+                            <div class='export-siddhi-app-list' id='additional-bundles-list'>
+                                <div class='step-description'>Add additional JARS</div>
                                 <div class='form-group'>
                                     <div class='export-dialog-form-scrollable-block-list'>
                                         <div id='bundlesTree'></div>
@@ -2529,25 +2529,25 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="step-6" class="docker-config">
+                        <div id="step-6" class="export-selector">
                             <div class='docker-config-container' id='docker-config-container-id'>
                                 <input class="docker-checkbox" type="checkbox" name="download-docker-artifacts" value="download"><label class="label-description">Download artifacts</label><br><br>
                                 <input class="docker-checkbox" type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"><label class="label-description">Push to docker registry</label><br>
                                 <div class="docker-details-form" id="docker-details" hidden>
                                     <div class="docker-details-row">
-                                        <label class="export-form-input">Docker Image Tag:</label><br>
+                                        <label class="clearfix">Docker Image Tag:</label>
                                         <input class="file-dialog-form-control" type="text"  id="docker-img-name-input-field" placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">
                                     </div>
                                     <div class="docker-details-row">
-                                        <label class="export-form-input">Docker Username:</label><br>
+                                        <label class="clearfix">Docker Username:</label>
                                         <input class="file-dialog-form-control" type="text" name="username" id="userName">
                                     </div>
                                     <div class="docker-details-row">
-                                        <label class="export-form-input">Docker Password:</label><br>
+                                        <label class="clearfix">Docker Password:</label>
                                         <input class="file-dialog-form-control" type="text" name="password" id="password">
                                     </div>
                                     <div class="docker-details-row">
-                                        <label class="export-form-input">Email:</label><br>
+                                        <label class="clearfix">Email:</label>
                                         <input class="file-dialog-form-control" type="text" name="email" id="email">
                                     </div>
                                 </div>
