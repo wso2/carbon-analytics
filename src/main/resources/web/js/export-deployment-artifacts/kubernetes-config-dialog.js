@@ -133,14 +133,14 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             var siddhiProcessNameConfig = "siddhiProcessName: ".concat(siddhiProcessName.toString());
             self.editorObjectArrayList.forEach(function(editorObj) {
                 if(self.natsConfigsGiven && editorObj.name == 'messaging') {
-                    messagingConfig = editorObj.content.session.getValue().toString();
+                    messagingConfig = "\n" + editorObj.content.session.getValue().toString();
                 }
                 if(self.pvConfigsGiven && editorObj.name == 'persistence') {
-                    pvConfig = editorObj.content.session.getValue().toString();
+                    pvConfig = "\n" + editorObj.content.session.getValue().toString();
                 }
             });
 
-            return siddhiProcessNameConfig + "\n" + messagingConfig + "\n" + pvConfig;
+            return siddhiProcessNameConfig + messagingConfig + pvConfig;
         };
         return KubernetesConfigDialog;
     });
