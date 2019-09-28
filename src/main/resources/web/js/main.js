@@ -18,10 +18,10 @@
 
 define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar', 'command', 'workspace',
         'app/tab/service-tab-list', 'event_simulator', 'app/output-console/service-console-list-manager',
-        'nano_scroller','guide','workspace/file', 'operator_finder', 'utils'],
+        'nano_scroller','guide','workspace/file', 'operator_finder', 'template_deploy', 'utils'],
 
     function (require, log, $, _, Backbone, MenuBar, ToolBar, CommandManager, Workspace, TabController,
-              EventSimulator, OutputController,NanoScroller, Guide, File, OperatorFinder,Utils) {
+              EventSimulator, OutputController,NanoScroller, Guide, File, OperatorFinder, TemplateDeploy ,Utils) {
 
         var Application = Backbone.View.extend(
             /** @lends Application.prototype */
@@ -97,6 +97,10 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     var operatorFinderOpts = _.get(this.config, 'operator_finder');
                     _.set(operatorFinderOpts, 'application', this);
                     this.operatorFinder = new OperatorFinder.OperatorFinder(operatorFinderOpts);
+
+                    var templateDeploymentOpts = _.get(this.config, 'template_deploy');
+                    _.set(templateDeploymentOpts, 'application', this);
+                    this.templateDeploy = new TemplateDeploy.TemplateDeploy(templateDeploymentOpts);
                 },
 
                 render: function () {
@@ -123,6 +127,10 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                     log.debug("start: rendering operator finder");
                     this.operatorFinder.render();
                     log.debug("end: rendering operator finder");
+
+                    log.debug("start: rendering template deploy feature");
+                    this.templateDeploy.render();
+                    log.debug("end: rendering template deploy feature");
                 },
 
                 getOperatingSystem: function(){

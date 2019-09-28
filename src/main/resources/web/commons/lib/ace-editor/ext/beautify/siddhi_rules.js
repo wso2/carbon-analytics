@@ -35,7 +35,7 @@ define(function (require) {
         {
             type: 'comment.block',
             breakBefore: false,
-            breakAfter: true
+            breakAfter: false
         },
         {
             type: 'annotation.plan.start',
