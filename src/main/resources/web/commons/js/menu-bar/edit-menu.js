@@ -83,7 +83,7 @@ define(([], function () {
                     labels: {
                         mac: {
                             //key: "command+option+f",
-                            label: "\u2318\u2325f"
+                            label: "\u2318\u2325F"
                         },
                         other: {
                             //key: "ctrl+h",
