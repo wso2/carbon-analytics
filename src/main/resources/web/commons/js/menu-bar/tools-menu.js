@@ -95,7 +95,7 @@ define(([],function (){
             },
             {
                 id: "queryStore",
-                label: "Siddhi Store Query",
+                label: "On-Demand Query",
                 command: {
                     id: "query-store",
                     labels:{
