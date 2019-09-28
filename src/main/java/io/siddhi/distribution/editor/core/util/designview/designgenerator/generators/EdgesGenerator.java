@@ -141,9 +141,11 @@ public class EdgesGenerator {
         Set<Edge> edges = new HashSet<>();
         for (SourceSinkConfig sink : sinkList) {
             if (sink.isCorrelationIdExist()) {
-                SiddhiElementConfig sourceElement = getElementWithSinkCorrelationId(sink.getCorrelationId());
-                if (sourceElement != null) {
-                    edges.add(generateEdge(sink, sourceElement));
+                List<SiddhiElementConfig> sourceElementList = getElementWithSinkCorrelationId(sink.getCorrelationId());
+                if (sourceElementList != null && !sourceElementList.isEmpty()) {
+                    for (SiddhiElementConfig sourceElement : sourceElementList) {
+                        edges.add(generateEdge(sink, sourceElement));
+                    }
                 }
             }
             edges.add(generateEdge(getElementWithStreamName(sink.getConnectedElementName(), null), sink));
@@ -582,13 +584,14 @@ public class EdgesGenerator {
                 "Type is unknown for Siddhi Element with id '" + siddhiElementConfig.getId() + "'");
     }
 
-    private SiddhiElementConfig getElementWithSinkCorrelationId(String correlateId) {
+    private List<SiddhiElementConfig> getElementWithSinkCorrelationId(String correlateId) {
 
+        List<SiddhiElementConfig> siddhiElementConfigList = new ArrayList<>();
         for (SourceSinkConfig sourceConfig : siddhiAppConfig.getSourceList()) {
             if (sourceConfig.getCorrelationId() != null && sourceConfig.getCorrelationId().equals(correlateId)) {
-                return sourceConfig;
+                siddhiElementConfigList.add(sourceConfig);
             }
         }
-        return null;
+        return siddhiElementConfigList;
     }
 }
