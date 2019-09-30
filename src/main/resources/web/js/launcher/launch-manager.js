@@ -61,7 +61,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console'],
                     siddhiAppName: siddhiAppName,
                     variables: variableMap
                 };
-                JSON.parse(JSON.stringify(data));
                 $.ajax({
                     async: async,
                     type: "POST",

@@ -37,6 +37,12 @@ define(['require', 'lodash', 'jquery'],
 
         FillTemplateValueDialog.prototype.render = function () {
             var self = this;
+            var variableMap = {};
+            var localVarObj = JSON.parse(localStorage.getItem("templatedAttributeList"))
+            Object.keys(localVarObj).forEach((key , index)=>{
+                var name = extractPlaceHolderName(key);
+                variableMap[name] = localVarObj[key];
+            });
 
             _.forEach(self.templatedApps, function(element, i) {
                 self.findTemplatedKeys(element.appContent);
@@ -65,7 +71,8 @@ define(['require', 'lodash', 'jquery'],
                         '<div class="clearfix">' + '<label class="option-name optional-option">' +
                         key +
                         '</label>' + '</div>' + '<div class="clearfix">' +
-                        '<input class="option-value" type="text" data-toggle="popover" data-placement="bottom" data-original-title="" title="">' +
+                        '<input class="option-value" type="text" data-toggle="popover" data-placement="bottom" data-original-title="" title=""'
+                        +' value="'+ variableMap[key] + '"'+ '>' +
                         '</div>' + ' <label class="error-message"></label>' + '</div> </div> </div>'
 
                 });
@@ -75,6 +82,15 @@ define(['require', 'lodash', 'jquery'],
             self.container.append(allTemplatedKeysHTMLContent);
             $(".nano").nanoScroller();
         };
+
+        function extractPlaceHolderName(name) {
+            var textMatch = name.match("\\$\\{(.*?)\\}");
+            if (textMatch) {
+                return textMatch[1];
+            } else {
+                return '';
+            }
+        }
 
 
         FillTemplateValueDialog.prototype.validateTemplatedValues = function (keyValueList) {

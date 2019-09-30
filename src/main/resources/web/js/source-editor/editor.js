@@ -265,15 +265,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 }
             }
 
-
-            SiddhiEditor.prototype.clearSyntaxErrors = function() {
-                self.completionEngine.clearData();
-                self.completionEngine.clearIncompleteDataLists();
-                self.state.semanticErrorList = [];
-                self.state.syntaxErrorList = [];
-                self.unMarkErrors();
-            }
-
             /**
              * This method send server calls to check the semantic errors
              * Also retrieves the missing completion engine data from the server if the siddhi app is valid

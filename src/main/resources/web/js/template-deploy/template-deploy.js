@@ -143,12 +143,11 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                             if (Date.now() - self.lastEdit >= 1000 - 100) {
                                 localStorage.setItem("templatedAttributeList", JSON.stringify(attrLocalStore));
                                 // Check for semantic errors by sending a validate request to the server
-                                // self._application.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().
-                                // getMainEditor().clearSyntaxErrors();
-                                // self._application.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().
-                                // getMainEditor().checkForSemanticErrors();
-                                self._application.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().
-                                getMainEditor().onEnvironmentChange();
+                                var activeTab = self._application.tabController.getActiveTab();
+                                if (activeTab._title !== "welcome-page") {
+                                    activeTab.getSiddhiFileEditor().getSourceView().getMainEditor()
+                                        .onEnvironmentChange();
+                                }
                             }
                         }, 1000);
                     })
