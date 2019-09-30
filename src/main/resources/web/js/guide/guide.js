@@ -158,7 +158,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         $('#partition').removeClass('partition-drag');
                         $('#stream').addClass('stream-drag');
                         currentStep = instance.getCurrentStep();
-                        browserStorage.put("isWidgetFromTourGuid", true);
+                        browserStorage.put("isWidgetFromTourGuide", true);
                         setTimeout(function () {
                             var interval = null;
                             interval = window.setInterval(function () {
@@ -484,7 +484,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                                 clearInterval(interval);
                             }
                         }, 1000)
-                        browserStorage.put("isWidgetFromTourGuid", false);
+                        browserStorage.put("isWidgetFromTourGuide", false);
                     }
                 },
                 {
