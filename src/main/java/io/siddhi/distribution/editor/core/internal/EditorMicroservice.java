@@ -732,20 +732,10 @@ public class EditorMicroservice implements Microservice {
                 .build();
     }
 
-    @POST
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/start")
-    public Response start(String appStartRequestString) {
-        AppStartRequest appStartRequest = new Gson().fromJson(appStartRequestString, AppStartRequest.class);
-        String siddhiAppName = appStartRequest.getSiddhiAppName();
-        if (appStartRequest.getVariables().size() > 0) {
-            DebugRuntime existingRuntime = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
-            String siddhiApp = existingRuntime.getSiddhiApp();
-            siddhiApp = SourceEditorUtils.populateSiddhiAppWithVars(appStartRequest.getVariables(), siddhiApp);
-            DebugRuntime runtimeHolder = new DebugRuntime(siddhiAppName, siddhiApp);
-            EditorDataHolder.getSiddhiAppMap().put(siddhiAppName, runtimeHolder);
-
-        }
+    @Path("/{siddhiAppName}/start")
+    public Response start(@PathParam("siddhiAppName") String siddhiAppName) {
         List<String> streams = EditorDataHolder
                 .getDebugProcessorService()
                 .getSiddhiAppRuntimeHolder(siddhiAppName)
@@ -757,12 +747,27 @@ public class EditorMicroservice implements Microservice {
         EditorDataHolder
                 .getDebugProcessorService()
                 .start(siddhiAppName);
-
         return Response
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, siddhiAppName,
-                        streams, queries)).build();
+                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, siddhiAppName, streams, queries)).build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/start")
+    public Response startWithVariables(String appStartRequestString) {
+        AppStartRequest appStartRequest = new Gson().fromJson(appStartRequestString, AppStartRequest.class);
+        String siddhiAppName = appStartRequest.getSiddhiAppName();
+        if (appStartRequest.getVariables().size() > 0) {
+            DebugRuntime existingRuntime = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
+            String siddhiApp = existingRuntime.getSiddhiApp();
+            siddhiApp = SourceEditorUtils.populateSiddhiAppWithVars(appStartRequest.getVariables(), siddhiApp);
+            DebugRuntime runtimeHolder = new DebugRuntime(siddhiAppName, siddhiApp);
+            EditorDataHolder.getSiddhiAppMap().put(siddhiAppName, runtimeHolder);
+
+        }
+        return start(siddhiAppName);
     }
 
     @GET
