@@ -212,6 +212,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * @private
              */
             function editorChangeHandler() {
+                    clearErrorsAndTriggerOnChange();
+            }
+
+            function clearErrorsAndTriggerOnChange() {
                 if (self.realTimeValidation) {
                     // Clearing all errors before finding the errors again
                     self.state.semanticErrorList = [];
@@ -219,6 +223,10 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                     self.unMarkErrors();
                     siddhiWorker.onEditorChange(aceEditor.getValue().trim());
                 }
+            }
+
+            SiddhiEditor.prototype.onEnvironmentChange = function () {
+                clearErrorsAndTriggerOnChange();
             }
 
             /**
@@ -233,7 +241,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                     setTimeout(function () {
                         if (Date.now() - self.state.lastEdit >= constants.SERVER_SIDE_VALIDATION_DELAY - 100) {
                             // Check for semantic errors by sending a validate request to the server
-                            checkForSemanticErrors();
+                            self.checkForSemanticErrors();
                         }
                     }, constants.SERVER_SIDE_VALIDATION_DELAY);
                 }
@@ -248,20 +256,49 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 this.errorMarkers = [];       // Holds highlighted syntax/semantic error markers
             }
 
+            function extractPlaceHolderName(name) {
+                var textMatch = name.match("\\$\\{(.*?)\\}");
+                if (textMatch) {
+                    return textMatch[1];
+                } else {
+                    return '';
+                }
+            }
+
+
+            SiddhiEditor.prototype.clearSyntaxErrors = function() {
+                self.completionEngine.clearData();
+                self.completionEngine.clearIncompleteDataLists();
+                self.state.semanticErrorList = [];
+                self.state.syntaxErrorList = [];
+                self.unMarkErrors();
+            }
+
             /**
              * This method send server calls to check the semantic errors
              * Also retrieves the missing completion engine data from the server if the siddhi app is valid
              *
              * @private
              */
-            function checkForSemanticErrors() {
+            SiddhiEditor.prototype.checkForSemanticErrors = function() {
                 var editorText = aceEditor.getValue();
+                var variableMap = {};
+                var localVarObj = JSON.parse(localStorage.getItem("templatedAttributeList"))
+                Object.keys(localVarObj).forEach((key , index)=>{
+                    var name = extractPlaceHolderName(key);
+                    variableMap[name] = localVarObj[key];
+                });
+
+                console.log("At sending to Sementic check");
+                console.log(variableMap);
+                console.log("---------------------------------------------");
+
                 // If the user has not typed anything after 3 seconds from his last change, then send the query for
                 // semantic check to check whether the query contains errors or not.
                 submitToServerForSemanticErrorCheck(
                     {
                         siddhiApp: editorText,
-                        variables: localStorage.getItem("templatedAttributeList"),
+                        variables: variableMap,
                         missingStreams: self.completionEngine.incompleteData.streams,
                         missingInnerStreams: self.completionEngine.incompleteData.partitions,
                         missingAggregationDefinitions: self.completionEngine.incompleteData.aggregationDefinitions

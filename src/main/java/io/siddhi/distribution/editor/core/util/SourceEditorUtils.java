@@ -517,7 +517,6 @@ public class SourceEditorUtils {
     }
 
     public static String populateSiddhiAppWithVars(Map<String, String> envMap, String siddhiApp) {
-        String populatedApp = siddhiApp;
         if (siddhiApp.contains("$")) {
             String envPattern = "\\$\\{(\\w+)\\}";
             Pattern expr = Pattern.compile(envPattern);
@@ -531,6 +530,6 @@ public class SourceEditorUtils {
                 }
             }
         }
-        return populatedApp;
+        return siddhiApp;
     }
 }

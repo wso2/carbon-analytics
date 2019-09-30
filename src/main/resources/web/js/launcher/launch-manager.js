@@ -15,11 +15,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
-    function (require, $, Backbone, _ ,EventChannel, Console) {
+define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console'],
+    function (require, $, Backbone, _, EventChannel, Console) {
         var instance;
 
-        var LaunchManager = function(args) {
+        var LaunchManager = function (args) {
             var self = this;
             this.enable = false;
             this.channel = undefined;
@@ -30,8 +30,17 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
         LaunchManager.prototype = Object.create(EventChannel.prototype);
         LaunchManager.prototype.constructor = LaunchManager;
 
-        LaunchManager.prototype.runApplication = function(siddhiAppName,consoleListManager,activeTab,workspace, async){
-            if(activeTab.getFile().getRunStatus() !== undefined && !activeTab.getFile().getRunStatus() &&
+        function extractPlaceHolderName(name) {
+            var textMatch = name.match("\\$\\{(.*?)\\}");
+            if (textMatch) {
+                return textMatch[1];
+            } else {
+                return '';
+            }
+        }
+
+        LaunchManager.prototype.runApplication = function (siddhiAppName, consoleListManager, activeTab, workspace, async) {
+            if (activeTab.getFile().getRunStatus() !== undefined && !activeTab.getFile().getRunStatus() &&
                 !activeTab.getFile().getDebugStatus()) {
                 var consoleOptions = {};
                 var options = {};
@@ -42,10 +51,25 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                     async = true;
                 }
                 var console;
+                var variableMap = {};
+                var localVarObj = JSON.parse(localStorage.getItem("templatedAttributeList"))
+                Object.keys(localVarObj).forEach((key , index)=>{
+                    var name = extractPlaceHolderName(key);
+                    variableMap[name] = localVarObj[key];
+                });
+                var data = {
+                    siddhiAppName: siddhiAppName,
+                    variables: variableMap
+                };
+                JSON.parse(JSON.stringify(data));
                 $.ajax({
                     async: async,
-                    url: this.baseurl+ siddhiAppName + "/start",
-                    type: "GET",
+                    // url: this.baseurl+ siddhiAppName + "/start",
+                    // type: "GET",
+
+                    type: "POST",
+                    url: this.baseurl + "start",
+                    data: JSON.stringify(data),
                     success: function (data) {
                         _.set(options, 'statusForCurrentFocusedFile', data.status);
                         _.set(options, 'message', " Started Successfully!");
@@ -70,10 +94,10 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
             }
         };
 
-        LaunchManager.prototype.stopApplication = function(siddhiAppName,consoleListManager,activeTab,workspace,initialLoad, async){
-            if(activeTab.getFile().getRunStatus() || initialLoad){
+        LaunchManager.prototype.stopApplication = function (siddhiAppName, consoleListManager, activeTab, workspace, initialLoad, async) {
+            if (activeTab.getFile().getRunStatus() || initialLoad) {
                 var console = undefined;
-                if(!initialLoad){
+                if (!initialLoad) {
                     console = consoleListManager.getGlobalConsole();
                 }
                 if (null == async) {
@@ -85,21 +109,21 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                     url: this.baseurl + siddhiAppName + "/stop",
                     type: "GET",
                     success: function (data) {
-                        if(console != undefined){
+                        if (console != undefined) {
                             activeTab.getFile().setStopProcessRunning(false);
                             var msg = "";
                             activeTab.getFile().setRunStatus(false);
                             activeTab.getFile().save();
                             msg = "" + siddhiAppName + ".siddhi - Stopped Successfully!"
                             var message = {
-                                "type" : "INFO",
+                                "type": "INFO",
                                 "message": msg
                             }
                             console.println(message);
                             workspace.updateRunMenuItem();
                             activeTab.setNonRunningMode();
                             consoleListManager.application.toolBar.disableStopButtonLoading();
-                        }else if(initialLoad){
+                        } else if (initialLoad) {
                             activeTab.getFile().setRunStatus(false);
                             activeTab.getFile().setStopProcessRunning(false);
                             activeTab.getFile().setDebugStatus(false);
@@ -109,10 +133,10 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
 
                     },
                     error: function (msg) {
-                        if(console != undefined){
-                            msg = ""+siddhiAppName+".siddhi - Error in Stopping."
+                        if (console != undefined) {
+                            msg = "" + siddhiAppName + ".siddhi - Error in Stopping."
                             var message = {
-                                "type" : "ERROR",
+                                "type": "ERROR",
                                 "message": msg
                             }
                             console.println(message);
@@ -122,13 +146,13 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
 
                     }
                 });
-            } else{
+            } else {
                 activeTab.getSiddhiFileEditor().getDebuggerWrapper().stop();
             }
         };
 
-        LaunchManager.prototype.debugApplication = function(siddhiAppName,consoleListManager,uniqueTabId,
-                                                            debuggerWrapperInstance,activeTab,workspace, async){
+        LaunchManager.prototype.debugApplication = function (siddhiAppName, consoleListManager, uniqueTabId,
+                                                             debuggerWrapperInstance, activeTab, workspace, async) {
             if (!activeTab.getFile().getRunStatus()) {
                 var consoleOptions = {};
                 var options = {};
@@ -144,7 +168,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                         debuggerWrapperInstance.setDebuggerStarted(true);
                         debuggerWrapperInstance.acquireDebugPoints();
                         var console = consoleListManager.getGlobalConsole();
-                        if(console == undefined){
+                        if (console == undefined) {
                             var globalConsoleOptions = {};
                             var opts = {};
                             _.set(opts, '_type', "CONSOLE");
@@ -154,9 +178,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                             _.set(opts, 'message', " - Started in Debug mode Successfully!");
                             _.set(globalConsoleOptions, 'consoleOptions', opts);
                             console = consoleListManager.newConsole(globalConsoleOptions);
-                        }else {
+                        } else {
                             var message = {
-                                "type" : "INFO",
+                                "type": "INFO",
                                 "message": "" + siddhiAppName + ".siddhi - Started in Debug mode Successfully!"
                             };
                             console.println(message);
@@ -173,7 +197,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                         // debug not started (possible error)
                         debuggerWrapperInstance.setDebuggerStarted(false);
                         var console = consoleListManager.getGlobalConsole();
-                        if(console == undefined){
+                        if (console == undefined) {
                             var globalConsoleOptions = {};
                             var opts = {};
                             _.set(opts, '_type', "CONSOLE");
@@ -183,9 +207,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console' ],
                             _.set(opts, 'message', (JSON.parse(msg.responseText)).message);
                             _.set(globalConsoleOptions, 'consoleOptions', opts);
                             consoleListManager.newConsole(globalConsoleOptions);
-                        }else {
+                        } else {
                             var message = {
-                                "type" : "ERROR",
+                                "type": "ERROR",
                                 "message": "" + siddhiAppName + ".siddhi - Could not start in debug mode.Siddhi App is in" +
                                 " faulty state."
                             };

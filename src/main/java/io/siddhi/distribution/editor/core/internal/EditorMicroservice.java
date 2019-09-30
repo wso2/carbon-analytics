@@ -39,6 +39,7 @@ import io.siddhi.distribution.editor.core.EditorSiddhiAppRuntimeService;
 import io.siddhi.distribution.editor.core.Workspace;
 import io.siddhi.distribution.editor.core.commons.configs.DockerBuildConfig;
 import io.siddhi.distribution.editor.core.commons.metadata.MetaData;
+import io.siddhi.distribution.editor.core.commons.request.AppStartRequest;
 import io.siddhi.distribution.editor.core.commons.request.ExportAppsRequest;
 import io.siddhi.distribution.editor.core.commons.request.ValidationRequest;
 import io.siddhi.distribution.editor.core.commons.response.DebugRuntimeResponse;
@@ -224,7 +225,7 @@ public class EditorMicroservice implements Microservice {
         try {
             String siddhiApp = validationRequest.getSiddhiApp();
             if (validationRequest.getVariables().size() != 0) {
-                SourceEditorUtils.populateSiddhiAppWithVars(validationRequest.getVariables(), siddhiApp);
+                siddhiApp = SourceEditorUtils.populateSiddhiAppWithVars(validationRequest.getVariables(), siddhiApp);
             }
             SiddhiAppRuntime siddhiAppRuntime =
                     EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(siddhiApp);
@@ -731,26 +732,35 @@ public class EditorMicroservice implements Microservice {
                 .build();
     }
 
-    @GET
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{siddhiAppName}/start")
-    public Response start(@PathParam("siddhiAppName") String siddhiAppName) {
-
+    @Path("/start")
+    public Response start(String appStartRequestString) {
+        AppStartRequest appStartRequest = new Gson().fromJson(appStartRequestString, AppStartRequest.class);
+        if (EditorDataHolder.getSiddhiAppMap().containsKey(appStartRequest.getSiddhiAppName())) {
+            DebugRuntime existing = EditorDataHolder.getSiddhiAppMap().get(appStartRequest.getSiddhiAppName());
+            String siddhiApp = existing.getSiddhiApp();
+            siddhiApp = SourceEditorUtils.populateSiddhiAppWithVars(appStartRequest.getVariables(), siddhiApp);
+            DebugRuntime runtimeHolder = new DebugRuntime(appStartRequest.getSiddhiAppName(), siddhiApp);
+            EditorDataHolder.getSiddhiAppMap().put(appStartRequest.getSiddhiAppName(), runtimeHolder);
+        }
         List<String> streams = EditorDataHolder
                 .getDebugProcessorService()
-                .getSiddhiAppRuntimeHolder(siddhiAppName)
+                .getSiddhiAppRuntimeHolder(appStartRequest.getSiddhiAppName())
                 .getStreams();
         List<String> queries = EditorDataHolder
                 .getDebugProcessorService()
-                .getSiddhiAppRuntimeHolder(siddhiAppName)
+                .getSiddhiAppRuntimeHolder(appStartRequest.getSiddhiAppName())
                 .getQueries();
         EditorDataHolder
                 .getDebugProcessorService()
-                .start(siddhiAppName);
+                .start(appStartRequest.getSiddhiAppName());
+
         return Response
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, siddhiAppName, streams, queries)).build();
+                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, appStartRequest.getSiddhiAppName(),
+                        streams, queries)).build();
     }
 
     @GET

@@ -37,6 +37,8 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
             if (!localStorage.getItem('templatedAttributeList')) {
                 localStorage.setItem('templatedAttributeList', JSON.stringify({}));
             }
+            this.lastEdit = 0;
+
 
             console.log(CompletionEngine);
         };
@@ -213,7 +215,25 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                         let attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
                         attrLocalStore['${' + e.target.id.split('-input')[0] + '}'] = e.target.value;
 
-                        localStorage.setItem("templatedAttributeList", JSON.stringify(attrLocalStore));
+                        setTimeout(function () {
+                            if (Date.now() - self.lastEdit >= 1000 - 100) {
+                                localStorage.setItem("templatedAttributeList", JSON.stringify(attrLocalStore));
+                                // Check for semantic errors by sending a validate request to the server
+                                // self._application.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().
+                                // getMainEditor().clearSyntaxErrors();
+                                // self._application.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().
+                                // getMainEditor().checkForSemanticErrors();
+                                self._application.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().
+                                getMainEditor().onEnvironmentChange();
+                                console.log("Called Sementic check");
+                                console.log(localStorage.getItem("templatedAttributeList"));
+                                console.log("---------------------------------------------");
+                            } else {
+                                console.log("Skipped Sementic check");
+                                console.log(localStorage.getItem("templatedAttributeList"));
+                                console.log("---------------------------------------------");
+                            }
+                        }, 1000);
                     })
                 });
             } else {
@@ -240,6 +260,7 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                     );
 
                     $("#" + justGetName(attr) + "-input").on('keyup', function (e) {
+
                         let attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
                         attrLocalStore['${' + e.target.id.split('-input')[0] + '}'] = e.target.value;
 

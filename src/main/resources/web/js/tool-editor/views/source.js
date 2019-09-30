@@ -186,5 +186,9 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
             this._editor.getSession().getUndoManager().markClean();
         };
 
+        SourceView.prototype.getMainEditor = function () {
+            return this._mainEditor;
+        };
+
         return SourceView;
     });
