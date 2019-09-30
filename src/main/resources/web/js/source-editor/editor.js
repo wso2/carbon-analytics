@@ -289,10 +289,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                     variableMap[name] = localVarObj[key];
                 });
 
-                console.log("At sending to Sementic check");
-                console.log(variableMap);
-                console.log("---------------------------------------------");
-
                 // If the user has not typed anything after 3 seconds from his last change, then send the query for
                 // semantic check to check whether the query contains errors or not.
                 submitToServerForSemanticErrorCheck(
