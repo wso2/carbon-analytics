@@ -65,6 +65,7 @@ define(['require', 'lodash', 'jquery'],
                     '</div>';
             } else {
                 _.forEach(self.templatedKeyList, function(key) {
+                    let value = variableMap[key] || "";
                     dynamicKeyHTMLContent = dynamicKeyHTMLContent + '<div id="template-value-element-id" class="template-element" style="width: 50%;float: left">' +
                         '<div class="sub-template-value-element-div">' +
                         '<div class="option">' +
@@ -72,7 +73,7 @@ define(['require', 'lodash', 'jquery'],
                         key +
                         '</label>' + '</div>' + '<div class="clearfix">' +
                         '<input class="option-value" type="text" data-toggle="popover" data-placement="bottom" data-original-title="" title=""'
-                        +' value="'+ variableMap[key] + '"'+ '>' +
+                        +' value="'+ value + '"'+ '>' +
                         '</div>' + ' <label class="error-message"></label>' + '</div> </div> </div>'
 
                 });
