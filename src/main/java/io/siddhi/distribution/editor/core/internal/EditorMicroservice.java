@@ -273,7 +273,7 @@ public class EditorMicroservice implements Microservice {
     }
 
     @POST
-    @Path("/stores/query")
+    @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response executeStoreQuery(JsonElement element, @Context Request request) {
