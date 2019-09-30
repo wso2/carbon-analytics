@@ -3,7 +3,7 @@ package io.siddhi.distribution.editor.core.commons.request;
 import java.util.Map;
 
 /**
- * Bean class to represent the Siddhi application start request
+ * Bean class to represent the Siddhi application start request.
  */
 public class AppStartRequest {
     private String siddhiAppName;
