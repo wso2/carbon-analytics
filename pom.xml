@@ -201,10 +201,6 @@
                                 <Export-Package>
                                     io.siddhi.distribution.editor.core.*,
                                     org.apache.commons.*
-<!--                                    ,-->
-<!--                                    com.kenai.*,-->
-<!--                                    org.apache.commons.*,-->
-<!--                                    jni.*-->
                                 </Export-Package>
                                 <Import-Package>
                                     org.osgi.framework.*;version="${osgi.framework.import.version.range}",
