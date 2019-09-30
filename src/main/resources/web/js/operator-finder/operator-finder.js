@@ -37,6 +37,11 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
             var data = CompletionEngine.getRawMetadata();
             // Flatten operator metadata into an array.
             var operators = flattenOperators(data);
+
+            // Remove unnecessary operators
+            delete data.extensions.distributionStrategy;
+            delete data.extensions.incrementalAggregator;
+
             // Get all extension namespaces.
                 var namespaces = [];
             for (var extension in data.extensions) {
