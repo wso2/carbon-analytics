@@ -737,29 +737,31 @@ public class EditorMicroservice implements Microservice {
     @Path("/start")
     public Response start(String appStartRequestString) {
         AppStartRequest appStartRequest = new Gson().fromJson(appStartRequestString, AppStartRequest.class);
-        if (EditorDataHolder.getSiddhiAppMap().containsKey(appStartRequest.getSiddhiAppName())) {
-            DebugRuntime existing = EditorDataHolder.getSiddhiAppMap().get(appStartRequest.getSiddhiAppName());
-            String siddhiApp = existing.getSiddhiApp();
+        String siddhiAppName = appStartRequest.getSiddhiAppName();
+        if (appStartRequest.getVariables().size() > 0) {
+            DebugRuntime existingRuntime = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
+            String siddhiApp = existingRuntime.getSiddhiApp();
             siddhiApp = SourceEditorUtils.populateSiddhiAppWithVars(appStartRequest.getVariables(), siddhiApp);
-            DebugRuntime runtimeHolder = new DebugRuntime(appStartRequest.getSiddhiAppName(), siddhiApp);
-            EditorDataHolder.getSiddhiAppMap().put(appStartRequest.getSiddhiAppName(), runtimeHolder);
+            DebugRuntime runtimeHolder = new DebugRuntime(siddhiAppName, siddhiApp);
+            EditorDataHolder.getSiddhiAppMap().put(siddhiAppName, runtimeHolder);
+
         }
         List<String> streams = EditorDataHolder
                 .getDebugProcessorService()
-                .getSiddhiAppRuntimeHolder(appStartRequest.getSiddhiAppName())
+                .getSiddhiAppRuntimeHolder(siddhiAppName)
                 .getStreams();
         List<String> queries = EditorDataHolder
                 .getDebugProcessorService()
-                .getSiddhiAppRuntimeHolder(appStartRequest.getSiddhiAppName())
+                .getSiddhiAppRuntimeHolder(siddhiAppName)
                 .getQueries();
         EditorDataHolder
                 .getDebugProcessorService()
-                .start(appStartRequest.getSiddhiAppName());
+                .start(siddhiAppName);
 
         return Response
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, appStartRequest.getSiddhiAppName(),
+                .entity(new DebugRuntimeResponse(Status.SUCCESS, null, siddhiAppName,
                         streams, queries)).build();
     }
 

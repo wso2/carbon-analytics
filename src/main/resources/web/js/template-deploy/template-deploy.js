@@ -225,13 +225,6 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                                 // getMainEditor().checkForSemanticErrors();
                                 self._application.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().
                                 getMainEditor().onEnvironmentChange();
-                                console.log("Called Sementic check");
-                                console.log(localStorage.getItem("templatedAttributeList"));
-                                console.log("---------------------------------------------");
-                            } else {
-                                console.log("Skipped Sementic check");
-                                console.log(localStorage.getItem("templatedAttributeList"));
-                                console.log("---------------------------------------------");
                             }
                         }, 1000);
                     })

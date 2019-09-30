@@ -64,9 +64,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console'],
                 JSON.parse(JSON.stringify(data));
                 $.ajax({
                     async: async,
-                    // url: this.baseurl+ siddhiAppName + "/start",
-                    // type: "GET",
-
                     type: "POST",
                     url: this.baseurl + "start",
                     data: JSON.stringify(data),
