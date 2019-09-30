@@ -43,7 +43,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
             //Script array for the complete guide
             this.completeGuide = [
                 {
-                    'click #newButton': '<b>Welcome to WSO2 Siddhi Editor!</b> Click <b class="lime-text">New</b> to get started.',
+                    'click #newButton': '<b>Welcome to Siddhi Editor!</b> Click <b class="lime-text">New</b> to get started.',
                     'showNext' : false
                 },
                 {
@@ -158,6 +158,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         $('#partition').removeClass('partition-drag');
                         $('#stream').addClass('stream-drag');
                         currentStep = instance.getCurrentStep();
+                        browserStorage.put("isWidgetFromTourGuid", true);
                         setTimeout(function () {
                             var interval = null;
                             interval = window.setInterval(function () {
@@ -483,6 +484,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                                 clearInterval(interval);
                             }
                         }, 1000)
+                        browserStorage.put("isWidgetFromTourGuid", false);
                     }
                 },
                 {
