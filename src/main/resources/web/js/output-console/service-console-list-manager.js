@@ -214,7 +214,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     ws.onerror = function (error) {
                         console.error('Editor console service encountered an error, ', error, 'Hence, ' +
                             'closing connection.');
-                        ws.close();
+                        // ws.close();
                     };
                     ws.onclose = function (error) {
                         console.log('Editor console service has terminated. Reconnect will be attempted in 1 second.',
