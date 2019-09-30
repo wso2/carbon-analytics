@@ -285,6 +285,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                     self.configurationData.setIsDesignViewContentChanged(true);
                     // close the form window
                     self.consoleListManager.removeFormConsole(formConsole);
+                    if (self.application.browserStorage.get("isWidgetFromTourGuide")) {
+                        self.consoleListManager.removeAllConsoles();
+                    }
                 }
             });
 

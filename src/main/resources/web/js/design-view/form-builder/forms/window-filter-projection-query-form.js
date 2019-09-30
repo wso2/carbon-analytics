@@ -425,6 +425,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
 
                         // close the form window
                         self.consoleListManager.removeFormConsole(formConsole);
+                        if (self.application.browserStorage.get("isWidgetFromTourGuide")) {
+                            self.consoleListManager.removeAllConsoles();
+                        }
                     }
                 });
 
