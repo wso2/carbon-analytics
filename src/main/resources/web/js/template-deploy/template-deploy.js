@@ -38,9 +38,6 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                 localStorage.setItem('templatedAttributeList', JSON.stringify({}));
             }
             this.lastEdit = 0;
-
-
-            console.log(CompletionEngine);
         };
 
         TemplateDeploy.prototype.render = function () {
@@ -253,7 +250,6 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                     );
 
                     $("#" + justGetName(attr) + "-input").on('keyup', function (e) {
-
                         let attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
                         attrLocalStore['${' + e.target.id.split('-input')[0] + '}'] = e.target.value;
 
