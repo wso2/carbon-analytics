@@ -50,6 +50,8 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', '../../../js/event-sim
                     this._storeQueryModal = storeQueryModal;
                     var errorBox = storeQueryModal.find('#error-box');
                     var resultBox = storeQueryModal.find('#simulator_output');
+                    var queryTextArea = storeQueryModal.find("textarea[id='curlEditor']");
+                    var appNameSelector = storeQueryModal.find("select[name='siddhi-app-name']");
 
                     var showError = function (message) {
                         errorBox.text(message).show();
@@ -76,6 +78,35 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', '../../../js/event-sim
                             showError("Error when retrieving siddhi apps. Reason: " + data);
                         }
                     );
+
+                    appNameSelector.on('change', function (event) {
+                        var siddhiAppName = storeQueryModal.find("select[name='siddhi-app-name']").val();
+                        if (siddhiAppName != 'undefined' && sessionStorage.getItem("onDemandTempStore") != null) {
+                            var onDemandTempStore = JSON.parse(sessionStorage.getItem("onDemandTempStore"));
+                            if (onDemandTempStore[siddhiAppName] != null) {
+                                queryTextArea.val(onDemandTempStore[siddhiAppName]);
+                            } else {
+                                queryTextArea.val('');
+                            }
+                        }
+                    });
+
+                    queryTextArea.on('input change keyup', function (event) {
+                        var siddhiAppName = storeQueryModal.find("select[name='siddhi-app-name']").val();
+                        var onDemandQuery = storeQueryModal.find("textarea[id='curlEditor']").val();
+                        if (sessionStorage.getItem("onDemandTempStore") !== null) {
+                            if (siddhiAppName !== 'undefined' && onDemandQuery !== 'undefined') {
+                                var onDemandTempStore = JSON.parse(sessionStorage.getItem("onDemandTempStore"));
+                                onDemandTempStore[siddhiAppName] = onDemandQuery;
+                                sessionStorage.setItem("onDemandTempStore", JSON.stringify(onDemandTempStore));
+                            }
+                        } else {
+                            var onDemandTempStore = {};
+                            onDemandTempStore[siddhiAppName] = onDemandQuery;
+                            sessionStorage.setItem("onDemandTempStore", JSON.stringify(onDemandTempStore));
+                        }
+                        event.preventDefault();
+                    });
 
                     storeQueryModal.submit(function (event) {
                         QueryStoreRestClient.retrieveStoresQuery(
