@@ -24,11 +24,13 @@ import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.distribution.editor.core.exception.InvalidExecutionStateException;
 import io.siddhi.distribution.editor.core.exception.NoSuchStreamException;
 import io.siddhi.distribution.editor.core.util.DebugCallbackEvent;
+import io.siddhi.distribution.editor.core.util.SourceEditorUtils;
 import io.siddhi.query.api.definition.Attribute;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -44,11 +46,17 @@ public class DebugRuntime {
     private transient LinkedBlockingQueue<DebugCallbackEvent> callbackEventsQueue;
 
     public DebugRuntime(String siddhiAppName, String siddhiApp) {
-
         this.siddhiAppName = siddhiAppName;
         this.siddhiApp = siddhiApp;
         callbackEventsQueue = new LinkedBlockingQueue<>(10);
-        createRuntime();
+        createRuntime(siddhiApp);
+    }
+
+    public DebugRuntime(String siddhiAppName, String siddhiApp, Map<String, String> variableMap) {
+        this.siddhiAppName = siddhiAppName;
+        this.siddhiApp = siddhiApp;
+        callbackEventsQueue = new LinkedBlockingQueue<>(10);
+        createRuntime(SourceEditorUtils.populateSiddhiAppWithVars(variableMap, siddhiApp));
     }
 
     public String getSiddhiAppName() {
@@ -122,7 +130,7 @@ public class DebugRuntime {
             siddhiAppRuntime = null;
         }
         callbackEventsQueue.clear();
-        createRuntime();
+        createRuntime(siddhiApp);
     }
 
     public void reload(String siddhiApp) {
@@ -177,8 +185,7 @@ public class DebugRuntime {
         return callbackEventsQueue;
     }
 
-    private void createRuntime() {
-
+    private void createRuntime(String siddhiApp) {
         try {
             if (siddhiApp != null && !siddhiApp.isEmpty()) {
                 siddhiAppRuntime = EditorDataHolder.getSiddhiManager()
