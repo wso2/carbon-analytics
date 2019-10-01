@@ -144,7 +144,7 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                                 localStorage.setItem("templatedAttributeList", JSON.stringify(attrLocalStore));
                                 // Check for semantic errors by sending a validate request to the server
                                 var activeTab = self._application.tabController.getActiveTab();
-                                if (activeTab._title !== "welcome-page") {
+                                if (activeTab._title !== "welcome-page" && !activeTab.getFile().getRunStatus()) {
                                     activeTab.getSiddhiFileEditor().getSourceView().getMainEditor()
                                         .onEnvironmentChange();
                                 }
