@@ -2482,7 +2482,7 @@
             </div>
             <div class='modal-body'>
                 <div id='export-form' class="clearfix" >
-                    <ul id="form-steps" class="k8_export_header">
+                    <ul id="form-steps" class="docker_export_header">
                         <li><a href="#step-1" class="link-disabled">Step 1<br/><small>Select Siddhi Apps</small></a></li>
                         <li><a href="#step-2" class="link-disabled">Step 2<br/><small>Template Siddhi Apps</small></a></li>
                         <li><a href="#step-3" class="link-disabled">Step 3<br/><small>Update Siddhi Runner<br/>Configurations</small></a></li>
@@ -2504,13 +2504,13 @@
                             </div>
                         </div>
                         <div id="step-2">
-                            <div class="step-description">Use ${...} format to template siddhi apps</div>
+                            <div class="step-description-text">Use ${...} format to template siddhi apps</div>
                             <div id='siddhi-app-template-container-id'
                                  style='display: block'>
                             </div>
                         </div>
                         <div id="step-3">
-                            <div class="step-description">Use ${...} format to template the configurations</div>
+                            <div class="step-description-text">Use ${...} format to template the configurations</div>
                             <div class='config-template-container' id='config-template-container-id'
                                  style='display: block'>
                             </div>
@@ -2531,7 +2531,7 @@
                         </div>
                         <div id="step-6" class="export-selector">
                             <div class='docker-config-container' id='docker-config-container-id'>
-                                <input class="docker-checkbox" type="checkbox" name="download-docker-artifacts" id="download-docker-artifacts" value="download"><label class="label-description">Download artifacts</label><br><br>
+                                <input class="docker-checkbox" type="checkbox" name="download-docker-artifacts" id="download-docker-artifacts" value="download"><label class="label-description">Download artifacts</label><br>
                                 <input class="docker-checkbox" type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"><label class="label-description">Push to docker registry</label><br>
                                 <div class="docker-details-form" id="docker-details" hidden>
                                     <div class="docker-details-row">
@@ -2550,6 +2550,7 @@
                                         <label class="clearfix">Email:</label>
                                         <input class="file-dialog-form-control" type="text" name="email" id="email">
                                     </div>
+                                    <br/>
                                 </div>
                             </div>
                         </div>
