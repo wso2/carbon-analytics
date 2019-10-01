@@ -145,6 +145,7 @@ ul.quick-links li {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding-top: 5px;
 }
 
 ul.quick-links li i,
