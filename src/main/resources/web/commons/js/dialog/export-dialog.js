@@ -18,9 +18,10 @@
 
 define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorDialog', 'jarsSelectorDialog',
         'templateAppDialog', 'templateConfigDialog', 'fillTemplateValueDialog', 'kubernetesConfigDialog',
-        'dockerConfigDialog'],
+        'dockerConfigDialog', 'alerts'],
     function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog,
-              TemplateAppDialog, TemplateConfigDialog, FillTemplateValueDialog, KubernetesConfigDialog, DockerConfigDialog) {
+              TemplateAppDialog, TemplateConfigDialog, FillTemplateValueDialog, KubernetesConfigDialog,
+              DockerConfigDialog, alerts) {
 
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
@@ -256,9 +257,12 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 data: {"payload": JSON.stringify(this._payload)},
                                 async: false,
                                 success: function (response) {
+                                    alerts.info("Docker image push process is in-progress. " +
+                                        "Please check editor console for the progress.");
                                     result = {status: "success"};
                                 },
                                 error: function (error) {
+                                    alerts.error("Docker image push process failed.");
                                     if (error.responseText) {
                                         result = {status: "fail", errorMessage: error.responseText};
                                     } else {
