@@ -46,7 +46,6 @@ define(['require', 'lodash', 'jquery'],
             templateKeyValue["username"] = self.container.find("#username").val();
             templateKeyValue["password"] = self.container.find("#password").val();
             templateKeyValue["email"] = self.container.find("#email").val();
-            console.log(templateKeyValue);
             return templateKeyValue;
         };
 
