@@ -1153,7 +1153,8 @@ public class EditorMicroservice implements Microservice {
         String errorMessage = "";
         try {
             if (payload == null) {
-                errorMessage = "Form parameter payload cannot be null. Expected payload format: " +
+                errorMessage = "Form parameter payload cannot be null while exporting docker/k8. " +
+                        "Expected payload format: " +
                         "{'templatedSiddhiApps': ['<SIDDHI-APPS>'], " +
                         "'configuration': '<SIDDHI-CONFIG-OF-DEPLOYMENT.YAML>', " +
                         "'templatedVariables': ['<TEMPLATED-VERIABLES>'], " +
@@ -1228,22 +1229,22 @@ public class EditorMicroservice implements Microservice {
                     .header("Siddhi-Docker-Key", dockerBuilderStatusKey)
                     .build();
         } catch (JsonSyntaxException e) {
-            log.error("Incorrect JSON configuration format.", e);
+            log.error("Incorrect JSON configuration format found while exporting Docker/K8s", e);
             return Response
                     .status(Response.Status.BAD_REQUEST)
                     .entity("Incorrect JSON configuration format. " + e.getMessage())
                     .build();
         } catch (DockerGenerationException e) {
-            log.error("Failed docker generation. ", e);
+            log.error("Exception caught while generating Docker export artifacts. ", e);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity("Failed Docker generation. " + e.getMessage())
+                    .entity("Exception caught while generating Docker export artifacts. " + e.getMessage())
                     .build();
         } catch (KubernetesGenerationException e) {
-            log.error("Failed Kubernetes generation. ", e);
+            log.error("Exception caught while generating Kubernetes export artifacts. ", e);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity("Failed Kubernetes generation. " + e.getMessage())
+                    .entity("Exception caught while generating Kubernetes export artifacts. " + e.getMessage())
                     .build();
         } catch (Exception e) {
             log.error("Cannot generate export-artifacts archive.", e);
@@ -1312,7 +1313,7 @@ public class EditorMicroservice implements Microservice {
             log.error("Cannot read deployment.yaml file. ", e);
             return Response
                     .status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Cannot read deployment.yaml file. " + e.getMessage())
+                    .entity("Cannot read deployment.yaml file in TOOLING|SAMPLE-RUNNER. " + e.getMessage())
                     .build();
         }
     }
