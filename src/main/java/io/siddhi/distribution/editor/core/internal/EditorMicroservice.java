@@ -1313,7 +1313,8 @@ public class EditorMicroservice implements Microservice {
             log.error("Cannot read deployment.yaml file. ", e);
             return Response
                     .status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Cannot read deployment.yaml file in TOOLING|SAMPLE-RUNNER. " + e.getMessage())
+                    .entity("Cannot read deployment.yaml file in TOOLING|RUNNER configuration. " +
+                            e.getMessage())
                     .build();
         }
     }
