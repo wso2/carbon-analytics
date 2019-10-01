@@ -18,6 +18,7 @@
 package io.siddhi.distribution.editor.core.commons.request;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Request wrapper for Validation Request.
@@ -28,6 +29,7 @@ public class ValidationRequest {
     private List<String> missingStreams;
     private List<String> missingAggregationDefinitions;
     private List<List<String>> missingInnerStreams;
+    private Map<String, String> variables;
 
     public String getSiddhiApp() {
 
@@ -67,5 +69,13 @@ public class ValidationRequest {
     public void setMissingInnerStreams(List<List<String>> missingInnerStreams) {
 
         this.missingInnerStreams = missingInnerStreams;
+    }
+
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
     }
 }

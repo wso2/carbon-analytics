@@ -37,7 +37,9 @@ import io.siddhi.distribution.common.common.SiddhiAppRuntimeService;
 import io.siddhi.distribution.common.common.utils.config.FileConfigManager;
 import io.siddhi.distribution.editor.core.EditorSiddhiAppRuntimeService;
 import io.siddhi.distribution.editor.core.Workspace;
+import io.siddhi.distribution.editor.core.commons.configs.DockerBuildConfig;
 import io.siddhi.distribution.editor.core.commons.metadata.MetaData;
+import io.siddhi.distribution.editor.core.commons.request.AppStartRequest;
 import io.siddhi.distribution.editor.core.commons.request.ExportAppsRequest;
 import io.siddhi.distribution.editor.core.commons.request.ValidationRequest;
 import io.siddhi.distribution.editor.core.commons.response.DebugRuntimeResponse;
@@ -104,6 +106,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -139,6 +142,9 @@ public class EditorMicroservice implements Microservice {
     private static final String STATUS = "status";
     private static final String SUCCESS = "success";
     private static final String EXPORT_TYPE_KUBERNETES = "kubernetes";
+    private static final String EXPORT_REQUEST_TYPE_DOWNLOAD_ONLY = "downloadOnly";
+    private static final String EXPORT_REQUEST_TYPE_BUILD_ONLY = "buildOnly";
+    private static final String EXPORT_REQUEST_GET_STATUS_HEADER = "Siddhi-Docker-Key";
     private ServiceRegistration serviceRegistration;
     private Workspace workspace;
     private ExecutorService executorService = Executors
@@ -149,6 +155,7 @@ public class EditorMicroservice implements Microservice {
     private ConfigProvider configProvider;
     private ServiceRegistration siddhiAppRuntimeServiceRegistration;
     private StoreQueryAPIHelper storeQueryAPIHelper;
+    private Map<String, DockerBuilderStatus> dockerBuilderStatusMap = new HashMap<>();
 
     public EditorMicroservice() {
 
@@ -216,8 +223,12 @@ public class EditorMicroservice implements Microservice {
         ValidationRequest validationRequest = new Gson().fromJson(validationRequestString, ValidationRequest.class);
         String jsonString;
         try {
+            String siddhiApp = validationRequest.getSiddhiApp();
+            if (validationRequest.getVariables().size() != 0) {
+                siddhiApp = SourceEditorUtils.populateSiddhiAppWithVars(validationRequest.getVariables(), siddhiApp);
+            }
             SiddhiAppRuntime siddhiAppRuntime =
-                    EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(validationRequest.getSiddhiApp());
+                    EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(siddhiApp);
 
             // Status SUCCESS to indicate that the siddhi app is valid
             ValidationSuccessResponse response = new ValidationSuccessResponse(Status.SUCCESS);
@@ -725,7 +736,6 @@ public class EditorMicroservice implements Microservice {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{siddhiAppName}/start")
     public Response start(@PathParam("siddhiAppName") String siddhiAppName) {
-
         List<String> streams = EditorDataHolder
                 .getDebugProcessorService()
                 .getSiddhiAppRuntimeHolder(siddhiAppName)
@@ -741,6 +751,23 @@ public class EditorMicroservice implements Microservice {
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(new DebugRuntimeResponse(Status.SUCCESS, null, siddhiAppName, streams, queries)).build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/start")
+    public Response startWithVariables(String appStartRequestString) {
+        AppStartRequest appStartRequest = new Gson().fromJson(appStartRequestString, AppStartRequest.class);
+        String siddhiAppName = appStartRequest.getSiddhiAppName();
+        if (appStartRequest.getVariables().size() > 0) {
+            DebugRuntime existingRuntime = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
+            String siddhiApp = existingRuntime.getSiddhiApp();
+            siddhiApp = SourceEditorUtils.populateSiddhiAppWithVars(appStartRequest.getVariables(), siddhiApp);
+            DebugRuntime runtimeHolder = new DebugRuntime(siddhiAppName, siddhiApp);
+            EditorDataHolder.getSiddhiAppMap().put(siddhiAppName, runtimeHolder);
+
+        }
+        return start(siddhiAppName);
     }
 
     @GET
@@ -1114,21 +1141,83 @@ public class EditorMicroservice implements Microservice {
     @POST
     @Path("/export")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response exportApps(@QueryParam("type") String exportType, @FormParam("payload") String payload) {
+    public Response exportApps(
+            @QueryParam("exportType") String exportType,
+            @QueryParam("requestType") String requestType,
+            @FormParam("payload") String payload
+    ) {
+        String dockerBuilderStatusKey = "";
         try {
+            if (payload == null) {
+                log.error("Form parameter payload cannot be null. Expected payload format: " +
+                        "{'templatedSiddhiApps': ['<SIDDHI-APPS>'], " +
+                        "'configuration': '<SIDDHI-CONFIG-OF-DEPLOYMENT.YAML>', " +
+                        "'templatedVariables': ['<TEMPLATED-VERIABLES>'], " +
+                        "'kubernetesConfiguration': '<K8S-CONFIG>', " +
+                        "'dockerConfiguration': '<DOCKER-CONFIG>'}");
+                return Response
+                        .status(Response.Status.BAD_REQUEST)
+                        .build();
+            }
             ExportAppsRequest exportAppsRequest = new Gson().fromJson(payload, ExportAppsRequest.class);
             ExportUtils exportUtils = new ExportUtils(configProvider, exportAppsRequest, exportType);
             File zipFile = exportUtils.createZipFile();
             String fileName = "siddhi-docker.zip";
+            boolean kubernetesEnabled = false;
             if (exportType != null) {
                 if (exportType.equals(EXPORT_TYPE_KUBERNETES)) {
                     fileName = "siddhi-kubernetes.zip";
+                    kubernetesEnabled = true;
                 }
+            }
+
+            if (requestType != null && requestType.equals(EXPORT_REQUEST_TYPE_DOWNLOAD_ONLY)) {
+                return Response
+                        .status(Response.Status.OK)
+                        .entity(zipFile)
+                        .header("Content-Disposition", ("attachment; filename=" + fileName))
+                        .build();
+            }
+            DockerBuilderStatus dockerBuilderStatus = new DockerBuilderStatus("", "");
+            if (exportAppsRequest != null && exportAppsRequest.getDockerConfiguration() != null) {
+                DockerBuildConfig dockerBuildConfig = exportAppsRequest.getDockerConfiguration();
+                if ((dockerBuildConfig.getImageName() == null) ||
+                        (dockerBuildConfig.getUserName() == null) ||
+                        (dockerBuildConfig.getEmail() == null) ||
+                        (dockerBuildConfig.getPassword() == null)
+                ) {
+                    log.error("Missing required Docker build configuration " +
+                            "of (DockerImageName|UserName|Email|Password)");
+                    return Response
+                            .status(Response.Status.BAD_REQUEST)
+                            .build();
+                }
+                DockerBuilder dockerBuilder = new DockerBuilder(
+                        dockerBuildConfig.getImageName(),
+                        dockerBuildConfig.getUserName(),
+                        dockerBuildConfig.getEmail(),
+                        dockerBuildConfig.getPassword(),
+                        exportUtils.getTempDockerPath(),
+                        dockerBuilderStatus
+                );
+                dockerBuilder.start();
+                UUID uuid = UUID.randomUUID();
+                dockerBuilderStatusKey = uuid.toString();
+                dockerBuilderStatusMap.clear();
+                dockerBuilderStatusMap.put(dockerBuilderStatusKey, dockerBuilderStatus);
+            }
+
+            if (requestType != null && requestType.equals(EXPORT_REQUEST_TYPE_BUILD_ONLY) && !kubernetesEnabled) {
+                return Response
+                        .status(Response.Status.OK)
+                        .header(EXPORT_REQUEST_GET_STATUS_HEADER, dockerBuilderStatusKey)
+                        .build();
             }
             return Response
                     .status(Response.Status.OK)
                     .entity(zipFile)
                     .header("Content-Disposition", ("attachment; filename=" + fileName))
+                    .header("Siddhi-Docker-Key", dockerBuilderStatusKey)
                     .build();
         } catch (JsonSyntaxException e) {
             log.error("Incorrect configuration format.", e);
@@ -1141,6 +1230,42 @@ public class EditorMicroservice implements Microservice {
                     .status(Response.Status.INTERNAL_SERVER_ERROR)
                     .build();
         }
+    }
+
+    @GET
+    @Path("/dockerBuildStatus")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response get(@Context Request request) {
+        JsonObject dockerBuilderStatus = new JsonObject();
+        if (request.getHeader(EXPORT_REQUEST_GET_STATUS_HEADER) != null) {
+            if (dockerBuilderStatusMap.get(request.getHeader(EXPORT_REQUEST_GET_STATUS_HEADER)) != null) {
+                DockerBuilderStatus currentStatus = dockerBuilderStatusMap.get(
+                        request.getHeader(EXPORT_REQUEST_GET_STATUS_HEADER)
+                );
+                dockerBuilderStatus.addProperty(
+                        "Step",
+                        currentStatus.getStep()
+                );
+                dockerBuilderStatus.addProperty(
+                        "Status",
+                        currentStatus.getStatus()
+                );
+            } else {
+                dockerBuilderStatus.addProperty(
+                        "Step",
+                        ""
+                );
+                dockerBuilderStatus.addProperty(
+                        "Status",
+                        ""
+                );
+            }
+        }
+        return Response
+                .status(Response.Status.OK)
+                .entity(dockerBuilderStatus)
+                .type(MediaType.APPLICATION_JSON)
+                .build();
     }
 
     /**

@@ -71,6 +71,10 @@ public class DebugRuntime {
         return debugger;
     }
 
+    public String getSiddhiApp() {
+        return siddhiApp;
+    }
+
     public void start() {
 
         if (Mode.STOP.equals(mode)) {

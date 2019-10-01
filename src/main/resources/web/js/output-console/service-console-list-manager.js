@@ -212,13 +212,19 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         console.println(message);
                     };
                     ws.onerror = function (error) {
-                        console.log(error);
+                        console.error('Editor console service encountered an error, ', error, 'Hence, ' +
+                            'closing connection.');
+                        // ws.close();
                     };
-                    ws.onclose = function () {
-
+                    ws.onclose = function (error) {
+                        console.log('Editor console service has terminated. Reconnect will be attempted in 1 second.',
+                            error.reason);
+                        setTimeout(function () {
+                            opts.application.outputController.initiateLogReader(opts);
+                        }, 1000);
                     };
                 }
-            });
 
+            });
         return OutputConsoleList;
     });

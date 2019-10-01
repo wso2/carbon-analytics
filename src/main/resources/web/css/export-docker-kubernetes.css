@@ -115,6 +115,12 @@ hr.export-dialog-hr {
 .kubernetes-configuration-step {
 
 }
+
+.template-value-elements {
+    margin: 10px;
+    padding: 15px;
+}
+
 .sub-template-value-element-div .option {
     align-items: center;
     padding: 5px;
@@ -125,7 +131,7 @@ hr.export-dialog-hr {
 .sub-template-value-element-div .option input {
     color: #fff !important;
     width: 75%;
-    background-color: #2C2C2C;
+    background-color: #222222;
     border-style: none;
     height: 35px;
     padding-left: 10px;
@@ -135,7 +141,6 @@ hr.export-dialog-hr {
 .step-description {
     padding: 10px;
     background-color: transparent;
-    transition: background-color 500ms linear;
 }
 
 .export-siddhi-app-list {
@@ -151,10 +156,95 @@ hr.export-dialog-hr {
     height: 98% !important;
 }
 
-.sw-theme-default > ul.step-anchor.k8_export_header_item li {
-    width: 16%;
+.k8_export_header {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.sw-theme-default > ul.step-anchor.k8_export_header li {
+    max-width: 14.28%;
+    height: 86px;
 }
 
 .link-disabled {
     pointer-events: none;
+}
+
+.docker-config-container {
+    padding-top: 40px;
+    padding-left: 50px;
+}
+
+.label-description {
+    padding-top: 2px;
+    padding-left: 8px;
+}
+
+.docker-config-container input {
+    margin: 0 0 0 !important;
+}
+
+.docker-details-form {
+    margin-top: 10px;
+    margin-left: 50px;
+    padding-left: 10px;
+    padding-top: 10px;
+}
+
+.docker-details-row {
+    padding: 5px;
+}
+
+.export-form-input {
+    padding-top: 2px;
+}
+
+.docker-details-row input {
+    height: 30px !important;
+    width: 80% !important;
+    background-color: #222222 !important;
+}
+
+.export-kube-config-container {
+    display: block;
+    overflow: auto;
+    width: 100%;
+    background-color: #2C2C2C !important;
+    padding: 10px;
+}
+
+.kube-config-form {
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow: auto;
+    width: 100%;
+    background-color: transparent;
+    margin: auto;
+}
+
+.kube-config-row {
+    padding-top: 10px;
+    padding-left: 10px;
+    margin-top: 10px;
+}
+
+.kube-config-sub-row {
+    padding: 10px 10px 5px;
+}
+
+.kube-input-group {
+    padding: 5px 5px 5px 10px;
+}
+
+.siddhi-process-name-input {
+    height: 30px !important;
+    background-color: #222222 !important;
+    margin-top: 2px;
+    width: 80%;
+}
+
+.kubernetes-config-editor {
+    height: 150px !important;
+    width: 80%; !important;
+    padding-top: 2px !important;
 }

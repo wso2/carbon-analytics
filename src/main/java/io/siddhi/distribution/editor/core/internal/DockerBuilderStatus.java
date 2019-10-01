@@ -16,30 +16,33 @@
  * under the License.
  */
 
-package io.siddhi.distribution.editor.core.commons.kubernetes;
-
-import java.util.ArrayList;
+package io.siddhi.distribution.editor.core.internal;
 
 /**
- * Container configuration of a Kubernetes Siddhi process.
+ * This class store the status of the DockerBuilder.
  */
-public class SiddhiProcessContainer {
-    private ArrayList<Env> env;
-    private String image;
+class DockerBuilderStatus {
+    private String status;
+    private String step;
 
-    public ArrayList<Env> getEnv() {
-        return env;
+    DockerBuilderStatus(String status, String step) {
+        this.status = status;
+        this.step = step;
     }
 
-    public void setEnv(ArrayList<Env> env) {
-        this.env = env;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public String getImage() {
-        return image;
+    public String getStatus() {
+        return status;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public String getStep() {
+        return step;
+    }
+
+    public void setStep(String step) {
+        this.step = step;
     }
 }

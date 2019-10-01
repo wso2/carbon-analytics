@@ -136,30 +136,96 @@
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-client</artifactId>
+            <classifier>shaded</classifier>
+        </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>extract-dependency</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-dependencies</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <markersDirectory>${project.build.directory}/dependencies/dependency-maven-plugin-markers</markersDirectory>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>com.spotify</groupId>
+                                            <artifactId>docker-client</artifactId>
+                                            <classifier>shaded</classifier>
+                                            <outputDirectory>${project.build.directory}/dependencies/docker-client</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <instructions>
+                                <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                                <Bundle-Name>${project.artifactId}</Bundle-Name>
+                                <Include-Resource>
+                                    web=target/classes/web,
+                                    target/classes/mime-map.properties,
+                                    META-INF=target/classes/META-INF,
+                                    META-INF/services=${project.build.directory}/dependencies/docker-client/META-INF/services
+                                </Include-Resource>
+                                <Private-Package>
+                                    com.spotify.docker.*,
+                                    com.kenai.*,
+                                    org.apache.commons.*,
+                                    jni.*,
+                                    jersey.repackaged.com.*,
+                                    io.siddhi.distribution.editor.core.internal,
+                                    io.siddhi.distribution.editor.core.internal.*
+                                </Private-Package>
+                                <Export-Package>
+                                    io.siddhi.distribution.editor.core.*,
+                                    org.apache.commons.*
+                                </Export-Package>
+                                <Import-Package>
+                                    org.osgi.framework.*;version="${osgi.framework.import.version.range}",
+                                    org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
+                                    org.yaml.snakeyaml.*; version="${org.yaml.snakeyaml.version.range}",
+                                    io.siddhi.distribution.common.*;version="${io.siddhi.distribution.version.range}",
+                                    io.siddhi.distribution.editor.log.appender.*,
+                                    org.wso2.msf4j.*;version="${msf4j.import.version.range}",
+                                    javax.management.*,
+                                    javax.ws.rs.*;version="0.0.0",
+                                    com.fasterxml.jackson.core.*;version="${com.fasterxml.jackson.core.version.range}",
+                                    com.fasterxml.jackson.databind.*;version="${com.fasterxml.jackson.core.version.range}",
+                                    *;resolution:=optional
+                                </Import-Package>
+                                <DynamicImport-Package>*</DynamicImport-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <properties>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
-        <Private-Package>
-            io.siddhi.distribution.editor.core.internal,
-            io.siddhi.distribution.editor.core.internal.*,
-        </Private-Package>
-        <export.package>
-            io.siddhi.distribution.editor.core.*
-        </export.package>
-        <import.package>
-            org.osgi.framework.*;version="${osgi.framework.import.version.range}",
-            org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
-            org.yaml.snakeyaml.*; version="${org.yaml.snakeyaml.version.range}",
-            io.siddhi.distribution.common.*;version="${io.siddhi.distribution.version.range}",
-            io.siddhi.distribution.editor.log.appender.*,
-            org.wso2.msf4j.*;version="${msf4j.import.version.range}",
-            javax.management.*,
-            javax.ws.rs.*;version="0.0.0",
-            com.fasterxml.jackson.core.*;version="${com.fasterxml.jackson.core.version.range}",
-            com.fasterxml.jackson.databind.*;version="${com.fasterxml.jackson.core.version.range}",
-            *;resolution:=optional
-        </import.package>
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
             osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer";serviceCount="1"

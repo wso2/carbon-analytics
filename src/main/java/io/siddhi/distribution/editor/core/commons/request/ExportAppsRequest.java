@@ -18,6 +18,8 @@
 
 package io.siddhi.distribution.editor.core.commons.request;
 
+import io.siddhi.distribution.editor.core.commons.configs.DockerBuildConfig;
+
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +33,7 @@ public class ExportAppsRequest {
     private List<String> bundles;
     private List<String> jars;
     private String kubernetesConfiguration;
+    private DockerBuildConfig dockerConfiguration;
 
     public List<Map<String, String>> getTemplatedSiddhiApps() {
         return templatedSiddhiApps;
@@ -54,5 +57,9 @@ public class ExportAppsRequest {
 
     public String getKubernetesConfiguration() {
         return kubernetesConfiguration;
+    }
+
+    public DockerBuildConfig getDockerConfiguration() {
+        return dockerConfiguration;
     }
 }

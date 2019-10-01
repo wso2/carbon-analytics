@@ -2294,6 +2294,7 @@
                         <table class="table table-responsive" id="template-attr-table">
                             <thead>
                             <th width="100%">
+                                <label>Template Attributes</label>
                             </th>
                             </thead>
                             <tbody id="template-attr-table-body">
@@ -2481,23 +2482,14 @@
                 <hr class='export-dialog-hr'>
             </div>
             <div class='modal-body'>
-                <div id='export-form' class="clearfix">
-                    <ul id="form-steps" class="k8_export_header_item">
-                        <li><a href="#step-1" class="link-disabled">Step 1<br/>
-                            <small>Select Siddhi Apps</small>
-                        </a></li>
-                        <li><a href="#step-2" class="link-disabled">Step 2<br/>
-                            <small>Template Siddhi Apps</small>
-                        </a></li>
-                        <li><a href="#step-3" class="link-disabled">Step 3<br/>
-                            <small>Update Siddhi Runner<br/>Configurations</small>
-                        </a></li>
-                        <li><a href="#step-4" class="link-disabled">Step 4<br/>
-                            <small>Populate arguments <br/>template</small>
-                        </a></li>
-                        <li><a href="#step-5" class="link-disabled">Step 5<br/>
-                            <small>Bundle additional <br/>dependencies</small>
-                        </a></li>
+                <div id='export-form' class="clearfix" >
+                    <ul id="form-steps" class="k8_export_header">
+                        <li><a href="#step-1" class="link-disabled">Step 1<br/><small>Select Siddhi Apps</small></a></li>
+                        <li><a href="#step-2" class="link-disabled">Step 2<br/><small>Template Siddhi Apps</small></a></li>
+                        <li><a href="#step-3" class="link-disabled">Step 3<br/><small>Update Siddhi Runner<br/>Configurations</small></a></li>
+                        <li><a href="#step-4" class="link-disabled">Step 4<br/><small>Populate arguments <br/>template</small></a></li>
+                        <li><a href="#step-5" class="link-disabled">Step 5<br/><small>Bundle additional <br/>dependencies</small></a></li>
+                        <li><a href="#step-6" class="link-disabled">Step 6<br/><small>Configure Docker</small></a></li>
                     </ul>
                     <div id="form-containers">
                         <div id="step-1" class="export-selector">
@@ -2524,16 +2516,40 @@
                                  style='display: block'>
                             </div>
                         </div>
-                        <div id="step-4">
+                        <div id="step-4" class="export-selector">
                             <div id="fill-template-container-id">
                             </div>
                         </div>
                         <div id="step-5" class="export-selector">
-                            <div class='export-siddhi-app-list' id='additional-bundles-list' style='display: block'>
-                                Add additional JARS
+                            <div class='export-siddhi-app-list' id='additional-bundles-list'>
+                                <div class='step-description'>Add additional JARS</div>
                                 <div class='form-group'>
                                     <div class='export-dialog-form-scrollable-block-list'>
                                         <div id='bundlesTree'></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="step-6" class="export-selector">
+                            <div class='docker-config-container' id='docker-config-container-id'>
+                                <input class="docker-checkbox" type="checkbox" name="download-docker-artifacts" id="download-docker-artifacts" value="download"><label class="label-description">Download artifacts</label><br><br>
+                                <input class="docker-checkbox" type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"><label class="label-description">Push to docker registry</label><br>
+                                <div class="docker-details-form" id="docker-details" hidden>
+                                    <div class="docker-details-row">
+                                        <label class="clearfix">Docker Image Tag:</label>
+                                        <input class="file-dialog-form-control" type="text"  id="docker-img-name-input-field" placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">
+                                    </div>
+                                    <div class="docker-details-row">
+                                        <label class="clearfix">Docker Username:</label>
+                                        <input class="file-dialog-form-control" type="text" name="username" id="userName">
+                                    </div>
+                                    <div class="docker-details-row">
+                                        <label class="clearfix">Docker Password:</label>
+                                        <input class="file-dialog-form-control" type="password" name="password" id="password">
+                                    </div>
+                                    <div class="docker-details-row">
+                                        <label class="clearfix">Email:</label>
+                                        <input class="file-dialog-form-control" type="text" name="email" id="email">
                                     </div>
                                 </div>
                             </div>
@@ -2545,6 +2561,37 @@
     </div>
 </div>
 
+<!-- Step 7 of export dialog -->
+<div id="step-7" class="export-selector">
+    <div class="export-kube-config-container" id="kubernetes-configuration-step-id">
+        <div class="step-description">Configure Kubernetes for Siddhi</div>
+        <div class="kube-config-form">
+            <div class="kube-config-row">
+                <div class="clearfix">Siddhi Process Name:</div>
+                <input type="text" class="file-dialog-form-control siddhi-process-name-input" id="sp-name-input-field" placeholder="sample-siddhi-process">
+                </div>
+            <div class="kube-config-row">
+                <div class="clearfix">Deployment types:</div>
+                <div class="kube-config-sub-row">
+                    <div class="clearfix">Distributed/Non-distributed</div>
+                    <div class="kube-input-group" id="distribution-selection">
+                        <input type="radio" name="distribution" id="non-distributed" value="non-distributed"> Non distributed deployment<br>
+                        <input type="radio" name="distribution" id="distributed-with-nats" value="distributed-with-nats"> Distributed deployment with NATS<br>
+                        <input type="radio" name="distribution" id="distributed-with-ext-nats" value="distributed-with-ext-nats"> Distributed deployment with External NATS<br>
+                    </div>
+                </div>
+                <div class="kube-config-sub-row">
+                    <div class="clearfix">Persistence Storage:</div>
+                    <div class="kube-input-group" id="persistent-select">
+                        <input type="radio" name="persistence" id="stateless" value="stateless"> Stateless<br>
+                        <input type="radio" name="persistence" id="backed-by-pv" value="backed-by-pv"> Backed by Persistent Volume<br>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
 <script type="text/javascript">
@@ -2694,6 +2741,7 @@
             jarsSelectorDialog: "js/export-deployment-artifacts/jars-selector-dialog",
             siddhiAppSelectorDialog: "js/export-deployment-artifacts/siddhiapp-selector-dialog",
             templateConfigDialog: "js/export-deployment-artifacts/template-config-dialog",
+            dockerConfigDialog: "js/export-deployment-artifacts/docker-config-dialog",
             fillTemplateValueDialog: "js/export-deployment-artifacts/fill-template-value-dialog",
             kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog"
         },
@@ -3488,9 +3536,11 @@
                     }
                 }
             },
-
             export_dialog: {
                 selector: "#openExportModal"
+            },
+            export_kube_step: {
+                selector: "#step-7"
             }
         };
         app = new Application(config);
