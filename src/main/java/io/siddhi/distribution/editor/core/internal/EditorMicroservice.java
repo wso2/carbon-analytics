@@ -47,6 +47,8 @@ import io.siddhi.distribution.editor.core.commons.response.GeneralResponse;
 import io.siddhi.distribution.editor.core.commons.response.MetaDataResponse;
 import io.siddhi.distribution.editor.core.commons.response.Status;
 import io.siddhi.distribution.editor.core.commons.response.ValidationSuccessResponse;
+import io.siddhi.distribution.editor.core.exception.DockerGenerationException;
+import io.siddhi.distribution.editor.core.exception.KubernetesGenerationException;
 import io.siddhi.distribution.editor.core.exception.SiddhiAppDeployerServiceStubException;
 import io.siddhi.distribution.editor.core.exception.SiddhiStoreQueryHelperException;
 import io.siddhi.distribution.editor.core.internal.local.LocalFSWorkspace;
@@ -73,6 +75,7 @@ import io.siddhi.query.api.definition.StreamDefinition;
 import io.siddhi.query.api.exception.SiddhiAppContextException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
@@ -1147,16 +1150,19 @@ public class EditorMicroservice implements Microservice {
             @FormParam("payload") String payload
     ) {
         String dockerBuilderStatusKey = "";
+        String errorMessage = "";
         try {
             if (payload == null) {
-                log.error("Form parameter payload cannot be null. Expected payload format: " +
+                errorMessage = "Form parameter payload cannot be null. Expected payload format: " +
                         "{'templatedSiddhiApps': ['<SIDDHI-APPS>'], " +
                         "'configuration': '<SIDDHI-CONFIG-OF-DEPLOYMENT.YAML>', " +
                         "'templatedVariables': ['<TEMPLATED-VERIABLES>'], " +
                         "'kubernetesConfiguration': '<K8S-CONFIG>', " +
-                        "'dockerConfiguration': '<DOCKER-CONFIG>'}");
+                        "'dockerConfiguration': '<DOCKER-CONFIG>'}";
+                log.error(errorMessage);
                 return Response
                         .status(Response.Status.BAD_REQUEST)
+                        .entity(errorMessage)
                         .build();
             }
             ExportAppsRequest exportAppsRequest = new Gson().fromJson(payload, ExportAppsRequest.class);
@@ -1181,15 +1187,17 @@ public class EditorMicroservice implements Microservice {
             DockerBuilderStatus dockerBuilderStatus = new DockerBuilderStatus("", "");
             if (exportAppsRequest != null && exportAppsRequest.getDockerConfiguration() != null) {
                 DockerBuildConfig dockerBuildConfig = exportAppsRequest.getDockerConfiguration();
-                if ((dockerBuildConfig.getImageName() == null) ||
-                        (dockerBuildConfig.getUserName() == null) ||
-                        (dockerBuildConfig.getEmail() == null) ||
-                        (dockerBuildConfig.getPassword() == null)
+                if ((StringUtils.isEmpty(dockerBuildConfig.getImageName())) ||
+                        (StringUtils.isEmpty(dockerBuildConfig.getUserName())) ||
+                        (StringUtils.isEmpty(dockerBuildConfig.getEmail())) ||
+                        (StringUtils.isEmpty(dockerBuildConfig.getPassword()))
                 ) {
-                    log.error("Missing required Docker build configuration " +
-                            "of (DockerImageName|UserName|Email|Password)");
+                    errorMessage = "Missing required Docker build configuration " +
+                            "of (DockerImageName|UserName|Email|Password)";
+                    log.error(errorMessage);
                     return Response
                             .status(Response.Status.BAD_REQUEST)
+                            .entity(errorMessage)
                             .build();
                 }
                 DockerBuilder dockerBuilder = new DockerBuilder(
@@ -1220,14 +1228,28 @@ public class EditorMicroservice implements Microservice {
                     .header("Siddhi-Docker-Key", dockerBuilderStatusKey)
                     .build();
         } catch (JsonSyntaxException e) {
-            log.error("Incorrect configuration format.", e);
+            log.error("Incorrect JSON configuration format.", e);
             return Response
                     .status(Response.Status.BAD_REQUEST)
+                    .entity("Incorrect JSON configuration format. " + e.getMessage())
+                    .build();
+        } catch (DockerGenerationException e) {
+            log.error("Failed docker generation. ", e);
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("Failed Docker generation. " + e.getMessage())
+                    .build();
+        } catch (KubernetesGenerationException e) {
+            log.error("Failed Kubernetes generation. ", e);
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("Failed Kubernetes generation. " + e.getMessage())
                     .build();
         } catch (Exception e) {
             log.error("Cannot generate export-artifacts archive.", e);
             return Response
                     .status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Cannot generate export-artifacts archive." + e.getMessage())
                     .build();
         }
     }
@@ -1287,9 +1309,10 @@ public class EditorMicroservice implements Microservice {
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (IOException e) {
-            log.error("Cannot read deployment.yaml file", e);
+            log.error("Cannot read deployment.yaml file. ", e);
             return Response
                     .status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Cannot read deployment.yaml file. " + e.getMessage())
                     .build();
         }
     }
