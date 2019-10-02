@@ -25,10 +25,12 @@ import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.debugger.SiddhiDebugger;
 import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.query.api.definition.Attribute;
+import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class DebugRuntime {
@@ -43,7 +45,14 @@ public class DebugRuntime {
         this.siddhiAppName = siddhiAppName;
         this.siddhiApp = siddhiApp;
         callbackEventsQueue = new LinkedBlockingQueue<>(10);
-        createRuntime();
+        createRuntime(siddhiApp);
+    }
+
+    public DebugRuntime(String siddhiAppName, String siddhiApp, Map<String, String> variableMap) {
+        this.siddhiAppName = siddhiAppName;
+        this.siddhiApp = siddhiApp;
+        callbackEventsQueue = new LinkedBlockingQueue<>(10);
+        createRuntime(SourceEditorUtils.populateSiddhiAppWithVars(variableMap, siddhiApp));
     }
 
     public String getSiddhiAppName() {
@@ -111,7 +120,7 @@ public class DebugRuntime {
             siddhiAppRuntime = null;
         }
         callbackEventsQueue.clear();
-        createRuntime();
+        createRuntime(siddhiApp);
     }
 
     public void reload(String siddhiApp) {
@@ -160,7 +169,7 @@ public class DebugRuntime {
         return callbackEventsQueue;
     }
 
-    private void createRuntime() {
+    private void createRuntime(String siddhiApp) {
         try {
             if (siddhiApp != null && !siddhiApp.isEmpty()) {
                 siddhiAppRuntime = EditorDataHolder.getSiddhiManager()
