@@ -19,14 +19,17 @@
 
 .output-console-content .INFO {
     color: #03a9f4;
+    white-space: pre-wrap;
 }
 
 .output-console-content .INFO-LOGGER {
     color: #e7dfe0;
+    white-space: pre-wrap;
 }
 
 .output-console-content .ERROR {
     color: #f44336;
+    white-space: pre-wrap;
 }
 
 .output-headers-bar {
