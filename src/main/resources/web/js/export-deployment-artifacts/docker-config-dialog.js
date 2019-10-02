@@ -20,6 +20,7 @@ define(['require', 'lodash', 'jquery'],
     function (require, _, $) {
 
         var DockerConfigDialog = function (options) {
+            this.missingDockerConfigErrorMessage = options.templateHeader.find("#missing-docker-config-error-message");
             this.container = options.templateHeader;
             this.payload = options.payload;
             this.exportType = options.exportType;
@@ -45,6 +46,28 @@ define(['require', 'lodash', 'jquery'],
                     self.dockerDetailsForm.hide();
                 }
             });
+
+            self.container.find("#docker-push-checkbox").change(function() {
+                var pushDocker = self.container.find("#docker-push-checkbox").is(":checked");
+                var missingDockerConfigErrorMessage = self.container.find("#missing-docker-config-error-message");
+                if (!pushDocker) {
+                    missingDockerConfigErrorMessage.hide();
+                }
+            });
+
+            self.container.find("#docker-details").on('input', function() {
+                var imageName = self.container.find("#docker-img-name-input-field").val();
+                var userName = self.container.find("#userName").val();
+                var password = self.container.find("#password").val();
+                var email = self.container.find("#email").val();
+                var pushDocker = self.container.find("#docker-push-checkbox").is(":checked");
+                var missingDockerConfigErrorMessage = self.container.find("#missing-docker-config-error-message");
+                if (pushDocker) {
+                    if (imageName != "" && userName != "" && password != "" && email != "") {
+                        missingDockerConfigErrorMessage.hide();
+                    }
+                }
+            });
         };
 
         DockerConfigDialog.prototype.getDockerConfigs = function () {
@@ -57,6 +80,26 @@ define(['require', 'lodash', 'jquery'],
             templateKeyValue["downloadDocker"] = self.container.find("#download-docker-artifacts").is(":checked");
             templateKeyValue["pushDocker"] = self.container.find("#docker-push-checkbox").is(":checked");
             return templateKeyValue;
+        };
+
+        DockerConfigDialog.prototype.validateDockerConfig = function () {
+            var self = this;
+            var imageName = self.container.find("#docker-img-name-input-field").val();
+            var userName = self.container.find("#userName").val();
+            var password = self.container.find("#password").val();
+            var email = self.container.find("#email").val();
+            var pushDocker = self.container.find("#docker-push-checkbox").is(":checked");
+            if (pushDocker) {
+                if (imageName == "" || userName == "" || password == "" || email == "" ||
+                    imageName == null || userName == null || password == null || email == null
+                ) {
+                    this.missingDockerConfigErrorMessage.css('opacity', '1.0');
+                    this.missingDockerConfigErrorMessage.css('background-color', '#d9534f !important');
+                    this.missingDockerConfigErrorMessage.show();
+                    return false;
+                }
+            }
+            return true;
         };
 
         return DockerConfigDialog;
