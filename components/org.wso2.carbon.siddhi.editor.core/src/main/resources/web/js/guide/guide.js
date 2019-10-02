@@ -158,6 +158,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                         $('#partition').removeClass('partition-drag');
                         $('#stream').addClass('stream-drag');
                         currentStep = instance.getCurrentStep();
+                        browserStorage.put("isExecutingTourGuide", true);
                         setTimeout(function () {
                             var interval = null;
                             interval = window.setInterval(function () {
@@ -169,6 +170,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                                 }
                             }, 3000);
                         }, 3000)
+                        browserStorage.put("isExecutingTourGuide", false);
                     }
                 },
                 {

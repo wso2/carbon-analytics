@@ -51,7 +51,7 @@ define(['require', 'lodash', 'jquery'],
             var dynamicKeyHTMLContent = "";
 
             if (self.templatedKeyList.length == 0) {
-                dynamicKeyHTMLContent = dynamicKeyHTMLContent + '<div id="fillTemplateValueError" class="alert alert-danger">' +
+                dynamicKeyHTMLContent = dynamicKeyHTMLContent + '<div id="fillTemplateValueError" class="alert">' +
                     'No values are templated to fill.' +
                     '</div>';
             } else {
@@ -96,7 +96,10 @@ define(['require', 'lodash', 'jquery'],
             while (match != null) {
                 if (match[0].trim() !== constants.KEY_CARBON_HOME && match[0].trim() !== constants.KEY_SYS_CARBON_HOME
                     && match[0].trim() !== constants.KEY_RUNTIME) {
-                    self.templatedKeyList.push(match[0].trim().substring(1).replace("{","").replace("}",""));
+                    var templatedKey = match[0].trim().substring(1).replace("{","").replace("}","")
+                    if (!self.templatedKeyList.includes(templatedKey)) {
+                        self.templatedKeyList.push(match[0].trim().substring(1).replace("{","").replace("}",""));
+                    }
                 }
                 match = constants.TEMPLATED_ELEMENT_REGEX.exec(text);
             }

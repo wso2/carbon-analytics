@@ -22,6 +22,10 @@ hr.style1 {
     width: 93%;
 }
 
+.form-group {
+    margin: 10px 0;
+}
+
 .export-dialog .modal-body {
 }
 
@@ -73,7 +77,7 @@ hr.export-dialog-hr {
 }
 
 .export-dialog-form-scrollable-block-list {
-    padding: 20px;
+    padding: 0px 10px;
     overflow: auto;
     max-height: 200px;
     width: 100%;
@@ -123,14 +127,28 @@ hr.export-dialog-hr {
     min-width: 100px;
 }
 .sub-template-value-element-div .option input {
-    color: #000 !important;
+    color: #fff !important;
     width: 75%;
+    background-color: #2C2C2C;
+    border-style: none;
+    height: 35px;
+    padding-left: 10px;
+    margin-top: 1px;
 }
 
 .step-description {
-    padding: 10px;
+    padding: 5px;
     background-color: transparent;
     transition: background-color 500ms linear;
+}
+
+.step-description-text {
+    padding: 0px 5px 5px 5px;
+    background-color: transparent;
+}
+
+div#step-6 {
+    height: fit-content !important;
 }
 
 .export-siddhi-app-list {
