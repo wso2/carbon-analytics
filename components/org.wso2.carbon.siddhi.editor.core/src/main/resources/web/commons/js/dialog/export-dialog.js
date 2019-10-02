@@ -83,8 +83,13 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         heading.text('Export Siddhi Apps for Docker image');
                     } else {
                         heading.text('Export Siddhi Apps For Kubernetes CRD');
-                        form.find('#form-steps')
-                            .append('<li><a href="#step-6">Step 6<br/><small>Add Kubernetes Config</small></a></li>');
+                        var formSteps = form.find('#form-steps');
+                        for (i = 0; i < formSteps.children().length; i++) {
+                            formSteps.children()[i].setAttribute("style", "max-width: 14.28%;")
+                        }
+                        formSteps.append('<li style="max-width: 14.28%;"><a href="#step-7" ' +
+                            'class="link-disabled">Step 7<br/><small>Add Kubernetes Config</small>' +
+                            '</a></li>');
 
                         form.find('#form-containers')
                             .append("\n" +
