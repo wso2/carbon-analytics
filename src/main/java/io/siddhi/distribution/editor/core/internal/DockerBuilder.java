@@ -84,9 +84,9 @@ public class DockerBuilder extends Thread {
                     dockerBuilderStatus.setStep(STEP_ERROR);
                 }
             }
-            removeSampleDockerDir();
+            removeDockerBuildTempDir();
         } catch (DockerGenerationException e) {
-            log.error("Failed to build and push Docker artifacts automatically ", e);
+            log.error("Failed to build and push Docker artifacts automatically.\n", e);
         }
     }
 
@@ -141,12 +141,10 @@ public class DockerBuilder extends Thread {
             }
         } catch (DockerException | InterruptedException | IOException e) {
             dockerBuilderStatus.setStatus(e.getMessage());
-            throw new DockerGenerationException(
-                    "Failed to build the Docker image in directory " + dockerFilePath.toString() +
-                            " and Docker image name " + dockerImageName, e
-            );
+            throw new DockerGenerationException("Failed to build Docker image '" + dockerImageName, e);
+        } finally {
+            removeDockerBuildTempDir();
         }
-
         return isDockerBuilt;
     }
 
@@ -156,7 +154,6 @@ public class DockerBuilder extends Thread {
         if (dockerClient == null) {
             createDockerClient();
         }
-
         //push built docker image to the docker hub registry
         final RegistryAuth registryAuth = RegistryAuth.builder()
                 .email(dockerEmail)
@@ -166,32 +163,35 @@ public class DockerBuilder extends Thread {
         try {
             final int statusCode = dockerClient.auth(registryAuth);
             if (statusCode == 200) {
+                log.info("Pushing Docker image '" + dockerImageName + "' started.");
                 dockerClient.push(dockerImageName, message -> {
                     if (message != null && message.status() != null && message.id() != null) {
                         dockerBuilderStatus.setStatus(message.status());
                         log.info(message.id() + ": " + message.status());
                     }
                 }, registryAuth);
+                log.info("Docker image '" + dockerImageName + "' pushed successfully.");
                 isPushed = true;
             } else {
-                dockerBuilderStatus.setStatus("Authentication failed to connect to the Docker registry using UserName: "
-                        + dockerUserName + " and Email: " + dockerEmail);
+                String errorMessage = "Authentication failed to connect to the Docker registry using UserName: "
+                        + dockerUserName + " and Email: " + dockerEmail;
+                log.error(errorMessage);
+                dockerBuilderStatus.setStatus(errorMessage);
                 throw new DockerGenerationException(
                         "Authentication failed to connect to the Docker registry using UserName: "
                                 + dockerUserName + " and Email: " + dockerEmail
                 );
             }
         } catch (DockerException | InterruptedException e) {
+            String errorMessage = "Failed to push the Docker image '" + dockerImageName +
+                    "' with UserName: " + dockerUserName + " and Email: " + dockerEmail;
             dockerBuilderStatus.setStatus(e.getMessage());
-            throw new DockerGenerationException(
-                    "Failed to push the Docker image " + dockerImageName +
-                            " with UserName: " + dockerUserName + " and Email: " + dockerEmail, e
-            );
+            throw new DockerGenerationException(errorMessage, e);
         }
         return isPushed;
     }
 
-    private void removeSampleDockerDir() {
+    private void removeDockerBuildTempDir() {
         if (dockerFilePath != null && Files.exists(dockerFilePath)) {
             try {
                 FileUtils.deleteDirectory(new File(dockerFilePath.toString()));
