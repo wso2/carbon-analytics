@@ -149,12 +149,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "snippet define-Trigger\n" +
             "\tdefine trigger ${1:trigger_name} at ${2:time};\n" +
             "snippet define-Aggregation\n" +
-            "\tdefine aggregation ${1:aggregator_name}\n" +
-            "\tfrom ${2:input_stream}\n" +
-            "\tselect ${3:attribute1}, ${4:aggregate_function}(${5:attribute2}) as ${6:attribute3}," +
-            "${7:aggregate_function}(${8:attribute4}) as ${9:attribute5}\n" +
-            "\t\tgroup by ${10:attribute6}\n" +
-            "\t\taggregate by ${11:timestamp_attribute} every ${12:time_periods};\n" +
+            "\t@Purge(enable = '${1:enable_purge}', interval= '${2:purge_interval}',\n" +
+            "\t\t\t@retentionPeriod(...))\n" +
+            "\tdefine aggregation ${3:aggregator_name}\n" +
+            "\tfrom ${4:input_stream}\n" +
+            "\tselect ${5:attribute1}, ${6:aggregate_function}(${7:attribute2}) as ${8:attribute3}, ${9:aggregate_function}(${10:attribute4}) as ${11:attribute5}\n" +
+            "\t\tgroup by ${12:attribute6}\n" +
+            "\t\taggregate by ${13:timestamp_attribute} every ${14:time_periods};\n" +
             "snippet define-Function\n" +
             "\tdefine function ${1:function_name}[${2:lang_name}] return ${3:return_type} { \n" +
             "\t\t${4:function_body} \n" +
@@ -172,7 +173,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "snippet annotate-QueryInfo\n" +
             "\t@info(name = \"${1:Query_Name}\")\n" +
             "snippet annotate-Async\n" +
-            "\t@async(buffer.size = \"${1:Buffer_Size}\")\n" +
+            "\t@async(buffer.size=\"${1:64}\", workers=\'${2:2}\', batch.size.max=\'${3:10}\')\n" +
             "snippet define-Partition\n" +
             "\tpartition with (${1:attribute_name} of ${2:stream_name})\n" +
             "\tbegin\n" +
@@ -226,7 +227,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
             "snippet query\n" +
             "\tfrom ${1:stream_name}\n" +
             "\tselect ${2:attribute1} , ${3:attribute2}\n" +
-            "\tinsert into ${4:output_stream}\n"
+            "\tinsert into ${4:output_stream}\n" +
+            "snippet query-tableJoin\n" +
+            "\tfrom ${1:stream_name} as ${2:reference} join ${3:table_name} as ${4:reference}\n" +
+            "\t\ton ${5:join_condition}\n" +
+            "\tselect ${6:attribute1}, ${7:attribute2}\n" +
+            "\tlimit ${8:limit_value}\n" +
+            "\toffset ${9:offset_value}\n" +
+            "\tinsert into ${10:output_stream}\n"
         );
 
         /*
@@ -265,10 +273,13 @@ define(["ace/ace", "jquery", "./constants", "./utils", "ace/snippets", "ace/rang
                     'App:statistics(enable=\'true\', include=\'*.*\')',
                     'index(\'attribute_name\')',
                     'primaryKey(\'attribute_name\')',
-                    'async(buffer.size=\'64\')',
+                    'async(buffer.size=\'64\', workers=\'2\', batch.size.max=\'10\')',
                     'map(type=\'map_type\', option_key=\'option_value\')',
                     'attributes(\'attribute_mapping_a\', \'attribute_mapping_b\')',
                     'payload(\'payload_string\')',
+                    'purge(enable=\'true\', interval=\'purging_interval\', @retentionPeriod(\'granularity\' = \'retention period\', ...))',
+                    'purge(enable=\'true\', interval=\'purge_interval\', idle.period=\'idle_period_of_partition\')',
+                    'onError(action=\'log\')',
                     'info(name=\'query_name\')'
                 ]
             },
