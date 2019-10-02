@@ -61,23 +61,31 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', '../../../js/event-sim
                         errorBox.hide();
                     };
 
-                    SimulatorRestClient.retrieveSiddhiAppNames(
-                        function (data) {
-                            var template = '<option value="{{dataName}}">{{dataName}}</option>';
-                            var options =
-                                '<option selected="selected" value = "-1" disabled>-- Please Select a Siddhi App --</option>';
-                            if (data) {
-                                data.sort();
-                                for (var i = 0; i < data.length; i++) {
-                                    options += template.replaceAll('{{dataName}}', data[i].siddhiAppName);
-                                }
+                    var tabList = app.tabController.getTabList();
+                    var runningFileList = [];
+                    _.each(tabList, function (tab) {
+                        if(tab._title != "welcome-page"){
+                            var file = tab.getFile();
+                            if(file.getRunStatus()){
+                                runningFileList.push(file.getName().substring(0, file.getName().lastIndexOf(".siddhi")));
                             }
-                            storeQueryModal.find("select[name='siddhi-app-name']").html(options);
-                        },
-                        function (data) {
-                            showError("Error when retrieving siddhi apps. Reason: " + data);
                         }
-                    );
+                    });
+
+                    if (runningFileList.length !== 0) {
+                        const template = '<option value="{{dataName}}">{{dataName}}</option>';
+                        var options =
+                            '<option selected="selected" value = "-1" disabled>-- Please Select a Siddhi App --</option>';
+                        runningFileList.sort();
+                        for (var i = 0; i < runningFileList.length; i++) {
+                            options += template.replaceAll('{{dataName}}', runningFileList[i]);
+                        }
+                        storeQueryModal.find("select[name='siddhi-app-name']").html(options);
+
+                    } else {
+                        errorBox.text("No siddhi apps are running in the workspace. Start a siddhi app to " +
+                            "execute an on-demand query.").show();
+                    }
 
                     appNameSelector.on('change', function (event) {
                         var siddhiAppName = storeQueryModal.find("select[name='siddhi-app-name']").val();
