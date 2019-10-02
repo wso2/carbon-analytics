@@ -239,9 +239,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                     var payloadInputField = $('<input id="payload" name="payload" type="text" style="display: none;"/>')
                         .attr('value', JSON.stringify(this._payload));
-                    this._btnExportForm.append(payloadInputField);
 
-                    $(document.body).append(this._btnExportForm);
                     var exportUrl = this._exportUrl
                     var requestType = "downloadOnly"
 
@@ -252,6 +250,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         if (this._payload.dockerConfiguration.pushDocker && this._payload.dockerConfiguration.downloadDocker) {
                             requestType = "downloadAndBuild";
                         } else if (this._payload.dockerConfiguration.pushDocker) {
+                            this._btnExportForm.append(payloadInputField);
+                            $(document.body).append(this._btnExportForm);
                             requestType = "buildOnly";
                             exportUrl = exportUrl + "&requestType=" + requestType;
                             $.ajax({
@@ -288,6 +288,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             requestType = "downloadOnly";
                         }
                     }
+                    this._btnExportForm.append(payloadInputField);
+                    $(document.body).append(this._btnExportForm);
                     exportUrl = exportUrl + "&requestType=" + requestType;
                     this._btnExportForm = this._btnExportForm.attr('action', exportUrl)
                     this._btnExportForm.submit();
