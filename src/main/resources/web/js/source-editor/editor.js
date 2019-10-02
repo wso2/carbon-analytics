@@ -277,7 +277,9 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 var localVarObj = JSON.parse(localStorage.getItem("templatedAttributeList"))
                 Object.keys(localVarObj).forEach((key , index)=>{
                     var name = extractPlaceHolderName(key);
-                    variableMap[name] = localVarObj[key];
+                    if (localVarObj[key] !== undefined   && localVarObj[key] !== '') {
+                        variableMap[name] = localVarObj[key];
+                    }
                 });
 
                 // If the user has not typed anything after 3 seconds from his last change, then send the query for

@@ -55,7 +55,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console'],
                 var localVarObj = JSON.parse(localStorage.getItem("templatedAttributeList"))
                 Object.keys(localVarObj).forEach((key , index)=>{
                     var name = extractPlaceHolderName(key);
-                    variableMap[name] = localVarObj[key];
+                    if (localVarObj[key] !== undefined && localVarObj[key] !== '') {
+                        variableMap[name] = localVarObj[key];
+                    }
                 });
                 var data = {
                     siddhiAppName: siddhiAppName,
