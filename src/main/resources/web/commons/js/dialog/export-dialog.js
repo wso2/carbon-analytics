@@ -69,7 +69,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this._exportUrl = options.config.baseUrl + "/export?exportType=" + this._exportType;
                     this._btnExportForm =  $('' +
                         '<form id="submit-form" method="post" enctype="application/x-www-form-urlencoded" target="export-download" >' +
-                        '<button  type="button" class="btn btn-primary hidden" id="export-btn" data-dismiss="modal" >Export</button>' +
+                        '<button type="button" class="btn btn-primary hidden" id="export-btn" >Export</button>' +
                         '</form>');
 
                 },
@@ -141,6 +141,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 getTemplatedKeyValues();
                                 return self._fill_template_value_dialog.
                                 validateTemplatedValues(self._payload.templatedVariables)
+                            } else if (stepNumber === 5) {
+                                return self._dockerConfigModel.validateDockerConfig();
                             }
                         }
                     });
@@ -244,6 +246,9 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     var requestType = "downloadOnly"
 
                     if (this._exportType == "docker") {
+                        if (!this._dockerConfigModel.validateDockerConfig()) {
+                           return;
+                        }
                         if (this._payload.dockerConfiguration.pushDocker && this._payload.dockerConfiguration.downloadDocker) {
                             requestType = "downloadAndBuild";
                         } else if (this._payload.dockerConfiguration.pushDocker) {
@@ -271,6 +276,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                     }
                                 }
                             });
+                            this._exportContainer.modal('hide');
                             return;
                         } else {
                             requestType = "downloadOnly";
@@ -285,6 +291,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     exportUrl = exportUrl + "&requestType=" + requestType;
                     this._btnExportForm = this._btnExportForm.attr('action', exportUrl)
                     this._btnExportForm.submit();
+                    this._exportContainer.modal('hide');
                 },
 
                 clear: function () {

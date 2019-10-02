@@ -2531,23 +2531,26 @@
                         </div>
                         <div id="step-6" class="export-selector">
                             <div class='docker-config-container' id='docker-config-container-id'>
+                                <div id='missing-docker-config-error-message' class='step-description openDockerWizardError-container' hidden>
+                                    Required to fill Docker Configurations
+                                </div>
                                 <input class="docker-checkbox" type="checkbox" name="download-docker-artifacts" id="download-docker-artifacts" value="download"><label class="label-description">Download artifacts</label><br>
                                 <input class="docker-checkbox" type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"><label class="label-description">Push to docker registry</label><br>
                                 <div class="docker-details-form" id="docker-details" hidden>
                                     <div class="docker-details-row">
-                                        <label class="clearfix">Docker Image Tag:</label>
+                                        <label class="clearfix">* Docker Image Tag:</label>
                                         <input class="file-dialog-form-control" type="text"  id="docker-img-name-input-field" placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">
                                     </div>
                                     <div class="docker-details-row">
-                                        <label class="clearfix">Docker Username:</label>
+                                        <label class="clearfix">* Docker Username:</label>
                                         <input class="file-dialog-form-control" type="text" name="username" id="userName">
                                     </div>
                                     <div class="docker-details-row">
-                                        <label class="clearfix">Docker Password:</label>
+                                        <label class="clearfix">* Docker Password:</label>
                                         <input class="file-dialog-form-control" type="password" name="password" id="password">
                                     </div>
                                     <div class="docker-details-row">
-                                        <label class="clearfix">Email:</label>
+                                        <label class="clearfix">* Email:</label>
                                         <input class="file-dialog-form-control" type="text" name="email" id="email">
                                     </div>
                                     <br/>
