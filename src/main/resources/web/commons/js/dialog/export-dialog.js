@@ -210,6 +210,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 self._dockerConfigModel = new DockerConfigDialog({
                                     app: self._options,
                                     templateHeader: exportContainer.find('#docker-config-container-id'),
+                                    exportType:self._exportType,
                                     payload: self._payload
                                 });
                                 self._dockerConfigModel.render();

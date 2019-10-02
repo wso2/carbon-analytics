@@ -31,6 +31,10 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
 
         KubernetesConfigDialog.prototype.render = function () {
             var self = this;
+            let distributionSelectionInput = self.templateContainer.find("#distribution-selection");
+            let persistenceSelectionInput = self.templateContainer.find("#persistent-select");
+            distributionSelectionInput.find("#non-distributed").prop('checked', true);
+            persistenceSelectionInput.find("#stateless").prop('checked', true);
 
             var messagingEdtdivId = "kubernetes-messaging-editor-id";
             var messagingTemplateEntry = "<div class='kubernetes-config-editor' style='display:none' id='".concat(messagingEdtdivId).concat("'></div>");
