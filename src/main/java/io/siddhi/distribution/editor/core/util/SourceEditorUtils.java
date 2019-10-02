@@ -523,10 +523,12 @@ public class SourceEditorUtils {
             Matcher matcher = expr.matcher(siddhiApp);
             while (matcher.find()) {
                 for (int i = 1; i <= matcher.groupCount(); i++) {
-                    String envValue = envMap.getOrDefault(matcher.group(i), "");
-                    envValue = envValue.replace("\\", "\\\\");
-                    Pattern subexpr = Pattern.compile("\\$\\{" + matcher.group(i) + "\\}");
-                    siddhiApp = subexpr.matcher(siddhiApp).replaceAll(envValue);
+                    String envValue = envMap.get(matcher.group(i));
+                    if (envValue != null) {
+                        envValue = envValue.replace("\\", "\\\\");
+                        Pattern subexpr = Pattern.compile("\\$\\{" + matcher.group(i) + "\\}");
+                        siddhiApp = subexpr.matcher(siddhiApp).replaceAll(envValue);
+                    }
                 }
             }
         }
