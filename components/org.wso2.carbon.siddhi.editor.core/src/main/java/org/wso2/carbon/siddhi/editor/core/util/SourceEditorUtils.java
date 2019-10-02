@@ -46,6 +46,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Utility class for getting the meta data for the in built and extension processors in siddhi
@@ -500,4 +502,22 @@ public class SourceEditorUtils {
         }
         return processorMetaData;
     }
+
+    public static String populateSiddhiAppWithVars(Map<String, String> envMap, String siddhiApp) {
+        if (siddhiApp.contains("$")) {
+            String envPattern = "\\$\\{(\\w+)\\}";
+            Pattern expr = Pattern.compile(envPattern);
+            Matcher matcher = expr.matcher(siddhiApp);
+            while (matcher.find()) {
+                for (int i = 1; i <= matcher.groupCount(); i++) {
+                    String envValue = envMap.getOrDefault(matcher.group(i), "");
+                    envValue = envValue.replace("\\", "\\\\");
+                    Pattern subexpr = Pattern.compile("\\$\\{" + matcher.group(i) + "\\}");
+                    siddhiApp = subexpr.matcher(siddhiApp).replaceAll(envValue);
+                }
+            }
+        }
+        return siddhiApp;
+    }
+
 }

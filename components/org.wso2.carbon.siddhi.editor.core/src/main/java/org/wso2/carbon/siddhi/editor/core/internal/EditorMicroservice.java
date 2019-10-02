@@ -53,6 +53,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.siddhi.editor.core.EditorSiddhiAppRuntimeService;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
+import org.wso2.carbon.siddhi.editor.core.commons.request.AppStartRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.request.DockerDownloadRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ExportAppsRequest;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ValidationRequest;
@@ -209,8 +210,13 @@ public class EditorMicroservice implements Microservice {
         ValidationRequest validationRequest = new Gson().fromJson(validationRequestString, ValidationRequest.class);
         String jsonString;
         try {
+            String siddhiApp = validationRequest.getSiddhiApp();
+            if (validationRequest.getVariables().size() != 0) {
+                siddhiApp = SourceEditorUtils.populateSiddhiAppWithVars(validationRequest.getVariables(), siddhiApp);
+            }
+
             SiddhiAppRuntime siddhiAppRuntime =
-                    EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(validationRequest.getSiddhiApp());
+                    EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(siddhiApp);
 
             // Status SUCCESS to indicate that the siddhi app is valid
             ValidationSuccessResponse response = new ValidationSuccessResponse(Status.SUCCESS);
@@ -716,6 +722,23 @@ public class EditorMicroservice implements Microservice {
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(new DebugRuntimeResponse(Status.SUCCESS, null, siddhiAppName, streams, queries)).build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/start")
+    public Response startWithVariables(String appStartRequestString) {
+        AppStartRequest appStartRequest = new Gson().fromJson(appStartRequestString, AppStartRequest.class);
+        String siddhiAppName = appStartRequest.getSiddhiAppName();
+        if (appStartRequest.getVariables().size() > 0) {
+            DebugRuntime existingRuntime = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
+            String siddhiApp = existingRuntime.getSiddhiApp();
+            siddhiApp = SourceEditorUtils.populateSiddhiAppWithVars(appStartRequest.getVariables(), siddhiApp);
+            DebugRuntime runtimeHolder = new DebugRuntime(siddhiAppName, siddhiApp);
+            EditorDataHolder.getSiddhiAppMap().put(siddhiAppName, runtimeHolder);
+
+        }
+        return start(siddhiAppName);
     }
 
     @GET
