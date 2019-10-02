@@ -212,10 +212,29 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         console.println(message);
                     };
                     ws.onerror = function (error) {
-                        console.log(error);
+                        console.error('Editor console service encountered an error, ', error,
+                            'Hence, closing connection.');
                     };
                     ws.onclose = function () {
-
+                        var console = opts.application.outputController.getGlobalConsole();
+                        if (console == undefined) {
+                            var consoleOptions = {};
+                            var options = {};
+                            _.set(options, '_type', "CONSOLE");
+                            _.set(options, 'title', "Console");
+                            _.set(options, 'statusForCurrentFocusedFile', "LOGGER");
+                            _.set(options, 'currentFocusedFile', undefined);
+                            _.set(consoleOptions, 'consoleOptions', options);
+                            console = opts.application.outputController.newConsole(consoleOptions);
+                            opts.application.outputController.hideAllConsoles();
+                        }
+                        var logMessage = "Connection closed, backend is unavailable! " +
+                            "Refresh to reconnect the console.";
+                        var message = {
+                            "type": "ERROR",
+                            "message": logMessage
+                        };
+                        console.println(message);
                     };
                 }
             });

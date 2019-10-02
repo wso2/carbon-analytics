@@ -94,7 +94,7 @@ public class EditorConsoleService implements WebSocketEndpoint {
             try {
                 ConsoleLogEvent clientCloseEvent = new ConsoleLogEvent();
                 clientCloseEvent.setMessage("Connection closed (Possibly due to opening the editor in a "
-                        + "new Tab/Window) ! Refresh to reconnect the console.");
+                        + "new Tab/Window)! Refresh to reconnect the console.");
                 clientCloseEvent.setLevel("ERROR");
                 clientCloseEvent.setFqcn(EditorConsoleService.class.getCanonicalName());
                 String timeString = timeFormatter.format(System.currentTimeMillis());
