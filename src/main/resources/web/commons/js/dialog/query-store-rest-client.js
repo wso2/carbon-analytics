@@ -20,12 +20,19 @@ define(["jquery"], function (jQuery) {
     var self = {};
     self.siddhiStoreUrl = window.location.protocol + "//" + window.location.host + "/editor/query";
     self.retrieveStoresQuery = function (appName, query, successCallback, errorCallback) {
+        
+        var request = {
+          "appName" : appName,
+          "query" : query,
+          "details" : true
+        };
+
         jQuery.ajax({
             async: true,
             type: "POST",
             contentType: "application/json",
             url: self.siddhiStoreUrl,
-            data: "{\"appName\": \"" + appName + "\", \"query\": \"" + query + "\", \"details\": true }",
+            data: JSON.stringify(request),
             success: function (data) {
                 if (typeof successCallback === 'function') {
                     successCallback(data);
