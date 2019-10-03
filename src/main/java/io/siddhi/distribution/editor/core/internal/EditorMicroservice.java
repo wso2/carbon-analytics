@@ -298,8 +298,7 @@ public class EditorMicroservice implements Microservice {
         }
 
         try {
-            feign.Response response = storeQueryAPIHelper
-                    .executeStoreQuery(request.getProperty("LOCAL_ADDRESS").toString(), element.toString());
+            feign.Response response = storeQueryAPIHelper.executeStoreQuery(element.toString());
             String payload = response.body().toString();
             // If the response HTTP status code is OK, return the response.
             if (response.status() == 200) {
