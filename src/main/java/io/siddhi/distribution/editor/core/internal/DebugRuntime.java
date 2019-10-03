@@ -26,6 +26,8 @@ import io.siddhi.distribution.editor.core.exception.NoSuchStreamException;
 import io.siddhi.distribution.editor.core.util.DebugCallbackEvent;
 import io.siddhi.distribution.editor.core.util.SourceEditorUtils;
 import io.siddhi.query.api.definition.Attribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +46,7 @@ public class DebugRuntime {
     private transient SiddhiAppRuntime siddhiAppRuntime;
     private transient SiddhiDebugger debugger;
     private transient LinkedBlockingQueue<DebugCallbackEvent> callbackEventsQueue;
+    private static final Logger log = LoggerFactory.getLogger(DebugRuntime.class);
 
     public DebugRuntime(String siddhiAppName, String siddhiApp) {
         this.siddhiAppName = siddhiAppName;
@@ -91,7 +94,9 @@ public class DebugRuntime {
                 mode = Mode.RUN;
             } catch (Throwable e) {
                 mode = Mode.FAULTY;
-                throw new InvalidExecutionStateException("Siddhi App '" + siddhiAppName + "' is in faulty state.", e);
+                String errorMessage = "Siddhi App '" + siddhiAppName + "' is in faulty state.";
+                log.error(errorMessage, e);
+                throw new InvalidExecutionStateException(errorMessage, e);
             }
         } else {
             throw new InvalidExecutionStateException("Siddhi App '" + siddhiAppName + "' is in faulty state.");
