@@ -46,6 +46,7 @@ public class DebugRuntime {
     private transient SiddhiAppRuntime siddhiAppRuntime;
     private transient SiddhiDebugger debugger;
     private transient LinkedBlockingQueue<DebugCallbackEvent> callbackEventsQueue;
+    private Throwable caughtException;
     private static final Logger log = LoggerFactory.getLogger(DebugRuntime.class);
 
     public DebugRuntime(String siddhiAppName, String siddhiApp) {
@@ -87,7 +88,6 @@ public class DebugRuntime {
     }
 
     public void start() {
-
         if (Mode.STOP.equals(mode)) {
             try {
                 siddhiAppRuntime.start();
@@ -99,7 +99,9 @@ public class DebugRuntime {
                 throw new InvalidExecutionStateException(errorMessage, e);
             }
         } else {
-            throw new InvalidExecutionStateException("Siddhi App '" + siddhiAppName + "' is in faulty state.");
+            String errorMessage = "Siddhi App '" + siddhiAppName + "' is in faulty state.";
+            log.error(errorMessage, caughtException);
+            throw new InvalidExecutionStateException(errorMessage);
         }
     }
 
@@ -115,11 +117,15 @@ public class DebugRuntime {
                 });
                 mode = Mode.DEBUG;
             } catch (Throwable e) {
+                String errorMessage = "Siddhi App '" + siddhiAppName + "' is in faulty state.";
+                log.error(errorMessage, e);
                 mode = Mode.FAULTY;
-                throw new InvalidExecutionStateException("Siddhi App '" + siddhiAppName + "' is in faulty state.", e);
+                throw new InvalidExecutionStateException(errorMessage, e);
             }
         } else {
-            throw new InvalidExecutionStateException("Siddhi App '" + siddhiAppName + "' is in faulty state.");
+            String errorMessage = "Siddhi App '" + siddhiAppName + "' is in faulty state.";
+            log.error(errorMessage, caughtException);
+            throw new InvalidExecutionStateException(errorMessage);
         }
     }
 
@@ -145,7 +151,6 @@ public class DebugRuntime {
     }
 
     public List<String> getStreams() {
-
         if (!Mode.FAULTY.equals(mode)) {
             return new ArrayList<>(siddhiAppRuntime.getStreamDefinitionMap().keySet());
         } else {
@@ -200,6 +205,7 @@ public class DebugRuntime {
                 mode = Mode.FAULTY;
             }
         } catch (Exception e) {
+            caughtException = e;
             mode = Mode.FAULTY;
         }
     }
