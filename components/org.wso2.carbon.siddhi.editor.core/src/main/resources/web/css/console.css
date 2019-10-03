@@ -17,9 +17,9 @@
     width: calc(100% - 35px) !important;
 }
 
-.output-console-content .INFO { color: #03a9f4; }
-.output-console-content .INFO-LOGGER { color: #e7dfe0; }
-.output-console-content .ERROR { color: #f44336; }
+.output-console-content .INFO { color: #03a9f4; white-space: pre-wrap; }
+.output-console-content .INFO-LOGGER { color: #e7dfe0; white-space: pre-wrap; }
+.output-console-content .ERROR { color: #f44336; white-space: pre-wrap; }
 
 .output-headers-bar{
     background: #232323;
