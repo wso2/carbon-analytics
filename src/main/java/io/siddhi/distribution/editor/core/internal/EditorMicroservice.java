@@ -1051,7 +1051,7 @@ public class EditorMicroservice implements Microservice {
 
         try {
             FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
-            SiddhiManager siddhiManager = new SiddhiManager();
+            SiddhiManager siddhiManager = EditorDataHolder.getSiddhiManager();
             siddhiManager.setConfigManager(fileConfigManager);
             DesignGenerator designGenerator = new DesignGenerator();
             designGenerator.setSiddhiManager(siddhiManager);
@@ -1377,7 +1377,7 @@ public class EditorMicroservice implements Microservice {
     protected void start(BundleContext bundleContext) throws Exception {
         // Create Stream Processor Service
         EditorDataHolder.setDebugProcessorService(new DebugProcessorService());
-        SiddhiManager siddhiManager = new SiddhiManager();
+        SiddhiManager siddhiManager = EditorDataHolder.getSiddhiManager();
         FileConfigManager fileConfigManager = new FileConfigManager(configProvider);
         siddhiManager.setConfigManager(fileConfigManager);
         EditorDataHolder.setSiddhiManager(siddhiManager);
@@ -1495,5 +1495,20 @@ public class EditorMicroservice implements Microservice {
     protected void unregisterAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
 
         EditorDataHolder.getInstance().setClientBuilderService(null);
+    }
+
+    @Reference(
+            name = "siddhi-manager-service",
+            service = SiddhiManager.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetSiddhiManager"
+    )
+    protected void setSiddhiManager(SiddhiManager siddhiManager) {
+        EditorDataHolder.setSiddhiManager(siddhiManager);
+    }
+
+    protected void unsetSiddhiManager(SiddhiManager siddhiManager) {
+        EditorDataHolder.setSiddhiManager(null);
     }
 }
