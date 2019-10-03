@@ -170,7 +170,6 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                                 }
                             }, 3000);
                         }, 3000)
-                        browserStorage.put("isExecutingTourGuide", false);
                     }
                 },
                 {
@@ -485,6 +484,7 @@ define(['jquery', 'lodash', 'log', 'enjoyhint', 'designViewUtils', 'workspace', 
                                 clearInterval(interval);
                             }
                         }, 1000)
+                        browserStorage.put("isExecutingTourGuide", false);
                     }
                 },
                 {

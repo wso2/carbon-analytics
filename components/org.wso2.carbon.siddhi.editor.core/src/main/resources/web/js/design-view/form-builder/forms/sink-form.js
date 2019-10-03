@@ -450,10 +450,9 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                         self.configurationData.setIsDesignViewContentChanged(true);
                         // close the form window
 
+                        self.consoleListManager.removeFormConsole(formConsole);
                         if (self.application.browserStorage.get("isExecutingTourGuide")) {
                             self.consoleListManager.removeAllConsoles();
-                        } else {
-                            self.consoleListManager.removeFormConsole(formConsole);
                         }
                     }
                 });

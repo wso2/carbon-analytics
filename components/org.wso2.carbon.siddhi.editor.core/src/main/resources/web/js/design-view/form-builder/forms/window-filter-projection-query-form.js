@@ -424,10 +424,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                         textNode.html(queryName);
 
                         // close the form window
+                        self.consoleListManager.removeFormConsole(formConsole);
                         if (self.application.browserStorage.get("isExecutingTourGuide")) {
                             self.consoleListManager.removeAllConsoles();
-                        } else {
-                            self.consoleListManager.removeFormConsole(formConsole);
                         }
                     }
                 });
