@@ -19,8 +19,9 @@
  * This will set the options of ACE editor, attach client side parser and attach SiddhiCompletion Engine with the editor
  */
 define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip",
-        "ace/ext/language_tools", "./debug-rest-client", "log", 'ace/range'],
-    function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip, aceExtLangTools, DebugRESTClient, log, AceRange) {
+        "ace/ext/language_tools", "./debug-rest-client", "log", 'ace/range', 'lodash'],
+    function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip
+              , aceExtLangTools, DebugRESTClient, log, AceRange, _) {
 
         "use strict";   // JS strict mode
 
@@ -336,7 +337,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                 self.state.semanticErrorList = [({
                                     row: 0,
                                     // Change attribute "text" to "html" if html is sent from server
-                                    html: utils.wordWrap(response.message, 120),
+                                    html: utils.wordWrap(_.escape(response.message), 120),
                                     type: "error"
                                 })];
 
@@ -350,7 +351,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                                 self.state.semanticErrorList = [({
                                     row: response.queryContextStartIndex[0] - 1,
                                     // Change attribute "text" to "html" if html is sent from server
-                                    html: utils.wordWrap(response.message, 120),
+                                    html: utils.wordWrap(_.escape(response.message), 120),
                                     type: "error"
                                 })];
 
