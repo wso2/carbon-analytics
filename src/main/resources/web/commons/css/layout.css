@@ -433,3 +433,7 @@ header .tool-bar a.disabled {
 .nano.console-wrap {
     height: calc(100% - 26px);
 }
+
+div#query-guide-link-container {
+    margin-right: 10px;
+}
