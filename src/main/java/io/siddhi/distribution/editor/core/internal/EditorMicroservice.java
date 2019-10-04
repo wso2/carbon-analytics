@@ -238,6 +238,7 @@ public class EditorMicroservice implements Microservice {
                 DebugRuntime debugRuntime = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
                 if (debugRuntime != null) {
                     debugRuntime.setSiddhiAppRuntime(siddhiAppRuntime);
+                    debugRuntime.setMode(DebugRuntime.Mode.STOP);
                     EditorDataHolder.getSiddhiAppMap().put(siddhiAppName, debugRuntime);
                 }
 
