@@ -85,7 +85,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         heading.text('Export Siddhi Apps For Kubernetes CRD');
                         var formSteps = form.find('#form-steps');
                         for (i = 0; i < formSteps.children().length; i++) {
-                            formSteps.children()[i].setAttribute("style", "max-width: 14.28%;")
+                            formSteps.children()[i].setAttribute("style", "max-width: 16%;")
+                            formSteps.children()[i].setAttribute("style", "height: 12%;")
                         }
                         formSteps.append('<li style="max-width: 14.28%;"><a href="#step-7" ' +
                             'class="link-disabled">Step 7<br/><small>Add Kubernetes Config</small>' +
