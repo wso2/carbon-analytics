@@ -106,9 +106,9 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         "<button type='cancelButton' class='btn btn-default' data-dismiss='modal'>cancel</button>" +
                         "</div>" +
                         "</form>" +
+                        "</div>" +
                         "<div id='saveWizardError' class='alert alert-danger'>" +
                         "<strong>Error!</strong> Something went wrong." +
-                        "</div>" +
                         "</div>" +
                         "</div>" +
                         "</div>" +
