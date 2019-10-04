@@ -210,8 +210,11 @@ public class DebugRuntime {
         }
     }
 
-    public SiddhiAppRuntime getSiddhiAppRuntime() {
+    public void setSiddhiAppRuntime(SiddhiAppRuntime siddhiAppRuntime) {
+        this.siddhiAppRuntime = siddhiAppRuntime;
+    }
 
+    public SiddhiAppRuntime getSiddhiAppRuntime() {
         return siddhiAppRuntime;
     }
 
