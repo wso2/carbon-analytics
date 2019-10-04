@@ -31,23 +31,26 @@ define(["./constants"], function (constants) {
      * @return {string} The word wrapped string
      */
     self.wordWrap = function (str, maxWidth) {
-        maxWidth = maxWidth || 120;
-        var brk = '<br />';
-        var lines = str.split('\n');
-        var result = '';
-        for(var i = 0; i < lines.length; i++) {
-            var words = lines[i].split(/\s/g);
-            var length = 0;
-            for(var j = 0; j < words.length; j++) {
-                if (length + words[j].length > maxWidth) {
-                    result += brk;
-                    length = 0;
+        result = '';
+        if (str !== undefined) {
+            maxWidth = maxWidth || 120;
+            var brk = '<br />';
+            var lines = str.split('\n');
+            var result = '';
+            for(var i = 0; i < lines.length; i++) {
+                var words = lines[i].split(/\s/g);
+                var length = 0;
+                for(var j = 0; j < words.length; j++) {
+                    if (length + words[j].length > maxWidth) {
+                        result += brk;
+                        length = 0;
+                    }
+                    result += words[j] + ' ';
+                    length += words[j].length;
                 }
-                result += words[j] + ' ';
-                length += words[j].length;
-            }
-            if (i < lines.length - 1) {
-                result += brk;
+                if (i < lines.length - 1) {
+                    result += brk;
+                }
             }
         }
         return result;
