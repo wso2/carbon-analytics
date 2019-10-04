@@ -130,6 +130,7 @@
     color: #02aaad !important;
     background: transparent !important;
     cursor: pointer;
+    height: 10%;
 }
 
 .sw-theme-default > ul.step-anchor > li.active > a::after {
