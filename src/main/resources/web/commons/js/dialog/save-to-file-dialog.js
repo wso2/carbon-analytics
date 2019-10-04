@@ -155,8 +155,13 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         var replaceContent = false;
 
                         if (_.isEmpty(_configName)) {
+                            if (_.isEmpty(providedFileName)) {
+                                saveWizardError.text("Siddhi app name cannot be empty!");
+                                saveWizardError.show();
+                                return;
+                            };
                             _configName = providedFileName;
-                        }else{
+                        } else {
                             _configName = _configName.trim();
                         }
 
@@ -200,7 +205,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                                 saveConfiguration({location: _location, configName: _configName, replaceContent:
                                     replaceContent, oldAppName: providedFileName}, callback, tabInstance);
                             }
-                        }else {
+                        } else {
                             saveWizardError.text("Error in reading the file location "+_location);
                             saveWizardError.show();
                         }
@@ -271,7 +276,13 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         var siddhiFileEditor= activeTab.getSiddhiFileEditor();
                         var config = siddhiFileEditor.getContent();
                         var regexToExtractAppNameAnnotation = /@[Aa][Pp][Pp]:[Nn][Aa][Mm][Ee]\(['|"]/g;
-                        var appNameAnnotation = regexToExtractAppNameAnnotation.exec(config)[0];
+                        var regexExecuteResults = regexToExtractAppNameAnnotation.exec(config);
+                        var appNameAnnotation;
+                        if (regexExecuteResults == null) {
+                            appNameAnnotation = "@App:name(\"";
+                        } else {
+                            appNameAnnotation = regexExecuteResults[0];
+                        }
                         var unicodeOfLastCharacter =
                             appNameAnnotation.charCodeAt(appNameAnnotation.length-1);
                         var wrappingCodeTobeUsed = "";
@@ -285,8 +296,11 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'boots
                         (0, options.configName.lastIndexOf(".siddhi")) + wrappingCodeTobeUsed + ")";
                         var appNameToRemove = appNameAnnotation + options.oldAppName + wrappingCodeTobeUsed + ")";
                         if(options.replaceContent){
-                            config = config.replace(appNameToRemove,'');
-                            config = appNameToAdd + config;
+                            // If @App:name is present
+                            if (regexExecuteResults != null) {
+                                config = config.replace(appNameToRemove,'');
+                            }
+                            config = appNameToAdd + "\n" + config;
                         }
 
                         var payload = "configName=" + self.app.utils.base64EncodeUnicode(options.configName) +
