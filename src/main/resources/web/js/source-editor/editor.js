@@ -328,41 +328,44 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                             self.completionEngine.clearIncompleteDataLists();
                             self.unMarkErrors();
                         } else {
-                            /*
-                             * Error found in Siddhi app
-                             */
+                            try {
+                                /*
+                                * Error found in Siddhi app
+                                */
+                                if (response.queryContextStartIndex === undefined) {
+                                    // Update the semanticErrorList
+                                    self.state.semanticErrorList = [({
+                                        row: 0,
+                                        // Change attribute "text" to "html" if html is sent from server
+                                        html: utils.wordWrap(_.escape(response.message), 120),
+                                        type: "error"
+                                    })];
 
-                            if (response.queryContextStartIndex === undefined) {
-                                // Update the semanticErrorList
-                                self.state.semanticErrorList = [({
-                                    row: 0,
-                                    // Change attribute "text" to "html" if html is sent from server
-                                    html: utils.wordWrap(_.escape(response.message), 120),
-                                    type: "error"
-                                })];
+                                    // Show the errors in the ace editor gutter
+                                    aceEditor.session.setAnnotations(
+                                        self.state.semanticErrorList
+                                            .concat(self.state.syntaxErrorList)
+                                    );
+                                } else {
+                                    // Update the semanticErrorList
+                                    self.state.semanticErrorList = [({
+                                        row: response.queryContextStartIndex[0] - 1,
+                                        // Change attribute "text" to "html" if html is sent from server
+                                        html: utils.wordWrap(_.escape(response.message), 120),
+                                        type: "error"
+                                    })];
 
-                                // Show the errors in the ace editor gutter
-                                aceEditor.session.setAnnotations(
-                                    self.state.semanticErrorList
-                                        .concat(self.state.syntaxErrorList)
-                                );
-                            } else {
-                                // Update the semanticErrorList
-                                self.state.semanticErrorList = [({
-                                    row: response.queryContextStartIndex[0] - 1,
-                                    // Change attribute "text" to "html" if html is sent from server
-                                    html: utils.wordWrap(_.escape(response.message), 120),
-                                    type: "error"
-                                })];
+                                    // Show the errors in the ace editor gutter
+                                    aceEditor.session.setAnnotations(
+                                        self.state.semanticErrorList
+                                            .concat(self.state.syntaxErrorList)
+                                    );
 
-                                // Show the errors in the ace editor gutter
-                                aceEditor.session.setAnnotations(
-                                    self.state.semanticErrorList
-                                        .concat(self.state.syntaxErrorList)
-                                );
-
-                                // Highlight the error
-                                self.markError(response);
+                                    // Highlight the error
+                                    self.markError(response);
+                                }
+                            } catch (error) {
+                                console.log("Error while parsing Errors in Siddhi app" + error);
                             }
                         }
                         siddhiWorker.generateTokenTooltips();

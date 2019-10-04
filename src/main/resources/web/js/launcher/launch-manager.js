@@ -80,13 +80,18 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console'],
                         activeTab.setRunMode();
                     },
                     error: function (msg) {
-                        _.set(options, 'statusForCurrentFocusedFile', (JSON.parse(msg.responseText)).status);
-                        _.set(options, 'message', (JSON.parse(msg.responseText)).message);
-                        _.set(consoleOptions, 'consoleOptions', options);
-                        activeTab.getFile().setRunStatus(false);
-                        activeTab.getFile().save();
-                        console = consoleListManager.newConsole(consoleOptions);
-                        workspace.updateRunMenuItem();
+                        try {
+                            _.set(options, 'statusForCurrentFocusedFile', (JSON.parse(msg.responseText)).status);
+                            _.set(options, 'message', (JSON.parse(msg.responseText)).message);
+                            _.set(consoleOptions, 'consoleOptions', options);
+                            activeTab.getFile().setRunStatus(false);
+                            activeTab.getFile().save();
+                            console = consoleListManager.newConsole(consoleOptions);
+                            workspace.updateRunMenuItem();
+                        } catch (err) {
+                            console.log("Error while parsing the Error response from the " +
+                                "while starting Siddhi app." + err);
+                        }
                     }
                 });
             }

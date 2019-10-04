@@ -214,7 +214,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     ws.onerror = function (error) {
                         console.error('Editor console service encountered an error, ', error, 'Hence, ' +
                             'closing connection.');
-                        // ws.close();
+                        ws.close();
                     };
                     ws.onclose = function (error) {
                         var console = opts.application.outputController.getGlobalConsole();
