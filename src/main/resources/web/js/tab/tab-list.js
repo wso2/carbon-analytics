@@ -67,13 +67,13 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
                         log.error(errMsg);
                         throw errMsg;
                     }
+                    this.options = options;
                     this._closeAllFile = $('<a></a>');
                     this._closeAllFile.attr('href', '#');
                     this._closeAllFile.addClass('close-all pull-right');
                     this._closeAllFile.text('Close all files');
-                    this._$parent_el.children(_.get(this.options, 'headers.container')).append(this._closeAllFile);
+                    this._$parent_el.find(_.get(this.options, 'headers.container')).append(this._closeAllFile);
                     this._$tab_container = tabContainer;
-                    this.options = options;
                 },
 
                 render: function () {
