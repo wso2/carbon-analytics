@@ -898,6 +898,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
 
         self.changeSiddhiAppStatusInSingleSimulation = function (siddhiAppName, status) {
             var $singleEventConfigList = $("#single-event-configs").find("div[id^='event-content-parent-']");
+            var $send = $singleEventConfigList.find('#start-and-send');
             $singleEventConfigList.each(function () {
                 var $singleEventConfig = $(this);
                 var currentSiddhiAppName = $singleEventConfig.find("select[name='single-event-siddhi-app-name']").val();
@@ -919,12 +920,14 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                         $singleEventConfig.find('div[data-name="run-debug-buttons"]').html(self.createRunDebugButtons());
                         $singleEventConfig.find('button[type="submit"][name="send"]').text(self.startAndSendLabel);
                         $singleEventConfig.prop('disabled', false);
+                        $send.prop('disabled', false);
                     } else {
                         $notificationBox.addClass("alert-danger");
                         $notificationBox.removeClass("alert-warning");
                         $notificationBox.removeClass("alert-success");
                         $singleEventConfig.find('div[data-name="run-debug-buttons"]').empty();
                         $singleEventConfig.prop('disabled', true);
+                        $send.prop('disabled', true);
                     }
                 }
             });
@@ -955,10 +958,13 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                                     });
                                 }
                                 if (self.FAULTY === data[i]['mode']) {
+                                    self.changeSiddhiAppStatusInSingleSimulation(data[i]['siddhiAppName'], self.FAULTY);
                                     setTimeout(function(){
                                         self.changeSiddhiAppsAndStreamOptionsInSingleSimulationOnSave(
                                             changedSiddhiAppName, noOfIterations);
                                     }, 1000);
+                                } else if (self.STOP === data[i]['mode']) {
+                                    self.changeSiddhiAppStatusInSingleSimulation(data[i]['siddhiAppName'], self.STOP);
                                 }
                             }
                         }
