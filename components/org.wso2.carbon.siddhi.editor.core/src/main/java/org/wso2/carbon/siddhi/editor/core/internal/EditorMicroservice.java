@@ -211,7 +211,7 @@ public class EditorMicroservice implements Microservice {
         String jsonString;
         try {
             String siddhiApp = validationRequest.getSiddhiApp();
-            if (validationRequest.getVariables().size() != 0) {
+            if (validationRequest.getVariables() != null && validationRequest.getVariables().size() != 0) {
                 siddhiApp = SourceEditorUtils.populateSiddhiAppWithVars(validationRequest.getVariables(), siddhiApp);
             }
 
