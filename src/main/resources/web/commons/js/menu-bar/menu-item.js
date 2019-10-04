@@ -49,14 +49,20 @@ define(['lodash', 'event_channel'],
             var shortcuts = _.get(this, 'definition.command.shortcuts'),
                 commandId = _.get(this, 'definition.command.id'),
                 commandLabels = _.get(this, 'definition.command.labels');
-            if (!_.isNil(shortcuts)) {
-                this._application.commandManager.registerCommand(commandId, {shortcuts: shortcuts});
-                this.renderShortcutLabel();
+
+            // Hide Debug menu until https://github.com/siddhi-io/distribution/issues/555 is solved
+            if (_.get(this, 'definition.id') === "debug") {
+                item.hide();
             } else {
-                if (!_.isNil(commandLabels)) {
-                    this.renderCommandLabel();
+                if (!_.isNil(shortcuts)) {
+                    this._application.commandManager.registerCommand(commandId, {shortcuts: shortcuts});
+                    this.renderShortcutLabel();
+                } else {
+                    if (!_.isNil(commandLabels)) {
+                        this.renderCommandLabel();
+                    }
+                    this._application.commandManager.registerCommand(commandId, {});
                 }
-                this._application.commandManager.registerCommand(commandId, {});
             }
 
             if (_.get(this, 'definition.disabled')) {
