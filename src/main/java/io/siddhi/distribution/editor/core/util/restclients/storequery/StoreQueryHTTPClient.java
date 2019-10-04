@@ -25,8 +25,7 @@ import feign.Response;
  */
 public class StoreQueryHTTPClient {
 
-    // host will include a backslash at the start
-    private static final String PROTOCOL = "http:/";
+    private static final String PROTOCOL = "http://";
 
     /**
      * Avoids Instantiation of the default constructor.

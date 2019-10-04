@@ -48,6 +48,7 @@ import io.siddhi.distribution.editor.core.commons.response.MetaDataResponse;
 import io.siddhi.distribution.editor.core.commons.response.Status;
 import io.siddhi.distribution.editor.core.commons.response.ValidationSuccessResponse;
 import io.siddhi.distribution.editor.core.exception.DockerGenerationException;
+import io.siddhi.distribution.editor.core.exception.InvalidExecutionStateException;
 import io.siddhi.distribution.editor.core.exception.KubernetesGenerationException;
 import io.siddhi.distribution.editor.core.exception.SiddhiAppDeployerServiceStubException;
 import io.siddhi.distribution.editor.core.exception.SiddhiStoreQueryHelperException;
@@ -297,8 +298,7 @@ public class EditorMicroservice implements Microservice {
         }
 
         try {
-            feign.Response response = storeQueryAPIHelper
-                    .executeStoreQuery(request.getProperty("LOCAL_ADDRESS").toString(), element.toString());
+            feign.Response response = storeQueryAPIHelper.executeStoreQuery(element.toString());
             String payload = response.body().toString();
             // If the response HTTP status code is OK, return the response.
             if (response.status() == 200) {
@@ -739,14 +739,19 @@ public class EditorMicroservice implements Microservice {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{siddhiAppName}/start")
     public Response start(@PathParam("siddhiAppName") String siddhiAppName) {
-        List<String> streams = EditorDataHolder
-                .getDebugProcessorService()
-                .getSiddhiAppRuntimeHolder(siddhiAppName)
-                .getStreams();
-        List<String> queries = EditorDataHolder
-                .getDebugProcessorService()
-                .getSiddhiAppRuntimeHolder(siddhiAppName)
-                .getQueries();
+        List<String> streams = new ArrayList<>();
+        List<String> queries = new ArrayList<>();
+        try {
+            streams = EditorDataHolder
+                    .getDebugProcessorService()
+                    .getSiddhiAppRuntimeHolder(siddhiAppName)
+                    .getStreams();
+            queries = EditorDataHolder
+                    .getDebugProcessorService()
+                    .getSiddhiAppRuntimeHolder(siddhiAppName)
+                    .getQueries();
+        } catch (InvalidExecutionStateException ignored) {
+        }
         EditorDataHolder
                 .getDebugProcessorService()
                 .start(siddhiAppName);

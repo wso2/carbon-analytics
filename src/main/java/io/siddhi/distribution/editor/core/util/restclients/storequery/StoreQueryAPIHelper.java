@@ -25,12 +25,15 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.transport.http.netty.contract.config.ListenerConfiguration;
 import org.wso2.transport.http.netty.contract.config.TransportsConfiguration;
 
+import java.util.HashMap;
+
 /**
  * Utility class to access the Siddhi Store API.
  */
 public class StoreQueryAPIHelper {
 
     private static final Logger logger = Logger.getLogger(StoreQueryAPIHelper.class);
+    private static final String STORE_API_CONFIG = "storeRESTAPI";
     private ConfigProvider configProvider;
 
     /**
@@ -50,10 +53,24 @@ public class StoreQueryAPIHelper {
      * @return HTTP Response
      * @throws SiddhiStoreQueryHelperException when executing store queries
      */
-    public Response executeStoreQuery(String host, String query) throws SiddhiStoreQueryHelperException {
+    public Response executeStoreQuery(String query) throws SiddhiStoreQueryHelperException {
 
         // TODO: 9/23/19 Temporary fix till  https://github.com/siddhi-io/distribution/issues/426 is solved
-        return StoreQueryHTTPClient.executeStoreQuery(host, query);
+        try {
+            HashMap<String, String> storeAPIConfig = (HashMap<String, String>)
+                                                            configProvider.getConfigurationObject(STORE_API_CONFIG);
+            String url;
+            if (storeAPIConfig != null) {
+                String host = storeAPIConfig.get("host") != null ? storeAPIConfig.get("host") : "0.0.0.0";
+                String port = storeAPIConfig.get("port") != null ? storeAPIConfig.get("port") : "9390";
+                url = host + ":" + port;
+            } else {
+                url = "0.0.0.0:9390";
+            }
+            return StoreQueryHTTPClient.executeStoreQuery(url, query);
+        } catch (ConfigurationException e) {
+            throw new SiddhiStoreQueryHelperException("Cannot read store query API configurations.", e);
+        }
     }
 
     /**

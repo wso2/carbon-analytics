@@ -154,6 +154,7 @@ hr.export-dialog-hr {
 
 div#step-6 {
     height: fit-content !important;
+    min-height: 98%;
 }
 
 .export-siddhi-app-list {
