@@ -41,7 +41,7 @@ public class DockerBuilder extends Thread {
     private Thread t;
     private static final Logger log = LoggerFactory.getLogger(DockerBuilder.class);
     private static final String UNIX_DEFAULT_DOCKER_HOST = "unix:///var/run/docker.sock";
-    private static final String WINDOWS_DEFAULT_DOCKER_HOST = "tcp://localhost:2375";
+    private static final String WINDOWS_DEFAULT_DOCKER_HOST = "http://localhost:2375";
     private static final String STEP_BUILDING = "Building";
     private static final String STEP_PUSHING = "Pushing";
     private static final String STEP_COMPLETED = "Completed";
