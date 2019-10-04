@@ -89,7 +89,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console'],
                             console = consoleListManager.newConsole(consoleOptions);
                             workspace.updateRunMenuItem();
                         } catch (err) {
-                            console.log("Error while parsing the Error response from the while starting Siddhi app.");
+                            console.log("Error while parsing the Error response from the " +
+                                "while starting Siddhi app." + err);
                         }
                     }
                 });
