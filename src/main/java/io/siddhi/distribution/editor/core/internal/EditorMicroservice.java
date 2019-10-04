@@ -225,32 +225,34 @@ public class EditorMicroservice implements Microservice {
     public Response validateSiddhiApp(String validationRequestString) {
 
         ValidationRequest validationRequest = new Gson().fromJson(validationRequestString, ValidationRequest.class);
-        String jsonString;
+        String jsonString = "";
         try {
             String siddhiApp = validationRequest.getSiddhiApp();
             if (validationRequest.getVariables().size() != 0) {
                 siddhiApp = SourceEditorUtils.populateSiddhiAppWithVars(validationRequest.getVariables(), siddhiApp);
             }
-            SiddhiAppRuntime siddhiAppRuntime =
-                    EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(siddhiApp);
+            if (EditorDataHolder.getSiddhiManager() != null) {
+                SiddhiAppRuntime siddhiAppRuntime =
+                        EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(siddhiApp);
 
-            // Status SUCCESS to indicate that the siddhi app is valid
-            ValidationSuccessResponse response = new ValidationSuccessResponse(Status.SUCCESS);
+                // Status SUCCESS to indicate that the siddhi app is valid
+                ValidationSuccessResponse response = new ValidationSuccessResponse(Status.SUCCESS);
 
-            // Getting requested stream definitions
-            if (validationRequest.getMissingStreams() != null) {
-                response.setStreams(SourceEditorUtils.getStreamDefinitions(
-                        siddhiAppRuntime, validationRequest.getMissingStreams()
-                ));
+                // Getting requested stream definitions
+                if (validationRequest.getMissingStreams() != null) {
+                    response.setStreams(SourceEditorUtils.getStreamDefinitions(
+                            siddhiAppRuntime, validationRequest.getMissingStreams()
+                    ));
+                }
+
+                // Getting requested aggregation definitions
+                if (validationRequest.getMissingAggregationDefinitions() != null) {
+                    response.setAggregationDefinitions(SourceEditorUtils.getAggregationDefinitions(
+                            siddhiAppRuntime, validationRequest.getMissingAggregationDefinitions()
+                    ));
+                }
+                jsonString = new Gson().toJson(response);
             }
-
-            // Getting requested aggregation definitions
-            if (validationRequest.getMissingAggregationDefinitions() != null) {
-                response.setAggregationDefinitions(SourceEditorUtils.getAggregationDefinitions(
-                        siddhiAppRuntime, validationRequest.getMissingAggregationDefinitions()
-                ));
-            }
-            jsonString = new Gson().toJson(response);
         } catch (Throwable t) {
             // If the exception is a SiddhiAppCreationException and its message is null, append the stacktrace as the
             // message.

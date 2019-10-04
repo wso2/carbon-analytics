@@ -31,9 +31,14 @@ public class DebugProcessorService {
     }
 
     public synchronized void start(String siddhiAppName) {
-
         if (EditorDataHolder.getSiddhiAppMap().containsKey(siddhiAppName)) {
             DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
+            //retrying to accommodate late bundle loadings
+            if (runtimeHolder.getMode() == DebugRuntime.Mode.FAULTY) {
+                DebugRuntime recreatedRuntimeHolder = new DebugRuntime(siddhiAppName, runtimeHolder.getSiddhiApp());
+                runtimeHolder = recreatedRuntimeHolder;
+                EditorDataHolder.getSiddhiAppMap().put(siddhiAppName, recreatedRuntimeHolder);
+            }
             runtimeHolder.start();
         } else {
             throw new NoSuchSiddhiAppException(
