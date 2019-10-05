@@ -23,6 +23,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             this.app = options.app;
             this.templateContainer = options.templateHeader;
             this.natsConfigsGiven = false;
+            this.needDefaultNats = false;
             this.pvConfigsGiven = false;
             this.editorObjectArrayList = [];
         };
@@ -62,16 +63,19 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
 
             self.templateContainer.find('#distributed-with-ext-nats').change(function(){
                 self.natsConfigsGiven = true;
+                self.needDefaultNats = false;
                 self.templateContainer.find('#kubernetes-messaging-editor-id').show();
             });
 
             self.templateContainer.find('#non-distributed').change(function(){
                 self.natsConfigsGiven = false;
+                self.needDefaultNats = false;
                 self.templateContainer.find('#kubernetes-messaging-editor-id').hide();
             });
 
             self.templateContainer.find('#distributed-with-nats').change(function(){
                 self.natsConfigsGiven = false;
+                self.needDefaultNats = true;
                 self.templateContainer.find('#kubernetes-messaging-editor-id').hide();
             });
 
@@ -118,9 +122,14 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             var pvConfig = '';
             var siddhiProcessName = self.templateContainer.find("#sp-name-input-field").val() || 'sample-siddhi-process';
             var siddhiProcessNameConfig = "siddhiProcessName: ".concat(siddhiProcessName.toString());
+            var messagingDefaultConfig = 'messagingSystem:\n' +
+                            '  type: nats\n';
             self.editorObjectArrayList.forEach(function(editorObj) {
-                if(self.natsConfigsGiven && editorObj.name == 'messaging') {
+                if (self.natsConfigsGiven && !self.needDefaultNats && editorObj.name == 'messaging') {
                     messagingConfig = "\n" + editorObj.content.session.getValue().toString();
+                }
+                if (self.needDefaultNats && !self.natsConfigsGiven && editorObj.name == 'messaging') {
+                    messagingConfig = "\n" + messagingDefaultConfig;
                 }
                 if(self.pvConfigsGiven && editorObj.name == 'persistence') {
                     pvConfig = "\n" + editorObj.content.session.getValue().toString();
