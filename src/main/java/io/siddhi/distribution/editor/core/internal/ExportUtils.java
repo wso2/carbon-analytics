@@ -606,7 +606,8 @@ public class ExportUtils {
                 ArrayList<SiddhiProcessApp> siddhiProcessApps = new ArrayList<SiddhiProcessApp>();
                 for (Map<String, String> app : exportAppsRequest.getTemplatedSiddhiApps()) {
                     String escapedApp = app.get(SIDDHI_APP_CONTENT_ENTRY)
-                            .replaceAll("( |\\t)*\\n", "\n");
+                            .replaceAll("( |\\t)*\\n", "\n")
+                            .replaceAll("(\t)+", "");
                     SiddhiProcessApp siddhiProcessApp = new SiddhiProcessApp(escapedApp);
                     siddhiProcessApps.add(siddhiProcessApp);
                 }
