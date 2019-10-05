@@ -79,7 +79,6 @@ hr.export-dialog-hr {
 .export-dialog-form-scrollable-block-list {
     padding: 0px 10px;
     overflow: auto;
-    max-height: 200px;
     width: 100%;
     background-color: #2C2C2C;
 }
