@@ -66,7 +66,7 @@ public class Constants {
     public static final String ATTR_TYPE_BOOL = "bool";
     public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
     public static final String FAULT_STREAM_PREFIX = "!";
-    public static final String EXPORT_PROPERTIES_NAMESPACE = "export.properties";
+    public static final String EXPORT_PROPERTIES_NAMESPACE = "exportConfigs";
     public static final String DOCKER_BASE_IMAGE_PROPERTY = "dockerBaseImage";
     public static final String DEFAULT_SIDDHI_DOCKER_BASE_IMAGE_NAME = "siddhiio/siddhi-runner-base-alpine";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
