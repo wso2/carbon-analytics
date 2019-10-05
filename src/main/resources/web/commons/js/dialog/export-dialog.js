@@ -265,15 +265,10 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 success: function (response) {
                                     alerts.info("Docker image push process is in-progress. " +
                                         "Please check editor console for the progress.");
-                                    result = {status: "success"};
                                 },
                                 error: function (error) {
-                                    alerts.error("Docker image push process failed.");
-                                    if (error.responseText) {
-                                        result = {status: "fail", errorMessage: error.responseText};
-                                    } else {
-                                        result = {status: "fail", errorMessage: "Error Occurred while processing your request"};
-                                    }
+                                    alerts.error("Docker image push process failed, " +
+                                        "Please check editor console for further information.");
                                 }
                             });
                             this._exportContainer.modal('hide');
@@ -294,6 +289,11 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this._btnExportForm = this._btnExportForm.attr('action', exportUrl)
                     this._btnExportForm.submit();
                     this._exportContainer.modal('hide');
+
+                    if(this._payload.dockerConfiguration.pushDocker) {
+                        alerts.info("Please see the editor console for the progress of docker push.");
+                    }
+
                 },
 
                 clear: function () {
