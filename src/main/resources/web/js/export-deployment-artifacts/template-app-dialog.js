@@ -57,7 +57,9 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                 };
                 self.editorObjectArrayList.push(obj);
             });
-            self.templateContainer.accordion();
+            self.templateContainer.accordion({
+                collapsible: true
+            });
         };
 
         TemplateAppDialog.prototype.readSiddhiApps = function (appNames) {
