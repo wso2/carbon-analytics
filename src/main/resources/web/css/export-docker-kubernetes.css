@@ -183,8 +183,12 @@ div#step-6 {
 }
 
 .docker-config-container {
-    padding-top: 30px;
-    padding-left: 30px;
+    padding: 10px;
+}
+
+.docker-config-form {
+    padding-top: 20px;
+    padding-left: 20px;
 }
 
 .sw-theme-default > ul.step-anchor > li > a, .sw-theme-default > ul.step-anchor > li > a:hover {

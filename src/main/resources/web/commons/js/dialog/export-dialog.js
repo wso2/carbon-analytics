@@ -278,7 +278,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             });
                             this._exportContainer.modal('hide');
                             return;
-                        } else {
+                        } else if (this._payload.dockerConfiguration.downloadDocker) {
                             requestType = "downloadOnly";
                         }
                     } else if (this._exportType == "kubernetes") {

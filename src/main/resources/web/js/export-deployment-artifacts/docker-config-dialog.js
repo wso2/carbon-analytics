@@ -22,6 +22,7 @@ define(['require', 'lodash', 'jquery'],
         var DockerConfigDialog = function (options) {
             this.missingDockerConfigErrorMessage = options.templateHeader.find("#missing-docker-config-error-message");
             this.dockerNameInUpperError = options.templateHeader.find("#docker-name-upper-error");
+            this.stepDesciption = options.templateHeader.find("#docker-config-description");
             this.container = options.templateHeader;
             this.payload = options.payload;
             this.exportType = options.exportType;
@@ -40,11 +41,10 @@ define(['require', 'lodash', 'jquery'],
                 dockerDownloadCheckboxInput.prop('checked', true);
             }
 
-            self.container.find("#docker-push-checkbox").change(function(event){
+            self.container.find("#download-docker-artifacts").change(function(event){
                 if (event.target.checked){
-                    self.dockerDetailsForm.show();
-                } else {
-                    self.dockerDetailsForm.hide();
+                    self.stepDesciption.css('opacity', '0.6');
+                    self.stepDesciption.css('background-color', 'transparent');
                 }
             });
 
@@ -53,6 +53,11 @@ define(['require', 'lodash', 'jquery'],
                 if (!pushDocker) {
                     self.missingDockerConfigErrorMessage.hide();
                     self.dockerNameInUpperError.hide();
+                    self.dockerDetailsForm.hide();
+                } else {
+                    self.dockerDetailsForm.show();
+                    self.stepDesciption.css('opacity', '0.6');
+                    self.stepDesciption.css('background-color', 'transparent');
                 }
             });
 
@@ -90,11 +95,20 @@ define(['require', 'lodash', 'jquery'],
 
         DockerConfigDialog.prototype.validateDockerConfig = function () {
             var self = this;
+
+            var pushDocker = self.container.find("#docker-push-checkbox").is(":checked");
+            var downloadArtifacts = self.container.find("#download-docker-artifacts").is(":checked");
+
+            if (!pushDocker && !downloadArtifacts) {
+                self.stepDesciption.css('opacity', '1.0');
+                self.stepDesciption.css('background-color', '#d9534f !important');
+                return false;
+            }
+
             var imageName = self.container.find("#docker-img-name-input-field").val();
             var userName = self.container.find("#userName").val();
             var password = self.container.find("#password").val();
             var email = self.container.find("#email").val();
-            var pushDocker = self.container.find("#docker-push-checkbox").is(":checked");
             if (pushDocker) {
 
                 var upperCase = new RegExp('[A-Z]');
