@@ -136,6 +136,11 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                         self.console.println(message);
                     }
                 );
+
+                $form
+                    .find('div[data-name="run-debug-buttons"]')
+                    .hide();
+
             });
 
             // refresh attributes list when a stream is selected
