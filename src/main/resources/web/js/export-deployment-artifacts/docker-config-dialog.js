@@ -61,10 +61,15 @@ define(['require', 'lodash', 'jquery'],
                 var password = self.container.find("#password").val();
                 var email = self.container.find("#email").val();
                 var pushDocker = self.container.find("#docker-push-checkbox").is(":checked");
-                var missingDockerConfigErrorMessage = self.container.find("#missing-docker-config-error-message");
                 if (pushDocker) {
-                    if (imageName != "" && userName != "" && password != "" && email != "") {
-                        missingDockerConfigErrorMessage.hide();
+                    var upperCase = new RegExp('[A-Z]');
+                    if (!imageName.match(upperCase)) {
+                        this.missingDockerConfigErrorMessage.text('Docker image name cannot be in upper case.');
+                        this.missingDockerConfigErrorMessage.hide();
+                    }
+                    if (imageName !== "" && userName !== "" && password !== "" && email !== "") {
+                        this.missingDockerConfigErrorMessage.text('Required to fill Docker Configurations');
+                        this.missingDockerConfigErrorMessage.hide();
                     }
                 }
             });
@@ -90,9 +95,20 @@ define(['require', 'lodash', 'jquery'],
             var email = self.container.find("#email").val();
             var pushDocker = self.container.find("#docker-push-checkbox").is(":checked");
             if (pushDocker) {
-                if (imageName == "" || userName == "" || password == "" || email == "" ||
+
+                var upperCase = new RegExp('[A-Z]');
+                if (imageName.match(upperCase)) {
+                    this.missingDockerConfigErrorMessage.text('Docker image name cannot be in upper case.');
+                    this.missingDockerConfigErrorMessage.css('opacity', '1.0');
+                    this.missingDockerConfigErrorMessage.css('background-color', '#d9534f !important');
+                    this.missingDockerConfigErrorMessage.show();
+                    return false;
+                }
+
+                if (imageName === "" || userName === "" || password === "" || email === "" ||
                     imageName == null || userName == null || password == null || email == null
                 ) {
+                    this.missingDockerConfigErrorMessage.text('Required to fill Docker Configurations');
                     this.missingDockerConfigErrorMessage.css('opacity', '1.0');
                     this.missingDockerConfigErrorMessage.css('background-color', '#d9534f !important');
                     this.missingDockerConfigErrorMessage.show();
