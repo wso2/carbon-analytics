@@ -1215,7 +1215,7 @@ public class EditorMicroservice implements Microservice {
                             .build();
                 }
                 DockerBuilder dockerBuilder = new DockerBuilder(
-                        dockerBuildConfig.getImageName(),
+                        dockerBuildConfig.getImageName().toLowerCase(),
                         dockerBuildConfig.getUserName(),
                         dockerBuildConfig.getEmail(),
                         dockerBuildConfig.getPassword(),

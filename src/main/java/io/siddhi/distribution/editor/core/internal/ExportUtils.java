@@ -592,7 +592,7 @@ public class ExportUtils {
             if (exportAppsRequest.getDockerConfiguration() != null &&
                     exportAppsRequest.getDockerConfiguration().getImageName() != null) {
                 siddhiProcessContainer.setImage(
-                        exportAppsRequest.getDockerConfiguration().getImageName()
+                        exportAppsRequest.getDockerConfiguration().getImageName().toLowerCase()
                 );
                 changedContainerSpec = true;
             }
