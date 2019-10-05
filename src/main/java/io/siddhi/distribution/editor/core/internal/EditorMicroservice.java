@@ -1219,7 +1219,7 @@ public class EditorMicroservice implements Microservice {
                 ) {
                     errorMessage = "Invalid docker image name " +
                             dockerBuildConfig.getImageName() +
-                            ". Docker image name must be lowercase.";
+                            ". Docker image name must be in lowercase.";
                     log.error(errorMessage);
                     return Response
                             .status(Response.Status.BAD_REQUEST)
