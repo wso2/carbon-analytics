@@ -68,7 +68,7 @@ public class Constants {
     public static final String FAULT_STREAM_PREFIX = "!";
     public static final String EXPORT_PROPERTIES_NAMESPACE = "export.properties";
     public static final String DOCKER_BASE_IMAGE_PROPERTY = "dockerBaseImage";
-    public static final String DEFAULT_SI_DOCKER_BASE_IMAGE = "siddhiio/siddhi-runner-base-alpine:latest";
+    public static final String DEFAULT_SIDDHI_DOCKER_BASE_IMAGE_NAME = "siddhiio/siddhi-runner-base-alpine";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
     static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregatorExecutor";
     static final String INCREMENTAL_AGGREGATOR = "IncrementalAggregator";

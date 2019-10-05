@@ -483,7 +483,11 @@ public class ExportUtils {
         }
         data = Files.readAllBytes(dockerFilePath);
         String content = new String(data, StandardCharsets.UTF_8);
-        String dockerBaseImgName = Constants.DEFAULT_SI_DOCKER_BASE_IMAGE;
+        String dockerBaseImgName = Constants.DEFAULT_SIDDHI_DOCKER_BASE_IMAGE_NAME;
+        String version = EditorDataHolder.getBundleContext().getBundle().getVersion().toString();
+        if (version != null && !version.isEmpty()) {
+            dockerBaseImgName = dockerBaseImgName.concat(":").concat(version);
+        }
         if (configProvider.getConfigurationObject(Constants.EXPORT_PROPERTIES_NAMESPACE) != null) {
             dockerBaseImgName = (String) ((Map) configProvider
                     .getConfigurationObject(Constants.EXPORT_PROPERTIES_NAMESPACE))
