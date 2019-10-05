@@ -21,6 +21,7 @@ define(['require', 'lodash', 'jquery'],
 
         var DockerConfigDialog = function (options) {
             this.missingDockerConfigErrorMessage = options.templateHeader.find("#missing-docker-config-error-message");
+            this.dockerNameInUpperError = options.templateHeader.find("#docker-name-upper-error");
             this.container = options.templateHeader;
             this.payload = options.payload;
             this.exportType = options.exportType;
@@ -49,9 +50,9 @@ define(['require', 'lodash', 'jquery'],
 
             self.container.find("#docker-push-checkbox").change(function() {
                 var pushDocker = self.container.find("#docker-push-checkbox").is(":checked");
-                var missingDockerConfigErrorMessage = self.container.find("#missing-docker-config-error-message");
                 if (!pushDocker) {
-                    missingDockerConfigErrorMessage.hide();
+                    self.missingDockerConfigErrorMessage.hide();
+                    self.dockerNameInUpperError.hide();
                 }
             });
 
@@ -61,10 +62,15 @@ define(['require', 'lodash', 'jquery'],
                 var password = self.container.find("#password").val();
                 var email = self.container.find("#email").val();
                 var pushDocker = self.container.find("#docker-push-checkbox").is(":checked");
-                var missingDockerConfigErrorMessage = self.container.find("#missing-docker-config-error-message");
                 if (pushDocker) {
-                    if (imageName != "" && userName != "" && password != "" && email != "") {
-                        missingDockerConfigErrorMessage.hide();
+                    var upperCase = new RegExp('[A-Z]');
+                    if (!imageName.match(upperCase)) {
+                        self.dockerNameInUpperError.hide();
+                    } else {
+                        self.dockerNameInUpperError.show();
+                    }
+                    if (imageName !== "" && userName !== "" && password !== "" && email !== "") {
+                        self.missingDockerConfigErrorMessage.hide();
                     }
                 }
             });
@@ -90,12 +96,17 @@ define(['require', 'lodash', 'jquery'],
             var email = self.container.find("#email").val();
             var pushDocker = self.container.find("#docker-push-checkbox").is(":checked");
             if (pushDocker) {
-                if (imageName == "" || userName == "" || password == "" || email == "" ||
+
+                var upperCase = new RegExp('[A-Z]');
+                if (imageName.match(upperCase)) {
+                    self.dockerNameInUpperError.show();
+                    return false;
+                }
+
+                if (imageName === "" || userName === "" || password === "" || email === "" ||
                     imageName == null || userName == null || password == null || email == null
                 ) {
-                    this.missingDockerConfigErrorMessage.css('opacity', '1.0');
-                    this.missingDockerConfigErrorMessage.css('background-color', '#d9534f !important');
-                    this.missingDockerConfigErrorMessage.show();
+                    self.missingDockerConfigErrorMessage.show();
                     return false;
                 }
             }

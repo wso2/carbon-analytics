@@ -2530,8 +2530,11 @@
                         </div>
                         <div id="step-6" class="export-selector">
                             <div class='docker-config-container' id='docker-config-container-id'>
-                                <div id='missing-docker-config-error-message' class='step-description openDockerWizardError-container' hidden>
+                                <div id='missing-docker-config-error-message' class='alert alert-danger' hidden>
                                     Required to fill Docker Configurations
+                                </div>
+                                <div id='docker-name-upper-error' class='alert alert-danger' hidden>
+                                    Docker Image Tag cannot contain uppercase letters.
                                 </div>
                                 <input class="docker-checkbox" type="checkbox" name="download-docker-artifacts" id="download-docker-artifacts" value="download"><label class="label-description">Download artifacts</label><br>
                                 <input class="docker-checkbox" type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"><label class="label-description">Push to docker registry</label><br>
