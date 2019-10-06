@@ -488,7 +488,7 @@ public class ExportUtils {
         String dockerBaseImgName = Constants.DEFAULT_SIDDHI_DOCKER_BASE_IMAGE_NAME;
         String version = EditorDataHolder.getBundleContext().getBundle().getVersion().toString();
         if (version != null && !version.isEmpty()) {
-            dockerBaseImgName = dockerBaseImgName.concat(":").concat(version);
+            dockerBaseImgName = dockerBaseImgName.concat(":").concat(version.toLowerCase());
         }
         if (configProvider.getConfigurationObject(Constants.EXPORT_PROPERTIES_NAMESPACE) != null) {
             dockerBaseImgName = (String) ((Map) configProvider
