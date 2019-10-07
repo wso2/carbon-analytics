@@ -90,7 +90,6 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         formSteps.removeClass('docker_export_header_item');
                         formSteps.addClass('k8_export_header_item');
                         for (i = 0; i < formSteps.children().length; i++) {
-                            // formSteps.children()[i].setAttribute("style", "height: 12%%;")
                             formSteps.children()[i].setAttribute("style", "max-width: 16%;")
                         }
                         formSteps.append('<li style="max-width: 14.28%;"><a href="#step-7" ' +
