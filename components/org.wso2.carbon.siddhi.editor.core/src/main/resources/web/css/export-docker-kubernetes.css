@@ -168,6 +168,10 @@ div#step-6 {
     width: 16%;
 }
 
+.sw-theme-default > ul.step-anchor.k8_export_header_item li a{
+    height: 9%;
+}
+
 .sw-theme-default > ul.step-anchor.docker_export_header_item li {
     width: 20%;
 }
