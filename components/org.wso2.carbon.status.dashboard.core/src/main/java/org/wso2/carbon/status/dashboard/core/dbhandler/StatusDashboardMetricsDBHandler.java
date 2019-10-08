@@ -381,8 +381,12 @@ public class StatusDashboardMetricsDBHandler {
                                     componentElements[0], componentElements[1], true).size() > 0) {
                         
                     }
-                    componentMetrics.setTotalEvents(getEventsCount(componentElements[0], componentElements[1],
-                            carbonId, appName, timeInterval));
+                    try {
+                        componentMetrics.setTotalEvents(getEventsCount(componentElements[0], componentElements[1],
+                                carbonId, appName, timeInterval));
+                    } catch (Throwable t) {
+                        logger.debug("Error occurred: " + t.getMessage(), t);
+                    }
                     metricElement = new MetricElement();
                     componentMetrics.setName(componentElements[1]);
                     typeMetrics.setType(componentElements[0]);
