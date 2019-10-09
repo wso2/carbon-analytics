@@ -105,6 +105,7 @@ public class ExportUtils {
     private static final String APPS_DIR = "siddhi-files/";
     private static final String CONFIG_FILE = "configurations.yaml";
     private static final String EXPORT_TYPE_KUBERNETES = "kubernetes";
+    private static final String EXPORT_TYPE_DOCKER = "docker";
     private static final String RUNNER_DEPLOYMENT_YAML_FILE = "runner-deployment.yaml";
     private static final String TOOLING_DEPLOYMENT_YAML_FILE = "deployment.yaml";
     private static final String DIRECTORY_CONF = "conf";
@@ -117,6 +118,8 @@ public class ExportUtils {
     private String exportType;
     Path tempDockerDirectoryPath;
     private Set<Integer> exposePorts = new HashSet<>();
+    private String zipFileName = "siddhi-docker.zip";
+    private String zipFileRoot = "siddhi-docker/";
 
     ExportUtils(
             ConfigProvider configProvider,
@@ -147,11 +150,34 @@ public class ExportUtils {
         boolean configChanged = false;
         boolean envChanged = false;
         boolean buildDocker = false;
-        String zipFileName = "siddhi-docker.zip";
-        String zipFileRoot = "siddhi-docker/";
+        if (exportType != null && exportType.equals(EXPORT_TYPE_DOCKER)) {
+            if (exportAppsRequest.getDockerConfiguration() != null) {
+                if (exportAppsRequest.getDockerConfiguration().getImageName() != null &&
+                        !exportAppsRequest.getDockerConfiguration().getImageName().equals("")) {
+                    String dockerImageName = exportAppsRequest
+                            .getDockerConfiguration()
+                            .getImageName()
+                            .replaceAll("/", "-")
+                            .replaceAll(":", "-").trim();
+                    zipFileName = dockerImageName + ".zip";
+                    zipFileRoot = dockerImageName + "/";
+                }
+            }
+        }
         if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
             zipFileName = "siddhi-kubernetes.zip";
             zipFileRoot = "siddhi-kubernetes/";
+            if (exportAppsRequest.getKubernetesConfiguration() != null) {
+                if (exportAppsRequest.getKubernetesConfiguration() != null) {
+                    KubernetesConfig kubernetesConfig = getKubernetesConfigs(
+                            exportAppsRequest.getKubernetesConfiguration()
+                    );
+                    zipFileName = kubernetesConfig.getSiddhiProcessName().toLowerCase().trim()
+                            + ".zip";
+                    zipFileRoot = kubernetesConfig.getSiddhiProcessName().toLowerCase().trim()
+                            + "/";
+                }
+            }
         }
         Path dockerFilePath = Paths.get(Constants.RUNTIME_PATH, RESOURCES_DIR, DOCKER_FILE_NAME);
         Path dockerReadmeFilePath = Paths.get(Constants.RUNTIME_PATH, RESOURCES_DIR, DOCKER_README_FILE_NAME);
@@ -554,16 +580,10 @@ public class ExportUtils {
         String content = new String(data, StandardCharsets.UTF_8);
         KubernetesConfig kubernetesConfig;
         if (exportAppsRequest.getKubernetesConfiguration() != null) {
-            CustomClassLoaderConstructor customClassLoaderConstructor = new
-                    CustomClassLoaderConstructor(this.getClass().getClassLoader());
-            Yaml kubernetesConfigYaml = new Yaml(customClassLoaderConstructor);
-            String kubernetesConfigString = exportAppsRequest.getKubernetesConfiguration();
-            kubernetesConfig = kubernetesConfigYaml.loadAs(
-                    kubernetesConfigString,
-                    KubernetesConfig.class
-            );
             SiddhiProcessSpec siddhiProcessSpec = new SiddhiProcessSpec();
-
+            kubernetesConfig = getKubernetesConfigs(
+                    exportAppsRequest.getKubernetesConfiguration()
+            );
             if (kubernetesConfig != null) {
                 if (kubernetesConfig.getMessagingSystem() != null) {
                     siddhiProcessSpec.setMessagingSystem(kubernetesConfig.getMessagingSystem());
@@ -751,5 +771,31 @@ public class ExportUtils {
             return dumpYaml.dump(runnerConfigMap);
         }
         return "";
+    }
+
+    /**
+     * Read configurations from the deployment.yaml.
+     *
+     * @return Configuration object
+     * @throws ConfigurationException
+     */
+    private KubernetesConfig getKubernetesConfigs(String kubernetesConfigString) {
+        CustomClassLoaderConstructor customClassLoaderConstructor = new
+                CustomClassLoaderConstructor(this.getClass().getClassLoader());
+        Yaml kubernetesConfigYaml = new Yaml(customClassLoaderConstructor);
+        KubernetesConfig kubernetesConfig = kubernetesConfigYaml.loadAs(
+                kubernetesConfigString,
+                KubernetesConfig.class
+        );
+        return kubernetesConfig;
+    }
+
+    /**
+     * Name of the created ZIP file.
+     *
+     * @return Name of the created ZIP file
+     */
+    public String getZipFileName() {
+        return zipFileName;
     }
 }

@@ -1182,11 +1182,10 @@ public class EditorMicroservice implements Microservice {
             ExportAppsRequest exportAppsRequest = new Gson().fromJson(payload, ExportAppsRequest.class);
             ExportUtils exportUtils = new ExportUtils(configProvider, exportAppsRequest, exportType);
             File zipFile = exportUtils.createZipFile();
-            String fileName = "siddhi-docker.zip";
+            String fileName = exportUtils.getZipFileName();
             boolean kubernetesEnabled = false;
             if (exportType != null) {
                 if (exportType.equals(EXPORT_TYPE_KUBERNETES)) {
-                    fileName = "siddhi-kubernetes.zip";
                     kubernetesEnabled = true;
                 }
             }
