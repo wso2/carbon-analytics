@@ -100,9 +100,9 @@ public class ExportUtils {
     private static final String KUBERNETES_README_FILE_NAME = "K8S-README.md";
     private static final String GENERIC_README_FILE_NAME = "README.md";
     private static final String KUBERNETES_FILE_NAME = "siddhi-process.yaml";
-    private static final String JARS_DIR = "jars/";
-    private static final String BUNDLE_DIR = "bundles/";
-    private static final String APPS_DIR = "siddhi-files/";
+    private static final String JARS_DIR = "jars" + File.separator;
+    private static final String BUNDLE_DIR = "bundles" + File.separator;
+    private static final String APPS_DIR = "siddhi-files" + File.separator;
     private static final String CONFIG_FILE = "configurations.yaml";
     private static final String EXPORT_TYPE_KUBERNETES = "kubernetes";
     private static final String EXPORT_TYPE_DOCKER = "docker";
@@ -119,7 +119,7 @@ public class ExportUtils {
     Path tempDockerDirectoryPath;
     private Set<Integer> exposePorts = new HashSet<>();
     private String zipFileName = "siddhi-docker.zip";
-    private String zipFileRoot = "siddhi-docker/";
+    private String zipFileRoot = "siddhi-docker" + File.separator;
 
     ExportUtils(
             ConfigProvider configProvider,
@@ -160,13 +160,13 @@ public class ExportUtils {
                             .replaceAll("/", "-")
                             .replaceAll(":", "-").trim();
                     zipFileName = dockerImageName + ".zip";
-                    zipFileRoot = dockerImageName + "/";
+                    zipFileRoot = dockerImageName + File.separator;
                 }
             }
         }
         if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
             zipFileName = "siddhi-kubernetes.zip";
-            zipFileRoot = "siddhi-kubernetes/";
+            zipFileRoot = "siddhi-kubernetes" +  File.separator;
             if (exportAppsRequest.getKubernetesConfiguration() != null) {
                 KubernetesConfig kubernetesConfig = getKubernetesConfigs(
                         exportAppsRequest.getKubernetesConfiguration()
@@ -176,7 +176,7 @@ public class ExportUtils {
                     zipFileName = kubernetesConfig.getSiddhiProcessName().toLowerCase().trim()
                             + ".zip";
                     zipFileRoot = kubernetesConfig.getSiddhiProcessName().toLowerCase().trim()
-                            + "/";
+                            + File.separator;
                 }
             }
         }
