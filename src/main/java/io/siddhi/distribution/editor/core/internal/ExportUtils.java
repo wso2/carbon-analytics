@@ -168,10 +168,11 @@ public class ExportUtils {
             zipFileName = "siddhi-kubernetes.zip";
             zipFileRoot = "siddhi-kubernetes/";
             if (exportAppsRequest.getKubernetesConfiguration() != null) {
-                if (exportAppsRequest.getKubernetesConfiguration() != null) {
-                    KubernetesConfig kubernetesConfig = getKubernetesConfigs(
-                            exportAppsRequest.getKubernetesConfiguration()
-                    );
+                KubernetesConfig kubernetesConfig = getKubernetesConfigs(
+                        exportAppsRequest.getKubernetesConfiguration()
+                );
+
+                if (kubernetesConfig != null && kubernetesConfig.getSiddhiProcessName() != null) {
                     zipFileName = kubernetesConfig.getSiddhiProcessName().toLowerCase().trim()
                             + ".zip";
                     zipFileRoot = kubernetesConfig.getSiddhiProcessName().toLowerCase().trim()
