@@ -71,7 +71,7 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                             } else if (metadata.getTypes()[i].equals(DataSetMetadata.Types.ORDINAL)) {
                                 rowData[i] = resultSet.getString(i + 1);
                             } else if (metadata.getTypes()[i].equals(DataSetMetadata.Types.TIME)) {
-                                rowData[i] = resultSet.getDouble(i + 1);
+                                rowData[i] = resultSet.getTimestamp(i + 1);
                             } else {
                                 if (LOGGER.isDebugEnabled()) {
                                     LOGGER.debug("Meta Data type not defined, added value of the given column as a " +
