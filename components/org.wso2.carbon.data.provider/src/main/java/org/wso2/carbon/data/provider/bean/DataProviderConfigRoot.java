@@ -25,6 +25,9 @@ import com.google.gson.JsonElement;
  */
 public class DataProviderConfigRoot {
     private String topic;
+    private String widgetName;
+    private String username;
+    private String dashboardId;
     private String providerName;
     private String action;
     private JsonElement dataProviderConfiguration;
@@ -38,6 +41,9 @@ public class DataProviderConfigRoot {
 
     public DataProviderConfigRoot() {
         this.topic = "";
+        this.widgetName = "";
+        this.username = "";
+        this.dashboardId = "";
         this.providerName = "";
         this.action = "";
         this.dataProviderConfiguration = null;
@@ -49,6 +55,30 @@ public class DataProviderConfigRoot {
 
     public void setTopic(String topic) {
         this.topic = topic;
+    }
+
+    public String getWidgetName() {
+        return widgetName;
+    }
+
+    public void setWidgetName(String widgetName) {
+        this.widgetName = widgetName;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getDashboardId() {
+        return dashboardId;
+    }
+
+    public void setDashboardId(String dashboardId) {
+        this.dashboardId = dashboardId;
     }
 
     public String getProviderName() {

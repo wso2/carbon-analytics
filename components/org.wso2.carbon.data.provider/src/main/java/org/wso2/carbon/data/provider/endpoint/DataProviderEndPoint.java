@@ -18,6 +18,7 @@
 package org.wso2.carbon.data.provider.endpoint;
 
 import com.google.gson.Gson;
+import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.data.provider.AbstractDataProvider;
 import org.wso2.carbon.data.provider.DataProvider;
+import org.wso2.carbon.data.provider.DataProviderAuthorizer;
 import org.wso2.carbon.data.provider.bean.DataProviderConfigRoot;
 import org.wso2.carbon.data.provider.siddhi.SiddhiProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
@@ -56,6 +58,10 @@ import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDat
 public class DataProviderEndPoint implements WebSocketEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataProviderEndPoint.class);
     private static final Map<String, WebSocketConnection> sessionMap = new ConcurrentHashMap<>();
+    private static final String WEB_SOCKET_CONFIG_HEADER = "data.provider.configs";
+    private static final String WEB_SOCKET_AUTHORIZING_CLASS_CONFIG_HEADER = "authorizingClass";
+    private static final String DEFAULT_WEBSOCKET_AUTHORIZING_CLASS
+            = "org.wso2.carbon.data.provider.DefaultDataProviderAuthorizer";
 
     @Reference(
             name = "org.wso2.carbon.datasource.DataSourceService",
@@ -84,6 +90,21 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
         getDataProviderHelper().setConfigProvider(null);
     }
 
+    @Reference(service = DataProviderAuthorizer.class,
+            cardinality = ReferenceCardinality.AT_LEAST_ONE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetDataProviderAuthorizer")
+    protected void setDataProviderAuthorizer(DataProviderAuthorizer dataProviderAuthorizer) {
+        getDataProviderHelper()
+                .setDataProviderAuthorizer(dataProviderAuthorizer.getClass().getName(), dataProviderAuthorizer);
+        LOGGER.debug("Data Provider Authorizer '{}' registered.", dataProviderAuthorizer.getClass().getName());
+    }
+
+    protected void unsetDataProviderAuthorizer(DataProviderAuthorizer dataProviderAuthorizer) {
+        getDataProviderHelper().removeDataProviderAuthorizerClass(dataProviderAuthorizer.getClass().getName());
+        LOGGER.debug("Data Provider Authorizer '{}' unregistered.", dataProviderAuthorizer.getClass().getName());
+    }
+
     /**
      * Handle initiation of the connection map the session object in the session map.
      *
@@ -103,6 +124,42 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
     @OnMessage
     public void onMessage(String message, WebSocketConnection webSocketConnection) {
         DataProviderConfigRoot dataProviderConfigRoot = new Gson().fromJson(message, DataProviderConfigRoot.class);
+        String authoringClassName;
+        try {
+            Map webSocketConfiguration
+                    = (Map)getDataProviderHelper().getConfigProvider().getConfigurationObject(WEB_SOCKET_CONFIG_HEADER);
+            if (webSocketConfiguration != null) {
+                JSONObject webSocketConfigJSON = new JSONObject(new Gson().toJson(webSocketConfiguration));
+                if (!webSocketConfigJSON.has(WEB_SOCKET_AUTHORIZING_CLASS_CONFIG_HEADER)) {
+                    throw new Exception("Web socket authorizing class cannot be found in the deployment.yaml file.");
+                }
+                authoringClassName = (String) webSocketConfigJSON.get(WEB_SOCKET_AUTHORIZING_CLASS_CONFIG_HEADER);
+            } else {
+                authoringClassName = DEFAULT_WEBSOCKET_AUTHORIZING_CLASS;
+            }
+            DataProviderAuthorizer dataProviderAuthorizer;
+            try {
+                dataProviderAuthorizer = getDataProviderHelper().getDataProviderAuthorizer(authoringClassName);
+            } catch (NullPointerException e) {
+                throw new Exception("Cannot find the Data Provider Authorizer class for the given class name: "
+                        + authoringClassName + ".");
+            }
+            boolean authorizerResult = dataProviderAuthorizer.authorize(dataProviderConfigRoot);
+            if (!authorizerResult) {
+                throw new Exception("Access denied to data provider.");
+            }
+        } catch (Exception e) {
+            try {
+                sendText(webSocketConnection.getChannelId(), e.getMessage());
+            } catch (IOException e1) {
+                //ignore
+            }
+            LOGGER.error("Error occurred while authorizing the access to data provider. " + dataProviderConfigRoot
+                    .getProviderName() + ". " + e.getMessage(), e);
+            onError(e);
+            return;
+        }
+
         try {
             if (dataProviderConfigRoot.getAction().equalsIgnoreCase(DataProviderConfigRoot.Types.SUBSCRIBE.toString()
             )) {

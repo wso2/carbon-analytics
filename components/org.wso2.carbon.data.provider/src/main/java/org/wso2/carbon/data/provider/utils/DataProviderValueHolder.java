@@ -20,6 +20,7 @@ package org.wso2.carbon.data.provider.utils;
 
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.data.provider.DataProvider;
+import org.wso2.carbon.data.provider.DataProviderAuthorizer;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 
 import java.util.Map;
@@ -35,6 +36,7 @@ public class DataProviderValueHolder {
     private ConfigProvider configProvider = null;
     private Map<String, Map<String, DataProvider>> sessionDataProviderMap = new ConcurrentHashMap<>();
     private Map<String, Class> dataProviderClassMap = new ConcurrentHashMap<>();
+    private Map<String, DataProviderAuthorizer> dataProviderAuthorizerClassMap = new ConcurrentHashMap<>();
 
     public static DataProviderValueHolder getDataProviderHelper() {
         return dataProviderHelper;
@@ -56,6 +58,15 @@ public class DataProviderValueHolder {
         this.configProvider = configProvider;
     }
 
+    public DataProviderAuthorizer getDataProviderAuthorizer(String dataProviderAuthorizerClassName) {
+        return this.dataProviderAuthorizerClassMap.get(dataProviderAuthorizerClassName);
+    }
+
+    public void setDataProviderAuthorizer(String dataProviderAuthorizerClassName,
+                                          DataProviderAuthorizer dataProviderAuthorizer) {
+        this.dataProviderAuthorizerClassMap.put(dataProviderAuthorizerClassName, dataProviderAuthorizer);
+    }
+
     public void setDataProvider(String providerName, DataProvider dataProvider) {
         this.dataProviderClassMap.put(providerName, dataProvider.getClass());
     }
@@ -74,6 +85,10 @@ public class DataProviderValueHolder {
 
     public void removeDataProviderClass(String providerName) {
         this.dataProviderClassMap.remove(providerName);
+    }
+
+    public void removeDataProviderAuthorizerClass(String dataProviderAuthorizerClassName) {
+        this.dataProviderAuthorizerClassMap.remove(dataProviderAuthorizerClassName);
     }
 
     public void removeSessionData(String sessionId) {
