@@ -126,12 +126,12 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
         DataProviderConfigRoot dataProviderConfigRoot = new Gson().fromJson(message, DataProviderConfigRoot.class);
         String authoringClassName;
         try {
-            Object webSocketConfiguration
-                    = getDataProviderHelper().getConfigProvider().getConfigurationObject(WEB_SOCKET_CONFIG_HEADER);
+            Map webSocketConfiguration
+                    = (Map)getDataProviderHelper().getConfigProvider().getConfigurationObject(WEB_SOCKET_CONFIG_HEADER);
             if (webSocketConfiguration != null) {
                 JSONObject webSocketConfigJSON = new JSONObject(new Gson().toJson(webSocketConfiguration));
                 if (!webSocketConfigJSON.has(WEB_SOCKET_AUTHORIZING_CLASS_CONFIG_HEADER)) {
-                    throw new Exception("Web socket authorizing class cannot be found in the deployment yaml file.");
+                    throw new Exception("Web socket authorizing class cannot be found in the deployment.yaml file.");
                 }
                 authoringClassName = (String) webSocketConfigJSON.get(WEB_SOCKET_AUTHORIZING_CLASS_CONFIG_HEADER);
             } else {
@@ -144,8 +144,7 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
                 throw new Exception("Cannot find the Data Provider Authorizer class for the given class name: "
                         + authoringClassName + ".");
             }
-            boolean authorizerResult
-                    = dataProviderAuthorizer.authorize(dataProviderConfigRoot);
+            boolean authorizerResult = dataProviderAuthorizer.authorize(dataProviderConfigRoot);
             if (!authorizerResult) {
                 throw new Exception("Access denied to data provider.");
             }
