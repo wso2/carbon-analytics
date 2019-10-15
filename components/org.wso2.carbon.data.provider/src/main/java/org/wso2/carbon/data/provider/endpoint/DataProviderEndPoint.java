@@ -30,6 +30,7 @@ import org.wso2.carbon.data.provider.AbstractDataProvider;
 import org.wso2.carbon.data.provider.DataProvider;
 import org.wso2.carbon.data.provider.DataProviderAuthorizer;
 import org.wso2.carbon.data.provider.bean.DataProviderConfigRoot;
+import org.wso2.carbon.data.provider.rdbms.bean.RDBMSDataProviderConfBean;
 import org.wso2.carbon.data.provider.siddhi.SiddhiProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
@@ -126,8 +127,13 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
         DataProviderConfigRoot dataProviderConfigRoot = new Gson().fromJson(message, DataProviderConfigRoot.class);
         String authoringClassName;
         try {
-            Map webSocketConfiguration
-                    = (Map)getDataProviderHelper().getConfigProvider().getConfigurationObject(WEB_SOCKET_CONFIG_HEADER);
+            Map webSocketConfiguration = null;
+            if (!(getDataProviderHelper().getConfigProvider()
+                    .getConfigurationObject(WEB_SOCKET_CONFIG_HEADER, Map.class)
+                    instanceof RDBMSDataProviderConfBean)) {
+                webSocketConfiguration = getDataProviderHelper().getConfigProvider()
+                    .getConfigurationObject(WEB_SOCKET_CONFIG_HEADER, Map.class);
+            }
             if (webSocketConfiguration != null) {
                 JSONObject webSocketConfigJSON = new JSONObject(new Gson().toJson(webSocketConfiguration));
                 if (!webSocketConfigJSON.has(WEB_SOCKET_AUTHORIZING_CLASS_CONFIG_HEADER)) {
