@@ -719,6 +719,12 @@
                 <version>${google.protobuf.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>cn.guoyukun.jdbc</groupId>
+                <artifactId>db2jcc</artifactId>
+                <version>1.4.2</version>
+            </dependency>
+
 
             <!--wso2 orbit bundles -->
             <dependency>
@@ -1550,7 +1556,7 @@
         <repository>
             <id>wso2nexus</id>
             <name>WSO2 internal Repository</name>
-            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+            <url>https://maven-us.nuxeo.org/nexus/content/groups/public</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>daily</updatePolicy>

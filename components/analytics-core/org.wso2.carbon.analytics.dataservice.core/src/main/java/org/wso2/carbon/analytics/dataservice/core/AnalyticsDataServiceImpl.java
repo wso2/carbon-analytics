@@ -41,6 +41,7 @@ import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsDataIndexer;
 import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsIndexedTableStore;
 import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsIndexerInfo;
 import org.wso2.carbon.analytics.dataservice.core.tasks.AnalyticsGlobalDataPurgingTask;
+import org.wso2.carbon.analytics.dataservice.core.tasks.AnalyticsTableDeleteTask;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsIterator;
 import org.wso2.carbon.analytics.datasource.commons.AnalyticsSchema;
 import org.wso2.carbon.analytics.datasource.commons.ColumnDefinition;
@@ -74,6 +75,10 @@ import java.util.concurrent.Callable;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The implementation of {@link AnalyticsDataService}.
@@ -121,6 +126,10 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     private String primaryARSName;
         
     private AnalyticsIndexedTableStore indexedTableStore;
+
+    private ExecutorService executorService;
+
+    private AtomicInteger count = new AtomicInteger(0);
     
     private static ThreadLocal<Boolean> initIndexedTableStore = new ThreadLocal<Boolean>() {
         @Override
@@ -128,6 +137,10 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             return true;
         }
     };
+
+    public AnalyticsIndexedTableStore getIndexedTableStore() {
+        return indexedTableStore;
+    }
     
     public AnalyticsDataServiceImpl() throws AnalyticsException {
         AnalyticsDataServiceConfiguration config = this.loadAnalyticsDataServiceConfig();
@@ -170,6 +183,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
         } 
         this.indexer.init();
         this.initDataPurging(config);
+        executorService = Executors.newFixedThreadPool(14);
     }
     
     private int extractIndexWorkerCount(AnalyticsDataServiceConfiguration config) throws AnalyticsException {
@@ -332,7 +346,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
                     File.separator + AnalyticsDataSourceConstants.ANALYTICS_CONF_DIR +
                     File.separator + ANALYTICS_DS_CONFIG_FILE);
             if (!confFile.exists()) {
-                throw new AnalyticsException("Cannot initalize analytics data service, " +
+                throw new AnalyticsException("Cannot initialize analytics data service, " +
                         "the analytics data service configuration file cannot be found at: " +
                         confFile.getPath());
             }
@@ -904,7 +918,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
             int recordsCount) throws AnalyticsException, AnalyticsTableNotAvailableException {
         if (this.isGlobalTenantTableAccess(tenantId)) {
             if (recordsFrom != 0 && recordsCount != Integer.MAX_VALUE) {
-                throw new AnalyticsException("Global analytics data lookup cannot be done on a dataset subset, "
+                throw new AnalyticsException("Global analytics data lookup cannot be done on a data set subset, "
                         + "recordsFrom: " + recordsFrom + " recordsCount: " + recordsCount);
             }
             return this.getByGlobalLookup(tableName, numPartitionsHint, columns, timeFrom, timeTo);
@@ -1053,62 +1067,7 @@ public class AnalyticsDataServiceImpl implements AnalyticsDataService {
     public void delete(int tenantId, String tableName, long timeFrom, long timeTo) throws AnalyticsException,
             AnalyticsTableNotAvailableException {
         tableName = GenericUtils.normalizeTableName(tableName);
-        /* this is done to make sure, raw record data as well as the index data are also deleted,
-         * even if the table is not indexed now, it could have been indexed earlier, so delete operation
-         * must be done in the indexer as well */
-        AnalyticsIndexedTableStore.IndexedTableId indexedTableId =
-                new AnalyticsIndexedTableStore.IndexedTableId(tenantId, tableName);
-        AnalyticsIndexedTableStore.IndexedTableId[] indexedTableIds = this.indexedTableStore.getAllIndexedTables();
-        boolean isTableIndexed = false;
-        for (AnalyticsIndexedTableStore.IndexedTableId indexedTableId1 : indexedTableIds) {
-            if (indexedTableId.equals(indexedTableId1)) {
-                isTableIndexed = true;
-                break;
-            }
-        }
-        long numberOfRecordsDelete = 0;
-        long startedTime = System.currentTimeMillis();
-        long intialsStartTime = startedTime;
-        if (isTableIndexed) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Purging an indexed " + tableName + " table.");
-            }
-            while (true) {
-                List<SearchResultEntry> searchResultEntries = this.getIndexer().search(tenantId, tableName,
-                        "_timestamp : [" + timeFrom + " TO " + timeTo + "}", 0, 10000,
-                        new ArrayList<SortByField>(0));
-                numberOfRecordsDelete += searchResultEntries.size();
-                if (searchResultEntries.size() == 0) {
-                    break;
-                }
-                this.delete(tenantId, tableName, this.getRecordIdsBatch(searchResultEntries));
-                if (logger.isDebugEnabled()) {
-                    if (0 == numberOfRecordsDelete % 100000) {
-                        logger.debug("Total No of records deleted: " + numberOfRecordsDelete);
-                        logger.debug("Time(seconds) taken to delete current batch of 100000: " +
-                                (System.currentTimeMillis() - startedTime) / 1000);
-                        startedTime = System.currentTimeMillis();
-                    }
-                }
-            }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Purging ended for indexed data. time taken in millies" +
-                        (System.currentTimeMillis() - intialsStartTime));
-                logger.debug("No of indexed records deleted: " + numberOfRecordsDelete);
-            }
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Started purging " + tableName + " table data through database query.");
-        }
-        String arsName = this.getRecordStoreNameByTable(tenantId, tableName);
-        if (arsName == null) {
-            throw new AnalyticsTableNotAvailableException(tenantId, tableName);
-        }
-        this.getAnalyticsRecordStore(arsName).delete(tenantId, tableName, timeFrom, timeTo);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Time(seconds) taken to purge the table: " + tableName + " through database query." +
-                    (System.currentTimeMillis() - intialsStartTime) / 1000);
-        }
+        executorService.execute(new AnalyticsTableDeleteTask(this, tenantId, tableName, + timeFrom, timeTo));
     }
 
     private List<String> getRecordIdsBatch(List<SearchResultEntry> searchResultEntries) throws AnalyticsException {
