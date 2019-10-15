@@ -125,6 +125,9 @@ public class RDBMSQueriesIT {
             };
             DataProviderValueHolder.getDataProviderHelper().setDataSourceService(dataSourceService);
             DataProviderValueHolder.getDataProviderHelper().setConfigProvider(configProvider);
+            DataProviderValueHolder.getDataProviderHelper().setDataProviderAuthorizer(
+                    DefaultDataProviderAuthorizer.class.getName(),
+                    new DefaultDataProviderAuthorizer());
         } catch (SQLException e) {
             log.info("Test case ignored due to " + e.getMessage());
         }
