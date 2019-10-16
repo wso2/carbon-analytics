@@ -27,7 +27,11 @@ import org.wso2.carbon.analytics.dataservice.core.indexing.AnalyticsIndexedTable
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsTableNotAvailableException;
 import org.wso2.carbon.analytics.datasource.core.util.GenericUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 
 public class AnalyticsTableDeleteTask implements Runnable {
 
