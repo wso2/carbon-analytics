@@ -130,7 +130,7 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
             Map webSocketConfiguration = null;
             if (!(getDataProviderHelper().getConfigProvider().getConfigurationObject(WEB_SOCKET_CONFIG_HEADER)
                     instanceof RDBMSDataProviderConfBean)) {
-                webSocketConfiguration = (Map)getDataProviderHelper().getConfigProvider()
+                webSocketConfiguration = (Map) getDataProviderHelper().getConfigProvider()
                         .getConfigurationObject(WEB_SOCKET_CONFIG_HEADER);
             }
             if (webSocketConfiguration != null) {
