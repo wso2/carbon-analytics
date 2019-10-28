@@ -631,6 +631,8 @@ public class EditorMicroservice implements Microservice {
             }
             byte[] base64Config = Base64.getDecoder().decode(config);
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
+            WorkspaceDeployer.deployConfigFile(new String(base64ConfigName, Charset.defaultCharset()),
+                    new String(base64Config, Charset.defaultCharset()));
             java.nio.file.Path filePath = SecurityUtil.resolvePath(
                     Paths.get(location).toAbsolutePath(),
                     Paths.get(Constants.DIRECTORY_WORKSPACE + System.getProperty(FILE_SEPARATOR) +
@@ -718,6 +720,7 @@ public class EditorMicroservice implements Microservice {
                 entity.addProperty(STATUS, SUCCESS);
                 entity.addProperty("path", Constants.DIRECTORY_WORKSPACE);
                 entity.addProperty("message", "Siddi App: " + siddhiAppName + " is deleted");
+                WorkspaceDeployer.unDeployConfigFile(siddhiAppName);
                 return Response.status(Response.Status.OK).entity(entity)
                         .type(MediaType.APPLICATION_JSON).build();
             } else {
