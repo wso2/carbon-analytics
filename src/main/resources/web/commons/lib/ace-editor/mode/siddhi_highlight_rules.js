@@ -64,6 +64,11 @@ define("ace/mode/siddhi_highlight_rules", ["require", "exports", "module", "ace/
                     end: "\\*/"
                 },
                 {
+                    token: "string.quoted.double.thrice",
+                    start: '"""',
+                    end: '"""'
+                },
+                {
                     token: "string.quoted.double",
                     regex: '".*?"'
                 },
@@ -125,6 +130,11 @@ define("ace/mode/siddhi_highlight_rules", ["require", "exports", "module", "ace/
                     token: "comment.block",
                     start: "/\\*",
                     end: "\\*/"
+                },
+                {
+                    token: "string.quoted.double.thrice",
+                    start: '"""',
+                    end: '"""'
                 },
                 {
                     token: "string.quoted.double",
