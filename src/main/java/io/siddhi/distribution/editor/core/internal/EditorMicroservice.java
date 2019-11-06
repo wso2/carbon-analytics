@@ -1201,7 +1201,8 @@ public class EditorMicroservice implements Microservice {
                         .build();
             }
             DockerBuilderStatus dockerBuilderStatus = new DockerBuilderStatus("", "");
-            if (exportAppsRequest != null && exportAppsRequest.getDockerConfiguration() != null) {
+            if (exportAppsRequest != null && exportAppsRequest.getDockerConfiguration() != null &&
+                    exportAppsRequest.getDockerConfiguration().isPushDocker()) {
                 DockerBuildConfig dockerBuildConfig = exportAppsRequest.getDockerConfiguration();
                 if ((StringUtils.isEmpty(dockerBuildConfig.getImageName())) ||
                         (StringUtils.isEmpty(dockerBuildConfig.getUserName())) ||
@@ -1217,7 +1218,7 @@ public class EditorMicroservice implements Microservice {
                             .build();
                 }
                 if (!dockerBuildConfig.getImageName().equals(
-                                dockerBuildConfig.getImageName().toLowerCase())
+                        dockerBuildConfig.getImageName().toLowerCase())
                 ) {
                     errorMessage = "Invalid docker image name " +
                             dockerBuildConfig.getImageName() +
