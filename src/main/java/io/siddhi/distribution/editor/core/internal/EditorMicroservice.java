@@ -638,15 +638,6 @@ public class EditorMicroservice implements Microservice {
                     Paths.get(Constants.DIRECTORY_WORKSPACE + System.getProperty(FILE_SEPARATOR) +
                             new String(base64ConfigName, Charset.defaultCharset())));
             Files.write(filePath, base64Config);
-            java.nio.file.Path fileNamePath = filePath.getFileName();
-            if (null != fileNamePath) {
-                String siddhiAppName = fileNamePath.toString().replace(Constants.SIDDHI_APP_FILE_EXTENSION, "");
-                if (null != EditorDataHolder.getDebugProcessorService().getSiddhiAppRuntimeHolder(siddhiAppName)) {
-                    //making the app faulty until the file gets deployed again for editor usage purposes
-                    EditorDataHolder.getDebugProcessorService().getSiddhiAppRuntimeHolder(siddhiAppName).setMode(
-                            DebugRuntime.Mode.FAULTY);
-                }
-            }
             JsonObject entity = new JsonObject();
             entity.addProperty(STATUS, SUCCESS);
             entity.addProperty("path", Constants.DIRECTORY_WORKSPACE);
