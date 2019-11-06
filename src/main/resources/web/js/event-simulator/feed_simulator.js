@@ -46,7 +46,6 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             self.FAULTY = 'FAULTY';
             self.STOP = 'STOP';
             self.RUN = 'RUN';
-            self.DEBUG = 'DEBUG';
             self.app = _.get(config, 'application');
 
             self.activeSimulationList = {};
@@ -379,8 +378,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 return false;
             });
 
-            $("#run_debug_app_modal").on('click', 'button[name="confirm"]', function () {
-                var simulationName = $("#run_debug_app_modal").attr("data-uuid");
+            $("#run_app_modal").on('click', 'button[name="confirm"]', function () {
+                var simulationName = $("#run_app_modal").attr("data-uuid");
                 var $panel = $("#active-simulation-list").find('div.input-group[data-name="' + simulationName + '"]');
                 var tabController = self.app.tabController;
                 var simulationConfigs = self.activeSimulationList[simulationName].sources;
@@ -392,11 +391,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                 $siddhiAppStartList.find("div.siddhi_app_mode_config").each(function () {
                     var $appMode = $(this);
                     var siddhiAppName = $appMode.find("label.siddhi_app_name").text();
-                    if ($appMode.find('input[value="run"]').is(':checked')) {
-                        simulatingApps[siddhiAppName] = "run";
-                    } else {
-                        simulatingApps[siddhiAppName] = "debug";
-                    }
+                    simulatingApps[siddhiAppName] = "run";
                 });
                 for (var i = 0; i < simulationConfigs.length; i++) {
                     var siddhiAppName = simulationConfigs[i].siddhiAppName;
@@ -408,13 +403,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                     tabController.setActiveTab(activeTab);
                     if (siddhiAppName in simulatingApps) {
                         var launcher;
-                        if ("run" == simulatingApps[siddhiAppName]) {
-                            launcher = self.app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
-                            launcher.runApplication(self.workspace, false);
-                        } else {
-                            launcher = self.app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
-                            launcher.debugApplication(self.workspace, false);
-                        }
+                        launcher = self.app.tabController.getActiveTab().getSiddhiFileEditor().getLauncher();
+                        launcher.runApplication(self.workspace, false);
                     }
                 }
                 tabController.setActiveTab(activeTab);
@@ -427,19 +417,13 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             self.$eventFeedConfigTabContent.on('click', 'a i.fw-start', function () {
                 var $panel = $(this).closest('.input-group');
                 var simulationName = $panel.attr('data-name');
-                var $runDebugAppModal = $("#run_debug_app_modal");
-                $runDebugAppModal.attr("data-uuid", simulationName);
+                var $runAppModal = $("#run_app_modal");
+                $runAppModal.attr("data-uuid", simulationName);
                 var stoppedAppAvailable = false;
                 var isValidApp = false;
                 var appName = "";
-                var runDebugModalInitialContent = "<div class='clearfix'>" +
-                    "<div class='col-md-6'>" +
-                    "<h5>Siddhi Apps</h5></div>" +
-                    "<div class='col-md-6'>" +
-                    "<h5>Run/Debug Mode</h5>" +
-                    "</div></div>";
-                var dynamicRunDebugContent = "";
-                var $siddhiAppList = $runDebugAppModal.find("div.siddhi-app-list");
+                var dynamicRunContent = "";
+                var $siddhiAppList = $runAppModal.find("div.siddhi-app-list");
                 $siddhiAppList.empty();
 
                 Simulator.retrieveSiddhiAppNames(
@@ -452,10 +436,10 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                                     appName = data[j]['siddhiAppName'];
                                     stoppedAppAvailable = true;
                                     isValidApp = true;
-                                    dynamicRunDebugContent += self.createRunDebugButtons(data[j]['siddhiAppName']);
+                                    dynamicRunContent += self.createSiddhiAppList(data[j]['siddhiAppName']);
                                     break;
-                                } else if (data[j]['siddhiAppName'] == simulationConfigs[i].siddhiAppName && (
-                                    "RUN" == data[j]['mode'] || "DEBUG" == data[j]['mode'])) {
+                                } else if (data[j]['siddhiAppName'] == simulationConfigs[i].siddhiAppName &&
+                                    "RUN" == data[j]['mode']) {
                                     //todo handle properly
 //                                 if(stoppedAppAvailable){
 //                                    $siddhiAppList.append(self.createRunDebugButtons(data[j]['siddhiAppName']));
@@ -492,8 +476,8 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                             self.console = console;
                             self.console.println(message);
                         } else if (stoppedAppAvailable) {
-                            $siddhiAppList.append(runDebugModalInitialContent + dynamicRunDebugContent);
-                            $runDebugAppModal.modal('show');
+                            $siddhiAppList.append(dynamicRunContent);
+                            $runAppModal.modal('show');
                         } else {
                             self.simulateFeed(simulationName, $panel);
                         }
@@ -2608,20 +2592,13 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
             );
         };
 
-        self.createRunDebugButtons = function (siddhiAppName) {
-            var runDebugButtons =
+        self.createSiddhiAppList = function (siddhiAppName) {
+            var siddhiAppName =
                 '<div class="siddhi_app_mode_config">' +
                 '<div class="clearfix app-list">' +
                 '<label class="siddhi_app_name col-md-6">' + siddhiAppName + '</label>' +
-                '<div class="switch-toggle switch-ios col-md-6">' +
-                '<input id="run' + siddhiAppName + '" name="run-debug' + siddhiAppName + '" value="run" checked="" ' +
-                'type="radio">' +
-                '<label for="run' + siddhiAppName + '" onclick="">Run</label>' +
-                '<input id="debug' + siddhiAppName + '" name="run-debug' + siddhiAppName + '" value="debug" type="radio">' +
-                '<label for="debug' + siddhiAppName + '" onclick="">Debug</label>' +
-                '<a></a>' +
-                '</div></div></div>';
-            return runDebugButtons;
+                '</div></div>';
+            return siddhiAppName;
         };
 
         self.simulateFeed = function (simulationName, $panel) {
@@ -2716,7 +2693,7 @@ define(['jquery', 'log', './simulator-rest-client', 'lodash', './open-siddhi-app
                             simulationName,
                             function (data) {
                                 var status = data.message;
-                                if ("RUN" == status && "DEBUG" == status) {
+                                if ("RUN" == status) {
                                     Simulator.simulationAction(
                                         simulationName,
                                         "stop",

@@ -441,19 +441,14 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                     $form
                         .find('div[data-name="siddhi-app-name-mode"]')
                         .html(self.SiddhiAppStatus + mode);
-                    self.disableRunDebugButtonSection($form);
+                    $form
+                        .find('button[name="start"]')
+                        .prop('disabled', true);
                     $form
                         .find('button[type="submit"][name="send"]')
                         .prop('disabled', false);
                 }
             });
-        };
-
-// disable the run, debug and start buttons
-        self.disableRunDebugButtonSection = function ($form) {
-            $form
-                .find('button[name="start"]')
-                .prop('disabled', true);
         };
 
         //remove the tab from the single event tabs list and remove its tab content
