@@ -631,13 +631,13 @@ public class EditorMicroservice implements Microservice {
             }
             byte[] base64Config = Base64.getDecoder().decode(config);
             byte[] base64ConfigName = Base64.getDecoder().decode(configName);
-            WorkspaceDeployer.deployConfigFile(new String(base64ConfigName, Charset.defaultCharset()),
-                    new String(base64Config, Charset.defaultCharset()));
             java.nio.file.Path filePath = SecurityUtil.resolvePath(
                     Paths.get(location).toAbsolutePath(),
                     Paths.get(Constants.DIRECTORY_WORKSPACE + System.getProperty(FILE_SEPARATOR) +
                             new String(base64ConfigName, Charset.defaultCharset())));
             Files.write(filePath, base64Config);
+            WorkspaceDeployer.deployConfigFile(new String(base64ConfigName, Charset.defaultCharset()),
+                    new String(base64Config, Charset.defaultCharset()));
             JsonObject entity = new JsonObject();
             entity.addProperty(STATUS, SUCCESS);
             entity.addProperty("path", Constants.DIRECTORY_WORKSPACE);
