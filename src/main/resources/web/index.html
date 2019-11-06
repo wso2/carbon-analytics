@@ -2486,8 +2486,6 @@
                         <li><a href="#step-2" class="link-disabled">Step 2<br/><small>Template Siddhi Apps</small></a></li>
                         <li><a href="#step-3" class="link-disabled">Step 3<br/><small>Update Siddhi Runner<br/>Configurations</small></a></li>
                         <li><a href="#step-4" class="link-disabled">Step 4<br/><small>Populate arguments <br/>template</small></a></li>
-                        <li><a href="#step-5" class="link-disabled">Step 5<br/><small>Bundle additional <br/>dependencies</small></a></li>
-                        <li><a href="#step-6" class="link-disabled">Step 6<br/><small>Configure Docker</small></a></li>
                     </ul>
                     <div id="form-containers">
                         <div id="step-1" class="export-selector">
@@ -2518,50 +2516,6 @@
                             <div id="fill-template-container-id">
                             </div>
                         </div>
-                        <div id="step-5" class="export-selector">
-                            <div class='export-siddhi-app-list' id='additional-bundles-list'>
-                                <div class='step-description'>Add additional JARS</div>
-                                <div class='form-group'>
-                                    <div class='export-dialog-form-scrollable-block-list'>
-                                        <div id='bundlesTree'></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="step-6" class="export-selector">
-                            <div class='docker-config-container' id='docker-config-container-id'>
-                                <div class='step-description' id="docker-config-description">Select method to export artifacts:</div>
-                                <div class="docker-config-form">
-                                <div id='missing-docker-config-error-message' class='alert alert-danger' hidden>
-                                    Required to fill Docker Configurations
-                                </div>
-                                <div id='docker-name-upper-error' class='alert alert-danger' hidden>
-                                    Docker Image Tag cannot contain uppercase letters.
-                                </div>
-                                <input class="docker-checkbox" type="checkbox" name="download-docker-artifacts" id="download-docker-artifacts" value="download"><label class="label-description">Download artifacts</label><br>
-                                <input class="docker-checkbox" type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"><label class="label-description">Push to docker registry</label><br>
-                                <div class="docker-details-form" id="docker-details" hidden>
-                                    <div class="docker-details-row">
-                                        <label class="clearfix">* Docker Image Tag:</label>
-                                        <input class="file-dialog-form-control" type="text"  id="docker-img-name-input-field" placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">
-                                    </div>
-                                    <div class="docker-details-row">
-                                        <label class="clearfix">* Docker Username:</label>
-                                        <input class="file-dialog-form-control" type="text" name="username" id="userName">
-                                    </div>
-                                    <div class="docker-details-row">
-                                        <label class="clearfix">* Docker Password:</label>
-                                        <input class="file-dialog-form-control" type="password" name="password" id="password">
-                                    </div>
-                                    <div class="docker-details-row">
-                                        <label class="clearfix">* Email:</label>
-                                        <input class="file-dialog-form-control" type="text" name="email" id="email">
-                                    </div>
-                                    <br/>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -2569,8 +2523,79 @@
     </div>
 </div>
 
+<!-- Step 5 of export dialog -->
+<div id="step-5" class="export-selector">
+    <div class='docker-config-container' id='docker-image-type-container-id'>
+        <div class='step-description' id="docker-image-type">Select type of the Docker image:</div>
+        <div class="docker-config-form">
+            <div id='missing-docker-build-type-error-message' class='alert alert-danger' hidden>
+                Required to fill Docker Configurations
+            </div>
+            <div id='missing-docker-build-type-upper-error' class='alert alert-danger' hidden>
+                Docker Image Tag cannot contain uppercase letters.
+            </div>
+            <input class="docker-checkbox" type="radio" name="docker-image-type-name" id="docker-image-type-tobuild" value="tobuild" checked="checked"><label class="label-description">Build Docker Image</label><br>
+            <input class="docker-checkbox" type="radio" name="docker-image-type-name" id="docker-image-type-existing" value="existing" ><label class="label-description">Use Existing Image</label><br>
+            <div class="docker-details-form" id="docker-image-name-form" hidden>
+                <div class="docker-details-row">
+                    <label class="clearfix">* Docker Image Tag:</label>
+                    <input class="file-dialog-form-control" type="text" id="built-docker-image-name-input-field" placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Step 6 of export dialog -->
+<div id="step-6" class="export-selector">
+    <div class='export-siddhi-app-list' id='additional-bundles-list'>
+        <div class='step-description'>Add additional JARS</div>
+        <div class='form-group'>
+            <div class='export-dialog-form-scrollable-block-list'>
+                <div id='bundlesTree'></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Step 7 of export dialog -->
 <div id="step-7" class="export-selector">
+    <div class='docker-config-container' id='docker-config-container-id'>
+        <div class='step-description' id="docker-config-description">Select method to export artifacts:</div>
+        <div class="docker-config-form">
+            <div id='missing-docker-config-error-message' class='alert alert-danger' hidden>
+                Required to fill Docker Configurations
+            </div>
+            <div id='docker-name-upper-error' class='alert alert-danger' hidden>
+                Docker Image Tag cannot contain uppercase letters.
+            </div>
+            <input class="docker-checkbox" type="checkbox" name="download-docker-artifacts" id="download-docker-artifacts" value="download"><label class="label-description">Download artifacts</label><br>
+            <input class="docker-checkbox" type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"><label class="label-description">Push to docker registry</label><br>
+            <div class="docker-details-form" id="docker-details" hidden>
+                <div class="docker-details-row">
+                    <label class="clearfix">* Docker Image Tag:</label>
+                    <input class="file-dialog-form-control" type="text"  id="docker-img-name-input-field" placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">
+                </div>
+                <div class="docker-details-row">
+                    <label class="clearfix">* Docker Username:</label>
+                    <input class="file-dialog-form-control" type="text" name="username" id="userName">
+                </div>
+                <div class="docker-details-row">
+                    <label class="clearfix">* Docker Password:</label>
+                    <input class="file-dialog-form-control" type="password" name="password" id="password">
+                </div>
+                <div class="docker-details-row">
+                    <label class="clearfix">* Email:</label>
+                    <input class="file-dialog-form-control" type="text" name="email" id="email">
+                </div>
+                <br/>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Step 8 of export dialog -->
+<div id="step-8" class="export-selector">
     <div class="export-kube-config-container" id="kubernetes-configuration-step-id">
         <div class="step-description">Configure Kubernetes for Siddhi</div>
         <div class="kube-config-form">
@@ -2750,6 +2775,7 @@
             siddhiAppSelectorDialog: "js/export-deployment-artifacts/siddhiapp-selector-dialog",
             templateConfigDialog: "js/export-deployment-artifacts/template-config-dialog",
             dockerConfigDialog: "js/export-deployment-artifacts/docker-config-dialog",
+            dockerImageTypeDialog: "js/export-deployment-artifacts/docker-image-type-dialog",
             fillTemplateValueDialog: "js/export-deployment-artifacts/fill-template-value-dialog",
             kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog"
         },
@@ -3547,8 +3573,17 @@
             export_dialog: {
                 selector: "#openExportModal"
             },
-            export_kube_step: {
+            export_docker_type_step: {
+                selector: "#step-5"
+            },
+            export_dependency_selection_step: {
+                selector: "#step-6"
+            },
+            export_configure_docker_step: {
                 selector: "#step-7"
+            },
+            export_kube_step: {
+                selector: "#step-8"
             }
         };
         app = new Application(config);
