@@ -39,6 +39,8 @@ define(['require', 'lodash', 'jquery'],
                     self.templateContainer.find("#docker-image-type-tobuild").prop("checked", false);
                 } else {
                     self.dockerImageNameForm.hide();
+                    self.dockerNameMissingErrorMessage.hide();
+                    self.dockerNameInUpperError.hide();
                     self.templateContainer.find("#docker-image-type-tobuild").prop("checked", true);
                 }
             });
