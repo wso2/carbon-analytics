@@ -35,7 +35,6 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             self.FAULTY = 'FAULTY';
             self.STOP = 'STOP';
             self.RUN = 'RUN';
-            self.DEBUG = 'DEBUG';
             self.app = _.get(config, 'application');
             self.baseUrl = config.application.config.baseUrl;
             self.workspace = self.app.workspaceManager;
@@ -77,7 +76,6 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                 var $streamNameSelect = $form.find('select[name="stream-name"]');
                 var $timestamp = $form.find('input[name="sim-timestamp"]');
                 var $attributes = $form.find('div[data-name="attributes"]');
-                var $runDebugButtons = $form.find('div[data-name="run-debug-buttons"]');
                 var $send = $form.find('button[type="submit"][name="send"]');
                 var $singleEventForm = $element.closest(".single-event-form");
                 var $nitificationBox = $singleEventForm.find(".alert");
@@ -92,7 +90,6 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                         $siddhiAppMode.html(self.SiddhiAppStatus + self.siddhiAppDetailsMap[siddhiAppName]);
                         self.removeSingleEventAttributeRules(uuid);
                         $attributes.empty();
-                        $runDebugButtons.empty();
                         if (self.siddhiAppDetailsMap[siddhiAppName] === self.FAULTY) {
                             $streamNameSelect.prop('disabled', true);
                             $timestamp.prop('disabled', true);
@@ -116,11 +113,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                             if (self.siddhiAppDetailsMap[siddhiAppName] === self.STOP) {
                                 $nitificationBox.removeClass("alert-success");
                                 $nitificationBox.addClass("alert-warning");
-                                $runDebugButtons.html(self.createRunDebugButtons());
                                 $sendButton.text(self.startAndSendLabel);
-                                $form
-                                    .find('label[data-name="siddhi-app-start-msg"]')
-                                    .html('starting mode for siddhi app');
                             } else {
                                 $nitificationBox.addClass("alert-success");
                                 $nitificationBox.removeClass("alert-warning");
@@ -131,16 +124,11 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                     function (data) {
                         var message = {
                             "type" : "ERROR",
-                            "message": data,
+                            "message": data
                         };
                         self.console.println(message);
                     }
                 );
-
-                $form
-                    .find('div[data-name="run-debug-buttons"]')
-                    .hide();
-
             });
 
             // refresh attributes list when a stream is selected
@@ -237,7 +225,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                 var started = true;
                 if (self.siddhiAppDetailsMap[_.get(formDataMap, 'siddhiAppName')] == "STOP") {
                     started = self.startInactiveSiddhiApp($form);
-                    log.info(_.get(formDataMap, 'siddhiAppName') + " is stopped");
+                    log.info(_.get(formDataMap, 'siddhiAppName') + " is started");
                 }
 
                 if (started) {
@@ -443,38 +431,16 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             });
         };
 
-// if the siddhi app is not on run or debug mode, append buttons to start siddhi app in either of the modes
-        self.createRunDebugButtons = function () {
-            var runDebugButtons =
-                '<div class="col-md-12 row">' +
-                '<label data-name="siddhi-app-start-msg">' +
-                '</label>' +
-                '</div>'+
-                '<div class="switch-toggle switch-ios col-md-6">' +
-                '<input id="btnRadioRun" name="run-debug" checked type="radio" value="run">' +
-                '<label for="btnRadioRun" onclick="">Run</label>' +
-                '<input id="btnRadioDebug" name="run-debug" type="radio" value="debug">' +
-                '<label for="btnRadioDebug" onclick="">Debug</label>' +
-                '<a></a>' +
-                '</div>';
-            return runDebugButtons;
-        };
-
 // refresh the run debug buttons of single event forms which have the same siddhi app name selected
         self.refreshRunDebugButtons = function (siddhiAppName) {
             $('form[data-form-type="single"]').each(function () {
                 var $form = $(this);
-                var uuid = $form.data('uuid');
                 var thisSiddhiAppName = $form.find('select[name="single-event-siddhi-app-name"]').val();
                 if (thisSiddhiAppName !== null && thisSiddhiAppName === siddhiAppName) {
                     var mode = self.siddhiAppDetailsMap[siddhiAppName];
                     $form
                         .find('div[data-name="siddhi-app-name-mode"]')
                         .html(self.SiddhiAppStatus + mode);
-                    $form
-                        .find('label[data-name="siddhi-app-start-msg"]')
-                        .html('Started siddhi app \'' +
-                            siddhiAppName + '\' in \'' + mode + '\' mode.');
                     self.disableRunDebugButtonSection($form);
                     $form
                         .find('button[type="submit"][name="send"]')
@@ -485,10 +451,6 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
 
 // disable the run, debug and start buttons
         self.disableRunDebugButtonSection = function ($form) {
-            $form.find('input[name="run-debug"]').each(function () {
-                $(this)
-                    .prop('disabled', true)
-            });
             $form
                 .find('button[name="start"]')
                 .prop('disabled', true);
@@ -626,9 +588,6 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                         .empty();
                     $form
                         .find('div[data-name="attributes"]')
-                        .empty();
-                    $form
-                        .find('div[data-name="run-debug-buttons"]')
                         .empty();
                 }
             }
@@ -872,9 +831,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
 
         // start inactive siddhi apps in run or debug mode
         self.startInactiveSiddhiApp = function ($form) {
-            var uuid = $form.data('uuid');
             var siddhiAppName = $form.find('select[name="single-event-siddhi-app-name"]').val();
-            var mode = $form.find('input[name="run-debug"]:checked').val();
             var tabController = self.app.tabController;
             var activeTab = tabController.getTabFromTitle(siddhiAppName);
             if (!activeTab) {
@@ -886,18 +843,13 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             var launcher = tab.getSiddhiFileEditor().getLauncher();
             if(tab !== undefined){
                 var started = false;
-                if (mode === 'run') {
-                    started = launcher.runApplication(self.workspace, false);
-                    if (started) {
-                        self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
-                    }
-                } else if (mode === 'debug') {
-                    started = launcher.debugApplication(self.workspace, false);
-                    if (started) {
-                        self.siddhiAppDetailsMap[siddhiAppName] = self.DEBUG;
-                    }
+                started = launcher.runApplication(self.workspace, false);
+                if (started) {
+                    self.siddhiAppDetailsMap[siddhiAppName] = self.RUN;
                 }
                 return started;
+            } else {
+                return false;
             }
         };
 
@@ -911,11 +863,10 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                     var $notificationBox = $singleEventConfig.find(".alert");
                     self.siddhiAppDetailsMap[siddhiAppName] = status;
                     $singleEventConfig.find('div[data-name="siddhi-app-name-mode"]').html(self.SiddhiAppStatus + status);
-                    if (status == "RUN" || status == "DEBUG") {
+                    if (status == "RUN") {
                         $notificationBox.addClass("alert-success");
                         $notificationBox.removeClass("alert-warning");
                         $notificationBox.removeClass("alert-danger");
-                        $singleEventConfig.find('div[data-name="run-debug-buttons"]').empty();
                         self.removeOrAddSiddhiStreamsOnAppSave($(this), currentSiddhiAppName);
                         $singleEventConfig.find('button[type="submit"][name="send"]').text(self.sendLabel);
                         $singleEventConfig.prop('disabled', false);
@@ -923,7 +874,6 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                         $notificationBox.removeClass("alert-success");
                         $notificationBox.removeClass("alert-danger");
                         $notificationBox.addClass("alert-warning");
-                        $singleEventConfig.find('div[data-name="run-debug-buttons"]').html(self.createRunDebugButtons());
                         $singleEventConfig.find('button[type="submit"][name="send"]').text(self.startAndSendLabel);
                         $singleEventConfig.prop('disabled', false);
                         $send.prop('disabled', false);
@@ -931,7 +881,6 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                         $notificationBox.addClass("alert-danger");
                         $notificationBox.removeClass("alert-warning");
                         $notificationBox.removeClass("alert-success");
-                        $singleEventConfig.find('div[data-name="run-debug-buttons"]').empty();
                         $singleEventConfig.prop('disabled', true);
                         $send.prop('disabled', true);
                     }
