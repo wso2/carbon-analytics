@@ -916,6 +916,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                         $notificationBox.removeClass("alert-warning");
                         $notificationBox.removeClass("alert-danger");
                         $singleEventConfig.find('div[data-name="run-debug-buttons"]').empty();
+                        self.removeOrAddSiddhiStreamsOnAppSave($(this), currentSiddhiAppName);
                         $singleEventConfig.find('button[type="submit"][name="send"]').text(self.sendLabel);
                         $singleEventConfig.prop('disabled', false);
                     } else if (status == "STOP") {
