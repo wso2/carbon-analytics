@@ -148,7 +148,17 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                                             file: file
                                         }
                                     });
-                                    app.commandManager.dispatch("open-folder", "workspace");
+
+                                    var trimmedSiddhiAppName = configName;
+                                    if (trimmedSiddhiAppName.endsWith(".siddhi")) {
+                                        trimmedSiddhiAppName = trimmedSiddhiAppName.slice(0, -7);
+                                    }
+
+                                    self.app.commandManager.dispatch("open-folder", "workspace");
+                                    self.app.workspaceManager.updateMenuItems();
+                                    self.app.commandManager.dispatch('remove-unwanted-streams-single-simulation',
+                                                                                                trimmedSiddhiAppName);
+                                    self.app.eventSimulator.getFeedSimulator().updateFeedCreationButtonAndNotification();
                                     alertSuccess();
                                 } else {
                                     alertError(data.Error);
