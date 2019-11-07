@@ -68,5 +68,26 @@ define(['require', 'jquery'],
             }).join(''));
         };
 
+        Utils.prototype.retrieveEnvVariables = function () {
+            var variableMap = {};
+            var localVarObj = JSON.parse(localStorage.getItem("templatedAttributeList"));
+            Object.keys(localVarObj).forEach((key , index)=>{
+                var name = extractPlaceHolderName(key);
+                if (localVarObj[key] !== undefined   && localVarObj[key] !== '') {
+                    variableMap[name] = localVarObj[key];
+                }
+            });
+            return variableMap;
+        };
+
+        function extractPlaceHolderName(name) {
+            var textMatch = name.match("\\$\\{(.*?)\\}");
+            if (textMatch) {
+                return textMatch[1];
+            } else {
+                return '';
+            }
+        }
+
         return Utils;
     });

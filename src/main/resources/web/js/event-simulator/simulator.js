@@ -94,6 +94,10 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                             $streamNameSelect.prop('disabled', true);
                             $timestamp.prop('disabled', true);
                             $send.prop('disabled', true);
+                            $nitificationBox.removeClass("hidden");
+                            $nitificationBox.addClass("alert-danger");
+                            $nitificationBox.removeClass("alert-warning");
+                            $nitificationBox.removeClass("alert-success");
                         } else {
                             $streamNameSelect.prop('disabled', false);
                             $timestamp.prop('disabled', false);
@@ -112,11 +116,13 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                             var $sendButton = $singleEventForm.find('button[name="send"]');
                             if (self.siddhiAppDetailsMap[siddhiAppName] === self.STOP) {
                                 $nitificationBox.removeClass("alert-success");
+                                $nitificationBox.removeClass("alert-danger");
                                 $nitificationBox.addClass("alert-warning");
                                 $sendButton.text(self.startAndSendLabel);
                             } else {
                                 $nitificationBox.addClass("alert-success");
                                 $nitificationBox.removeClass("alert-warning");
+                                $nitificationBox.removeClass("alert-danger");
                                 $sendButton.text("Send");
                             }
                         }

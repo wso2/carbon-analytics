@@ -19,9 +19,9 @@
  * This will set the options of ACE editor, attach client side parser and attach SiddhiCompletion Engine with the editor
  */
 define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", "./token-tooltip",
-        "ace/ext/language_tools", "./debug-rest-client", "log", 'ace/range', 'lodash'],
+        "ace/ext/language_tools", "./debug-rest-client", "log", 'ace/range', 'lodash', 'utils'],
     function (ace, $, constants, utils, CompletionEngine, aceTokenTooltip
-              , aceExtLangTools, DebugRESTClient, log, AceRange, _) {
+              , aceExtLangTools, DebugRESTClient, log, AceRange, _, Utils) {
 
         "use strict";   // JS strict mode
 
@@ -257,15 +257,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 this.errorMarkers = [];       // Holds highlighted syntax/semantic error markers
             }
 
-            function extractPlaceHolderName(name) {
-                var textMatch = name.match("\\$\\{(.*?)\\}");
-                if (textMatch) {
-                    return textMatch[1];
-                } else {
-                    return '';
-                }
-            }
-
             /**
              * This method send server calls to check the semantic errors
              * Also retrieves the missing completion engine data from the server if the siddhi app is valid
@@ -274,14 +265,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              */
             SiddhiEditor.prototype.checkForSemanticErrors = function() {
                 var editorText = aceEditor.getValue();
-                var variableMap = {};
-                var localVarObj = JSON.parse(localStorage.getItem("templatedAttributeList"))
-                Object.keys(localVarObj).forEach((key , index)=>{
-                    var name = extractPlaceHolderName(key);
-                    if (localVarObj[key] !== undefined   && localVarObj[key] !== '') {
-                        variableMap[name] = localVarObj[key];
-                    }
-                });
+                var variableMap = Utils.prototype.retrieveEnvVariables();
 
                 // If the user has not typed anything after 3 seconds from his last change, then send the query for
                 // semantic check to check whether the query contains errors or not.
