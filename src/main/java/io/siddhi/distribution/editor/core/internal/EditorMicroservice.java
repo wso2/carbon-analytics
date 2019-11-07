@@ -53,6 +53,7 @@ import io.siddhi.distribution.editor.core.exception.KubernetesGenerationExceptio
 import io.siddhi.distribution.editor.core.exception.SiddhiAppDeployerServiceStubException;
 import io.siddhi.distribution.editor.core.exception.SiddhiStoreQueryHelperException;
 import io.siddhi.distribution.editor.core.internal.local.LocalFSWorkspace;
+import io.siddhi.distribution.editor.core.model.SiddhiAppStatus;
 import io.siddhi.distribution.editor.core.util.Constants;
 import io.siddhi.distribution.editor.core.util.DebugCallbackEvent;
 import io.siddhi.distribution.editor.core.util.DebugStateHolder;
@@ -1039,12 +1040,15 @@ public class EditorMicroservice implements Microservice {
             // If error in json syntax, return siddhi app list without populating
         }
 
+        List<Object> siddhiAppStatusList = EditorDataHolder.getSiddhiAppMap().values().stream()
+                .map((runtime -> new SiddhiAppStatus(runtime.getSiddhiAppName(), runtime.getMode().toString())))
+                .collect(Collectors.toList());
+
         return Response
                 .status(Response.Status.OK)
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(
-                        new ArrayList<>(EditorDataHolder.getSiddhiAppMap().values())
-                ).build();
+                .entity(siddhiAppStatusList)
+                .build();
     }
 
     @GET
