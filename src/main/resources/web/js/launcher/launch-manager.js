@@ -15,8 +15,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console'],
-    function (require, $, Backbone, _, EventChannel, Console) {
+define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console', 'utils'],
+    function (require, $, Backbone, _, EventChannel, Console, Utils) {
         var instance;
 
         var LaunchManager = function (args) {
@@ -30,15 +30,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console'],
         LaunchManager.prototype = Object.create(EventChannel.prototype);
         LaunchManager.prototype.constructor = LaunchManager;
 
-        function extractPlaceHolderName(name) {
-            var textMatch = name.match("\\$\\{(.*?)\\}");
-            if (textMatch) {
-                return textMatch[1];
-            } else {
-                return '';
-            }
-        }
-
         LaunchManager.prototype.runApplication = function (siddhiAppName, consoleListManager, activeTab, workspace, async) {
             if (activeTab.getFile().getRunStatus() !== undefined && !activeTab.getFile().getRunStatus() &&
                 !activeTab.getFile().getDebugStatus()) {
@@ -51,14 +42,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console'],
                     async = true;
                 }
                 var console;
-                var variableMap = {};
-                var localVarObj = JSON.parse(localStorage.getItem("templatedAttributeList"))
-                Object.keys(localVarObj).forEach((key , index)=>{
-                    var name = extractPlaceHolderName(key);
-                    if (localVarObj[key] !== undefined && localVarObj[key] !== '') {
-                        variableMap[name] = localVarObj[key];
-                    }
-                });
+                var variableMap = Utils.prototype.retrieveEnvVariables();
                 var data = {
                     siddhiAppName: siddhiAppName,
                     variables: variableMap

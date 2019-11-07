@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'lodash', 'jquery'],
-    function (require, _, $) {
+define(['require', 'lodash', 'jquery', 'utils'],
+    function (require, _, $, Utils) {
 
         var constants = {
             TEMPLATED_ELEMENT_REGEX: /\${([^(\\$\\|\\{\\]+)}/g,
@@ -37,12 +37,7 @@ define(['require', 'lodash', 'jquery'],
 
         FillTemplateValueDialog.prototype.render = function () {
             var self = this;
-            var variableMap = {};
-            var localVarObj = JSON.parse(localStorage.getItem("templatedAttributeList"))
-            Object.keys(localVarObj).forEach((key , index)=>{
-                var name = extractPlaceHolderName(key);
-                variableMap[name] = localVarObj[key];
-            });
+            var variableMap = Utils.prototype.retrieveEnvVariables();
 
             _.forEach(self.templatedApps, function(element, i) {
                 self.findTemplatedKeys(element.appContent);
@@ -83,16 +78,6 @@ define(['require', 'lodash', 'jquery'],
             self.container.append(allTemplatedKeysHTMLContent);
             $(".nano").nanoScroller();
         };
-
-        function extractPlaceHolderName(name) {
-            var textMatch = name.match("\\$\\{(.*?)\\}");
-            if (textMatch) {
-                return textMatch[1];
-            } else {
-                return '';
-            }
-        }
-
 
         FillTemplateValueDialog.prototype.validateTemplatedValues = function (keyValueList) {
             var self = this;
