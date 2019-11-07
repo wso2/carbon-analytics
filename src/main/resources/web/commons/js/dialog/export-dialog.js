@@ -18,10 +18,10 @@
 
 define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelectorDialog', 'jarsSelectorDialog',
         'templateAppDialog', 'templateConfigDialog', 'fillTemplateValueDialog', 'kubernetesConfigDialog',
-        'dockerConfigDialog', 'dockerImageTypeDialog', 'alerts'],
+        'dockerConfigDialog', 'alerts'],
     function (require, $, log, Backbone, smartWizard, SiddhiAppSelectorDialog, JarsSelectorDialog,
               TemplateAppDialog, TemplateConfigDialog, FillTemplateValueDialog, KubernetesConfigDialog,
-              DockerConfigDialog, DockerImageTypeDialog, alerts) {
+              DockerConfigDialog, alerts) {
 
         var ExportDialog = Backbone.View.extend(
             /** @lends ExportDialog.prototype */
@@ -37,15 +37,6 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this._options = options;
                     var exportDialog = _.cloneDeep(_.get(options.config, 'export_dialog'));
                     this._exportContainer = $(_.get(exportDialog, 'selector')).clone();
-
-                    var exportDockerTypeStep = _.cloneDeep(_.get(options.config, 'export_docker_type_step'));
-                    this._exportDockerTypeStep = $(_.get(exportDockerTypeStep, 'selector')).clone();
-
-                    var exportDependencySelectionStep = _.cloneDeep(_.get(options.config, 'export_dependency_selection_step'));
-                    this._exportDependencySelectionStep = $(_.get(exportDependencySelectionStep, 'selector')).clone();
-
-                    var exportConfigureDockerStep = _.cloneDeep(_.get(options.config, 'export_configure_docker_step'));
-                    this._exportConfigureDockerStep = $(_.get(exportConfigureDockerStep, 'selector')).clone();
 
                     var exportKubeStep = _.cloneDeep(_.get(options.config, 'export_kube_step'));
                     this._exportKubeStepContainer = $(_.get(exportKubeStep, 'selector')).clone();
@@ -67,7 +58,6 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this._kubernetesConfigModel;
                     this._fill_template_value_dialog;
                     this._dockerConfigModel;
-                    this._dockerImageTypeModel;
                     this._exportUrl;
                     this._exportType;
 
@@ -99,39 +89,15 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                     if (isExportDockerFlow) {
                         heading.text('Export Siddhi Apps for Docker image');
-                        var formSteps = form.find('#form-steps');
-                        for (i = 0; i < formSteps.children().length; i++) {
-                            formSteps.children()[i].setAttribute("style", "max-width: 16.66%;")
-                        }
-                        formSteps.append('<li style="max-width: 16.66%;"><a href="#step-6" ' +
-                            'class="link-disabled">Step 5<br/><small>Bundle additional <br/>dependencies</small>' +
-                            '</a></li>');
-                        formSteps.append('<li style="max-width: 16.66%;"><a href="#step-7" ' +
-                            'class="link-disabled">Step 6<br/><small>Configure Docker</small>' +
-                            '</a></li>');
-                        form.find('#form-containers').append(this._exportDependencySelectionStep);
-                        form.find('#form-containers').append(this._exportConfigureDockerStep);
                     } else {
                         heading.text('Export Siddhi Apps For Kubernetes CRD');
                         var formSteps = form.find('#form-steps');
                         for (i = 0; i < formSteps.children().length; i++) {
-                            formSteps.children()[i].setAttribute("style", "max-width: 12.5%;")
+                            formSteps.children()[i].setAttribute("style", "max-width: 14.28%;")
                         }
-                        formSteps.append('<li style="max-width: 12.5%;"><a href="#step-5" ' +
-                            'class="link-disabled">Step 5<br/><small>Select Docker build type</small>' +
+                        formSteps.append('<li style="max-width: 14.28%;"><a href="#step-7" ' +
+                            'class="link-disabled">Step 7<br/><small>Add Kubernetes Config</small>' +
                             '</a></li>');
-                        formSteps.append('<li style="max-width: 12.5%;"><a href="#step-6" ' +
-                            'class="link-disabled">Step 6<br/><small>Bundle additional <br/>dependencies</small>' +
-                            '</a></li>');
-                        formSteps.append('<li style="max-width: 12.5%;"><a href="#step-7" ' +
-                            'class="link-disabled">Step 7<br/><small>Configure Docker</small>' +
-                            '</a></li>');
-                        formSteps.append('<li style="max-width: 12.5%;"><a href="#step-8" ' +
-                            'class="link-disabled">Step 8<br/><small>Add Kubernetes Config</small>' +
-                            '</a></li>');
-                        form.find('#form-containers').append(this._exportDockerTypeStep);
-                        form.find('#form-containers').append(this._exportDependencySelectionStep);
-                        form.find('#form-containers').append(this._exportConfigureDockerStep);
                         form.find('#form-containers').append(this._exportKubeStepContainer);
                     }
 
@@ -175,9 +141,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 getTemplatedKeyValues();
                                 return self._fill_template_value_dialog.
                                 validateTemplatedValues(self._payload.templatedVariables)
-                            } else if (stepNumber === 4 && self._exportType === 'kubernetes') {
-                                return self._dockerImageTypeModel.validateDockerTypeConfig();
-                            } else if (stepNumber === 6 && self._exportType === 'kubernetes') {
+                            } else if (stepNumber === 5) {
                                 return self._dockerConfigModel.validateDockerConfig();
                             }
                         }
@@ -230,15 +194,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 });
                                 self._configTemplateModel.render();
                             } else if (stepNumber === 4) {
-                                  if (self._exportType === 'kubernetes') {
-                                      self._dockerImageTypeModel = new DockerImageTypeDialog({
-                                        templateHeader: exportContainer.find('#docker-image-type-container-id'),
-                                      });
-                                      self._dockerImageTypeModel.render();
-                                  } else {
-                                      self._jarsSelectorDialog = new JarsSelectorDialog(options, form);
-                                      self._jarsSelectorDialog.render();
-                                  }
+                                self._jarsSelectorDialog = new JarsSelectorDialog(options, form);
+                                self._jarsSelectorDialog.render();
                             } else if (stepNumber === 3) {
                                 var fillTemplateContainer
                                     = exportContainer.find('#fill-template-container-id');
@@ -252,39 +209,19 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 self._fill_template_value_dialog = new FillTemplateValueDialog(fillTemplateOptions);
                                 self._fill_template_value_dialog.render();
                             } else if (stepNumber === 5) {
-                                if (self._exportType === 'kubernetes') {
-                                    if (self._dockerImageTypeModel.getDockerTypeConfigs()['isExistingImage']) {
-                                        e.preventDefault();
-                                        form.smartWizard("goToStep", 7);
-                                    } else {
-                                        self._jarsSelectorDialog = new JarsSelectorDialog(options, form);
-                                        self._jarsSelectorDialog.render();
-                                    }
-                                } else {
-                                    self._dockerConfigModel = new DockerConfigDialog({
-                                        app: self._options,
-                                        templateHeader: exportContainer.find('#docker-config-container-id'),
-                                        exportType: self._exportType,
-                                        payload: self._payload,
-                                        defaultPushDocker: false
-                                    });
-                                    self._dockerConfigModel.render();
-                                }
-                            } else if (stepNumber === 6 && self._exportType === 'kubernetes') {
                                 self._dockerConfigModel = new DockerConfigDialog({
                                     app: self._options,
                                     templateHeader: exportContainer.find('#docker-config-container-id'),
-                                    exportType: self._exportType,
-                                    payload: self._payload,
-                                    defaultPushDocker: self._dockerImageTypeModel.getDockerTypeConfigs()['pushDocker']
+                                    exportType:self._exportType,
+                                    payload: self._payload
                                 });
                                 self._dockerConfigModel.render();
-                            } else if (stepNumber === 7 && self._exportType === 'kubernetes') {
-                                 self._kubernetesConfigModel = new KubernetesConfigDialog({
+                            } else if (stepNumber === 6) {
+                                self._kubernetesConfigModel = new KubernetesConfigDialog({
                                     app: self._options,
                                     templateHeader: exportContainer.find('#kubernetes-configuration-step-id')
-                                 });
-                                 self._kubernetesConfigModel.render();
+                                });
+                                self._kubernetesConfigModel.render();
                             }
                         }
                     });
@@ -296,19 +233,9 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     if (!this._isExportDockerFlow) {
                         this._payload.kubernetesConfiguration = this._kubernetesConfigModel.getKubernetesConfigs();
                     }
-                    if (typeof this._dockerConfigModel == "undefined") {
-                        this._payload.dockerConfiguration = this._dockerImageTypeModel.getDockerTypeConfigs();
-                    } else {
-                        this._payload.dockerConfiguration = this._dockerConfigModel.getDockerConfigs();
-                    }
-
-                    if (typeof this._jarsSelectorDialog == "undefined") {
-                        this._payload.bundles = []
-                        this._payload.jars = []
-                    } else {
-                        this._payload.bundles = this._jarsSelectorDialog.getSelected('bundles');
-                        this._payload.jars = this._jarsSelectorDialog.getSelected('jars');
-                    }
+                    this._payload.dockerConfiguration = this._dockerConfigModel.getDockerConfigs();
+                    this._payload.bundles = this._jarsSelectorDialog.getSelected('bundles');
+                    this._payload.jars = this._jarsSelectorDialog.getSelected('jars');
 
                     var payloadInputField = $('<input id="payload" name="payload" type="text" style="display: none;"/>')
                         .attr('value', JSON.stringify(this._payload));

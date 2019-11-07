@@ -26,9 +26,7 @@ define(['require', 'lodash', 'jquery'],
             this.container = options.templateHeader;
             this.payload = options.payload;
             this.exportType = options.exportType;
-            this.defaultPushDocker = options.defaultPushDocker;
             this.dockerDetailsForm = options.templateHeader.find('#docker-details')
-            this.templateContainer = options.templateHeader;
         };
 
         DockerConfigDialog.prototype.constructor = DockerConfigDialog;
@@ -36,15 +34,9 @@ define(['require', 'lodash', 'jquery'],
         DockerConfigDialog.prototype.render = function () {
             let self = this;
             let dockerDownloadCheckboxInput = self.container.find("#download-docker-artifacts");
-            let dockerPushCheckboxInput = self.container.find("#docker-push-checkbox");
             if (self.exportType === "kubernetes") {
                 dockerDownloadCheckboxInput.prop('checked', true);
                 dockerDownloadCheckboxInput.attr("disabled", true);
-                if (self.defaultPushDocker) {
-                    dockerPushCheckboxInput.prop('checked', true);
-                    dockerPushCheckboxInput.attr("disabled", true);
-                    self.dockerDetailsForm.show();
-                }
             } else {
                 dockerDownloadCheckboxInput.prop('checked', true);
             }
