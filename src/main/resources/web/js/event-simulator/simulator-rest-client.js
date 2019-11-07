@@ -35,7 +35,7 @@ define(["jquery", "utils"], function (jQuery, Utils) {
         var retrieveEnvVariables = Utils.prototype.retrieveEnvVariables();
         jQuery.ajax({
             async: true,
-            url: self.editorUrl + "/artifact/listSiddhiAppsAfterPopulating?envVar=" +
+            url: self.editorUrl + "/artifact/listSiddhiApps?envVar=" +
                                     Utils.prototype.base64EncodeUnicode(JSON.stringify(retrieveEnvVariables)),
             type: self.HTTP_GET,
             success: function (data) {

@@ -1004,43 +1004,32 @@ public class EditorMicroservice implements Microservice {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/artifact/listSiddhiApps")
-    public Response getSiddhiApps() {
+    public Response getSiddhiApps(@QueryParam("envVar") String encodedEnvVar) {
 
-        return Response
-                .status(Response.Status.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(
-                        new ArrayList<>(EditorDataHolder.getSiddhiAppMap().values())
-                ).build();
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/artifact/listSiddhiAppsAfterPopulating")
-    public Response getSiddhiAppsAfterPopulating(@QueryParam("envVar") String encodedEnvVar) {
-
-        try {
-            String envVarJson = new String(Base64.getDecoder().decode(encodedEnvVar), StandardCharsets.UTF_8);
-            Gson gson = DeserializersRegisterer.getGsonBuilder().disableHtmlEscaping().create();
-            HashMap<String, String> envVariables = gson.fromJson(envVarJson, HashMap.class);
-            if (!envVariables.isEmpty()) {
-                EditorDataHolder.getSiddhiAppMap().forEach((siddhiAppName, debugRuntime) -> {
-                    String populatedSiddhiApp = SourceEditorUtils.populateSiddhiAppWithVars(envVariables,
-                            debugRuntime.getSiddhiApp());
-                    SiddhiAppRuntime siddhiAppRuntime =
-                            EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(populatedSiddhiApp);
-                    if (debugRuntime.getMode() != DebugRuntime.Mode.RUN) {
-                        debugRuntime.setSiddhiAppRuntime(siddhiAppRuntime);
-                        debugRuntime.setMode(DebugRuntime.Mode.STOP);
-                        EditorDataHolder.getSiddhiAppMap().put(siddhiAppName, debugRuntime);
-                    }
-                });
+        if (encodedEnvVar != null) {
+            try {
+                String envVarJson = new String(Base64.getDecoder().decode(encodedEnvVar), StandardCharsets.UTF_8);
+                Gson gson = DeserializersRegisterer.getGsonBuilder().disableHtmlEscaping().create();
+                HashMap<String, String> envVariables = gson.fromJson(envVarJson, HashMap.class);
+                if (!envVariables.isEmpty()) {
+                    EditorDataHolder.getSiddhiAppMap().forEach((siddhiAppName, debugRuntime) -> {
+                        String populatedSiddhiApp = SourceEditorUtils.populateSiddhiAppWithVars(envVariables,
+                                debugRuntime.getSiddhiApp());
+                        SiddhiAppRuntime siddhiAppRuntime =
+                                EditorDataHolder.getSiddhiManager().createSiddhiAppRuntime(populatedSiddhiApp);
+                        if (debugRuntime.getMode() != DebugRuntime.Mode.RUN) {
+                            debugRuntime.setSiddhiAppRuntime(siddhiAppRuntime);
+                            debugRuntime.setMode(DebugRuntime.Mode.STOP);
+                            EditorDataHolder.getSiddhiAppMap().put(siddhiAppName, debugRuntime);
+                        }
+                    });
+                }
+            } catch (Throwable ignored) {
+                // If error in json syntax, return siddhi app list without populating
             }
-        } catch (Throwable ignored) {
-            // If error in json syntax, return siddhi app list without populating
         }
 
-        List<Object> siddhiAppStatusList = EditorDataHolder.getSiddhiAppMap().values().stream()
+        List<SiddhiAppStatus> siddhiAppStatusList = EditorDataHolder.getSiddhiAppMap().values().stream()
                 .map((runtime -> new SiddhiAppStatus(runtime.getSiddhiAppName(), runtime.getMode().toString())))
                 .collect(Collectors.toList());
 

@@ -20,7 +20,7 @@ consumes:
 produces:
   - application/json
 paths:
-  /artifact/listSiddhiAppsAfterPopulating:
+  /artifact/listSiddhiApps:
     get:
       summary: Lists Siddhi Applications and it's modes.
       description: |
