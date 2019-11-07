@@ -148,6 +148,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                                             file: file
                                         }
                                     });
+                                    app.commandManager.dispatch("open-folder", "workspace");
                                     alertSuccess();
                                 } else {
                                     alertError(data.Error);
