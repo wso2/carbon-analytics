@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(["jquery"], function (jQuery) {
+define(["jquery", "utils"], function (jQuery, Utils) {
 
     "use strict";   // JS strict mode
 
@@ -32,9 +32,11 @@ define(["jquery"], function (jQuery) {
 
 
     self.retrieveSiddhiAppNames = function (successCallback, errorCallback) {
+        var retrieveEnvVariables = Utils.prototype.retrieveEnvVariables();
         jQuery.ajax({
             async: true,
-            url: self.editorUrl + "/artifact/listSiddhiApps",
+            url: self.editorUrl + "/artifact/listSiddhiAppsAfterPopulating?envVar=" +
+                                    Utils.prototype.base64EncodeUnicode(JSON.stringify(retrieveEnvVariables)),
             type: self.HTTP_GET,
             success: function (data) {
                 if (typeof successCallback === 'function')
