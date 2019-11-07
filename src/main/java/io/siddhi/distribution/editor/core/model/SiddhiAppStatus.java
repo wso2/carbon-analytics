@@ -18,7 +18,7 @@
 package io.siddhi.distribution.editor.core.model;
 
 /**
- * Class to return status of the siddhi apps
+ * Class to return status of the siddhi apps.
  */
 public class SiddhiAppStatus {
     private String siddhiAppName;
