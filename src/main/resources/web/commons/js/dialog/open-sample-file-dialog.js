@@ -41,10 +41,6 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     this._sampleFileOpenModal.modal('show');
                 },
 
-                select: function(path){
-                    this._fileBrowser.select('path');
-                },
-
                 render: function () {
                     var self = this;
                     var fileBrowser;
@@ -125,6 +121,10 @@ define(['require', 'lodash','jquery', 'log', 'backbone', 'file_browser', 'worksp
                     var openFileWizardError = sampleFileOpen.find("#openFileWizardError");
                     var location = sampleFileOpen.find("input").filter("#location");
                     var locationSearch = sampleFileOpen.find("input").filter("#locationSearch");
+
+                    openSampleConfigModal.on('shown.bs.modal', function () {
+                        locationSearch.focus();
+                    });
 
                     var treeContainer = sampleFileOpen.find("div").filter("#sampleTable");
                     var bodyUlSampleContent = $('<ul class="recent-files clearfix"></ul>');
