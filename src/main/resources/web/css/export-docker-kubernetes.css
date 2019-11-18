@@ -22,7 +22,7 @@ hr.style1 {
     width: 93%;
 }
 
-.form-group {
+.export-dialog .form-group {
     margin: 10px 0;
 }
 
@@ -43,12 +43,6 @@ hr.style1 {
     font-weight: 300;
 }
 
-.divider {
-    width: 5px;
-    height: auto;
-    display: inline-block;
-}
-
 hr.export-dialog-hr {
     border-top: 1px solid #2C2C2C;
     width: 100%;
@@ -61,12 +55,6 @@ hr.export-dialog-hr {
 
 .export-dialog-form-divider {
     height: 10px;
-}
-
-.siddhi-app-list {
-    display: block;
-    overflow: hidden;
-    width: 100%;
 }
 
 .openDockerWizardError-container {
