@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -29,6 +29,7 @@ public class ParameterMetaData {
 
     private String name;
     private List<DataType> type;
+    private Boolean dynamic;
     private Boolean optional;
     private String description;
     private String defaultValue;
@@ -51,6 +52,16 @@ public class ParameterMetaData {
     public void setType(List<DataType> type) {
 
         this.type = type;
+    }
+
+    public Boolean getDynamic() {
+
+        return dynamic;
+    }
+
+    public void setDynamic(Boolean dynamic) {
+
+        this.dynamic = dynamic;
     }
 
     public Boolean getOptional() {
