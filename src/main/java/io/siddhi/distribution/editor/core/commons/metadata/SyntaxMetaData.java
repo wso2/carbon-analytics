@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,20 +22,24 @@ package io.siddhi.distribution.editor.core.commons.metadata;
  * Used in JSON responses.
  */
 public class SyntaxMetaData {
+
     private String syntax;
     private String clipboardSyntax;
+
+    public SyntaxMetaData(String syntax, String clipboardSyntax) {
+
+        this.syntax = syntax;
+        this.clipboardSyntax = clipboardSyntax;
+    }
+
     public String getSyntax() {
+
         return syntax;
     }
 
-    public void setSyntax(String syntax) {
-        this.syntax = syntax;
-    }
     public String getClipboardSyntax() {
+
         return clipboardSyntax;
-    }
-    public void setClipboardSyntax(String clipboardSyntax) {
-        this.clipboardSyntax = clipboardSyntax;
     }
 
 }

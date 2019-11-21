@@ -17,7 +17,6 @@
  */
 package io.siddhi.distribution.editor.core.commons.metadata;
 
-
 import java.util.List;
 
 /**
@@ -28,12 +27,12 @@ public class ProcessorMetaData {
 
     private String name;
     private String namespace;
-    private List<SyntaxMetaData> syntax;
+    private List<ExampleMetaData> examples;
     private String description;
     private List<ParameterMetaData> parameters;
     private List<String[]> parameterOverloads;
     private List<AttributeMetaData> returnAttributes;
-    private List<ExampleMetaData> examples;
+    private List<SyntaxMetaData> syntax;
 
     public String getName() {
 
@@ -55,14 +54,14 @@ public class ProcessorMetaData {
         this.namespace = namespace;
     }
 
-    public List<SyntaxMetaData> getSyntax() {
+    public List<ExampleMetaData> getExamples() {
 
-        return syntax;
+        return examples;
     }
 
-    public void setSyntax(List<SyntaxMetaData>  syntax) {
+    public void setExamples(List<ExampleMetaData> examples) {
 
-        this.syntax = syntax;
+        this.examples = examples;
     }
 
     public String getDescription() {
@@ -89,29 +88,30 @@ public class ProcessorMetaData {
 
         this.returnAttributes = returnAttributes;
     }
+
     public List<AttributeMetaData> getReturnAttributes() {
 
         return returnAttributes;
     }
 
-
     public void setParameterOverloads(List<String[]> parameterOverloads) {
+
         this.parameterOverloads = parameterOverloads;
     }
-
 
     public List<String[]> getParameterOverloads() {
 
         return parameterOverloads;
     }
-    public List<ExampleMetaData> getExamples() {
 
-        return examples;
+    public List<SyntaxMetaData> getSyntax() {
+
+        return syntax;
     }
 
-    public void setExamples(List<ExampleMetaData> examples) {
+    public void setSyntax(List<SyntaxMetaData> syntax) {
 
-        this.examples = examples;
+        this.syntax = syntax;
     }
 
 }
