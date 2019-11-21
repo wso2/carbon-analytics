@@ -440,7 +440,7 @@ public class SourceEditorUtils {
     }
 
     /**
-     * generate the parameter data type syntax for extension syntax generation
+     * generate the parameter data type syntax for extension syntax generation.
      *
      * @param parameterName        parameter name from parameter
      * @param parameterDataTypeMap Parameter datatype map
@@ -450,7 +450,7 @@ public class SourceEditorUtils {
                                                              Map<String, DataType[]> parameterDataTypeMap) {
 
         StringBuilder parameterDataType = new StringBuilder();
-        parameterDataType.append("<");
+        parameterDataType.append(" <");
         DataType[] parameterType = parameterDataTypeMap.get(parameterName);
         for (int i = 0; i < parameterType.length; i++) {
             DataType dataType = parameterType[i];
@@ -460,12 +460,12 @@ public class SourceEditorUtils {
                 parameterDataType.append(dataType);
             }
         }
-        parameterDataType.append(">");
+        parameterDataType.append("> ");
         return parameterDataType;
     }
 
     /**
-     * generate the syntax  for functions,windows,stream processor and aggregate function
+     * generate the syntax  for functions,windows,stream processor and aggregate function.
      *
      * @param extension            Extension data from extension anotation
      * @param parameterDataTypeMap Parameter datatype map
@@ -488,7 +488,7 @@ public class SourceEditorUtils {
                     syntax.append(returnAttribute.type()[j]);
                 }
             }
-            syntax.append(">");
+            syntax.append("> ");
         }
 
         // Add name syntax to the extension
@@ -515,7 +515,7 @@ public class SourceEditorUtils {
                 } else {
                     String previousDataname;
                     parameterSyntax.append("(");
-                    parameterClipboardSyntax.append("(");
+                    parameterClipboardSyntax.append("( ");
                     for (int j = 0; j < parameterOverload.parameterNames().length; j++) {
                         String parameterName = parameterOverload.parameterNames()[j];
                         if (parameterName.equalsIgnoreCase(SiddhiCodeBuilderConstants.THREE_DOTS)) {
@@ -536,8 +536,8 @@ public class SourceEditorUtils {
                             }
                         }
                     }
-                    parameterClipboardSyntax.append(")");
-                    parameterSyntax.append(")");
+                    parameterClipboardSyntax.append(" )");
+                    parameterSyntax.append(" )");
                 }
                 finalClipBoardSyntax = clipBoardSyntax.toString() + parameterClipboardSyntax.toString();
                 finalSyntax = syntax.toString() + parameterSyntax.toString();
@@ -546,7 +546,7 @@ public class SourceEditorUtils {
             }
         } else {
             syntax.append("(");
-            clipBoardSyntax.append("(");
+            clipBoardSyntax.append("( ");
             for (int i = 0; i < extension.parameters().length; i++) {
                 Parameter parameter = extension.parameters()[i];
                 syntax.append(parameterDataTypeGeneration(parameter.name(), parameterDataTypeMap));
@@ -558,8 +558,8 @@ public class SourceEditorUtils {
                     clipBoardSyntax.append(parameter.name());
                 }
             }
-            syntax.append(")");
-            clipBoardSyntax.append(")");
+            syntax.append(" )");
+            clipBoardSyntax.append(" )");
             finalSyntax = syntax.toString();
             finalClipBoardSyntax = clipBoardSyntax.toString();
             SyntaxMetaData syntaxMetaData = new SyntaxMetaData(finalSyntax, finalClipBoardSyntax);
@@ -569,7 +569,7 @@ public class SourceEditorUtils {
     }
 
     /**
-     * generate the syntax  for source and sink extension
+     * generate the syntax  for source and sink extension.
      *
      * @param extension            Extension data from extension anotation
      * @param parameterDataTypeMap Parameter datatype map
@@ -603,7 +603,7 @@ public class SourceEditorUtils {
     }
 
     /**
-     * generate the syntax  for source mapper and sink mapper extension
+     * generate the syntax  for source mapper and sink mapper extension.
      *
      * @param extension            Extension data from extension anotation
      * @param parameterDataTypeMap Parameter datatype map
@@ -642,7 +642,7 @@ public class SourceEditorUtils {
     }
 
     /**
-     * generate the syntax  for store  extension
+     * generate the syntax  for store  extension.
      *
      * @param extension            Extension data from extension anotation
      * @param parameterDataTypeMap Parameter datatype map
@@ -732,36 +732,36 @@ public class SourceEditorUtils {
 
               /* Generate syntax annotation data for function,attribute aggregation,windows,stream
             function and stream */
-            if (Constants.FUNCTION_EXECUTOR.equalsIgnoreCase(processorType)
-                    || Constants.ATTRIBUTE_AGGREGATOR.equalsIgnoreCase(processorType) ||
-                    Constants.WINDOW_PROCESSOR.equalsIgnoreCase(processorType)
-                    || Constants.STREAM_FUNCTION_PROCESSOR.equalsIgnoreCase(processorType) ||
+            if (Constants.FUNCTION_EXECUTOR.equalsIgnoreCase(processorType) ||
+                    Constants.ATTRIBUTE_AGGREGATOR.equalsIgnoreCase(processorType) ||
+                    Constants.WINDOW_PROCESSOR.equalsIgnoreCase(processorType) ||
+                    Constants.STREAM_FUNCTION_PROCESSOR.equalsIgnoreCase(processorType) ||
                     Constants.STREAM_PROCESSOR.equalsIgnoreCase(processorType)) {
                 processorMetaData.setSyntax(windowFunctionSyntaxGeneration(extensionAnnotation,
                         parameterDataTypeMap));
             }
 
-//Generate syntax annotation data for source and sink
-            if ((Constants.SOURCE.equals(processorType))
-                    || (Constants.SINK.equals(processorType))) {
+            //Generate syntax annotation data for source and sink
+            if ((Constants.SOURCE.equals(processorType)) ||
+                    (Constants.SINK.equals(processorType))) {
                 processorMetaData.setSyntax(sourceSinkSyntaxGeneration(extensionAnnotation,
                         parameterDataTypeMap));
             }
 
-//Generate Syntax annotation data for source mapper and sink mapper
-            if ((Constants.SOURCEMAP.equals(processorType))
-                    || (Constants.SINKMAP.equals(processorType))) {
+            //Generate Syntax annotation data for source mapper and sink mapper
+            if ((Constants.SOURCEMAP.equals(processorType)) ||
+                    (Constants.SINKMAP.equals(processorType))) {
                 processorMetaData.setSyntax(sourceSinkMapSyntaxGeneration(extensionAnnotation,
                         parameterDataTypeMap));
             }
 
-//Generate Syntax annotation data for store
+            //Generate Syntax annotation data for store
             if ((Constants.STORE.equals(processorType))) {
                 processorMetaData.setSyntax(storeSyntaxGeneration(extensionAnnotation,
                         parameterDataTypeMap));
             }
 
-//Adding Example annotation data
+            //Adding Example annotation data
             if (extensionAnnotation.examples().length > 0) {
                 // When multiple examples are present
                 List<ExampleMetaData> examplesList = new ArrayList<>();

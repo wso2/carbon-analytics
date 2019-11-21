@@ -55,12 +55,10 @@ public class ProcessorMetaData {
     }
 
     public List<ExampleMetaData> getExamples() {
-
         return examples;
     }
 
     public void setExamples(List<ExampleMetaData> examples) {
-
         this.examples = examples;
     }
 
@@ -105,12 +103,10 @@ public class ProcessorMetaData {
     }
 
     public List<SyntaxMetaData> getSyntax() {
-
         return syntax;
     }
 
     public void setSyntax(List<SyntaxMetaData> syntax) {
-
         this.syntax = syntax;
     }
 
