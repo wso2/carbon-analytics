@@ -55,12 +55,10 @@ public class ParameterMetaData {
     }
 
     public Boolean isDynamic() {
-
         return dynamic;
     }
 
     public void setDynamic(Boolean dynamic) {
-
         this.dynamic = dynamic;
     }
 
