@@ -17,14 +17,16 @@
  *
  */
 
+import Qs from 'qs';
 import AuthenticationAPI from '../api/AuthenticationAPI';
+import { Constants } from '../components/auth/Constants';
+
 
 /**
  * Name of the session cookie
  */
 const SESSION_USER_COOKIE = 'BR_USER';
 const REFRESH_TOKEN_VALIDITY_PERIOD = 604800;
-const RTK = 'RTK';
 
 /**
  * App context
@@ -91,7 +93,7 @@ export default class AuthManager {
      * @returns {Object}        User object
      */
     static getUser() {
-        const buffer = AuthManager.getCookie(SESSION_USER_COOKIE);
+        const buffer = AuthManager.getCookie(Constants.SESSION_USER_COOKIE);
         return buffer ? JSON.parse(buffer) : null;
     }
 
@@ -100,15 +102,15 @@ export default class AuthManager {
      * @param {Object} user     User object
      */
     static setUser(user) {
-        AuthManager.setCookie(SESSION_USER_COOKIE, JSON.stringify(user), null, window.contextPath);
+        AuthManager.setCookie(Constants.SESSION_USER_COOKIE, JSON.stringify(user), null, window.contextPath);
     }
 
     /**
      * Discards active user session
      */
     static discardSession() {
-        AuthManager.deleteCookie(SESSION_USER_COOKIE);
-        AuthManager.deleteCookie(RTK);
+        AuthManager.deleteCookie(Constants.SESSION_USER_COOKIE);
+        AuthManager.deleteCookie(Constants.REFRESH_TOKEN_COOKIE);
         window.localStorage.clear();
     }
 
@@ -118,6 +120,15 @@ export default class AuthManager {
      */
     static isLoggedIn() {
         return !!AuthManager.getUser();
+    }
+
+    /**
+     * Check if SSO authenticated.
+     *
+     * @returns {boolean}
+     */
+    static isSSOAuthenticated() {
+        return !!this.getSSOUserCookie();
     }
 
     /**
@@ -167,10 +178,39 @@ export default class AuthManager {
                     // If rememberMe, set refresh token into a persistent cookie, otherwise a session cookie
                     const refreshTokenValidityPeriod =
                         AuthManager.isRememberMeSet() ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
-                    AuthManager.setCookie(RTK, lID, refreshTokenValidityPeriod, window.contextPath);
+                    AuthManager.setCookie(Constants.REFRESH_TOKEN_COOKIE, lID, refreshTokenValidityPeriod,
+                        window.contextPath);
                     resolve();
                 })
                 .catch(error => reject(error));
+        });
+    }
+
+    /**
+     * Authenticate user via SSO.
+     *
+     * @returns {Promise<any>}
+     */
+    static ssoAuthenticate() {
+        return new Promise((resolve, reject) => {
+            AuthenticationAPI.login('', '', true, 'authorization_code')
+                .catch((e) => {
+                    if (e.response.status === 302) {
+                        let scope = 'openid';
+                        if (e.response.data.scope) {
+                            scope = e.response.data.scope;
+                        }
+                        let redirectUrl = e.response.data.redirectUrl + '?' + Qs.stringify({
+                            response_type: 'code',
+                            client_id: e.response.data.clientId,
+                            scope: scope,
+                            redirect_uri: e.response.data.callbackUrl,
+                        });
+                        resolve(redirectUrl);
+                    } else {
+                        reject(e);
+                    }
+                });
         });
     }
 
@@ -183,12 +223,19 @@ export default class AuthManager {
             AuthenticationAPI
                 .getAccessTokenWithRefreshToken()
                 .then((response) => {
-                    const { pID, lID, validityPeriod } = response.data;
+                    if(response.status != 200) {
+                        console.log('Error occurred while refreshing token.');
+                        this.discardSession();
+                        reject();
+                    }
+                    const {
+                        pID, lID, validityPeriod,
+                    } = response.data;
                     const username =
                         AuthManager.isRememberMeSet() ? window.localStorage.getItem('username') :
                             AuthManager.getUser().username;
                     AuthManager.setUser({
-                        username,
+                        username: username,
                         SDID: pID,
                         validity: validityPeriod,
                         expires: AuthManager.calculateExpiryTime(validityPeriod),
@@ -196,12 +243,16 @@ export default class AuthManager {
                     // If rememberMe, set refresh token into a persistent cookie else session cookie.
                     const refreshTokenValidityPeriod =
                         AuthManager.isRememberMeSet() ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
-                    AuthManager.setCookie(RTK, lID, refreshTokenValidityPeriod, window.contextPath);
+                    AuthManager.setCookie(Constants.REFRESH_TOKEN_COOKIE, lID, refreshTokenValidityPeriod,
+                        window.contextPath);
                     resolve();
                 })
                 .catch(error => reject(error));
         });
     }
+
+
+
 
     /**
      * Logs out the user by revoking tokens and clearing the session
@@ -217,6 +268,41 @@ export default class AuthManager {
                 })
                 .catch(error => reject(error));
         });
+    }
+
+    /**
+     * Loogut user via SSO.
+     *
+     * @returns {Promise<any>}
+     */
+    static ssoLogout() {
+        return new Promise((resolve, reject) => {
+            AuthenticationAPI.ssoLogout(AuthManager.getUser().SDID, AuthManager.getCookie(Constants.ID_TOKEN_COOKIE))
+                .then((response) => {
+                    AuthManager.discardSession();
+                    resolve(response.data.externalLogoutUrl);
+                })
+                .catch((error) => reject(error));
+        })
+    }
+
+    /**
+     * Get authentication type.
+     *
+     * @returns {*}
+     */
+    static getAuthType() {
+        return AuthenticationAPI.getAuthType();
+    }
+
+    /**
+     * Get SSO user cookie.
+     *
+     * @returns {null}
+     */
+    static getSSOUserCookie() {
+        const buffer = AuthManager.getCookie(Constants.USER_DTO_COOKIE);
+        return buffer ? JSON.parse(buffer) : null;
     }
 
     /**
