@@ -4,8 +4,8 @@
 define(['jquery', 'lodash', 'log', 'file_browser', 'js_tree'],
     function ($,  _, log, FileBrowser, jsTree) {
 
-        var SiddhiAppSelectorDialog = function (application, form) {
-            var siddhiAppSelectorStep = form.find("#siddiAppsTree");
+        var SiddhiAppSelectorDialog = function (application, form, exportType) {
+            var siddhiAppSelectorStep = form.find("#siddhi-apps-tree");
             var openFileWizardError = form.find("#select-siddhi-app");
             var fileBrowser = new FileBrowser({
                 container: siddhiAppSelectorStep,
@@ -19,35 +19,41 @@ define(['jquery', 'lodash', 'log', 'file_browser', 'js_tree'],
             this.fileBrowser = fileBrowser;
             this.openFileWizardError = openFileWizardError;
             this.pathSeparator = application.getPathSeperator();
+            this.exportType = exportType;
+            this.form = form;
 
         };
 
         SiddhiAppSelectorDialog.prototype.constructor = SiddhiAppSelectorDialog;
 
         SiddhiAppSelectorDialog.prototype.render = function () {
+            let self = this;
             var openFileWizardError = this.openFileWizardError;
             var fileBrowser = this.fileBrowser;
             var siddhiAppSelectorStep = this.siddhiAppSelectorStep;
+
+            if (self.exportType == 'docker') {
+                self.form.find("#sp-name-input-row").hide();
+            }
 
             fileBrowser.render();
             siddhiAppSelectorStep.on('ready.jstree', function () {
                 siddhiAppSelectorStep.jstree("open_all");
             });
-            fileBrowser.on("selected", function () {
+            fileBrowser.on("selected", function (events) {
                 openFileWizardError.css('opacity', '0.6');
                 openFileWizardError.css('background-color', 'transparent');
+                if (events.length > 0) {
+                   var i;
+                   for(i=0; i < events.length; i++) {
+                       if(events[i].endsWith('.siddhi')){
+                          self.form.find("#sp-name-input-field").text(events[i]);
+                          break;
+                       }
+                   }
+                }
             });
 
-        };
-        
-        SiddhiAppSelectorDialog.prototype.validateSiddhiAppSelection = function () {
-            var files = this.fileBrowser.getSelected();
-            if (files.length === 0) {
-                this.openFileWizardError.css('opacity', '1.0');
-                this.openFileWizardError.css('background-color', '#d9534f !important');
-                return false;
-            }
-            return true;
         };
 
         SiddhiAppSelectorDialog.prototype.getSiddhiApps = function () {

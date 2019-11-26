@@ -19,9 +19,13 @@ define(['require', 'lodash', 'jquery'],
         DockerConfigDialog.prototype.render = function () {
             var self = this;
             var dockerDownloadCheckboxInput = self.container.find("#download-docker-artifacts");
+            var dockerDownloadCheckboxText = self.container.find("#download-docker-artifacts-label");
+            var dockerPushCheckboxInput = self.container.find("#docker-push-checkbox");
             if (self.exportType === "kubernetes") {
-                dockerDownloadCheckboxInput.prop('checked', true);
-                dockerDownloadCheckboxInput.attr("disabled", true);
+                dockerDownloadCheckboxInput.hide();
+                dockerPushCheckboxInput.hide();
+                dockerDownloadCheckboxText.hide();
+                self.dockerDetailsForm.show();
             } else {
                 dockerDownloadCheckboxInput.prop('checked', true);
             }
@@ -48,11 +52,11 @@ define(['require', 'lodash', 'jquery'],
 
             self.container.find("#docker-details").on('input', function() {
                 var imageName = self.container.find("#docker-img-name-input-field").val();
-                var userName = self.container.find("#userName").val();
+                var userName = self.container.find("#username").val();
                 var password = self.container.find("#password").val();
                 var email = self.container.find("#email").val();
                 var pushDocker = self.container.find("#docker-push-checkbox").is(":checked");
-                if (pushDocker) {
+                if (pushDocker || self.exportType === "kubernetes") {
                     var upperCase = new RegExp('[A-Z]');
                     if (!imageName.match(upperCase)) {
                         self.dockerNameInUpperError.hide();
@@ -70,7 +74,7 @@ define(['require', 'lodash', 'jquery'],
             var self = this;
             var templateKeyValue = {};
             templateKeyValue["imageName"] = self.container.find("#docker-img-name-input-field").val();
-            templateKeyValue["userName"] = self.container.find("#userName").val();
+            templateKeyValue["userName"] = self.container.find("#username").val();
             templateKeyValue["password"] = self.container.find("#password").val();
             templateKeyValue["email"] = self.container.find("#email").val();
             templateKeyValue["downloadDocker"] = self.container.find("#download-docker-artifacts").is(":checked");
@@ -87,14 +91,13 @@ define(['require', 'lodash', 'jquery'],
             if (!pushDocker && !downloadArtifacts) {
                 self.stepDesciption.css('opacity', '1.0');
                 self.stepDesciption.css('background-color', '#d9534f !important');
-                return false;
             }
 
             var imageName = self.container.find("#docker-img-name-input-field").val();
-            var userName = self.container.find("#userName").val();
+            var userName = self.container.find("#username").val();
             var password = self.container.find("#password").val();
             var email = self.container.find("#email").val();
-            if (pushDocker) {
+            if (pushDocker || self.exportType === "kubernetes") {
 
                 var upperCase = new RegExp('[A-Z]');
                 if (imageName.match(upperCase)) {

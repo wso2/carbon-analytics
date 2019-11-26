@@ -567,6 +567,10 @@
         prev: function () {
             this._showPrevious();
         },
+        // Update the original library to move given no. of steps to use in K8s export
+        goToStep: function (stepNum) {
+            this._showStep(stepNum);
+        },
         reset: function () {
             // Trigger "beginReset" event
             if (this._triggerEvent("beginReset") === false) {
