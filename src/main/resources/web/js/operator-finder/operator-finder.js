@@ -16,8 +16,9 @@
  * under the License.
  */
 
-define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-editor/completion-engine'],
-    function ($, _, log, Handlebars, DesignViewUtils, CompletionEngine) {
+
+define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils', 'app/source-editor/completion-engine'],
+    function ($, _, log, Remarkable, Handlebars, DesignViewUtils, CompletionEngine) {
         /**
          * Load operators from the Completion engine.
          *
@@ -126,7 +127,80 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
         };
 
         /**
-         * Flattens the metadata structure into an array ti reduce the search complexity.
+         * replacing the pipeline and newline character for md conversation.
+         * @param data string variable
+         * @returns {""} retrun string data
+         */
+        var pipelineNewlineEscape = function (data) {
+            return data.replace(/[|]/g, '&#124;').replace(/[\n]/g, '<br/>');
+        }
+
+        /**
+         * mdconvertion which converst md data into html.
+         * @param cloneOperator extension object
+         * @returns {*{}} return extension object which contains converted md
+         */
+        var mdConversion = function (cloneOperator) {
+            //Add remarkable instance to convert md type data into html
+            var markDownConvertor = new Remarkable({
+                html: true, // Enable HTML tags in source
+                xhtmlOut: false, // Use '/' to close single tags (<br />)
+                breaks: false, // Convert '\n' in paragraphs into <br>
+                linkify: true, // Autoconvert URL-like text to links
+                // Enable some language-neutral replacement + quotes beautification
+                typographer: false,
+                // Double + single quotes replacement pairs, when typographer enabled,
+                // and smartquotes on. Set doubles to '«»' for Russian, '„“' for German.
+                quotes: '“”‘’',
+                highlight: function (/*str, lang*/) {
+                    return '';
+                }
+            });
+            if (cloneOperator.description) {
+                cloneOperator.extensionDescription = markDownConvertor.render(cloneOperator.description);
+            }
+            if (cloneOperator.examples) {
+                cloneOperator.example = "";
+                cloneOperator.examples.forEach(function (e, i) {
+                    //change the "|" as "," and "\n" as "<br/> in returnAttributes description to avoid md
+                    // conversation bug.
+                    e.syntax = pipelineNewlineEscape(e.syntax);
+                    cloneOperator.example += "<h5>example " + (++i) + "</h5>"
+                        + "<pre>" + e.syntax + "</pre>" + "<p>" + e.description + "</p>";
+                });
+                cloneOperator.example = markDownConvertor.render(cloneOperator.example);
+            }
+            if (cloneOperator.parameters) {
+                cloneOperator.parameterTable = "| Name | Possible DataTypes | Description | " +
+                    "Default Value | Optional | Dynamic | " + "\n" +
+                    "| ------| ------| -----------|" +
+                    " ------| ------| ------|\n";
+                cloneOperator.parameters.forEach(function (m) {
+                    //change the "|" as "," and "\n" as "<br/> in returnAttributes description to avoid md
+                    // conversation bug.
+                    m.description = pipelineNewlineEscape(m.description);
+                    cloneOperator.parameterTable += " | " + m.name + " | " + m.type.join('<br/>') + " | " +
+                        m.description + " | " + m.defaultValue + " | " + m.optional + " | "
+                        + m.dynamic + " | " + "\n";
+                });
+                cloneOperator.parameterTable = markDownConvertor.render(cloneOperator.parameterTable);
+            }
+            if (cloneOperator.returnAttributes) {
+                cloneOperator.returnTable = "| Name | DataTypes | Description |\n " +
+                    "| ------| ------| -----------|\n";
+                cloneOperator.returnAttributes.forEach(function (m) {
+                    //change the "|" as "," and "\n" as "<br/> in returnAttributes description to avoid md
+                    // conversation bug.
+                    m.description = pipelineNewlineEscape(m.description);
+                    cloneOperator.returnTable += " | " + m.name + " | " + m.type.join('<br/>') + " | " +
+                        m.description + " | \n";
+                });
+                cloneOperator.returnTable = markDownConvertor.render(cloneOperator.returnTable);
+            }
+            return cloneOperator;
+        }
+        /**
+         * Flattens the metadata structure into an array it reduce the search complexity.
          *
          * @param meta Operator metadata
          * @returns {*[]} Array of operators
@@ -138,10 +212,10 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
             for (type in meta.inBuilt) {
                 if (meta.inBuilt.hasOwnProperty(type)) {
                     meta.inBuilt[type].forEach(function (operator) {
-                        var op = _.clone(operator);
-                        op.fqn = op.name;
-                        op.type = type;
-                        operators.push(op);
+                        var cloneOperator = _.clone(operator);
+                        cloneOperator.fqn = cloneOperator.name;
+                        cloneOperator.type = type;
+                        operators.push(mdConversion(cloneOperator));
                     });
                 }
             }
@@ -150,16 +224,16 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
             });
 
             // Flatten extensions.
-            var extensions = []
+            var extensions = [];
             for (var extension in meta.extensions) {
                 if (meta.extensions.hasOwnProperty(extension)) {
                     for (type in meta.extensions[extension]) {
                         if (meta.extensions[extension].hasOwnProperty(type)) {
                             meta.extensions[extension][type].forEach(function (operator) {
-                                var op = _.clone(operator);
-                                op.fqn = op.namespace + ':' + op.name;
-                                op.type = type;
-                                extensions.push(op)
+                                var cloneOperator = _.clone(operator);
+                                cloneOperator.fqn = cloneOperator.namespace + ':' + cloneOperator.name;
+                                cloneOperator.type = type;
+                                extensions.push(mdConversion(cloneOperator));
                             });
                         }
                     }
@@ -320,14 +394,15 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
         };
 
         /**
-         * Copies the syntax into the clipboard.
+         * copy the each clipboard syntax of extension.
          *
          * @param index Operator index
-         * @param container Current container to find the context.
+         * @param exIndex clipboard syntax
+         * @param container container Current container to find the context
          */
-        OperatorFinder.prototype.copyToClipboard = function (index, container) {
+        OperatorFinder.prototype.copyToClipboard = function (index, exIndex, container) {
             if (this._operators[index]) {
-                var syntax = buildSyntax(this._operators[index]);
+                var syntax = this._operators[index].syntax[exIndex].clipboardSyntax;
                 container.find('.copyable-text').val(syntax).select();
                 document.execCommand('copy');
             }
@@ -368,10 +443,11 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                 $('.nano').nanoScroller();
             });
 
-            // Event handler for modal's copy to clipboard event.
-            modalContent.on('click', '#btn-copy-to-clipboard', function () {
+            // Event handler for modal's extension syntax copy to clipboard event.
+            modalContent.on('click', '.copy-to-clipboard', function () {
                 var index = detailsModal.find('#operator-name').data('index');
-                self.copyToClipboard(index, modalContent);
+                var exIndex = $(this).data('clip-index');
+                self.copyToClipboard(index, exIndex, modalContent);
                 alertCopyToClipboardMessage(modalContent.find('.copy-status-msg'));
             });
 
@@ -398,16 +474,9 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                 e.preventDefault();
                 var index = $(this).closest('.result').data('index');
                 var data = _.clone(self._operators[index]);
-                if (data.parameters) {
-                    data.parameters.forEach(function (p) {
-                        p.dataTypes = p.type.join('<br />');
-                    });
-                }
-                if (data.returnAttributes) {
-                    data.returnAttributes.forEach(function (r) {
-                        r.dataTypes = r.type.join('<br />');
-                    });
-                }
+
+                data.hasSyntax = (data.syntax || []).length > 0;
+                data.hasExamples = (data.examples || []).length > 0;
                 data.hasParameters = (data.parameters || []).length > 0;
                 data.hasReturnAttributes = (data.returnAttributes || []).length > 0;
                 data.index = index;
@@ -442,8 +511,9 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
             // Event handler for copy syntax to clipboard.
             resultContent.on('click', 'a.copy-to-clipboard', function (e) {
                 e.preventDefault();
+                var firstIndex = 0;
                 var resultElement = $(this).closest('.result');
-                self.copyToClipboard(resultElement.data('index'), $('#operator-finder'));
+                self.copyToClipboard(resultElement.data('index'), firstIndex, $('#operator-finder'));
                 alertCopyToClipboardMessage(resultElement.find('.copy-status-msg'));
             });
 

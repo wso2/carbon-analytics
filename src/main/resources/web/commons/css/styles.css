@@ -1674,3 +1674,134 @@ div.dataTables_wrapper div.dataTables_info {
     padding: 7px;
     border-left: 1px solid #494949;
 }
+
+/*model extra classes*/
+
+.extension > h4 {
+    font-weight: bold;
+    color: #b7b7b7;
+}
+
+div.extension-description > p > code,
+div.extension-description > p {
+    font-size: 17px;
+    color: #b7b7b7;
+}
+
+div.extension-description > p > code {
+    background: #383838 !important;
+    border-radius: 8px;
+}
+
+div#syntax > table {
+    background: #313131;
+    color: #b7b7b7;
+    width: 100%;
+}
+
+div#syntax > table > tbody > tr:hover td:not(.dataTables_empty) {
+    background: #383838 !important;
+}
+
+div#syntax > table > tbody > tr > td {
+    font-size: 17px;
+    padding: 15px;
+}
+
+.title-bold {
+    font-weight: bold;
+}
+
+td#float-right {
+    float: right;
+}
+
+div.extension-table > table {
+    background: #242424;
+    color: #b7b7b7;
+    font-weight: normal;
+    font-size: medium;
+    font-style: normal;
+    text-align: start;
+    font-variant: normal;
+    width: 100%;
+}
+
+div.extension-table > table > tbody > tr > td > code {
+    background: #383838 !important;
+    color: #b7b7b7;
+    font-width: bold;
+    border-radius: 8px;
+}
+
+div.extension-table > table > tbody > tr:nth-of-type(2n+1) {
+    background-color: #313131;
+}
+
+div.extension-table > table > tbody > tr:hover td:not(.dataTables_empty) {
+    background: #383838 !important;
+}
+
+div.extension-table > table, div.extension-table > table > tbody > tr > td,
+div.extension-table > table > thead > tr > th {
+    border: 1px solid #424242;
+}
+
+div.extension-table > table > thead > tr > th {
+    font-weight: bold;
+    border-bottom: 0 none;
+    border-top: none !important;
+    padding: 8px;
+    line-height: 1.42857;
+    vertical-align: top;
+}
+
+div.example > p {
+    font-size: 17px;
+    color: #b7b7b7;
+}
+
+div.example > h5 {
+    font-size: 17px;
+    font-weight: bold;
+    color: #b7b7b7;
+}
+
+div.example > p > code {
+    background: #383838 !important;
+    color: #b7b7b7;
+    border-radius: 8px;
+}
+
+div.example > pre {
+    background: #313131;
+    font-size: 17px;
+    color: #b7b7b7;
+}
+
+div.scrollbar > pre {
+    overflow-x: auto;
+}
+
+div.scrollbar > pre::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    background-color: #777;
+    border-radius: 6px;
+}
+
+div.scrollbar > pre::-webkit-scrollbar {
+    border-radius: 6px;
+    width: 5px;
+    height: 10px;
+    background-color: #F5F5F5;
+}
+
+div.scrollbar > pre::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+    background-color: #FFF;
+    background-image: -webkit-gradient(linear, 20% 0%,
+    75% 84%,
+    from(#555),
+    to(#555),
+    color-stop(.6, #555))
+}
