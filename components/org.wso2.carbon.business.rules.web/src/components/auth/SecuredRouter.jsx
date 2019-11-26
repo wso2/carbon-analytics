@@ -40,73 +40,82 @@ const appContext = window.contextPath;
  * Represents the App's router, which is accessible after a successful login
  */
 export default class SecuredRouter extends Component {
+  constructor() {
+    super();
+    this.handleSessionInvalid = this.handleSessionInvalid.bind(this);
+    window.handleSessionInvalid = this.handleSessionInvalid;
+  }
 
-    constructor() {
-        super();
-        this.handleSessionInvalid = this.handleSessionInvalid.bind(this);
-        window.handleSessionInvalid = this.handleSessionInvalid;
-    }
-
-    handleSessionInvalid() {
-        this.forceUpdate();
-    }
-
-    componentWillMount() {
-        setInterval(() => {
-            if (AuthManager.getUser()) {
-                const expiresOn = new Date(AuthManager.getUser().expires);
-                const skew = 100;
-                if ((expiresOn - new Date()) / 1000 < skew) {
-                    AuthManager.authenticateWithRefreshToken();
-                }
-            }
-        }, 60000);
-    }
-
-    render() {
-        // If the user is not logged in, redirect to the login page.
-        if (!AuthManager.isLoggedIn()) {
-            let referrer = this.props.location.pathname;
-            const arr = referrer.split('');
-            if (arr[arr.length - 1] !== '/') {
-                referrer += '/';
-            }
-
-            const params = Qs.stringify({ referrer });
-            return (
-                <Redirect to={{ pathname: `${appContext}/login`, search: params }} />
-            );
+  componentWillMount() {
+    const { history } = this.props;
+    setInterval(() => {
+      if (AuthManager.getUser()) {
+        const expiresOn = new Date(AuthManager.getUser().expires);
+        const skew = 100;
+        if ((expiresOn - new Date()) / 1000 < skew) {
+          const authPromise = AuthManager.authenticateWithRefreshToken();
+          authPromise.then(() => {
+            console.debug('Token refresh successful.');
+          }).catch(() => {
+            console.log('Token refresh failed.');
+            history.push('/login');
+          });
         }
+      } else {
+        history.push('/login');
+      }
+    }, 60000);
+  }
 
-        return (
-            <Switch>
-                <div>
-                    <Redirect to={`${appContext}/businessRulesManager`} />
-                    <Route exact path={`${appContext}/businessRuleCreator`} component={BusinessRuleCreator} />
-                    <Route
-                        exact
-                        path={`${appContext}/businessRuleFromScratchForm/:formMode/` +
-                        'templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?'}
-                        component={BusinessRuleFromScratchForm}
-                    />
-                    <Route
-                        exact
-                        path={`${appContext}/businessRuleFromTemplateForm/:formMode/` +
-                        'templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?'}
-                        component={BusinessRuleFromTemplateForm}
-                    />
-                    <Route exact path={`${appContext}/businessRulesManager`} component={BusinessRulesManager} />
-                    <Route
-                        exact
-                        path={`${appContext}/templateGroupSelector/:mode`}
-                        component={TemplateGroupSelector}
-                    />
-                </div>
-            </Switch>
-        );
+  handleSessionInvalid() {
+    this.forceUpdate();
+  }
+
+  render() {
+    // If the user is not logged in, redirect to the login page.
+    if (!AuthManager.isLoggedIn()) {
+      const { location } = this.props;
+      let referrer = location.pathname;
+      const arr = referrer.split('');
+      if (arr[arr.length - 1] !== '/') {
+        referrer += '/';
+      }
+
+      const params = Qs.stringify({ referrer });
+      return (
+        <Redirect to={{ pathname: `${appContext}/login`, search: params }} />
+      );
     }
+
+    return (
+      <Switch>
+        <div>
+          <Redirect to={`${appContext}/businessRulesManager`} />
+          <Route exact path={`${appContext}/businessRuleCreator`} component={BusinessRuleCreator} />
+          <Route
+            exact
+            path={`${appContext}/businessRuleFromScratchForm/:formMode/`
+                        + 'templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?'}
+            component={BusinessRuleFromScratchForm}
+          />
+          <Route
+            exact
+            path={`${appContext}/businessRuleFromTemplateForm/:formMode/`
+                        + 'templateGroup/:templateGroupUUID?/businessRule/:businessRuleUUID?'}
+            component={BusinessRuleFromTemplateForm}
+          />
+          <Route exact path={`${appContext}/businessRulesManager`} component={BusinessRulesManager} />
+          <Route
+            exact
+            path={`${appContext}/templateGroupSelector/:mode`}
+            component={TemplateGroupSelector}
+          />
+        </div>
+      </Switch>
+    );
+  }
 }
 
 SecuredRouter.propTypes = {
-    location: PropTypes.string.isRequired,
+  location: PropTypes.object.isRequired,
 };
