@@ -33,12 +33,14 @@ import FormPanel from '../common/FormPanel';
 import Header from '../common/Header';
 // Auth Utils
 import AuthManager from '../../utils/AuthManager';
+import { Constants } from './Constants';
 
 
 /**
  * App context
  */
 const appContext = window.contextPath;
+
 
 const styles = {
   cookiePolicy: {
@@ -66,31 +68,96 @@ export default class Login extends Component {
       password: '',
       authenticated: false,
       rememberMe: false,
-      referrer: '/',
+      authType: Constants.AUTH_TYPE_UNKNOWN,
     };
+    this.setReferrer(this.getReferrerFromQueryString());
     this.authenticate = this.authenticate.bind(this);
   }
 
   componentWillMount() {
+    AuthManager.getAuthType()
+      .then((response) => {
+        if (response.data.authType === Constants.AUTH_TYPE_SSO) {
+          this.initSSOAuthenticationFlow();
+        } else {
+          this.initDefaultAuthenticationFlow();
+        }
+        this.setState({ authType: response.data.authType });
+      }).catch((e) => {
+        console.error('Unable to get the authentication type. ', e);
+      });
+  }
+
+
+  /**
+   * Get the referrer URL for the redirection after successful login.
+   * @returns {string | string}
+   */
+  getReferrer() {
+    const referrer = localStorage.getItem(Constants.REFERRER_KEY);
+    localStorage.removeItem(Constants.REFERRER_KEY);
+    return referrer || '/';
+  }
+
+  /**
+   * Set referrer URL to the local storage.
+   * @param referrer
+   */
+  setReferrer(referrer) {
+    if (localStorage.getItem(Constants.REFERRER_KEY) == null) {
+      localStorage.setItem(Constants.REFERRER_KEY, referrer);
+    }
+  }
+
+  getReferrerFromQueryString() {
+    const { location } = this.props;
+    const queryString = location.search.replace(/^\?/, '');
+    return Qs.parse(queryString).referrer || '/';
+  }
+
+  /**
+   * Initializes the default authentication flow
+   */
+  initDefaultAuthenticationFlow() {
     if (AuthManager.isRememberMeSet() && !AuthManager.isLoggedIn()) {
-      AuthManager.authenticateWithRefreshToken().then(() => this.setState({ authenticated: true }));
+      AuthManager.authenticateWithRefreshToken()
+        .then(() => this.setState({
+          authenticated: true,
+        }));
     }
   }
 
   /**
-   * Extracts the referrer and checks whether the user has been logged-in
+   * Initializes the SSO authentication flow.
    */
-  componentDidMount() {
-    // Extract referrer from the query string.
-    const queryString = this.props.location.search.replace(/^\?/, '');
-    const params = Qs.parse(queryString);
-    if (params.referrer) {
-      this.state.referrer = params.referrer;
-    }
-
-    // If the user already logged in set the state to redirect user to the referrer page.
-    if (AuthManager.isLoggedIn()) {
-      this.state.authenticated = true;
+  initSSOAuthenticationFlow() {
+    if (AuthManager.isSSOAuthenticated()) {
+      const {
+        authUser, pID, lID, validityPeriod, iID,
+      } = AuthManager.getSSOUserCookie();
+      localStorage.setItem('rememberMe', true);
+      localStorage.setItem('username', authUser);
+      AuthManager.setUser({
+        username: authUser,
+        SDID: pID,
+        validity: validityPeriod,
+        expires: AuthManager.calculateExpiryTime(validityPeriod),
+      });
+      AuthManager.setCookie(Constants.REFRESH_TOKEN_COOKIE, lID, 604800, window.contextPath);
+      AuthManager.setCookie(Constants.ID_TOKEN_COOKIE, iID, 604800, window.contextPath);
+      AuthManager.deleteCookie(Constants.USER_DTO_COOKIE);
+      this.setState({
+        authenticated: true,
+      });
+    } else {
+      // redirect the user to the service providers auth url
+      AuthManager.ssoAuthenticate()
+        .then((url) => {
+          window.location.href = url;
+        })
+        .catch((e) => {
+          console.error('Error getting SSO auth URL.');
+        });
     }
   }
 
@@ -99,25 +166,15 @@ export default class Login extends Component {
    * @param {Object} e    Event
    */
   authenticate(e) {
+    const { intl } = this.context;
+    const { username, password, rememberMe } = this.state;
     e.preventDefault();
-    AuthManager.authenticate(
-      this.state.username,
-      this.state.password,
-      this.state.rememberMe,
-    )
+    AuthManager.authenticate(username, password, rememberMe)
       .then(() => this.setState({ authenticated: true }))
       .catch((error) => {
-        const errorMessage = error.response && error.response.status === 401 ? (
-          <FormattedMessage
-            id="login.error.invalid"
-            defaultMessage="The username/password is invalid"
-          />
-        ) : (
-          <FormattedMessage
-            id="login.error.unknown"
-            defaultMessage="Unknown error occurred!"
-          />
-        );
+        const errorMessage = error.response && error.response.status === 401
+          ? intl.formatMessage({ id: 'login.error.message', defaultMessage: 'Invalid username/password!' })
+          : intl.formatMessage({ id: 'login.unknown.error', defaultMessage: 'Unknown error occurred!' });
         this.setState({
           username: '',
           password: '',
@@ -127,11 +184,7 @@ export default class Login extends Component {
       });
   }
 
-  render() {
-    // If the user is already authenticated redirect to referrer link.
-    if (this.state.authenticated) {
-      return <Redirect to={this.state.referrer} />;
-    }
+  renderDefaultLogin() {
     // const praivacy_policy = (<Link external="https://webmaker.org/en-US/terms">term</Link>);
     const cookiePolicy = (
       <a
@@ -277,8 +330,29 @@ export default class Login extends Component {
       </div>
     );
   }
+
+
+  render() {
+    const { authenticated, authType } = this.state;
+    if (authenticated) {
+      return (
+        <Redirect to={this.getReferrer()} />
+      );
+    }
+    if (authType === Constants.AUTH_TYPE_UNKNOWN) {
+      return <div />;
+    }
+    if (authType === Constants.AUTH_TYPE_SSO) {
+      return <div />;
+    }
+    return this.renderDefaultLogin();
+  }
 }
 
 Login.propTypes = {
-  location: PropTypes.string.isRequired,
+  location: PropTypes.object.isRequired,
+};
+
+Login.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
