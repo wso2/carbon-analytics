@@ -31,4 +31,7 @@ export const Constants = {
   SESSION_USER_COOKIE: 'BR_USER',
 
   REFERRER_KEY: 'referrer',
+
+  GRANT_TYPE_PASSWORD: 'password',
+  GRANT_TYPE_REFRESH: 'refresh_token',
 };

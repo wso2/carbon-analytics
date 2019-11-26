@@ -41,7 +41,6 @@ import { Constants } from './Constants';
  */
 const appContext = window.contextPath;
 
-
 const styles = {
   cookiePolicy: {
     padding: '10px',
