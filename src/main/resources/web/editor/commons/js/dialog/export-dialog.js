@@ -256,11 +256,16 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                         self._jarsSelectorDialog.render();
                                     }
                                 } else {
+                                    var dockerImageName = "";
+                                    if (self._siddhiAppSelector.getSiddhiProcessName() != "sample-siddhi-process") {
+                                        dockerImageName = self._siddhiAppSelector.getSiddhiProcessName();
+                                    }
                                     self._dockerConfigModel = new DockerConfigDialog({
                                         app: self._options,
                                         templateHeader: exportContainer.find('#docker-config-container-id'),
                                         exportType: self._exportType,
-                                        payload: self._payload
+                                        payload: self._payload,
+                                        dockerImageName: dockerImageName
                                     });
                                     self._dockerConfigModel.render();
                                 }
@@ -269,13 +274,15 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                     app: self._options,
                                     templateHeader: exportContainer.find('#docker-config-container-id'),
                                     exportType:self._exportType,
-                                    payload: self._payload
+                                    payload: self._payload,
+                                    dockerImageName: self._siddhiAppSelector.getSiddhiProcessName()
                                 });
                                 self._dockerConfigModel.render();
                             } else if (stepNumber === 7 && self._exportType === 'kubernetes') {
                                 self._kubernetesConfigModel = new KubernetesConfigDialog({
                                    app: self._options,
-                                   templateHeader: exportContainer.find('#kubernetes-configuration-step-id')
+                                   templateHeader: exportContainer.find('#kubernetes-configuration-step-id'),
+                                   siddhiProcessName: self._siddhiAppSelector.getSiddhiProcessName()
                                 });
                                 self._kubernetesConfigModel.render();
                             }
@@ -300,9 +307,19 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     if (!this._isExportDockerFlow) {
                         this._payload.kubernetesConfiguration = this._kubernetesConfigModel.getKubernetesConfigs();
                     }
-                    this._payload.dockerConfiguration = this._dockerConfigModel.getDockerConfigs();
-                    this._payload.bundles = this._jarsSelectorDialog.getSelected('bundles');
-                    this._payload.jars = this._jarsSelectorDialog.getSelected('jars');
+                    if (typeof this._dockerConfigModel == "undefined") {
+                        this._payload.dockerConfiguration = this._dockerImageTypeModel.getDockerTypeConfigs();
+                    } else {
+                        this._payload.dockerConfiguration = this._dockerConfigModel.getDockerConfigs();
+                    }
+
+                    if (typeof this._jarsSelectorDialog == "undefined") {
+                        this._payload.bundles = []
+                        this._payload.jars = []
+                    } else {
+                        this._payload.bundles = this._jarsSelectorDialog.getSelected('bundles');
+                        this._payload.jars = this._jarsSelectorDialog.getSelected('jars');
+                    }
 
                     var payloadInputField = $('<input id="payload" name="payload" type="text" style="display: none;"/>')
                         .attr('value', JSON.stringify(this._payload));

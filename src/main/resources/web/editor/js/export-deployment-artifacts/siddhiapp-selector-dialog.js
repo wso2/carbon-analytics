@@ -21,6 +21,7 @@ define(['jquery', 'lodash', 'log', 'file_browser', 'js_tree'],
             this.pathSeparator = application.getPathSeperator();
             this.exportType = exportType;
             this.form = form;
+            this.siddhiProcessName = "sample-siddhi-process";
 
         };
 
@@ -47,7 +48,19 @@ define(['jquery', 'lodash', 'log', 'file_browser', 'js_tree'],
                    var i;
                    for(i=0; i < events.length; i++) {
                        if(events[i].endsWith('.siddhi')){
-                          self.form.find("#sp-name-input-field").text(events[i]);
+                          if (events[i].endsWith('.siddhi')) {
+                             splitEvent = events[i].split("/");
+                             if (splitEvent.length > 0) {
+                                var siddhiProcessName = splitEvent[splitEvent.length-1]
+                                                            .trim().toLowerCase()
+                                                            .replace(".siddhi", "")
+                                                            .replace(/[^a-z0-9\-]/g, "-");
+                                siddhiProcessName = siddhiProcessName + "-1.0.0";
+                                self.siddhiProcessName = siddhiProcessName;
+                                self.form.find("#sp-name-input-field").val(siddhiProcessName);
+                             }
+                             break;
+                          }
                           break;
                        }
                    }
@@ -67,6 +80,11 @@ define(['jquery', 'lodash', 'log', 'file_browser', 'js_tree'],
                 }
             }
             return siddhiApps;
+        };
+
+        SiddhiAppSelectorDialog.prototype.getSiddhiProcessName = function () {
+            let self = this;
+            return self.siddhiProcessName;
         };
 
         return SiddhiAppSelectorDialog;

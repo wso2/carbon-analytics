@@ -2529,8 +2529,10 @@
             <input class="docker-checkbox" type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"><label class="label-description">Push to docker registry</label><br>
             <div class="docker-details-form" id="docker-details" hidden>
                 <div class="docker-details-row">
-                    <label class="clearfix">* Docker Image Tag:</label>
-                    <input class="file-dialog-form-control" type="text"  id="docker-img-name-input-field" placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">
+                    <label class="clearfix">* Docker Image:</label>
+                    <input class="file-dialog-form-control-mini-input" type="text"  id="docker-img-name-input-field-registry" placeholder="<DOCKER_REGISTRY_NAME>">
+                    &nbsp; / &nbsp;
+                    <input class="file-dialog-form-control-mini-input" type="text"  id="docker-img-name-input-field-image" placeholder="<IMAGE_NAME>">
                 </div>
                 <div class="docker-details-row">
                     <label class="clearfix">* Docker Username:</label>
@@ -2565,7 +2567,7 @@
             <input class="docker-checkbox" type="radio" name="docker-image-type-name" id="docker-image-type-existing" value="existing" ><label class="label-description">Use Existing Image</label><br>
             <div class="docker-details-form" id="k8s-path-docker-image-name-form" hidden>
                 <div class="docker-details-row">
-                    <label class="clearfix">* Docker Image Tag:</label>
+                    <label class="clearfix">* Docker Image:</label>
                     <input class="file-dialog-form-control" type="text" id="built-docker-image-name-input-field" placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">
                 </div>
             </div>
@@ -2584,12 +2586,11 @@
 </div>
 <div id="k8s-path-step-8" class="export-selector">
     <div class="export-kube-config-container" id="kubernetes-configuration-step-id">
-        <div class="step-description">Configure Kubernetes for Siddhi</div>
+        <div class="step-description">Add Deployment Configuration</div>
         <div class="kube-config-form">
             <div class="kube-config-row">
-                <div class="clearfix">Deployment types:</div>
                 <div class="kube-config-sub-row">
-                    <div class="clearfix">Distributed/Non-distributed</div>
+                    <div class="clearfix">Deployment Mode</div>
                     <div class="kube-input-group" id="distribution-selection">
                         <input type="radio" name="distribution" id="non-distributed" value="non-distributed"> Non distributed deployment<br>
                         <input type="radio" name="distribution" id="distributed-with-nats" value="distributed-with-nats"> Distributed deployment with NATS<br>
@@ -2597,10 +2598,10 @@
                     </div>
                 </div>
                 <div class="kube-config-sub-row">
-                    <div class="clearfix">Persistence Storage:</div>
+                    <div class="clearfix">Persistence</div>
                     <div class="kube-input-group" id="persistent-select">
-                        <input type="radio" name="persistence" id="stateless" value="stateless"> Stateless<br>
-                        <input type="radio" name="persistence" id="backed-by-pv" value="backed-by-pv"> Backed by Persistent Volume<br>
+                        <input type="radio" name="persistence" id="stateless" value="stateless"> Disable Persistence Volume<br>
+                        <input type="radio" name="persistence" id="backed-by-pv" value="backed-by-pv"> Enable Persistent Volume<br>
                     </div>
                 </div>
             </div>

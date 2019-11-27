@@ -211,7 +211,6 @@ div#step-6 {
 
 .docker-details-row input {
     height: 30px !important;
-    width: 80% !important;
     background-color: #222222 !important;
 }
 
@@ -257,4 +256,11 @@ div#step-6 {
     height: 150px !important;
     width: 80%; !important;
     margin-top: 10px !important;
+}
+
+.kube-export-persistence-dropdown {
+    text-transform: none;
+    color: #fefefe;
+    width: 30%;
+    background: #617d8b;
 }

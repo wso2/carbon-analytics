@@ -7,6 +7,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
         var KubernetesConfigDialog = function (options) {
             this.app = options.app;
             this.templateContainer = options.templateHeader;
+            this.siddhiProcessName = options.siddhiProcessName;
             this.natsConfigsGiven = false;
             this.needDefaultNats = false;
             this.pvConfigsGiven = false;
@@ -105,7 +106,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             var self = this;
             var messagingConfig ='';
             var pvConfig = '';
-            var siddhiProcessName = self.templateContainer.find("#sp-name-input-field").val() || 'sample-siddhi-process';
+            var siddhiProcessName = self.siddhiProcessName || 'sample-siddhi-process';
             var siddhiProcessNameConfig = "siddhiProcessName: ".concat(siddhiProcessName.toString());
             var messagingDefaultConfig = 'messagingSystem:\n' +
                             '  type: nats\n';
