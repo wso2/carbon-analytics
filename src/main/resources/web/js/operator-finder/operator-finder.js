@@ -53,44 +53,6 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
             namespaces.sort();
             callback(namespaces, operators);
         };
-        /**
-         * Builds operator syntax
-         *
-         * @param entry Operator
-         * @returns {string} Syntax
-         */
-        var buildSyntax = function (entry) {
-            var params = '';
-            var isStoreSinkSourceGeneration = false;
-            var namespaceValue = entry.namespace.toLowerCase();
-            if (namespaceValue === constants.STORE || namespaceValue === constants.SINK ||
-                namespaceValue === constants.SOURCE || namespaceValue === constants.SOURCE_MAPPER ||
-                namespaceValue === constants.SINK_MAPPER) {
-                if (namespaceValue === constants.SINK_MAPPER || namespaceValue === constants.SOURCE_MAPPER) {
-                    namespaceValue = constants.MAP;
-                }
-                isStoreSinkSourceGeneration = true;
-            }
-            if (entry.parameters) {
-                entry.parameters.forEach(function (p) {
-                    if (!p.optional) {
-                        if (isStoreSinkSourceGeneration) {
-                            params += ", " + p.name + "=" + "\'option_value\'";
-                        } else {
-                            params += ', ' + p.name;
-                        }
-                    }
-                });
-            }
-
-            if (isStoreSinkSourceGeneration) {
-                return (entry.namespace.length > 0 ? "@" + namespaceValue + "(type=" + "\'" + entry.name + "\'" +
-                    params + ")" : "");
-            } else {
-                return (entry.namespace.length > 0 ? namespaceValue + ':' : '') + entry.name
-                    + '(' + params.substr(2) + ')';
-            }
-        };
 
         /**
          * Checks if the content contains the token. If so returns the highlighted HTML text.
@@ -131,16 +93,16 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
          * @param data string variable
          * @returns {""} retrun string data
          */
-        var pipelineNewlineEscape = function (data) {
+        var normaliseString = function (data) {
             return data.replace(/[|]/g, '&#124;').replace(/[\n]/g, '<br/>');
         }
 
         /**
          * mdconvertion which converst md data into html.
-         * @param cloneOperator extension object
+         * @param operator extension object
          * @returns {*{}} return extension object which contains converted md
          */
-        var mdConversion = function (cloneOperator) {
+        var createMDFile = function (operator) {
             //Add remarkable instance to convert md type data into html
             var markDownConvertor = new Remarkable({
                 html: true, // Enable HTML tags in source
@@ -156,48 +118,61 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                     return '';
                 }
             });
-            if (cloneOperator.description) {
-                cloneOperator.extensionDescription = markDownConvertor.render(cloneOperator.description);
+            if (operator.description) {
+                operator.extensionDescription = markDownConvertor.render(operator.description);
             }
-            if (cloneOperator.examples) {
-                cloneOperator.example = "";
-                cloneOperator.examples.forEach(function (e, i) {
+            if (operator.examples) {
+                operator.combinedExamples = "";
+                operator.examples.forEach(function (e, i) {
                     //change the "|" as "," and "\n" as "<br/> in returnAttributes description to avoid md
                     // conversation bug.
-                    e.syntax = pipelineNewlineEscape(e.syntax);
-                    cloneOperator.example += "<h5>example " + (++i) + "</h5>"
-                        + "<pre>" + e.syntax + "</pre>" + "<p>" + e.description + "</p>";
+                    e.syntax = normaliseString(e.syntax);
+                    operator.combinedExamples += "<h5>example " + (++i) + "</h5>" +
+                        "<pre>" + e.syntax + "</pre>" +
+                        "<p>" + e.description + "</p>";
                 });
-                cloneOperator.example = markDownConvertor.render(cloneOperator.example);
+                operator.combinedExamples = markDownConvertor.render(operator.combinedExamples);
             }
-            if (cloneOperator.parameters) {
-                cloneOperator.parameterTable = "| Name | Possible DataTypes | Description | " +
+            if (operator.parameters) {
+                operator.parameterTable = "| Name | Possible DataTypes | Description | " +
                     "Default Value | Optional | Dynamic | " + "\n" +
                     "| ------| ------| -----------|" +
                     " ------| ------| ------|\n";
-                cloneOperator.parameters.forEach(function (m) {
+                operator.parameters.forEach(function (m) {
                     //change the "|" as "," and "\n" as "<br/> in returnAttributes description to avoid md
                     // conversation bug.
-                    m.description = pipelineNewlineEscape(m.description);
-                    cloneOperator.parameterTable += " | " + m.name + " | " + m.type.join('<br/>') + " | " +
-                        m.description + " | " + m.defaultValue + " | " + m.optional + " | "
+                    m.description = normaliseString(m.description);
+                    operator.parameterTable += " | " + m.name + " | "
+                        + m.type.join('<br/>') + " | " +
+                        m.description + " | "
+                        + m.defaultValue + " | "
+                        + m.optional + " | "
                         + m.dynamic + " | " + "\n";
                 });
-                cloneOperator.parameterTable = markDownConvertor.render(cloneOperator.parameterTable);
+                operator.parameterTable = markDownConvertor.render(operator.parameterTable);
             }
-            if (cloneOperator.returnAttributes) {
-                cloneOperator.returnTable = "| Name | DataTypes | Description |\n " +
-                    "| ------| ------| -----------|\n";
-                cloneOperator.returnAttributes.forEach(function (m) {
-                    //change the "|" as "," and "\n" as "<br/> in returnAttributes description to avoid md
-                    // conversation bug.
-                    m.description = pipelineNewlineEscape(m.description);
-                    cloneOperator.returnTable += " | " + m.name + " | " + m.type.join('<br/>') + " | " +
-                        m.description + " | \n";
+            if (operator.returnAttributes) {
+
+                operator.returnAttributes.forEach(function (m) {
+                    if(operator.type === "streamProcessors"){
+                        operator.returnTable = "| Name | DataTypes | Description |\n " +
+                            "| ------| ------| -----------|\n";
+                        m.description = normaliseString(m.description);
+                        operator.returnTable += " | " + m.name + " | "
+                            + m.type.join('<br/>') + " | "
+                            + m.description + " | \n";
+                    }
+                    else{
+                        operator.returnTable = "| DataTypes | Description |\n " +
+                            "| ------| -----------|\n";
+                        m.description = normaliseString(m.description);
+                        operator.returnTable +=  " | " + m.type.join('<br/>') +
+                            " | " + m.description + " | \n";
+                    }
                 });
-                cloneOperator.returnTable = markDownConvertor.render(cloneOperator.returnTable);
+                operator.returnTable = markDownConvertor.render(operator.returnTable);
             }
-            return cloneOperator;
+            return operator;
         }
         /**
          * Flattens the metadata structure into an array it reduce the search complexity.
@@ -215,7 +190,7 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                         var cloneOperator = _.clone(operator);
                         cloneOperator.fqn = cloneOperator.name;
                         cloneOperator.type = type;
-                        operators.push(mdConversion(cloneOperator));
+                        operators.push(createMDFile(cloneOperator));
                     });
                 }
             }
@@ -233,7 +208,7 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                                 var cloneOperator = _.clone(operator);
                                 cloneOperator.fqn = cloneOperator.namespace + ':' + cloneOperator.name;
                                 cloneOperator.type = type;
-                                extensions.push(mdConversion(cloneOperator));
+                                extensions.push(createMDFile(cloneOperator));
                             });
                         }
                     }
@@ -387,7 +362,7 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
          */
         OperatorFinder.prototype.addToSource = function (index) {
             if (this._operators[index]) {
-                var syntax = buildSyntax(this._operators[index]);
+                var syntax = this._operators[index].syntax[0].clipboardSyntax;
                 var aceEditor = this._activeTab.getSiddhiFileEditor().getSourceView().getEditor();
                 aceEditor.session.insert(aceEditor.getCursorPosition(), syntax);
             }
