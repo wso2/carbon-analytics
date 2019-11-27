@@ -130,10 +130,11 @@ export default class Login extends Component {
    * Initializes the SSO authentication flow.
    */
   initSSOAuthenticationFlow() {
-    if (AuthManager.isSSOAuthenticated()) {
+    const userCookie = AuthManager.getSSOUserCookie();
+    if (userCookie) {
       const {
         authUser, pID, lID, validityPeriod, iID,
-      } = AuthManager.getSSOUserCookie();
+      } = userCookie;
       localStorage.setItem('rememberMe', true);
       localStorage.setItem('username', authUser);
       AuthManager.setUser({

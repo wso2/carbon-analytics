@@ -123,15 +123,6 @@ export default class AuthManager {
     }
 
     /**
-     * Check if SSO authenticated.
-     *
-     * @returns {boolean}
-     */
-    static isSSOAuthenticated() {
-        return !!this.getSSOUserCookie();
-    }
-
-    /**
      * Checks whether remember me has been set or not
      * @returns {boolean}       Remember me status
      */
