@@ -1682,8 +1682,12 @@ div.dataTables_wrapper div.dataTables_info {
     color: #b7b7b7;
 }
 
+div.extension-description > p,
 div.extension-description > p > code,
-div.extension-description > p {
+div#syntax > table > tbody > tr > td,
+div.example > p,
+div.example > h5,
+div.example > pre {
     font-size: 17px;
     color: #b7b7b7;
 }
@@ -1704,7 +1708,6 @@ div#syntax > table > tbody > tr:hover td:not(.dataTables_empty) {
 }
 
 div#syntax > table > tbody > tr > td {
-    font-size: 17px;
     padding: 15px;
 }
 
@@ -1727,6 +1730,7 @@ div.extension-table > table {
     width: 100%;
 }
 
+div.extension-table > table > tbody > tr > td > attributename > code,
 div.extension-table > table > tbody > tr > td > code {
     background: #383838 !important;
     color: #b7b7b7;
@@ -1756,15 +1760,8 @@ div.extension-table > table > thead > tr > th {
     vertical-align: top;
 }
 
-div.example > p {
-    font-size: 17px;
-    color: #b7b7b7;
-}
-
 div.example > h5 {
-    font-size: 17px;
     font-weight: bold;
-    color: #b7b7b7;
 }
 
 div.example > p > code {
@@ -1775,8 +1772,6 @@ div.example > p > code {
 
 div.example > pre {
     background: #313131;
-    font-size: 17px;
-    color: #b7b7b7;
 }
 
 div.scrollbar > pre {
