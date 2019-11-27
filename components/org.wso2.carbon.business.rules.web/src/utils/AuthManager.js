@@ -21,7 +21,6 @@ import Qs from 'qs';
 import AuthenticationAPI from '../api/AuthenticationAPI';
 import { Constants } from '../components/auth/Constants';
 
-
 /**
  * Name of the session cookie
  */
@@ -241,9 +240,6 @@ export default class AuthManager {
                 .catch(error => reject(error));
         });
     }
-
-
-
 
     /**
      * Logs out the user by revoking tokens and clearing the session

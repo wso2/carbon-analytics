@@ -87,7 +87,6 @@ export default class Login extends Component {
       });
   }
 
-
   /**
    * Get the referrer URL for the redirection after successful login.
    * @returns {string | string}
@@ -330,7 +329,6 @@ export default class Login extends Component {
       </div>
     );
   }
-
 
   render() {
     const { authenticated, authType } = this.state;
