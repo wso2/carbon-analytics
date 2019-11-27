@@ -18,9 +18,10 @@
 
 define(['lodash', 'log', 'file_browser', 'event_channel', 'context_menu', 'bootstrap'],
     function (_, log, FileBrowser, EventChannel, ContextMenu) {
-
+        var application;
         var ExplorerItem = function (args) {
             this.app = args.application;
+            application=this.app;
             this.pathSeparator = this.app.getPathSeperator();
             _.assign(this, args);
         };
@@ -42,7 +43,7 @@ define(['lodash', 'log', 'file_browser', 'event_channel', 'context_menu', 'boots
                 header = $('<div class="folder-tree-header" role="button" href="#' + id +
                     '"+ data-toggle="collapse" aria-expanded="true" aria-controls="' +
                     id + '"></div>'),
-                body = $('<div class="collapse folder-tree-body" id="' + id +
+                body = $('<div class="folder-tree-body" id="' + id +
                     '"></div>'),
                 folderIcon = $("<i class='fw fw-folder item-icon'></i>"),
                 arrowHeadIcon = $("<i class='fw fw-right expand-icon'></i>");
@@ -71,6 +72,11 @@ define(['lodash', 'log', 'file_browser', 'event_channel', 'context_menu', 'boots
 
             body.on('hide.bs.collapse', function () {
                 arrowHeadIcon.removeClass("fw-rotate-90");
+            });
+
+            body.on('ready.jstree', function () {
+                body.jstree("open_all");
+                application.workspaceManager.updateExportArtifactsItem();
             });
 
             var fileBrowser = new FileBrowser({

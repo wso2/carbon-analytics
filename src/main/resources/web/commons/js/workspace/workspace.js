@@ -250,7 +250,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this.updateExportMenuItem();
                 this.updateRunMenuItem();
                 this.updateDeleteMenuItem();
-                this.updateExportArtifactsItem()
             };
 
             this.manageConsoles = function(evt){
@@ -486,30 +485,19 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             this.updateExportArtifactsItem = function () {
                 var exportMenuItem = app.menuBar.getMenuItemByID('export.export-for-docker'),
-                    exportKubeMenuItem = app.menuBar.getMenuItemByID('export.export-for-kubernetes');
+                    exportKubeMenuItem = app.menuBar.getMenuItemByID('export.export-for-kubernetes'),
+                    deployToServerMenuItem = app.menuBar.getMenuItemByID('deploy.deploy-to-server');
 
-                var listFilesEndpoint = app.config.services.workspace.endpoint + "/listFiles/workspace?path=" +
-                                                                        app.utils.base64EncodeUnicode("workspace");
-
-                jQuery.ajax({
-                    async: false,
-                    url: listFilesEndpoint,
-                    type: self.HTTP_GET,
-                    success: function (data) {
-                        if (data.length === 0) {
-                            exportMenuItem.disable();
-                            exportKubeMenuItem.disable();
-                        } else {
-                            exportMenuItem.enable();
-                            exportKubeMenuItem.enable();
-                        }
-                    },
-                    error: function (msg) {
-                        alerts.error("Error getting siddhi apps: " + msg.statusText);
-                        exportMenuItem.enable();
-                        exportKubeMenuItem.enable();
-                    }
-                });
+                var savedFiles = app.workspaceExplorer.treeHeader.parent().find('div[id="folder-tree_-1"] > ul').children();
+                if (savedFiles.length === 0) {
+                    exportMenuItem.disable();
+                    exportKubeMenuItem.disable();
+                    deployToServerMenuItem.disable();
+                } else {
+                    exportMenuItem.enable();
+                    exportKubeMenuItem.enable();
+                    deployToServerMenuItem.enable();
+                }
             };
 
             this.openFileSaveDialog = function openFileSaveDialog(options) {
