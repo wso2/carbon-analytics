@@ -33,6 +33,7 @@ public class ProcessorMetaData {
     private List<String[]> parameterOverloads;
     private List<AttributeMetaData> returnAttributes;
     private List<SyntaxMetaData> syntax;
+    private String type;
 
     public String getName() {
 
@@ -108,6 +109,15 @@ public class ProcessorMetaData {
 
     public void setSyntax(List<SyntaxMetaData> syntax) {
         this.syntax = syntax;
+    }
+
+    public String getType() {
+        return type;
+
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
 }

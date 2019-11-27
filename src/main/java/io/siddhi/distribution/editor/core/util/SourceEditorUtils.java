@@ -691,7 +691,7 @@ public class SourceEditorUtils {
         if (extensionAnnotation != null) {
             processorMetaData = new ProcessorMetaData();
             processorMetaData.setName(processorName);
-
+            processorMetaData.setType(processorType);
             // Adding Description annotation data
             processorMetaData.setDescription(extensionAnnotation.description());
 
