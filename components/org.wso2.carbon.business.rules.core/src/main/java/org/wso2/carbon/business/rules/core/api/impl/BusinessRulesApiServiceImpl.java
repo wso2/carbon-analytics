@@ -76,7 +76,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     public Response createBusinessRule(Request request, String businessRule, Boolean shouldDeploy) throws
             NotFoundException {
         if (!hasPermission(request, RequestMethod.CREATE_BUSINESS_RULE)) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         // convert the string received from API, as a json object
@@ -153,7 +153,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     public Response deleteBusinessRule(Request request, String businessRuleInstanceID, Boolean forceDelete)
             throws NotFoundException {
         if (!hasPermission(request, RequestMethod.DELETE_BUSINESS_RULE)) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
@@ -196,7 +196,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     public Response getBusinessRules(Request request) throws NotFoundException {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         if (!hasPermission(request, RequestMethod.GET_BUSINESS_RULES)) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
         List<Object> responseData = new ArrayList<Object>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
@@ -230,7 +230,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     public Response getRuleTemplate(Request request, String templateGroupID, String ruleTemplateID)
             throws NotFoundException {
         if (!hasPermission(request, RequestMethod.GET_RULE_TEMPLATE)) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
@@ -255,7 +255,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response getRuleTemplates(Request request, String templateGroupID) throws NotFoundException {
         if (!hasPermission(request, RequestMethod.GET_RULE_TEMPLATES)) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
@@ -283,7 +283,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response getTemplateGroup(Request request, String templateGroupID) throws NotFoundException {
         if (!hasPermission(request, RequestMethod.GET_TEMPLATE_GROUP)) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
@@ -307,7 +307,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response getTemplateGroups(Request request) throws NotFoundException {
         if (!hasPermission(request, RequestMethod.GET_TEMPLATE_GROUPS)) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
@@ -335,7 +335,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response loadBusinessRule(Request request, String businessRuleInstanceID) throws NotFoundException {
         if (!hasPermission(request, RequestMethod.LOAD_BUSINESS_RULE)) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
@@ -359,7 +359,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response loadDeploymentInfo(Request request, String businessRuleInstanceID) throws NotFoundException {
         if (!hasPermission(request, RequestMethod.LOAD_BUSINESS_RULE)) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
         List<Object> responseData = new ArrayList<>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
@@ -403,7 +403,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     public Response deployOrUndeployBusinessRule(Request request, String businessRuleInstanceID,
                                                  boolean shouldUndeploy) throws NotFoundException {
         if (!hasPermission(request, RequestMethod.REDEPLOY_BUSINESS_RULE)) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
 
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
@@ -473,7 +473,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     public Response updateBusinessRule(Request request, Object businessRule,
                                        String businessRuleInstanceID, Boolean deploy) throws NotFoundException {
         if (!hasPermission(request, RequestMethod.UPDATE_BUSINESS_RULE)) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         List<Object> responseData = new ArrayList<Object>();
