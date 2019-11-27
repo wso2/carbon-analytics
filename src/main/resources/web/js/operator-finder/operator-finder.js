@@ -93,14 +93,14 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
          * @param data string variable
          * @returns {""} retrun string data
          */
-        var normaliseString = function (data) {
+        let sanitiseString = function (data) {
             return data.replace(/[|]/g, '&#124;').replace(/[\n]/g, '<br/>');
-        }
+        };
 
         /**
          * mdconvertion which converst md data into html.
          * @param operator extension object
-         * @returns {*{}} return extension object which contains converted md
+         * @returns return extension object which contains converted md
          */
         var createMDFile = function (operator) {
             //Add remarkable instance to convert md type data into html
@@ -126,7 +126,7 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                 operator.examples.forEach(function (e, i) {
                     //change the "|" as "," and "\n" as "<br/> in returnAttributes description to avoid md
                     // conversation bug.
-                    e.syntax = normaliseString(e.syntax);
+                    e.syntax = sanitiseString(e.syntax);
                     operator.combinedExamples += "<h5>example " + (++i) + "</h5>" +
                         "<pre>" + e.syntax + "</pre>" +
                         "<p>" + e.description + "</p>";
@@ -141,7 +141,7 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                 operator.parameters.forEach(function (m) {
                     //change the "|" as "," and "\n" as "<br/> in returnAttributes description to avoid md
                     // conversation bug.
-                    m.description = normaliseString(m.description);
+                    m.description = sanitiseString(m.description);
                     operator.parameterTable += " | " + m.name + " | "
                         + m.type.join('<br/>') + " | " +
                         m.description + " | "
@@ -157,7 +157,7 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                     if(operator.type === "streamProcessors"){
                         operator.returnTable = "| Name | DataTypes | Description |\n " +
                             "| ------| ------| -----------|\n";
-                        m.description = normaliseString(m.description);
+                        m.description = sanitiseString(m.description);
                         operator.returnTable += " | " + m.name + " | "
                             + m.type.join('<br/>') + " | "
                             + m.description + " | \n";
@@ -165,7 +165,7 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                     else{
                         operator.returnTable = "| DataTypes | Description |\n " +
                             "| ------| -----------|\n";
-                        m.description = normaliseString(m.description);
+                        m.description = sanitiseString(m.description);
                         operator.returnTable +=  " | " + m.type.join('<br/>') +
                             " | " + m.description + " | \n";
                     }
@@ -486,9 +486,8 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
             // Event handler for copy syntax to clipboard.
             resultContent.on('click', 'a.copy-to-clipboard', function (e) {
                 e.preventDefault();
-                var firstIndex = 0;
                 var resultElement = $(this).closest('.result');
-                self.copyToClipboard(resultElement.data('index'), firstIndex, $('#operator-finder'));
+                self.copyToClipboard(resultElement.data('index'), 0, $('#operator-finder'));
                 alertCopyToClipboardMessage(resultElement.find('.copy-status-msg'));
             });
 
