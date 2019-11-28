@@ -16,9 +16,8 @@
  * under the License.
  */
 
-define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 'annotationObject', 'annotationElement',
-        'constants'],
-    function (log, $, _, Attribute, StoreAnnotation, Handlebars, AnnotationObject, AnnotationElement, Constants) {
+define(['log', 'jquery', 'lodash', 'definition', 'annotation', 'handlebar', 'constants'],
+    function (log, $, _, Definition, Annotation, Handlebars, Constants) {
 
         /**
          * @class TableForm Creates a forms to collect data from a table
@@ -232,7 +231,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                         var storeAnnotationOptions = {};
                         _.set(storeAnnotationOptions, 'type', selectedStoreType);
                         _.set(storeAnnotationOptions, 'options', storeOptions);
-                        var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
+                        var storeAnnotation = new Annotation.storeAnnotation(storeAnnotationOptions);
                         tableObject.setStore(storeAnnotation);
 
                         self.formUtils.buildPrimaryIndexAnnotations(annotationList, annotationObjectList);
@@ -257,7 +256,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                         var nameValue = $(this).find('.attr-name').val().trim();
                         var typeValue = $(this).find('.attr-type').val();
                         if (nameValue != "") {
-                            var attributeObject = new Attribute({ name: nameValue, type: typeValue });
+                            var attributeObject = new Definition.attribute({ name: nameValue, type: typeValue });
                             tableObject.addAttribute(attributeObject);
                         }
                     });

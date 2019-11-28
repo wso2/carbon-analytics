@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'constants'],
-    function (require, log, $, _, Attribute, JSONValidator, Constants) {
+define(['require', 'log', 'jquery', 'lodash', 'definition', 'jsonValidator', 'constants'],
+    function (require, log, $, _, Definition, JSONValidator, Constants) {
 
         /**
          * @class StreamForm Creates a forms to collect data from a stream
@@ -239,7 +239,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                         var nameValue = $(this).find('.attr-name').val().trim();
                         var typeValue = $(this).find('.attr-type').val();
                         if (nameValue != "") {
-                            var attributeObject = new Attribute({name: nameValue, type: typeValue});
+                            var attributeObject = new Definition.attribute({name: nameValue, type: typeValue});
                             streamObject.addAttribute(attributeObject)
                         }
                     });

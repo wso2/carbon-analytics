@@ -16,20 +16,18 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'partition', 'query', 'stream', 'table',
-        'window', 'trigger', 'aggregation', 'aggregateByTimePeriod', 'windowFilterProjectionQueryInput',
+define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'partition', 'query', 'definition', 
+        'windowFilterProjectionQueryInput',
         'queryWindowOrFunction', 'edge', 'querySelect', 'queryOrderByValue', 'queryOutput', 'queryOutputInsert',
-        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'attribute', 'annotationObject',
+        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto',
         'joinQueryInput', 'joinQuerySource', 'patternOrSequenceQueryInput', 'patternOrSequenceQueryCondition',
-        'sourceOrSinkAnnotation', 'mapAnnotation', 'functionDefinition', 'streamHandler', 'storeAnnotation',
-        'partitionWith', 'designViewUtils', 'payloadOrAttribute'],
-    function (require, log, _, $, ConfigurationData, AppData, Partition, Query, Stream, Table, Window, Trigger,
-              Aggregation, AggregateByTimePeriod, WindowFilterProjectionQueryInput, QueryWindowOrFunction, Edge,
+        'annotation', 'streamHandler', 'partitionWith', 'designViewUtils'],
+    function (require, log, _, $, ConfigurationData, AppData, Partition, Query, Definition,
+              WindowFilterProjectionQueryInput, QueryWindowOrFunction, Edge,
               QuerySelect, QueryOrderByValue, QueryOutput, QueryOutputInsert, QueryOutputDelete, QueryOutputUpdate,
-              QueryOutputUpdateOrInsertInto, Attribute, AnnotationObject, JoinQueryInput, JoinQuerySource,
+              QueryOutputUpdateOrInsertInto, JoinQueryInput, JoinQuerySource,
               PatternOrSequenceQueryInput,
-              PatternOrSequenceQueryCondition, SourceOrSinkAnnotation, MapAnnotation, FunctionDefinition, StreamHandler,
-              StoreAnnotation, PartitionWith, DesignViewUtils, PayloadOrAttribute) {
+              PatternOrSequenceQueryCondition, Annotation, StreamHandler, PartitionWith, DesignViewUtils) {
 
         /**
          * @class InitialiseDataStructure
@@ -127,7 +125,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
 
         function addSourceDefinitions(mainObject, sourceList, newIdBeginningPhrase) {
             _.forEach(sourceList, function (source) {
-                var sourceObject = new SourceOrSinkAnnotation(source);
+                var sourceObject = new Annotation.sourceOrSinkAnnotation(source);
                 sourceObject.setId(newIdBeginningPhrase + sourceObject.getId());
                 if (_.isEmpty(source.map)) {
                     sourceObject.setMap(undefined);
@@ -143,10 +141,10 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                         _.set(payloadOrAttributeOptions, 'annotationType', source.map.payloadOrAttribute.annotationType);
                         _.set(payloadOrAttributeOptions, 'type', source.map.payloadOrAttribute.type);
                         _.set(payloadOrAttributeOptions, 'value', source.map.payloadOrAttribute.value);
-                        var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
+                        var payloadOrAttributeObject = new Annotation.payloadOrAttribute(payloadOrAttributeOptions);
                         _.set(mapperOptions, 'payloadOrAttribute', payloadOrAttributeObject);
                     }
-                    var mapperObject = new MapAnnotation(mapperOptions);
+                    var mapperObject = new Annotation.MapAnnotation(mapperOptions);
                     sourceObject.setMap(mapperObject);
                 }
                 mainObject.addSource(sourceObject);
@@ -155,7 +153,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
 
         function addSinkDefinitions(mainObject, sinkList, newIdBeginningPhrase) {
             _.forEach(sinkList, function (sink) {
-                var sinkObject = new SourceOrSinkAnnotation(sink);
+                var sinkObject = new Annotation.sourceOrSinkAnnotation(sink);
                 sinkObject.setId(newIdBeginningPhrase + sinkObject.getId());
                 if (_.isEmpty(sink.map)) {
                     sinkObject.setMap(undefined);
@@ -171,10 +169,10 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                         _.set(payloadOrAttributeOptions, 'annotationType', sink.map.payloadOrAttribute.annotationType);
                         _.set(payloadOrAttributeOptions, 'type', sink.map.payloadOrAttribute.type);
                         _.set(payloadOrAttributeOptions, 'value', sink.map.payloadOrAttribute.value);
-                        var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
+                        var payloadOrAttributeObject = new Annotation.payloadOrAttribute(payloadOrAttributeOptions);
                         _.set(mapperOptions, 'payloadOrAttribute', payloadOrAttributeObject);
                     }
-                    var mapperObject = new MapAnnotation(mapperOptions);
+                    var mapperObject = new Annotation.mapAnnotation(mapperOptions);
                     sinkObject.setMap(mapperObject);
                 }
                 mainObject.addSink(sinkObject);
@@ -183,7 +181,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
 
         function addStreamDefinitions(mainObject, streamList, newIdBeginningPhrase) {
             _.forEach(streamList, function (stream) {
-                var streamObject = new Stream(stream);
+                var streamObject = new Definition.stream(stream);
                 addAnnotationsForElement(stream, streamObject);
                 addAttributesForElement(stream, streamObject);
                 addAnnotationObjectForElement(stream, streamObject)
@@ -194,11 +192,11 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
 
         function addTableDefinitions(mainObject, tableList, newIdBeginningPhrase) {
             _.forEach(tableList, function (table) {
-                var tableObject = new Table(table);
+                var tableObject = new Definition.table(table);
                 if (_.isEmpty(table.store)) {
                     tableObject.setStore(undefined);
                 } else {
-                    var storeAnnotation = new StoreAnnotation(table.store);
+                    var storeAnnotation = new Annotation.storeAnnotation(table.store);
                     tableObject.setStore(storeAnnotation);
                 }
                 addAnnotationsForElement(table, tableObject);
@@ -211,7 +209,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
 
         function addWindowDefinitions(mainObject, windowList, newIdBeginningPhrase) {
             _.forEach(windowList, function (window) {
-                var windowObject = new Window(window);
+                var windowObject = new Definition.window(window);
                 addAnnotationsForElement(window, windowObject);
                 addAnnotationObjectForElement(window, windowObject);
                 addAttributesForElement(window, windowObject);
@@ -222,7 +220,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
 
         function addTriggerDefinitions(mainObject, triggerList, newIdBeginningPhrase) {
             _.forEach(triggerList, function (trigger) {
-                var triggerObject = new Trigger(trigger);
+                var triggerObject = new Definition.trigger(trigger);
                 addAnnotationsForElement(trigger, triggerObject);
                 addAttributesForElement(trigger, triggerObject);
                 triggerObject.setId(newIdBeginningPhrase + triggerObject.getId());
@@ -232,11 +230,11 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
 
         function addAggregationDefinitions(mainObject, aggregationList, newIdBeginningPhrase) {
             _.forEach(aggregationList, function (aggregation) {
-                var aggregationObject = new Aggregation(aggregation);
+                var aggregationObject = new Definition.aggregation(aggregation);
                 if (_.isEmpty(aggregation.store)) {
                     aggregationObject.setStore(undefined);
                 } else {
-                    var storeAnnotation = new StoreAnnotation(aggregation.store);
+                    var storeAnnotation = new Annotation.StoreAnnotation(aggregation.store);
                     aggregationObject.setStore(storeAnnotation);
                 }
                 addAnnotationObjectForElement(aggregation, aggregationObject);
@@ -254,7 +252,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
                 if (_.isEmpty(aggregation.aggregateByTimePeriod)) {
                     aggregationObject.setAggregateByTimePeriod(undefined);
                 } else {
-                    var aggregateByTimePeriodSubElement = new AggregateByTimePeriod(aggregation.aggregateByTimePeriod);
+                    var aggregateByTimePeriodSubElement = new Definition.aggregateByTimePeriod(aggregation.aggregateByTimePeriod);
                     aggregationObject.setAggregateByTimePeriod(aggregateByTimePeriodSubElement);
                 }
                 aggregationObject.setId(newIdBeginningPhrase + aggregationObject.getId());
@@ -264,7 +262,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
 
         function addFunctionDefinitions(mainObject, functionList, newIdBeginningPhrase) {
             _.forEach(functionList, function (functionJSON) {
-                var functionObject = new FunctionDefinition(functionJSON);
+                var functionObject = new Definition.functionDefinition(functionJSON);
                 functionObject.setId(newIdBeginningPhrase + functionObject.getId());
                 mainObject.addFunction(functionObject);
             });
@@ -478,7 +476,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
         //adds annotation object from a json object for an element object
         function addAnnotationObjectForElement(element, newElementObject) {
             _.forEach(element.annotationListObjects, function (annotation) {
-                var annotationObject = new AnnotationObject(annotation);
+                var annotationObject = new Annotation.annotationObject(annotation);
                 newElementObject.addAnnotationObject(annotationObject)
             });
         }
@@ -493,7 +491,7 @@ define(['require', 'log', 'lodash', 'jquery', 'configurationData', 'appData', 'p
         // adds attributes from a json object for an element object
         function addAttributesForElement(element, newElementObject) {
             _.forEach(element.attributeList, function (attribute) {
-                var attributeObject = new Attribute(attribute);
+                var attributeObject = new Definition.attribute(attribute);
                 newElementObject.addAttribute(attributeObject);
             });
         }

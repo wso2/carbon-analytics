@@ -16,10 +16,10 @@
  * under the License.
  */
 
-define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annotationObject', 'annotationElement',
+define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annotation',
         'designViewUtils', 'queryWindowOrFunction', 'streamHandler', 'patternOrSequenceQueryCondition', 'queryOutputInsert',
         'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'perfect_scrollbar'],
-    function (require, _, AppData, log, Constants, Handlebars, AnnotationObject, AnnotationElement, DesignViewUtils,
+    function (require, _, AppData, log, Constants, Handlebars, Annotation, DesignViewUtils,
               QueryWindowOrFunction, StreamHandler, PatternOrSequenceQueryCondition, QueryOutputInsert, QueryOutputDelete,
               QueryOutputUpdate, QueryOutputUpdateOrInsertInto, PerfectScrollbar) {
 

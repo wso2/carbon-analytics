@@ -16,9 +16,9 @@
  * under the License.
  */
 
-define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'payloadOrAttribute',
+define(['log', 'jquery', 'lodash', 'annotation',
         'jsonValidator', 'handlebar', 'designViewUtils', 'constants'],
-    function (log, $, _, SourceOrSinkAnnotation, MapAnnotation, PayloadOrAttribute, JSONValidator, Handlebars,
+    function (log, $, _, Annotation, JSONValidator, Handlebars,
               DesignViewUtils, Constants) {
 
         /**
@@ -354,12 +354,12 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                             _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTES');
                             _.set(payloadOrAttributeOptions, 'type', Constants.MAP);
                             _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
-                            var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
+                            var payloadOrAttributeObject = new Annotation.payloadOrAttribute(payloadOrAttributeOptions);
                             _.set(mapper, 'payloadOrAttribute', payloadOrAttributeObject);
                         } else {
                             _.set(mapper, 'payloadOrAttribute', undefined);
                         }
-                        var mapperObject = new MapAnnotation(mapper);
+                        var mapperObject = new Annotation.mapAnnotation(mapper);
                         sourceObject.setMap(mapperObject);
 
                         $('#' + id).removeClass('incomplete-element');

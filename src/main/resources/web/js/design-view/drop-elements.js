@@ -16,11 +16,10 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'formBuilder', 'aggregation',
-        'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'window', 'trigger', 'functionDefinition',
-        'constants', 'attribute'],
-    function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator,
-              SourceOrSinkAnnotation, Stream, Table, Window, Trigger, FunctionDefinition,Constants,Attribute) {
+define(['require', 'log', 'lodash', 'jquery', 'partition', 'definition', 'query', 'formBuilder',
+        'jsonValidator', 'annotation', 'constants'],
+    function (require, log, _, $, Partition, Definition, Query, FormBuilder,
+              JSONValidator, Annotation, Constants) {
 
         /**
          * @class DesignView
@@ -87,7 +86,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 _.set(sourceOptions, 'id', i);
                 _.set(sourceOptions, 'annotationType', 'SOURCE');
                 _.set(sourceOptions, 'type', undefined);
-                var source = new SourceOrSinkAnnotation(sourceOptions);
+                var source = new Annotation.sourceOrSinkAnnotation(sourceOptions);
                 self.configurationData.getSiddhiAppConfig().addSource(source);
 
                 JSONValidator.prototype.validateSourceOrSinkAnnotation(source, 'Source', true)
@@ -174,7 +173,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 _.set(sinkOptions, 'id', i);
                 _.set(sinkOptions, 'annotationType', 'SINK');
                 _.set(sinkOptions, 'type', undefined);
-                var sink = new SourceOrSinkAnnotation(sinkOptions);
+                var sink = new Annotation.sourceOrSinkAnnotation(sinkOptions);
                 self.configurationData.getSiddhiAppConfig().addSink(sink);
 
                 JSONValidator.prototype.validateSourceOrSinkAnnotation(sink, 'Sink', true)
@@ -269,7 +268,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                     var streamOptions = {};
                     _.set(streamOptions, 'id', i);
                     _.set(streamOptions, 'name', undefined);
-                    var stream = new Stream(streamOptions);
+                    var stream = new Definition.stream(streamOptions);
                     self.configurationData.getSiddhiAppConfig().addStream(stream);
 
                     JSONValidator.prototype.validateForElementName(stream, "Stream", true)
@@ -399,7 +398,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 _.set(streamOptions, 'id', elementID);
                 _.set(streamOptions, 'name', outStream);
                 _.set(streamOptions, 'isInnerStream', false);
-                var stream = new Stream(streamOptions);
+                var stream = new Definition.stream(streamOptions);
                 _.forEach(streamAttributes, function (attribute) {
                     stream.addAttribute(attribute);
                 });
@@ -447,7 +446,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var tableOptions = {};
                 _.set(tableOptions, 'id', i);
                 _.set(tableOptions, 'name', undefined);
-                var table = new Table(tableOptions);
+                var table = new Definition.table(tableOptions);
                 self.configurationData.getSiddhiAppConfig().addTable(table);
 
                 JSONValidator.prototype.validateForElementName(table, "Table", true)
@@ -544,7 +543,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var windowOptions = {};
                 _.set(windowOptions, 'id', i);
                 _.set(windowOptions, 'name', undefined);
-                var window = new Window(windowOptions);
+                var window = new Definition.window(windowOptions);
                 self.configurationData.getSiddhiAppConfig().addWindow(window);
 
                 JSONValidator.prototype.validateForElementName(window, "Window", true)
@@ -641,7 +640,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var triggerOptions = {};
                 _.set(triggerOptions, 'id', i);
                 _.set(triggerOptions, 'name', undefined);
-                var trigger = new Trigger(triggerOptions);
+                var trigger = new Definition.trigger(triggerOptions);
                 self.configurationData.getSiddhiAppConfig().addTrigger(trigger);
 
                 JSONValidator.prototype.validateForElementName(trigger, "Trigger", true)
@@ -740,7 +739,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var aggregationOptions = {};
                 _.set(aggregationOptions, 'id', i);
                 _.set(aggregationOptions, 'name', undefined);
-                var aggregation = new Aggregation(aggregationOptions);
+                var aggregation = new Definition.aggregation(aggregationOptions);
                 self.configurationData.getSiddhiAppConfig().addAggregation(aggregation);
 
                 // perform JSON validation
@@ -841,7 +840,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var functionOptions = {};
                 _.set(functionOptions, 'id', i);
                 _.set(functionOptions, 'name', undefined);
-                var functionObject = new FunctionDefinition(functionOptions);
+                var functionObject = new Definition.functionDefinition(functionOptions);
                 self.configurationData.getSiddhiAppConfig().addFunction(functionObject);
 
                 //perform json validation
@@ -1439,10 +1438,10 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 var id = self.designGrid.generateNextNewAgentId();
 
                 //add error object
-                var attributeObject = new Attribute({ name: "_error", type: "OBJECT" });
+                var attributeObject = new Definition.attribute({ name: "_error", type: "OBJECT" });
                 var attributeList = stream.getAttributeList();
                 // Add the fault stream to the stream list
-                var faultStream = new Stream({
+                var faultStream = new Definition.stream({
                     id: id,
                     name: faultStreamName
                 });

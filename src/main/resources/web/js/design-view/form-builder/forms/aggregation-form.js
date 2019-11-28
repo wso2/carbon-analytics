@@ -16,10 +16,10 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySelect',
-        'elementUtils', 'storeAnnotation', 'designViewUtils', 'jsonValidator', 'constants', 'handlebar'],
-    function (require, log, $, _, AggregateByTimePeriod, QuerySelect, ElementUtils,
-              StoreAnnotation, DesignViewUtils, JSONValidator, Constants, Handlebars) {
+define(['require', 'log', 'jquery', 'lodash', 'definition', 'querySelect',
+        'elementUtils', 'annotation', 'designViewUtils', 'jsonValidator', 'constants', 'handlebar'],
+    function (require, log, $, _, Definition, QuerySelect, ElementUtils,
+              Annotation, DesignViewUtils, JSONValidator, Constants, Handlebars) {
 
         /**
          * @class AggregationForm Creates a forms to collect data from a aggregation
@@ -508,7 +508,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                             var storeAnnotationOptions = {};
                             _.set(storeAnnotationOptions, 'type', selectedStoreType);
                             _.set(storeAnnotationOptions, 'options', storeOptions);
-                            var storeAnnotation = new StoreAnnotation(storeAnnotationOptions);
+                            var storeAnnotation = new Annotation.storeAnnotation(storeAnnotationOptions);
                             aggregationObject.setStore(storeAnnotation);
 
                             //buildAnnotations
@@ -561,7 +561,7 @@ define(['require', 'log', 'jquery', 'lodash', 'aggregateByTimePeriod', 'querySel
                         }
                         _.set(aggregateByTimePeriodOptions, 'type', aggregateByTimePeriodType);
                         _.set(aggregateByTimePeriodOptions, 'value', value);
-                        var aggregateByTimePeriod = new AggregateByTimePeriod(aggregateByTimePeriodOptions);
+                        var aggregateByTimePeriod = new Definition.aggregateByTimePeriod(aggregateByTimePeriodOptions);
                         aggregationObject.setAggregateByTimePeriod(aggregateByTimePeriod);
 
                         if (self.formUtils.isUpdatingOtherElementsRequired(previousAggregationObject, aggregationObject,

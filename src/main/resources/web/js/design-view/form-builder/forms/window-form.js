@@ -16,8 +16,8 @@
  * under the License.
  */
 
-define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
-    function (require, log, $, _, Attribute, Constants) {
+define(['require', 'log', 'jquery', 'lodash', 'definition', 'constants'],
+    function (require, log, $, _, Definition, Constants) {
 
         /**
          * @class WindowForm Creates a forms to collect data from a window
@@ -223,7 +223,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                         var nameValue = $(this).find('.attr-name').val().trim();
                         var typeValue = $(this).find('.attr-type').val();
                         if (nameValue != "") {
-                            var attributeObject = new Attribute({name: nameValue, type: typeValue});
+                            var attributeObject = new Definition.attribute({name: nameValue, type: typeValue});
                             windowObject.addAttribute(attributeObject)
                         }
                     });

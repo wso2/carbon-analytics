@@ -16,10 +16,9 @@
  * under the License.
  */
 
-define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonValidator',
+define(['log', 'jquery', 'lodash', 'annotation', 'jsonValidator',
         'handlebar', 'designViewUtils', 'constants'],
-    function (log, $, _, MapAnnotation, PayloadOrAttribute, JSONValidator, Handlebars, DesignViewUtils,
-              Constants) {
+    function (log, $, _, Annotation, JSONValidator, Handlebars, DesignViewUtils, Constants) {
 
         /**
          * @class SinkForm Creates a forms to collect data from a sink
@@ -427,12 +426,12 @@ define(['log', 'jquery', 'lodash', 'mapAnnotation', 'payloadOrAttribute', 'jsonV
                             _.set(payloadOrAttributeOptions, 'annotationType', 'PAYLOAD');
                             _.set(payloadOrAttributeOptions, 'type', attributeType);
                             _.set(payloadOrAttributeOptions, 'value', mapperAttributeValuesArray);
-                            var payloadOrAttributeObject = new PayloadOrAttribute(payloadOrAttributeOptions);
+                            var payloadOrAttributeObject = new Annotation.payloadOrAttribute(payloadOrAttributeOptions);
                             _.set(mapper, 'payloadOrAttribute', payloadOrAttributeObject);
                         } else {
                             _.set(mapper, 'payloadOrAttribute', undefined);
                         }
-                        var mapperObject = new MapAnnotation(mapper);
+                        var mapperObject = new Annotation.mapAnnotation(mapper);
                         sinkObject.setMap(mapperObject);
 
                         var textNode = $('#' + id).find('.sinkNameNode');
