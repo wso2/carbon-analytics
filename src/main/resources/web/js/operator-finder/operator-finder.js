@@ -311,7 +311,7 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                     }
                 });
             }
-            var keyResult = [], descriptionResult = [], finalResults;
+            var keyResult = [], descriptionResult = [], combineResults;
             this._operators.forEach(function (e, i) {
                 var result = {
                     fqn: hasToken(e.fqn, tokens),
@@ -335,10 +335,10 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                     });
                 }
             });
-            finalResults = keyResult.concat(descriptionResult);
+            combineResults = keyResult.concat(descriptionResult);
             return {
-                results: finalResults,
-                hasResults: finalResults.length > 0,
+                results: combineResults,
+                hasResults: combineResults.length > 0,
                 hasQuery: tokens.length > 0,
                 namespaces: this._namespaces
             };
