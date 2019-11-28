@@ -46,6 +46,9 @@ import javax.sql.DataSource;
  */
 public class QueryExecutor {
     private static final Logger logger = LoggerFactory.getLogger(QueryExecutor.class);
+
+    private static final String POSTGRESQL_DB_TYPE = "PostgreSQL";
+
     private DataSource dataSource;
     private QueryManager queryManager;
     private Gson gson;
@@ -180,11 +183,17 @@ public class QueryExecutor {
         PreparedStatement statement = null;
         try {
             conn = dataSource.getConnection();
+            String dbType = conn.getMetaData().getDatabaseProductName();
             statement = getStatementForRetrievingBusinessRule(conn, uuid);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                Blob blob = resultSet.getBlob(2);
-                byte[] bdata = blob.getBytes(1, (int) blob.length());
+                byte[] bdata;
+                if (dbType.equalsIgnoreCase(POSTGRESQL_DB_TYPE)) {
+                    bdata = resultSet.getBytes(2);
+                } else {
+                    Blob blob = resultSet.getBlob(2);
+                    bdata = blob.getBytes(1, (int) blob.length());
+                }
 
                 JsonObject jsonObject = gson.fromJson(new String(bdata, Charset.forName("UTF-8")), JsonObject
                         .class).getAsJsonObject();
@@ -232,12 +241,18 @@ public class QueryExecutor {
         Map<String, BusinessRule> map = new HashMap<>();
         try {
             conn = dataSource.getConnection();
+            String dbType = conn.getMetaData().getDatabaseProductName();
             statement = getStatementForRetrievingAllBusinessRules(conn);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 String businessRuleUUID = resultSet.getString(1);
-                Blob blob = resultSet.getBlob(2);
-                byte[] bdata = blob.getBytes(1, (int) blob.length());
+                byte[] bdata;
+                if (dbType.equalsIgnoreCase(POSTGRESQL_DB_TYPE)) {
+                    bdata = resultSet.getBytes(2);
+                } else {
+                    Blob blob = resultSet.getBlob(2);
+                    bdata = blob.getBytes(1, (int) blob.length());
+                }
 
                 JsonObject jsonObject = gson.fromJson(new String(bdata, Charset.forName("UTF-8")),
                         JsonObject.class).getAsJsonObject();
@@ -284,12 +299,18 @@ public class QueryExecutor {
         List<Object[]> list = new ArrayList<>();
         try {
             conn = dataSource.getConnection();
+            String dbType = conn.getMetaData().getDatabaseProductName();
             statement = getStatementForRetrievingAllBusinessRules(conn);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Integer deploymentStatus = resultSet.getInt(3);
-                Blob blob = resultSet.getBlob(2);
-                byte[] bdata = blob.getBytes(1, (int) blob.length());
+                byte[] bdata;
+                if (dbType.equalsIgnoreCase(POSTGRESQL_DB_TYPE)) {
+                    bdata = resultSet.getBytes(2);
+                } else {
+                    Blob blob = resultSet.getBlob(2);
+                    bdata = blob.getBytes(1, (int) blob.length());
+                }
 
                 JsonObject jsonObject = gson.fromJson(new String(bdata, Charset.forName("UTF-8")),
                         JsonObject.class).getAsJsonObject();
