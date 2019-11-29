@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(([], function () {
+define([], function () {
     var ExportMenu = {
         id: "export",
         label: "Export",
@@ -60,4 +60,4 @@ define(([], function () {
         ]
     };
     return ExportMenu;
-}));
+});

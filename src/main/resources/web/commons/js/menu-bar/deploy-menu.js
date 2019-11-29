@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(([], function () {
+define([], function () {
     var DeployMenu = {
         id: "deploy",
         label: "Deploy",
@@ -42,4 +42,4 @@ define(([], function () {
         ]
     };
     return DeployMenu;
-}));
+});

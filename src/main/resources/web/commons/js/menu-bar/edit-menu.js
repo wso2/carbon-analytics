@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(([], function () {
+define([], function () {
     var EditMenu = {
         id: "edit",
         label: "Edit",
@@ -117,4 +117,4 @@ define(([], function () {
     };
 
     return EditMenu;
-}));
+});

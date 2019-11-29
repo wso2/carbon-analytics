@@ -16,7 +16,7 @@
  * under the License.
  */
 
-define(([], function () {
+define([], function () {
     var RunMenu = {
         id: "run",
         label: "Run",
@@ -81,4 +81,4 @@ define(([], function () {
     };
 
     return RunMenu;
-}));
+});
