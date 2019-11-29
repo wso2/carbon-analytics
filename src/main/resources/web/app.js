@@ -25,7 +25,7 @@
 //directory.
 
 requirejs.config({
-    baseUrl: '/editor',
+    baseUrl: 'editor',
     paths: {
         lib: "commons/lib",
         app: "js",
