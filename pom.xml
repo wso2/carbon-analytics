@@ -152,6 +152,48 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>node</executable>
+                                    <workingDirectory>${basedir}/src/main/resources/tools</workingDirectory>
+                                    <arguments>
+                                        <argument>r.js</argument>
+                                        <argument>-o</argument>
+                                        <argument>build.js</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <tasks>
+                                        <move file="target/classes/web/editor/commons" todir="target/classes/web"/>
+                                        <move file="target/classes/web/editor/css" todir="target/classes/web"/>
+                                        <move file="target/classes/web/editor/images" todir="target/classes/web"/>
+                                        <move file="target/classes/web/editor/js" todir="target/classes/web"/>
+                                        <delete dir="target/classes/web/editor" />
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
