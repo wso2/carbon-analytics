@@ -184,6 +184,7 @@
                                 <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                                 <Bundle-Name>${project.artifactId}</Bundle-Name>
                                 <Include-Resource>
+                                    web=target/classes/web,
                                     target/classes/mime-map.properties,
                                     META-INF=target/classes/META-INF,
                                     META-INF/services=${project.build.directory}/dependencies/docker-client/META-INF/services
