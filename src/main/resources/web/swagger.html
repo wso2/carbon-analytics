@@ -6,9 +6,9 @@
     <title>Swagger UI</title>
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700"
           rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="/editor/css/swagger-ui.css">
-    <link rel="icon" type="image/png" href="/editor/images/favicon-32x32.png" sizes="32x32"/>
-    <link rel="icon" type="image/png" href="/editor/images/favicon-16x16.png" sizes="16x16"/>
+    <link rel="stylesheet" type="text/css" href="editor/css/swagger-ui.css">
+    <link rel="icon" type="image/png" href="editor/images/favicon-32x32.png" sizes="32x32"/>
+    <link rel="icon" type="image/png" href="editor/images/favicon-16x16.png" sizes="16x16"/>
     <style>
         html {
             box-sizing: border-box;
@@ -67,15 +67,15 @@
 
 <div id="swagger-ui"></div>
 
-<script src="/editor/js/swagger/swagger-ui-bundle.js"></script>
-<script src="/editor/js/swagger/swagger-ui-standalone-preset.js"></script>
+<script src="editor/js/swagger/swagger-ui-bundle.js"></script>
+<script src="editor/js/swagger/swagger-ui-standalone-preset.js"></script>
 <script>
     window.onload = function () {
 
         // Build a system
         var baseURL = window.location.protocol + "//" + window.location.host;
         const ui = SwaggerUIBundle({
-            url: baseURL + "/editor/swagger/swagger_api.json",
+            url: baseURL + "editor/swagger/swagger_api.json",
             dom_id: '#swagger-ui',
             deepLinking: true,
             presets: [
@@ -86,7 +86,7 @@
                 SwaggerUIBundle.plugins.DownloadUrl
             ],
             layout: "StandaloneLayout"
-        })
+        });
 
         window.ui = ui
     }
