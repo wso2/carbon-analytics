@@ -449,9 +449,7 @@ public class SourceEditorUtils {
      */
     private static StringBuilder parameterDataTypeGeneration(String parameterName,
                                                              Map<String, DataType[]> parameterDataTypeMap) {
-
-        StringBuilder parameterDataType = new StringBuilder();
-        parameterDataType.append(" <");
+        StringBuilder parameterDataType = new StringBuilder(" <");
         DataType[] parameterType = parameterDataTypeMap.get(parameterName);
         for (int i = 0; i < parameterType.length; i++) {
             DataType dataType = parameterType[i];
@@ -474,7 +472,6 @@ public class SourceEditorUtils {
      */
     private static List<SyntaxMetaData> windowFunctionSyntaxGeneration(Extension extension,
                                                                        Map<String, DataType[]> parameterDataTypeMap) {
-
         List<SyntaxMetaData> syntaxList = new ArrayList<>();
         StringBuilder syntax = new StringBuilder();
         StringBuilder clipBoardSyntax = new StringBuilder();
@@ -573,7 +570,6 @@ public class SourceEditorUtils {
     private static List<SyntaxMetaData> sourceSinkSyntaxGeneration(Extension extension,
                                                                    Map<String, DataType[]> parameterDataTypeMap
                                                                   ) {
-
         StringBuilder syntax = new StringBuilder();
         StringBuilder clipBoardSyntax = new StringBuilder();
         if (!extension.namespace().isEmpty()) {
@@ -603,7 +599,6 @@ public class SourceEditorUtils {
      */
     private static List<SyntaxMetaData> sourceSinkMapSyntaxGeneration(Extension extension,
                                                                       Map<String, DataType[]> parameterDataTypeMap) {
-
         StringBuilder syntax = new StringBuilder();
         StringBuilder clipBoardSyntax = new StringBuilder();
         if (!extension.namespace().isEmpty()) {
@@ -638,7 +633,6 @@ public class SourceEditorUtils {
      */
     private static List<SyntaxMetaData> storeSyntaxGeneration(Extension extension,
                                                               Map<String, DataType[]> parameterDataTypeMap) {
-
         StringBuilder syntax = new StringBuilder();
         StringBuilder clipBoardSyntax = new StringBuilder();
         if (!extension.namespace().isEmpty()) {
@@ -708,7 +702,7 @@ public class SourceEditorUtils {
                     parameterDataTypeMap.put(parameter.name(), parameter.type());
                     parameterMetaData.setName(parameter.name());
                     parameterMetaData.setType(Arrays.asList(parameter.type()));
-                    parameterMetaData.setDynamic(parameter.dynamic());
+                    parameterMetaData.setIsDynamic(parameter.dynamic());
                     parameterMetaData.setOptional(parameter.optional());
                     parameterMetaData.setDescription(parameter.description());
                     parameterMetaData.setDefaultValue(parameter.defaultValue());
