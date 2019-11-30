@@ -18,14 +18,16 @@
 
 {
     appDir: '../web',
-        mainConfigFile: '../web/app.js',
+    mainConfigFile: '../web/app.js',
     dir: '../../../../target/classes/web',
+    generateSourceMaps: true,
+    preserveLicenseComments: false,
     "modules": [
-    {
+        {
         // module names are relative to baseUrl
         name: "../app",
         exclude: ['commons/lib/enjoyhint/enjoyhint.min']
 
-    }
-]
+        }
+    ]
 }
