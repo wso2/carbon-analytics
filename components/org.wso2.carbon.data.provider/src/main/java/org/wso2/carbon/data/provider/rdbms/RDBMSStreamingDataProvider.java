@@ -82,8 +82,14 @@ public class RDBMSStreamingDataProvider extends AbstractRDBMSDataProvider {
                             if (metadata.getNames()[i].equalsIgnoreCase(getRdbmsProviderConfig()
                                     .getIncrementalColumn()) &&
                                     !metadata.getTypes()[i].equals(DataSetMetadata.Types.TIME)) {
-                                if (lastRecordValue < (double) rowData[i]) {
-                                    lastRecordValue = (double) rowData[i];
+                                double value;
+                                if (rowData[i] instanceof Integer) {
+                                    value = (int) rowData[i];
+                                } else {
+                                    value = (double) rowData[i];
+                                }
+                                if (lastRecordValue < value) {
+                                    lastRecordValue = value;
                                 }
                             }
                         }
