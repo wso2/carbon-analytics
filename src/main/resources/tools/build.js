@@ -22,6 +22,7 @@
     dir: '../../../../target/classes/web',
     generateSourceMaps: true,
     preserveLicenseComments: false,
+    optimizeCss: "standard",
     "modules": [
         {
         // module names are relative to baseUrl
