@@ -1,21 +1,6 @@
-/*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
+/**
+ * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
-
 define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-editor/completion-engine', 'alerts'],
     function ($, _, log, Handlebars, DesignViewUtils, CompletionEngine, alerts) {
 
@@ -136,7 +121,7 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                     );
 
                     $("#" + justGetName(attr) + "-input").on('keyup', function (e) {
-                        let attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
+                        var attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
                         attrLocalStore['${' + e.target.id.split('-input')[0] + '}'] = e.target.value;
 
                         setTimeout(function () {
@@ -176,14 +161,14 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                     );
 
                     $("#" + justGetName(attr) + "-input").on('keyup', function (e) {
-                        let attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
+                        var attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
                         attrLocalStore['${' + e.target.id.split('-input')[0] + '}'] = e.target.value;
 
                         localStorage.setItem("templatedAttributeList", JSON.stringify(attrLocalStore));
                     });
 
                     $("#" + justGetName(attr) + "-clear").on('click', function (e) {
-                        let attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
+                        var attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
                         delete attrLocalStore['${' + e.currentTarget.id.split('-clear')[0] + '}'];
 
                         localStorage.setItem("templatedAttributeList", JSON.stringify(attrLocalStore));
@@ -192,8 +177,8 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                 });
 
                 $("#template-clear-all").on('click', function () {
-                    let unusedTemplateAttrs = unusedTemplateAttr;
-                    let attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
+                    var unusedTemplateAttrs = unusedTemplateAttr;
+                    var attrLocalStore = JSON.parse(localStorage.getItem('templatedAttributeList'));
 
                     unusedTemplateAttrs.forEach(function (elem) {
                         delete attrLocalStore[elem];

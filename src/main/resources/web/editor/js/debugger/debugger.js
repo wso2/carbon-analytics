@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
+ */
 define(['jquery', 'backbone', 'log', 'lodash', 'ace/range', 'render_json'], function ($, Backbone, log, _, AceRange) {
     var DebugManager = Backbone.View.extend({
         initialize: function (config) {
