@@ -167,6 +167,7 @@
                                         <argument>r.js</argument>
                                         <argument>-o</argument>
                                         <argument>build.js</argument>
+                                        <!--<argument>optimize=none</argument>-->
                                     </arguments>
                                 </configuration>
                             </execution>
