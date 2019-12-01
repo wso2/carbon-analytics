@@ -29,7 +29,7 @@ define(['require', 'log', 'jquery', 'lodash', 'backbone', 'menu_bar', 'tool_bar'
                                 self.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                             }
                         }
-                    } );
+                    });
                 },
 
                 initComponents: function(){

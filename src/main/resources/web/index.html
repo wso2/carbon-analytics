@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="editor/commons/lib/bootstrap_v3.3.6/css/bootstrap.min.css"/>
     <link href="editor/commons/lib/theme-wso2-2.0.0/css/theme-wso2.min.css" rel="stylesheet" type="text/css"/>
     <link href="editor/commons/lib/jquery-ui_v1.12.1/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
-    <link href="editor/commons/lib/js-tree-v3.3.2/themes/default/style.min.css" rel="stylesheet" type="text/css"/>
+    <link href="editor/commons/lib/js-tree-v3.3.8/themes/default/style.min.css" rel="stylesheet" type="text/css"/>
     <link href="editor/commons/lib/nanoscroller_0.8.7/nanoscroller.css" rel="stylesheet" type="text/css"/>
     <link href="editor/commons/lib/data-table/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css"/>
     <link href="editor/commons/lib/theme-wso2-2.0.0/extensions/datatables/css/dataTables.wso2.css" rel="stylesheet"
@@ -65,7 +65,6 @@
     <!-- SmartWizard CSS -->
     <link rel="stylesheet" type="text/css" href="editor/commons/lib/smartWizard/css/smart_wizard.css"/>
     <link rel="stylesheet" type="text/css" href="editor/css/export-docker-kubernetes.css"/>
-
     <title>Siddhi Editor</title>
 </head>
 
@@ -164,10 +163,14 @@
                     <!-- Start: service tabs wrapper row -->
                     <!-- Start: service tabs -->
                     <div id="tabs-container" class="col-sm-12">
-                        <div class="tab-headers tab-headers-bar">
+                        <div class="init-loading-screen" style="display: block;">
+                            <i class="fw fw-wso2-logo fw-pulse fw-2x"></i>
+                            <p></p>
+                            <p>Loading...</p>
                         </div>
-                        <div id="tab-content-wrapper" class="grid-background">
-                            <div class="tab-content tab-content-default "></div>
+                        <div class="tab-headers tab-headers-bar" style="display: none;"></div>
+                        <div id="tab-content-wrapper" class="grid-background" style="display: none;">
+                            <div class="tab-content tab-content-default"></div>
                         </div>
                     </div>
                     <!-- End: service tabs -->
@@ -2602,11 +2605,12 @@
     //logic for this page. Do the requirejs calls here instead of
     //a separate file so after a build there are only 2 HTTP
     //requests instead of three.
+    requirejs.config({ waitSeconds: 0 });
     requirejs(['./editor/app'], function (common) {
         //js/common sets the baseUrl to be js/ so
         //can just ask for 'app/main1' here instead
         //of 'js/app/main1'
-        requirejs(['app/main']);
+        requirejs(['app/app-main']);
     });
 </script>
 </body>

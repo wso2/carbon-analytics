@@ -17,18 +17,27 @@
  */
 
 {
-    appDir: '../web',
+    // appDir: '../web',
+    // mainConfigFile: '../web/app.js',
+    // dir: '../../../../target/classes/web',
+    // generateSourceMaps: true,
+    // preserveLicenseComments: false,
+    // optimizeCss: "standard",
+    // "modules": [
+    //     {
+    //     // module names are relative to baseUrl
+    //     name: "../editor/js/app-main",
+    //     exclude: ['commons/lib/enjoyhint/enjoyhint.min']
+    //
+    //     }
+    // ]
+
     mainConfigFile: '../web/app.js',
-    dir: '../../../../target/classes/web',
+        //dir: '../../../../target/classes/web',
+    name: "app/app-main",
+    out: '../../../../target/classes/web/editor/js/app-main.js',
     generateSourceMaps: true,
     preserveLicenseComments: false,
     optimizeCss: "standard",
-    "modules": [
-        {
-        // module names are relative to baseUrl
-        name: "../app",
-        exclude: ['commons/lib/enjoyhint/enjoyhint.min']
-
-        }
-    ]
+    exclude: ['commons/lib/enjoyhint/enjoyhint.min']
 }

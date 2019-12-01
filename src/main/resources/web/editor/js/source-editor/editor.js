@@ -45,7 +45,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
         function SiddhiEditor(config) {
             var self = this;
             var aceEditor = ace.edit(config.divID);                // Setting the DivID of the Editor .. Could be <pre> or <div> tags
-
+            aceEditor.$blockScrolling = Infinity;
             self.realTimeValidation = config.realTimeValidation;
             new aceTokenTooltip.TokenTooltip(aceEditor);
 
@@ -215,7 +215,7 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
             SiddhiEditor.prototype.onEnvironmentChange = function () {
                 clearErrorsAndTriggerOnChange();
-            }
+            };
 
             /**
              * Start the timer for checking the semantic errors

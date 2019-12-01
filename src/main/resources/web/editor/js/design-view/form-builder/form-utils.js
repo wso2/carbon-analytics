@@ -3165,7 +3165,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 },
                 "themes": {
                     "theme": "default",
-                    "url": "editor/commons/lib/js-tree-v3.3.2/themes/default/style.css"
+                    "url": "editor/commons/lib/js-tree-v3.3.8/themes/default/style.min.css"
                 },
                 "checkbox": {
                     "three_state": false,
