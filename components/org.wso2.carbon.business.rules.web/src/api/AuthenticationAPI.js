@@ -25,16 +25,12 @@ import { MediaType } from '../constants/AuthConstants';
 import BusinessRulesUtilityFunctions from '../utils/BusinessRulesUtilityFunctions';
 // Auth Utils
 import AuthManager from '../utils/AuthManager';
+import { Constants } from '../components/auth/Constants';
 
 /**
  * Authentication API base path
  */
 const basePath = window.location.origin;
-
-/**
- * Password grant type
- */
-const passwordGrantType = 'password';
 
 /**
  * App context starting from forward slash
@@ -66,13 +62,13 @@ export default class AuthenticationAPI {
         return AuthenticationAPI
             .getHttpClient()
             .post(`/login/${appContext}`, Qs.stringify({
-                grantType: 'refresh_token',
+                grantType: Constants.GRANT_TYPE_REFRESH,
                 rememberMe: true,
             }), {
                 headers: {
                     'Content-Type': MediaType.APPLICATION_WWW_FORM_URLENCODED,
-                    Authorization: 'Bearer ' + AuthManager.getCookie('RTK'),
-                    Accept: MediaType.APPLICATION_JSON,
+                    'Authorization': "Bearer " + AuthManager.getCookie(Constants.REFRESH_TOKEN_COOKIE),
+                    'Accept': MediaType.APPLICATION_JSON
                 },
             });
     }
@@ -84,13 +80,13 @@ export default class AuthenticationAPI {
      * @param {boolean} rememberMe      Remember me flag
      * @returns {AxiosPromise}          Response after the login
      */
-    static login(username, password, rememberMe = false) {
+    static login(username, password, rememberMe = false, grantType = Constants.GRANT_TYPE_PASSWORD) {
         return AuthenticationAPI
             .getHttpClient()
             .post(`/login/${appContext}`, Qs.stringify({
                 username,
                 password,
-                grantType: passwordGrantType,
+                grantType,
                 rememberMe,
                 appId: 'br_' + BusinessRulesUtilityFunctions.generateGUID(),
             }), {
@@ -113,5 +109,20 @@ export default class AuthenticationAPI {
                     Authorization: `Bearer ${token}`,
                 },
             });
+    }
+
+    static ssoLogout(accessToken, idToken) {
+        return AuthenticationAPI.getHttpClient()
+            .get(`/logout/slo/${appContext}`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    Fid: idToken,
+                },
+            });
+    }
+
+    static getAuthType() {
+        return AuthenticationAPI.getHttpClient()
+            .get('/login/auth-type');
     }
 }
