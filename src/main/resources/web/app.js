@@ -10,6 +10,7 @@ requirejs.config({
         /////////////////////////
         // third party modules //
         ////////////////////////
+        remarkable:"commons/lib/remarkable/remarkable.min",
         handlebar: "commons/lib/handlebar/handlebars-v4.0.11.min",
         jquery: "commons/lib/jquery_v1.9.1/jquery-1.9.1.min",
         jquery_ui: "commons/lib/jquery-ui_v1.12.1/jquery-ui.min",
