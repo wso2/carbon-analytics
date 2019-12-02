@@ -308,10 +308,10 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         this._payload.kubernetesConfiguration = this._kubernetesConfigModel.getConfigs()["kubernetesConfig"];
                         this._payload.configuration += this._kubernetesConfigModel.getConfigs()["statePersistenceConfig"];
                     }
-                    if (this._dockerImageTypeModel.getDockerTypeConfigs()["pushDocker"]) {
-                        this._payload.dockerConfiguration = this._dockerConfigModel.getDockerConfigs();
-                    } else {
+                    if (this._dockerImageTypeModel != undefined && !this._dockerImageTypeModel.getDockerTypeConfigs()["pushDocker"]) {
                         this._payload.dockerConfiguration = this._dockerImageTypeModel.getDockerTypeConfigs();
+                    } else {
+                        this._payload.dockerConfiguration = this._dockerConfigModel.getDockerConfigs();
                     }
 
                     if (typeof this._jarsSelectorDialog == "undefined") {

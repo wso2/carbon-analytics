@@ -149,6 +149,7 @@ requirejs.config({
         siddhiAppSelectorDialog: "js/export-deployment-artifacts/siddhiapp-selector-dialog",
         templateConfigDialog: "js/export-deployment-artifacts/template-config-dialog",
         dockerConfigDialog: "js/export-deployment-artifacts/docker-config-dialog",
+        dockerImageTypeDialog: "js/export-deployment-artifacts/docker-image-type-dialog",
         fillTemplateValueDialog: "js/export-deployment-artifacts/fill-template-value-dialog",
         kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog"
     },
