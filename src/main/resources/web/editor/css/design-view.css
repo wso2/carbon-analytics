@@ -1,0 +1,1678 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+.source-view-enabled {
+    height: 100%;
+}
+
+.design-view-container {
+    height: 100%;
+    display: flex;
+}
+
+.toggle-controls-container {
+    position: absolute;
+    bottom: 35px;
+    right: 10px;
+    z-index: 23;
+}
+
+.toggle-view-button {
+    transition: 0.15s;
+    font-weight: bold;
+    color: #333;
+    background-color: #02aaad;
+}
+
+.toggle-view-button:hover {
+    color: #fff;
+    transition: 0.15s;
+}
+
+.toggle-button-text {
+    padding-left: 5px;
+}
+
+.grid-container {
+    /* Temp */
+    width: calc(100% - 67px);
+    overflow: auto;
+    position: relative;
+    background: linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
+    linear-gradient(rgba(0, 0, 0, .03) 1px, transparent 1px),
+    linear-gradient(-90deg, rgba(0, 0, 0, .001) 1px, transparent 1px),
+    linear-gradient(rgba(0, 0, 0, .001) 1px, transparent 1px),
+    linear-gradient(transparent 3px, transparent 3px, transparent 78px, transparent 78px),
+    linear-gradient(-90deg, transparent 1px, transparent 1px),
+    linear-gradient(-90deg, transparent 3px, transparent 3px, transparent 78px, transparent 78px),
+    linear-gradient(transparent 1px, transparent 1px), transparent;
+    background-size: 10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px,
+    10px 10px;
+    background-color: #e7eaeb;
+}
+
+.sourceDrop {
+    background-image: url("../images/source.svg");
+}
+
+.sinkDrop {
+    background-image: url("../images/sink.svg");
+}
+
+.streamDrop {
+    background-image: url("../images/streams.svg");
+}
+
+.errorStreamDrop {
+    background-image: url("../images/error-stream.svg");
+}
+
+.tableDrop {
+    background-image: url("../images/table.svg");
+}
+
+.windowDrop {
+    background-image: url("../images/window.svg");
+}
+
+.triggerDrop {
+    background-image: url("../images/trigger.svg");
+}
+
+.aggregationDrop {
+    background-image: url("../images/aggregate.svg");
+}
+
+.functionDrop {
+    background-image: url("../images/function.svg");
+}
+
+.projectionQueryDrop {
+    background-image: url("../images/query.svg");
+}
+
+.filterQueryDrop {
+    background-image: url("../images/filter-query.svg");
+}
+
+.windowQueryDrop {
+    background-image: url("../images/window-query.svg");
+}
+
+.functionQueryDrop {
+    background-image: url("../images/function-query.svg");
+}
+
+.joinQueryDrop {
+    background-image: url("../images/join-query.svg");
+}
+
+.patternQueryDrop {
+    background-image: url("../images/pattern-query.svg");
+}
+
+.sequenceQueryDrop {
+    background-image: url("../images/sequence-query.svg");
+}
+
+/*
+    Dropped Elements corresponding to their toolbox elements
+*/
+
+.streamDrop, .tableDrop, .windowDrop, .triggerDrop, .aggregationDrop, .projectionQueryDrop, .filterQueryDrop,
+.windowQueryDrop, .functionQueryDrop, .joinQueryDrop, .patternQueryDrop, .sequenceQueryDrop, .sourceDrop, .sinkDrop,
+.functionDrop {
+    opacity: 1;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    text-align: center;
+    z-index: 20;
+    position: absolute;
+    background-color: #fff;
+    background-size: 40px 40px;
+    background-repeat: no-repeat;
+    background-position: 10px 10px;
+    color: black;
+    font-family: helvetica, sans-serif;
+    font-size: 0.9em;
+    -webkit-transition: -webkit-box-shadow 0.15s ease-in;
+    -moz-transition: -moz-box-shadow 0.15s ease-in;
+    -o-transition: -o-box-shadow 0.15s ease-in;
+    transition: box-shadow 0.15s ease-in;
+    border: 1px solid #ccc;
+}
+
+.faultStreamDrop {
+    background-image: url("../images/error-stream.svg");
+}
+
+.partitionDrop {
+    border: 1px solid #346789;
+    width: 250px;
+    height: 250px;
+    border-radius: 0.5em;
+    opacity: 1;
+    cursor: move;
+    text-align: center;
+    z-index: 1;
+    position: absolute;
+    background-color: transparent;
+    color: black;
+    font-family: helvetica, sans-serif;
+    font-size: 0.9em;
+    -webkit-transition: -webkit-box-shadow 0.15s ease-in;
+    -moz-transition: -moz-box-shadow 0.15s ease-in;
+    -o-transition: -o-box-shadow 0.15s ease-in;
+    transition: box-shadow 0.15s ease-in;
+    box-sizing: border-box;
+}
+
+/*
+    Element Divisions added as classes when the element is appended
+*/
+.title {
+    padding: 10px;
+    cursor: move;
+}
+
+.connection {
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    font-size: 10px;
+    text-align: center;
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
+    margin-left: -10px;
+    border: 1px solid #000;
+    background-color: #424242;
+}
+
+.error-connection {
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    font-size: 10px;
+    text-align: center;
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
+    margin-left: -10px;
+    border: 1px solid #FF0000;
+    background-color: #FF0000;
+}
+
+.property {
+    float: left;
+    margin-top: 10px;
+    background: #f4f4f4;
+    border: 1px solid #aaaaaa;
+    height: 800px;
+    overflow-y: scroll;
+    overflow-x: scroll;
+}
+
+/*
+*Styles for the configuration icons
+*/
+.element-prop-icon, .element-close-icon {
+    float: right;
+    width: 26px;
+    height: 26px;
+    margin-top: -95px;
+    cursor: pointer;
+    color: #616161;
+    border-radius: 40px;
+    font-size: 14px;
+}
+
+.element-prop-icon {
+    margin-right: 25px;
+}
+
+.element-close-icon {
+    margin-right: 5px;
+}
+
+input{
+. form-control input-md;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.disableContainer {
+    pointer-events: none;
+}
+
+table {
+    border: 2px solid transparent;
+}
+
+td {
+    padding: 5px;
+    border: 1px solid transparent;
+}
+
+.queryDiv {
+    margin: 20px 0 20px 0;
+    width: 600px;
+    box-shadow: 3px 4px 5px 6px #707070;
+}
+
+.simpleQueryLabel, .windowStreamLabel {
+    background-color: #565656;
+    text-align: center;
+    margin: 20px 0 20px 0;
+    color: transparent;
+    text-shadow: 0 2px 3px rgba(255, 255, 255, 0.3);
+    -webkit-background-clip: text;
+}
+
+.connectorInStream, .connectorInTable, .connectorInWindow, .connectorInTrigger, .connectorInAggregation,
+.connectorInQuery, .connectorInPatternQuery, .connectorInSequenceQuery, .connectorInJoinQuery, .connectorInSink,
+.connectorInSource {
+    float: left;
+    margin-top: -53px;
+    margin-left: -5px;
+}
+
+.connectorOutStream, .connectorOutTable, .connectorOutWindow, .connectorOutTrigger, .connectorOutAggregation,
+.connectorOutQuery, .connectorOutPatternQuery, .connectorOutSequenceQuery, .connectorOutJoinQuery, .connectorOutSource,
+.connectorOutSink {
+    float: right;
+    margin-top: -53px;
+    margin-right: -5px;
+}
+
+.connectorOutForErrorStream {
+    float: right;
+    margin-top: -58px;
+    margin-right: -5px;
+}
+
+.connectorInStreamForErrorStream {
+    float: left;
+    margin-top: -57px;
+    margin-left: -5px;
+}
+
+.connectorErrOutStream {
+    float: right;
+    margin-top: -40px;
+    margin-right: -5px;
+}
+
+.connectorIn {
+    float: left;
+    margin-top: -47%;
+    margin-left: -13px;
+}
+
+.connectorOut {
+    float: right;
+    margin-top: -47%;
+    margin-right: -13px;
+}
+
+.partition-connector-in-part {
+    margin-left: -5px;
+    margin-top: 20px;
+    width: 15px;
+    height: 15px;
+    border: 1px solid #424242;
+    background-color: #424242;
+}
+
+.connectorStream {
+    float: right;
+    margin-top: 25%;
+    margin-right: -10%;
+}
+
+.aggregationNameNode, .triggerNameNode, .windowNameNode, .tableNameNode, .streamNameNode, .queryNameNode,
+.patternQueryNameNode, .joinQueryNameNode, .sequenceQueryNameNode, .sourceNameNode, .sinkNameNode, .functionNameNode {
+    font-weight: 600;
+    width: 120px;
+    margin-left: -30px;
+    margin-top: 60px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.streamDrop:hover .streamNameNode, .windowDrop:hover .windowNameNode, .sequenceQueryDrop:hover .sequenceQueryNameNode,
+.triggerDrop:hover .triggerNameNode, .aggregationDrop:hover .aggregationNameNode, .functionDrop:hover .functionNameNode,
+.projectionQueryDrop:hover .queryNameNode, .filterQueryDrop:hover .queryNameNode, .windowQueryDrop:hover .queryNameNode,
+.joinQueryDrop:hover .joinQueryNameNode, .patternQueryDrop:hover .patternQueryNameNode, .tableDrop:hover .tableNameNode,
+.sourceDrop:hover .sourceNameNode, .sinkDrop:hover .sinkNameNode, .functionQueryDrop:hover .queryNameNode {
+    overflow: initial;
+}
+
+.partition-element-prop-icon, .partition {
+    float: right;
+    width: 20px;
+    height: 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    color: #616161;
+    font-size: 14px;
+}
+
+.partition-element-prop-icon {
+    margin-right: 0;
+}
+
+.partition {
+    margin-right: 6px;
+}
+
+/* Window Stream */
+
+.checkboxStyleWindow {
+    float: right;
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+    border: 1px solid transparent;
+    margin-top: -82px;
+    margin-right: 0;
+    cursor: pointer;
+    color: red;
+    border-radius: 40px;
+    padding-left: 10px;
+    padding-top: 4px;
+}
+
+.design-view-form-content .well {
+    background: transparent;
+    padding: 0;
+}
+
+.design-view-form-content {
+    padding: 10px;
+    height: calc(100% - 53px) !important;
+}
+
+select.form-control,
+.btn-group > div {
+    background: #2f2f2f !important;
+}
+
+.design-view-form-content th {
+    color: #BDBDBD;
+}
+
+.grid-container > div {
+    opacity: 1;
+}
+
+.design-view-form-content button i {
+    font-size: 1.1rem;
+}
+
+.section-seperator {
+    border-bottom: 1px solid #424242;
+}
+
+.design-view-form-content .table-bordered > tbody > tr > td,
+.design-view-form-content .table-bordered,
+.design-view-form-content .table-bordered > thead > tr > th {
+    border: 0;
+}
+
+.design-view-form-content,
+h3,
+.control-label {
+    color: #BDBDBD;
+}
+
+.frm-qry {
+    margin-bottom: 20px;
+}
+
+.frm-agr thead tr th:nth-of-type(2) {
+    width: 30%;
+}
+
+.frm-agr table {
+    width: 100% !important;
+}
+
+.form-control[disabled] {
+    opacity: 0.3;
+}
+
+.loading-screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 22;
+    background-color: #282828;
+    color: #fff;
+    font-size: 40px;
+    text-align: center;
+    padding: 20% 0;
+}
+
+.app-annotations-button {
+    position: fixed;
+    top: 79px;
+    right: 15px;
+    font-size: 20px;
+    color: #757575;
+    transition: 0.15s;
+}
+
+.app-annotations-button:hover {
+    color: black;
+}
+
+.siddhi-app-name-node {
+    position: fixed;
+    right: 60px;
+    top: 77px;
+    opacity: 1 !important;
+    font-size: 16px;
+}
+
+#siddhi-app-desc-node {
+    position: fixed;
+    right: 60px;
+    top: 97px;
+    opacity: 1 !important;
+    font-size: 14px;
+}
+
+.design-view-form-content h3 {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.design-view-form-content h4 {
+    font-size: 12px;
+}
+
+.design-view-form-content .form-control {
+    max-width: 500px;
+}
+
+.list-group-item {
+    background: #37474F;
+    color: #E0E0E0;
+    border: 0;
+    margin-bottom: 0;
+}
+
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+    background: #9E9E9E;
+    border: 0;
+    color: #212121;
+    font-weight: 500;;
+}
+
+a.list-group-item, button.list-group-item {
+    color: #E0E0E0;
+}
+
+.design-view-form-content .btn {
+    font-size: 12px;
+}
+
+.design-view-form-content select,
+.design-view-form-content p {
+    font-size: 12px;
+}
+
+/* JSONEditor overrides */
+/* Set widths */
+.define-appconfig [data-schemapath="root.annotations"] table,
+.define-source [data-schemapath="root.annotationOptions"] table,
+.define-source [data-schemapath="root.map.annotationOptions"] table,
+.define-source [data-schemapath="root.map.attributeValues"] table,
+.define-sink [data-schemapath="root.annotationOptions"] table,
+.define-sink [data-schemapath="root.map.annotationOptions"] table,
+.define-source [data-schemapath="root.map.attributeValues"] table,
+.define-stream [data-schemapath="root.annotations"] table,
+.define-stream [data-schemapath="root.attributes"] table,
+.define-table [data-schemapath="root.annotations"] table,
+.define-table [data-schemapath="root.storeAnnotation.storeOptions"] table,
+.define-table [data-schemapath="root.attributes"] table,
+.define-window [data-schemapath="root.annotations"] table,
+.define-window [data-schemapath="root.attributes"] table,
+.define-window [data-schemapath="root.parameters"] table,
+.define-trigger [data-schemapath="root.annotations"] table,
+.define-partition [data-schemapath="root.annotations"] table,
+.define-partition [data-schemapath="root.partitionKeys"] table
+{
+    width: 650px;
+}
+
+/* 1 column */
+.define-appconfig [data-schemapath="root.annotations"] table tr td:first-child,
+.define-source [data-schemapath="root.annotationOptions"] table tr td:first-child,
+.define-source [data-schemapath="root.map.annotationOptions"] table tr td:first-child,
+.define-sink [data-schemapath="root.annotationOptions"] table tr td:first-child,
+.define-sink [data-schemapath="root.map.annotationOptions"] table tr td:first-child,
+.define-stream [data-schemapath="root.annotations"] table tr td:first-child,
+.define-table [data-schemapath="root.annotations"] table tr td:first-child,
+.define-window [data-schemapath="root.annotations"] table tr td:first-child,
+.define-window [data-schemapath="root.parameters"] table tr td:first-child,
+.define-trigger [data-schemapath="root.annotations"] table tr td:first-child,
+.define-partition [data-schemapath="root.annotations"] table tr td:first-child
+{
+    width: 508px;
+}
+
+/* 2 column */
+.define-source [data-schemapath="root.map.attributeValues"] table tr td:nth-child(1),
+.define-source [data-schemapath="root.map.attributeValues"] table tr td:nth-child(2),
+.define-sink [data-schemapath="root.map.attributeOrPayloadValues"] table tr td:nth-child(1),
+.define-sink [data-schemapath="root.map.attributeOrPayloadValues"] table tr td:nth-child(2),
+.define-table [data-schemapath="root.storeAnnotation.storeOptions"] table tr td:nth-child(1),
+.define-table [data-schemapath="root.storeAnnotation.storeOptions"] table tr td:nth-child(2),
+.define-trigger [data-schemapath="root.annotations"] table tr td:nth-child(1),
+.define-trigger [data-schemapath="root.annotations"] table tr td:nth-child(2),
+.define-partition [data-schemapath="root.partitionKeys"] table tr td:nth-child(1),
+.define-partition [data-schemapath="root.partitionKeys"] table tr td:nth-child(2)
+{
+    width: 254px;
+}
+
+/* 2 column with type field */
+.define-stream [data-schemapath="root.attributes"] table tr td:nth-child(1),
+.define-table [data-schemapath="root.attributes"] table tr td:nth-child(1),
+.define-window [data-schemapath="root.attributes"] table tr td:nth-child(1)
+{
+    width: 428px;
+}
+
+.define-stream [data-schemapath="root.attributes"] table tr td:nth-child(2),
+.define-table [data-schemapath="root.attributes"] table tr td:nth-child(2),
+.define-window [data-schemapath="root.attributes"] table tr td:nth-child(2)
+{
+    width: 80px;
+}
+
+/* Hide duplicate labels */
+.define-appconfig [data-schemapath="root.annotations"] table thead,
+.define-source [data-schemapath="root.annotationOptions"] table thead,
+.define-source [data-schemapath="root.map.annotationOptions"] table thead,
+.define-sink [data-schemapath="root.annotationOptions"] table thead,
+.define-sink [data-schemapath="root.map.annotationOptions"] table thead,
+.define-stream [data-schemapath="root.annotations"] table thead,
+.define-table [data-schemapath="root.annotations"] table thead,
+.define-window [data-schemapath="root.annotations"] table thead,
+.define-window [data-schemapath="root.parameters"] table thead,
+.define-trigger [data-schemapath="root.annotations"] table thead,
+.define-partition [data-schemapath="root.annotations"] table thead,
+.define-windowFilterProjection-query [data-schemapath="root.annotations"] table thead,
+.define-windowFilterProjection-query [data-schemapath="root.streamHandlerList.0.streamHandler.parameters"] table thead,
+.define-aggregation [data-schemapath="root.annotations"] table thead,
+.define-aggregation [data-schemapath="root.aggregateByTimePeriod"] table thead,
+.define-pattern-query [data-schemapath="root.annotations"] table thead,
+.define-sequence-query [data-schemapath="root.annotations"] table thead
+{
+    display: none;
+}
+
+.incomplete-element {
+    border: 1px solid yellow;
+    box-shadow: 0 0 1px 2px yellow;
+}
+
+.error-element {
+    border: 1px solid #FF0000;
+    box-shadow: 0 0 1px 2px #FF0000;
+}
+
+.js-tree-error-node {
+    border: 1px solid red;
+    background: red;
+}
+
+.design-view-form-content input[type="text"].required-input-field,
+.design-view-form-content textarea.required-input-field {
+    border: 1px solid #FF0000;
+}
+
+.design-view-form-content .error-message {
+    display: none;
+    color: red;
+    padding-top: 4px;
+}
+
+.aggregation-form-container .aggregate-by-content .error-message {
+    margin-left: 20px;
+}
+
+.design-view-form-content .customized-options .error-message,
+.design-view-form-content .source-sink-map-options .customized-options .error-message {
+    margin-left: 75px;
+}
+
+.partition-form-container .partition-by-expression-selection {
+    width: 90%
+}
+
+.partition-form-container .partition-by-label {
+    width: 43%;
+    margin: 5px;
+    text-align: left;
+}
+
+.partition-form-container .partition-stream-name,
+.partition-form-container .partition-expression {
+    width: 45%;
+    float: left;
+}
+
+.partition-form-container input[type="text"].partition-by-stream-name {
+    width: 90%;
+}
+
+.source-sink-form-container .source-sink-map-options .error-message,
+.design-view-form-content #store-options .error-message,
+.design-view-form-content #primary-index-annotations .error-message {
+    margin-left: 20px;
+}
+
+.design-view-form-content input[type="text"],
+.design-view-form-content textarea {
+    border: 1px solid #716e6e;
+    line-height: 20px;
+    padding: 0 5px;
+    color: #ccc;
+    background: #424242;
+}
+
+.design-view-form-content input:read-only {
+    line-height: 20px;
+    padding: 0 5px;
+}
+
+.design-view-form-content textarea {
+    min-height: 65px;
+}
+
+.design-view-form-content input[type="text"].name,
+.design-view-form-content input:read-only.name,
+.design-view-form-content textarea {
+    width: 80%
+}
+
+.table-form-container input[type="text"].name,
+.window-form-container input[type="text"].name {
+    width: 82%;
+}
+
+.source-sink-form-container #mapper-attributes input[type="text"].attr-value,
+.source-sink-form-container #mapper-attributes input:read-only.attr-key,
+.source-sink-form-container #mapper-attributes input[type="text"].attr-key {
+    width: 40%;
+}
+
+.design-view-form-content .pattern-query-form-container input.name,
+.design-view-form-content .pattern-query-form-container textarea {
+    width: 100%;
+}
+
+.design-view-form-content .define-select input[type="text"].attribute-expression {
+    width: 60%;
+    margin-right: 5px;
+}
+
+.design-view-form-content .define-select input:read-only.attribute-as {
+    width: 35%;
+}
+
+.design-view-form-content .define-select .projection-expression-label {
+    width: 60%;
+    margin: 5px;
+    text-align: left;
+}
+
+.design-view-form-content .projection-as-label {
+    width: 32%;
+    text-align: left;
+}
+
+.design-view-form-content input[type="text"].option-value {
+    width: 85%;
+    margin-bottom: 2px;
+    margin-left: 20px;
+}
+
+.defineFunctionParameters input[type="text"].parameter-value {
+    width: 85%;
+    margin-bottom: 2px;
+}
+
+.trigger-form-container #trigger-criteria-content .description {
+    font-size: 12px;
+    margin-left: 5px;
+    color: #ccc;
+}
+
+.design-view-form-content #primary-index-annotations input[type="text"].annotation-value {
+    margin-bottom: 2px;
+    margin-left: 20px;
+    width: 70%;
+}
+
+.design-view-form-content .attr-nav {
+    margin-top: -1px;
+}
+
+.stream-form-container .attr-nav {
+    margin-left: -15px;
+}
+
+.design-view-form-content .attr-nav a {
+    float: left;
+    display: inline-block;
+    height: 22px;
+    padding: 0 5px;
+    margin-left: 3px;
+    margin-top: 2px;
+    background: #2c2c2c;
+    border: 1px solid #716e6e;
+}
+
+.design-view-form-content .btn-del-option,
+.window-form-container .btn-del-parameter,
+.design-view-form-content #primary-index-annotations .btn-del-annot-value {
+    display: inline-block;
+    height: 21px;
+    padding: 0 8px;
+    background: #2c2c2c;
+    margin-left: 3px;
+    border: 1px solid #716e6e;
+}
+
+.design-view-form-content .btn-del-option:hover,
+.window-form-container .btn-del-parameter:hover,
+.design-view-form-content #primary-index-annotations .btn-del-annot-value:hover,
+.design-view-form-content .attr-nav a:hover {
+    background: #424242;
+}
+
+.design-view-form-content input:read-only,
+.design-view-form-content select:disabled {
+    cursor: not-allowed;
+    background: #1d1d1d;
+    border: 1px solid #545353;
+}
+
+.design-view-form-content .attr-nav a .fw-sort-down {
+    font-size: 16px;
+    margin-top: -3px;
+    color: #fff;
+}
+
+.design-view-form-content .attr-nav a .fw-sort-up {
+    font-size: 16px;
+    margin-top: 6px;
+    color: #fff;
+}
+
+.clearfix {
+    display: block;
+    content: "";
+    clear: both;
+}
+
+.design-view-form-content .fw-delete {
+    font-size: 12px;
+    margin-top: 3px;
+    color: #fff;
+}
+
+.design-view-form-content .attr-nav,
+.design-view-form-content .attr-content {
+    display: inline-block;
+    float: left;
+}
+
+.design-view-form-content .attr-content {
+    width: 85%;
+}
+
+.design-view-form-content #attribute-div input[type="text"] {
+    width: 85%;
+}
+
+.design-view-form-content .define-stream-handler .attr-nav {
+    float: right;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.design-view-form-content #attribute-div .attribute {
+    margin-bottom: 5px;
+}
+
+.design-view-form-content .attributes-container {
+    margin-top: 15px;
+}
+
+.design-view-form-content .group-by-selection .attribute,
+.design-view-form-content .aggregation-form-container .group-by-attribute {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.design-view-form-content .define-select .define-user-defined-attributes {
+    margin-top: 10px;
+}
+
+.design-view-form-content .group-by-selection .expression-content {
+    margin-left: 20px;
+}
+
+.design-view-form-content .group-by-selection .error-message {
+    margin-left: 35px;
+}
+
+.aggregation-form-container .aggregate-by-time-period-selection,
+.aggregation-form-container .aggregate-by-attribute-content {
+    margin-left: 20px;
+}
+
+.aggregation-form-container .aggregate-by-time-period-content {
+    padding: 10px;
+    margin-left: 35px;
+}
+
+.design-view-form-content .annotation > a > i.jstree-checkbox,
+.design-view-form-content .annotation > .jstree-clicked > i.jstree-checkbox,
+.design-view-form-content .annotation > i.jstree-checkbox {
+    display: none;
+}
+
+.design-view-form-content .annotation-key > a > i.jstree-checkbox,
+.design-view-form-content .annotation-key > .jstree-clicked > i.jstree-checkbox,
+.design-view-form-content .annotation-key > i.jstree-checkbox {
+    display: none;
+}
+
+.design-view-form-content .annotation-value > a > i.jstree-checkbox,
+.design-view-form-content .annotation-value > .jstree-clicked > i.jstree-checkbox,
+.design-view-form-content .annotation-value > i.jstree-checkbox {
+    display: none;
+}
+
+.design-view-form-content .mandatory-key > a > i.jstree-checkbox,
+.design-view-form-content .mandatory-key > .jstree-clicked > i.jstree-checkbox {
+    display: none;
+}
+
+.design-view-form-content .mandatory-annotation > a > i.jstree-checkbox,
+.design-view-form-content .mandatory-annotation > .jstree-clicked > i.jstree-checkbox {
+    display: none;
+}
+
+.design-view-form-content #annotation-div a.annotation.jstree-hovered,
+.design-view-form-content #annotation-div a.annotation-key.jstree-hovered,
+.design-view-form-content #annotation-div a.annotation-value.jstree-hovered {
+    cursor: text;
+    color: #ccc;
+    background: transparent;
+    border-radius: 0px;
+}
+
+.design-view-form-content .optional-annotation > a.jstree-hovered,
+.design-view-form-content .mandatory-key > a.jstree-hovered {
+    cursor: default;
+    color: #ccc;
+    background: transparent;
+    border-radius: 0px;
+}
+
+.design-view-form-content .jstree-clicked {
+    background: #5F5B5A;
+    color: #ccc;
+    border-radius: 2px;
+    box-shadow: inset 0 0 1px #999999;
+}
+
+.design-view-form-content .jstree-rename-input {
+    background: #5F5B5A;
+}
+
+.design-view-form-content .jstree-hovered {
+    background: transparent;
+}
+
+.design-view-form-content .stream-form-container #define-annotation,
+.design-view-form-content .siddhi-app-form-container #define-annotation {
+    color: #ccc;
+}
+
+.design-view-form-content .cust-option-key {
+    margin-left: 20px;
+}
+
+.design-view-form-content .cust-option-value {
+    margin-left: 10px;
+}
+
+.stream-form-container,
+.partition-form-container,
+.siddhi-app-form-container {
+    width: 40%;
+}
+
+.stream-form-container,
+.source-sink-form-container,
+.table-form-container,
+.window-form-container,
+.trigger-form-container,
+.function-form-container,
+.partition-form-container,
+.siddhi-app-form-container,
+.aggregation-form-container,
+.join-query-form-container,
+.pattern-sequence-query-form-container,
+.query-form-container {
+    float: left;
+    display: inline-block;
+    padding: 5px;
+    margin-right: 10px;
+}
+
+.trigger-form-container,
+.function-form-container {
+    width: 40%;
+}
+
+.pattern-sequence-query-form-container,
+.join-query-form-container {
+    width: 23%;
+}
+
+.aggregation-form-container,
+.query-form-container {
+    width: 32%;
+}
+
+.aggregation-form-container #primary-index-annotations {
+    margin-top: 2px;
+}
+
+.aggregation-form-container .define-predefined-annotations {
+    margin-top: -10px;
+}
+
+.trigger-form-container #define-trigger-criteria {
+    margin-top: -3px;
+    margin-bottom: 10px;
+}
+
+.design-view-form-content .source-div,
+.design-view-form-content .sink-div {
+    width: 40%;
+}
+
+.design-view-form-content .table-div {
+    width: 33%;
+}
+
+.design-view-form-content .mapper-div {
+    width: 28%;
+}
+
+.design-view-form-content .customized-options {
+    min-width: 330px;
+}
+
+.design-view-form-content .define-select {
+    min-width: 300px;
+}
+
+.design-view-form-content .store-div {
+    width: 33%;
+}
+
+.design-view-form-content .define-table-annotation,
+.design-view-form-content .window-form-container {
+    width: 32%;
+}
+
+.design-view-form-content #primary-index-annotations .annotation {
+    margin-bottom: 10px;
+}
+
+.design-view-form-content .attribute-map-div {
+    width: 30%;
+}
+
+.design-view-form-content #store-options,
+.source-sink-form-container #source-options,
+.source-sink-form-container #sink-options,
+.design-view-form-content #stream-function-parameters {
+    display: flex;
+}
+
+.design-view-form-content .sub-store-options-div,
+.source-sink-form-container .sub-source-options-div,
+.source-sink-form-container .sub-sink-options-div,
+.design-view-form-content .sub-stream-function-parameter-div {
+    width: 50%;
+}
+
+.design-view-form-content #btn-submit,
+.design-view-form-content #btn-cancel {
+    margin-top: 15px;
+    margin-right: -6px;
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+.design-view-form-content input[type="checkbox"],
+.design-view-form-content input[type="radio"] {
+    margin: 0px 5px 0px 0;
+    vertical-align: middle;
+}
+
+.design-view-form-content #attribute-key-label {
+    margin-left: 75px;
+    margin-right: 100px;
+}
+
+.design-view-form-content .fw-info {
+    font-size: 10px;
+    margin-left: 3px;
+    color: #b7f1eb;
+}
+
+.design-view-form-content .trigger-form-container .fw-info {
+    font-size: 12px;
+}
+
+.design-view-form-content .cust-options .option {
+    margin-bottom: 5px;
+}
+
+.design-view-form-content .source-sink-form-container #stream-attributes {
+    margin-top: 10px;
+}
+
+.design-view-form-content .fw-info > span {
+    font-family: Arial;
+    background: rgb(37, 36, 36);
+    width: 250px;
+    color: #eee;
+    text-align: left;
+    border-radius: 6px;
+    padding: 5 5px;
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.design-view-popover .popover-content {
+    padding: .5rem .75rem;
+    font-family: Arial;
+    background: rgb(51, 50, 50);
+    color: #eee;
+    text-align: left;
+    word-break: break-all;
+}
+
+.design-view-popover.popover {
+    background: rgb(51, 50, 50);
+    border: 1px solid #655e5e;
+    width: unset;
+    min-width: 200px;
+    max-width: 400px;
+}
+
+.design-view-popover.popover .arrow:after {
+    border-bottom-color: rgb(51, 50, 50);
+}
+
+.design-view-form-content .btn-default {
+    margin-top: 15px;
+}
+
+.design-view-form-content #primary-index-annotations .btn-add-annot-value {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    margin-left: 20px;
+}
+
+.design-view-form-content .option .mandatory-symbol {
+    margin-right: 12px;
+}
+
+.design-view-form-content .mandatory-symbol,
+.design-view-form-content .parameter .mandatory-symbol {
+    margin-right: 7px;
+}
+
+.design-view-form-content select,
+.design-view-form-content input.custom-combobox-input,
+.design-view-form-content .custom-combobox-toggle {
+    color: #ccc;
+    background: #424242;
+    border: 1px solid #716e6e;
+    height: 22px;
+    border-radius: 0px;
+}
+
+.design-view-form-content input.custom-combobox-input {
+    padding: 5px;
+}
+
+.design-view-form-content .custom-combobox-toggle {
+    height: 22px;
+    margin: -1px 0 0 -1px;
+}
+
+.design-view-form-content .optional-option:hover,
+.design-view-form-content .optional-parameter:hover,
+.source-sink-form-container #attribute-map-label:hover,
+.design-view-form-content .rdbms-type,
+.design-view-form-content #primary-index-annotations .annotation-name {
+    cursor: pointer;
+}
+
+.source-sink-form-container .attribute-labels {
+    margin-top: 10px;
+}
+
+.design-view-form-content label {
+    word-break: break-all;
+}
+
+.design-view-form-content .rdbms-type {
+    margin-right: 10px;
+    margin-top: 10px;
+}
+
+.selector {
+    position: absolute;
+    background: rgba(0, 0, 255, 0.1) none repeat scroll 0% 0%;
+    border: 1px solid rgba(0, 0, 255, 0.45);
+    display: none;
+    pointer-events: none;
+    left: 0px;
+    top: 0px;
+}
+
+.form-wrapper .query-form-actions {
+    position: fixed;
+    bottom: 22px;
+    background: #0e0e0e;
+    width: 100%;
+    height: 53px;
+    padding: 10px;
+}
+
+.form-wrapper {
+    height: 100%;
+}
+
+.define-predefined-annotations .sub-annotation {
+    margin-left: 20px;
+}
+
+.define-predefined-annotations .sub-annotation > .sub-annotation {
+    margin-left: 20px;
+}
+
+.design-view-form-content #primary-index-annotations .annotation-content {
+    padding: 5px;
+    padding-left: 4px;
+}
+
+.design-view-form-content .define-predefined-annotations .annotation-options,
+.design-view-form-content .aggregation-form-container .store-content,
+.design-view-form-content .aggregation-form-container #store-options-div {
+    margin-left: 30px;
+}
+
+.design-view-form-content .option,
+.design-view-form-content .parameter {
+    margin-bottom: 5px;
+}
+
+.design-view-form-content .aggregation-form-container #primary-index-annotations {
+    margin-top: 4px;
+}
+
+.design-view-form-content .define-predefined-annotations .error-message {
+    margin-left: 20px;
+}
+
+.design-view-form-content .aggregate-by-time-period-content .interval-option {
+    padding: 5px;
+}
+
+.design-view-form-content hr {
+    margin-top: 10px;
+    margin-bottom: 3px;
+}
+
+.design-view-form-content .define-predefined-annotations .annotation-options h3,
+.aggregation-form-container #store-options-div h3 {
+    font-size: 12px;
+    margin-bottom: 3px;
+    margin-top: 10px;
+}
+
+.design-view-form-content .order-by-content .order-by-attribute-content,
+.design-view-form-content .group-by-content .group-by-attribute-content {
+    display: inline-flex;
+}
+
+.design-view-form-content .order-group-by-content .btn-del-option {
+    margin-top: 3px;
+}
+
+.design-view-form-content .group-by-content .btn-del-option {
+    margin-left: 10px;
+    margin-top: 1px;
+}
+
+.design-view-form-content .order-group-by-content .define-order-del {
+    margin-left: 10px;
+}
+
+.design-view-form-content .order-by-attribute-content .btn-del-option {
+    margin-top: 0px;
+}
+
+.join-query-form-container .define-source input[type="text"].as-content-value {
+    margin-top: 7px;
+}
+
+.join-query-form-container .define-unidirectional,
+.join-query-form-container .define-streamHandler,
+.design-view-form-content .query-selected-attributes li,
+.join-query-form-container .define-source .define-as {
+    margin-top: 10px;
+}
+
+.design-view-form-content .define-stream-handler .define-stream-handler-content {
+    border: 1px solid #403e3e;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.design-view-form-content .define-stream-handler .define-stream-handler-type-content {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.design-view-form-content .define-group-by-attributes,
+.design-view-form-content .define-order-by-attributes,
+.design-view-form-content .define-content,
+.design-view-form-content .define-output-content,
+.query-output-container .define-output-events,
+.design-view-form-content .define-stream-handler {
+    margin-top: 10px;
+}
+
+.focused-container {
+    border-color: #4af;
+    box-shadow: 0 0 1px 2px #4af !important;
+}
+
+.selected-container {
+    border-color: #4af;
+    box-shadow: 0 0 1px 1px #4af;
+}
+
+.selected-button {
+    color: #ffffff !important;
+    transition: 0.15s !important;
+}
+
+label.option-name {
+    margin-bottom: 2px;
+}
+
+.design-view-form-content .define-user-defined-attributes .attribute,
+.design-view-form-content #mapper-attributes .attribute,
+.design-view-form-content #partition-by-content .partition-key,
+.design-view-form-content .order-group-by-content ul li {
+    margin: 6px;
+}
+
+.design-view-form-content .define-conditions .nav-tabs > li.active > a {
+    font-weight: 500;
+}
+
+.design-view-form-content .define-conditions .nav-tabs > li.active {
+    background: #1f1e1e;
+}
+
+.design-view-form-content .define-conditions .nav-tabs > li {
+    width: auto;
+    border-right: 1px solid #4c4c4c;
+}
+
+.design-view-form-content .define-conditions .nav-tabs > li:last-child {
+    border: 0;
+}
+
+.design-view-form-content .define-conditions .nav-tabs > li > a {
+    padding: 2px 10px;
+    float: left;
+}
+
+.design-view-form-content .define-conditions .nav-tabs > li.active > a,
+.design-view-form-content .define-conditions .nav-tabs > li.active > a:hover,
+.design-view-form-content .define-conditions .nav-tabs > li.active > a:focus {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.design-view-form-content .define-conditions button.close {
+    padding-left: 10px;
+    display: none;
+    font-size: 0.7em;
+    opacity: 0.3;
+    text-shadow: none;
+    color: #fff;
+}
+
+.design-view-form-content .define-conditions button.close:hover,
+.design-view-form-content .define-conditions button.close:focus {
+    opacity: 0.6;
+}
+
+.design-view-form-content .define-conditions li.active button.close {
+    display: block;
+}
+
+.design-view-form-content .define-conditions .close i {
+    padding-right: 0;
+}
+
+.design-view-form-content .define-stream-handler-section,
+.design-view-form-content .define-stream-handler-buttons {
+    background: #1f1e1e;
+    padding: 5px;
+    margin-left: 20px;
+}
+
+.design-view-form-content .define-conditions .tab-content {
+    background: #1f1e1e;
+    padding: 5px;
+}
+
+.design-view-form-content .define-stream {
+    padding: 5px 0;
+}
+
+.design-view-form-content label {
+    margin-bottom: 2px;
+}
+
+.margin-top-5 {
+    margin-top: 5px;
+}
+
+.aggregation-form-container .min-range,
+.aggregation-form-container .max-range,
+.design-view-form-content .aggregation-info,
+.join-query-form-container .define-source {
+    margin-bottom: 10px;
+}
+
+.design-view-form-content .define-join-type {
+    margin-bottom: 15px;
+}
+
+.aggregation-form-container #define-aggregate-annotations,
+.trigger-form-container #define-trigger-criteria {
+    margin-top: 20px;
+}
+
+.window-form-container .define-output-events {
+    margin-bottom: 20px;
+}
+
+.design-view-form-content .define-user-defined-annotations,
+.design-view-form-content .join-source-content,
+.siddhi-app-form-container #define-app-description,
+.query-form-container .query-from-div {
+    margin-top: 10px;
+}
+
+#define-aggregate-annotations .define-store-annotation {
+    margin-top: -5px;
+}
+
+.cust-options .option div:first-child {
+    margin-bottom: 2px;
+}
+
+.perfect-scroller {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.form-min-width {
+    min-width: 1750px;
+}
+
+.btn-default:active,
+.btn-default:focus {
+    background: #2c2c2c;
+    color: #fff;
+}
+
+.design-view-form-content .attribute-mapping-label {
+    width: 37%;
+    text-align: left;
+    margin: 6px;
+}
+
+.design-view-form-content .customized-options input[type="text"] {
+    width: 50%;
+}
+
+.design-view-form-content .collapse-div[aria-expanded=false] .collapse-icon::after {
+    content: "\e685";
+}
+
+.design-view-form-content .collapse-div[aria-expanded=true] .collapse-icon::after {
+    content: "\e684";
+}
+
+.design-view-form-content .collapse-div .collapse-icon {
+    padding: 0 5px;
+    font-family: font-wso2;
+    font-size: 10px;
+    float: right;
+    color: #f47a1e;
+}
+
+.design-view-form-content .collapse-div {
+    min-height: 25px;
+    background-color: #282929;
+    padding: 3px 7px;
+}
+
+.design-view-form-content .define-query-output .set-condition li {
+    margin: 5px;
+}
+
+.design-view-form-content .define-query-output .set-condition li input[type="text"] {
+    width: 40%;
+}
+
+.design-view-form-content .define-query-output .define-operation-set-condition .set-attribute-label {
+    margin: 5px;
+    width: 38%;
+}
+
+.design-view-form-content h3 {
+    margin-top: 1px;
+}
+
+.ps .ps__rail-x:hover,
+.ps .ps__rail-y:hover,
+.ps .ps__rail-x:focus,
+.ps .ps__rail-y:focus,
+.ps .ps__rail-x.ps--clicking,
+.ps .ps__rail-y.ps--clicking {
+    background-color: transparent;
+}
+
+.ps__rail-y,
+.ps__rail-x {
+    color: #8a8a8a;
+    width: 6px;
+}
+
+.ps__rail-y:hover > .ps__thumb-y,
+.ps__rail-y:focus > .ps__thumb-y,
+.ps__rail-y.ps--clicking .ps__thumb-y,
+.ps__rail-x:hover > .ps__thumb-x,
+.ps__rail-x:focus > .ps__thumb-x,
+.ps__rail-x.ps--clicking .ps__thumb-x {
+    width: 6px;
+}
+
+.ps__rail-x:hover > .ps__thumb-x {
+    height: 6px;
+}
+
+.design-view-form-auto-complete.ui-widget.ui-widget-content {
+    background: #1f1e1e;
+    border: 1px solid grey !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.design-view-form-auto-complete .ui-menu-item {
+    font-family: Arial;
+}
+
+.design-view-form-auto-complete .ui-menu-item .option-helperText {
+    float: right;
+    color: #7b7977;
+    width: 101px;
+    text-align: right;
+    font-style: italic;
+}
+
+.design-view-form-auto-complete .ui-menu-item .option-label {
+    width: calc(100% - 105px);
+    overflow-wrap: break-word;
+    display: inline-block;
+}
+
+.design-view-form-auto-complete .ui-menu-item:hover,
+.design-view-form-auto-complete .ui-state-active {
+    background: #0d1113 !important;
+    color: #ccc !important;
+    border: 1px solid #222222;
+}
+
+.design-view-form-auto-complete.ui-widget-content .ui-menu-item-wrapper {
+    color: #ccc !important;
+    text-decoration: none;
+    display: block;
+    padding: .2em .4em;
+    line-height: 1.5;
+    zoom: 1;
+}
+
+.design-view-form-auto-complete .auto-option {
+    float: left;
+    display: inline-block;
+}
+
+.design-view-form-content .design-view-combobox {
+    max-height: 150px;
+    z-index: 1000 !important;
+}
+
+.design-view-form-content .display-predefined-parameters {
+    margin-top: 10px;
+    background: rgb(40, 41, 41);
+}
+
+.design-view-form-content .predefined-param {
+    margin: 5px;
+}
+
+.design-view-form-content .predefined-param .predefined-param-name {
+    font-weight: normal;
+}
+
+.design-view-form-content .predefined-param .optional-label {
+    font-weight: 300;
+    font-style: italic;
+}
+
+.design-view-form-content .predefined-param .predefined-param-desc {
+    margin-left: 5px;
+    word-break: break-word;
+}
+
+.design-view-form-content .display-predefined-parameters .parameter-label {
+    font-weight: bold;
+}
+
+.design-view-form-content .defineFunctionParameters .btn-add-param-attribute {
+    margin-top: -1px;
+    height: 21px;
+    padding: 0 10px;
+    margin-left: 3px;
+    border: 1px solid #716e6e;
+}
+
+.design-view-form-content .defineFunctionParameters .attribute-param-value {
+    margin-top: 5px;
+}
+
+.init-loading-screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 22;
+    background-color: #282828;
+    color: #fff;
+    font-size: 40px;
+    text-align: center;
+    padding: 20% 0;
+}
+
+.init-loading-screen p {
+    font-size: 20px;
+}
