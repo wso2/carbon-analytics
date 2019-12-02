@@ -149,15 +149,16 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                         type: "POST",
                         contentType: "text/plain; charset=utf-8",
                         url: sampleServiceURL,
+                        indexValue: i,
                         data: payload,
                         async: true,
                         success: function (data, textStatus, xhr) {
                             var config =
                                 {
-                                    "sampleName": payload.replace(/^.*[\\\/]/, '').match(/[^.]*/i)[0],
+                                    "sampleName": this.data.replace(/^.*[\\\/]/, '').match(/[^.]*/i)[0],
                                     "content": data.content,
                                     "parentContainer": "#sampleContent",
-                                    "firstItem": i === 0,
+                                    "firstItem": this.indexValue === 0,
                                     "clickEventCallback": function (event) {
                                         event.preventDefault();
                                         var file = new File({
