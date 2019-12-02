@@ -11,6 +11,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             this.natsConfigsGiven = false;
             this.needDefaultNats = false;
             this.pvConfigsGiven = false;
+            this.statePersistenceConfigGiven = false;
             this.editorObjectArrayList = [];
         };
 
@@ -65,15 +66,14 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                 self.templateContainer.find('#kubernetes-messaging-editor-id').hide();
             });
 
-            var divId = "kubernetes-pv-editor-id";
-            var templateEntry = "<div class='kubernetes-config-editor' style='display:none' id='".concat(divId).concat("'></div>");
+            this.divId = "kubernetes-pv-editor-id";
+            var templateEntry = "<div class='kubernetes-config-editor' style='display:none' id='".concat(this.divId).concat("'></div>");
             self.templateContainer.find('#persistent-select').append(templateEntry);
             this._mainEditor = new SiddhiEditor({
-                divID: divId,
+                divID: this.divId,
                 realTimeValidation: false,
                 autoCompletion: false
             });
-
             var pvSampleConfig = 'persistentVolumeClaim: \n' +
                 '  accessModes: \n' +
                 '    - ReadWriteOnce\n' +
@@ -82,7 +82,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                 '      storage: 1Gi\n' +
                 '  storageClassName: standard\n' +
                 '  volumeMode: Filesystem';
-            this._editor2 = ace.edit(divId);
+            this._editor2 = ace.edit(this.divId);
             this._editor2.getSession().setValue(pvSampleConfig);
             this._editor2.resize(true);
             var obj2 = {
@@ -91,21 +91,83 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             };
             self.editorObjectArrayList.push(obj2);
 
-            self.templateContainer.find('#stateless').change(function(){
-                self.pvConfigsGiven = false;
-                self.templateContainer.find('#kubernetes-pv-editor-id').hide();
+            this.persistenceConfDivId = "kubernetes-persistence-type-editor-id";
+            var templateEntry = "<div class='kubernetes-config-editor' style='display:none' id='".concat(this.persistenceConfDivId).concat("'></div>");
+            self.templateContainer.find('#persistent-select').append(templateEntry);
+            this._mainEditor = new SiddhiEditor({
+                divID: this.persistenceConfDivId,
+                realTimeValidation: false,
+                autoCompletion: false
             });
+            this.databasePersistenceConfig = 'statePersistence: \n' +
+                 '  enabled: true \n' +
+                 '  intervalInMin: 1 \n' +
+                 '  revisionsToKeep: 3 \n' +
+                 '  persistenceStore: io.siddhi.distribution.core.persistence.DBPersistenceStore \n' +
+                 '  config: \n' +
+                 '    datasource: DATASOURCE_NAME   # A datasource with this name should be defined in datasources namespace \n' +
+                 '    table: TABLE_NAME \n';
+            this.amazons3PersistenceConfig = 'statePersistence: \n' +
+                 '  enabled: true \n' +
+                 '  intervalInMin: 1 \n' +
+                 '  revisionsToKeep: 2 \n' +
+                 '  persistenceStore: io.siddhi.distribution.core.persistence.S3PersistenceStore \n' +
+                 '  config: \n' +
+                 '    accessKey: ACEESS_KEY \n' +
+                 '    secretKey: SECRET_KEY \n' +
+                 '    region: us-west-2 \n' +
+                 '    bucketName: siddhi-app-persistence \n';
+            this.filePersistenceConfig = 'statePersistence: \n' +
+                 '  enabled: true \n' +
+                 '  intervalInMin: 1 \n' +
+                 '  revisionsToKeep: 2 \n' +
+                 '  persistenceStore: io.siddhi.distribution.core.persistence.FileSystemPersistenceStore \n' +
+                 '  config: \n' +
+                 '    location: siddhi-app-persistence \n';
+            this._editor3 = ace.edit(this.persistenceConfDivId);
+            this._editor3.getSession().setValue("");
+            this._editor3.resize(true);
+            var obj3 = {
+                name: 'state-persistence',
+                content: this._editor3
+            };
+            self.editorObjectArrayList.push(obj3);
 
-            self.templateContainer.find('#backed-by-pv').change(function(){
-                self.pvConfigsGiven = true;
-                self.templateContainer.find('#kubernetes-pv-editor-id').show();
+            self.templateContainer.find('#kube-persistence-dropdown-id').change(function(){
+                var kubePersistenceOptions = self.templateContainer.find('#kube-persistence-dropdown-id')[0].options;
+                if (kubePersistenceOptions[kubePersistenceOptions.selectedIndex].value == "disable-persistence") {
+                    self.pvConfigsGiven = false;
+                    self.statePersistenceConfigGiven = false;
+                    self._editor3.getSession().setValue("");
+                    self.templateContainer.find("#" + self.persistenceConfDivId).hide();
+                    self.templateContainer.find("#" + self.divId).hide();
+                } else if (kubePersistenceOptions[kubePersistenceOptions.selectedIndex].value == "file-system-persistence") {
+                    self.pvConfigsGiven = true;
+                    self.statePersistenceConfigGiven = true;
+                    self._editor3.getSession().setValue(self.filePersistenceConfig);
+                    self.templateContainer.find("#" + self.persistenceConfDivId).show();
+                    self.templateContainer.find("#" + self.divId).show();
+                } else if (kubePersistenceOptions[kubePersistenceOptions.selectedIndex].value == "database-persistence") {
+                    self.pvConfigsGiven = false;
+                    self.statePersistenceConfigGiven = true;
+                    self._editor3.getSession().setValue(self.databasePersistenceConfig);
+                    self.templateContainer.find("#" + self.persistenceConfDivId).show();
+                    self.templateContainer.find("#" + self.divId).hide();
+                } else if (kubePersistenceOptions[kubePersistenceOptions.selectedIndex].value == "amazon-s3-persistence") {
+                    self.pvConfigsGiven = false;
+                    self.statePersistenceConfigGiven = true;
+                    self._editor3.getSession().setValue(self.amazons3PersistenceConfig);
+                    self.templateContainer.find("#" + self.persistenceConfDivId).show();
+                    self.templateContainer.find("#" + self.divId).hide();
+                }
             });
         };
 
-        KubernetesConfigDialog.prototype.getKubernetesConfigs = function () {
+        KubernetesConfigDialog.prototype.getConfigs = function () {
             var self = this;
             var messagingConfig ='';
             var pvConfig = '';
+            var statePersistenceConfig = '';
             var siddhiProcessName = self.siddhiProcessName || 'sample-siddhi-process';
             var siddhiProcessNameConfig = "siddhiProcessName: ".concat(siddhiProcessName.toString());
             var messagingDefaultConfig = 'messagingSystem:\n' +
@@ -120,10 +182,18 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                 if(self.pvConfigsGiven && editorObj.name == 'persistence') {
                     pvConfig = "\n" + editorObj.content.session.getValue().toString();
                 }
+                if(self.statePersistenceConfigGiven && editorObj.name == 'state-persistence') {
+                    statePersistenceConfig = "\n" + editorObj.content.session.getValue().toString();
+                }
             });
 
-            return siddhiProcessNameConfig + messagingConfig + pvConfig;
+            return {
+                        "kubernetesConfig": siddhiProcessNameConfig + messagingConfig + pvConfig,
+                        "statePersistenceConfig": statePersistenceConfig
+            };
         };
+
+
         return KubernetesConfigDialog;
     });
 

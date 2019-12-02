@@ -305,12 +305,13 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                 sendExportRequest: function () {
                     if (!this._isExportDockerFlow) {
-                        this._payload.kubernetesConfiguration = this._kubernetesConfigModel.getKubernetesConfigs();
+                        this._payload.kubernetesConfiguration = this._kubernetesConfigModel.getConfigs()["kubernetesConfig"];
+                        this._payload.configuration += this._kubernetesConfigModel.getConfigs()["statePersistenceConfig"];
                     }
-                    if (typeof this._dockerConfigModel == "undefined") {
-                        this._payload.dockerConfiguration = this._dockerImageTypeModel.getDockerTypeConfigs();
-                    } else {
+                    if (this._dockerImageTypeModel.getDockerTypeConfigs()["pushDocker"]) {
                         this._payload.dockerConfiguration = this._dockerConfigModel.getDockerConfigs();
+                    } else {
+                        this._payload.dockerConfiguration = this._dockerImageTypeModel.getDockerTypeConfigs();
                     }
 
                     if (typeof this._jarsSelectorDialog == "undefined") {

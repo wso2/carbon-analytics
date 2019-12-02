@@ -55,7 +55,7 @@ define(['jquery', 'lodash', 'log', 'file_browser', 'js_tree'],
                                                             .trim().toLowerCase()
                                                             .replace(".siddhi", "")
                                                             .replace(/[^a-z0-9\-]/g, "-");
-                                siddhiProcessName = siddhiProcessName + "-1.0.0";
+                                siddhiProcessName = siddhiProcessName + "-1-0-0";
                                 self.siddhiProcessName = siddhiProcessName;
                                 self.form.find("#sp-name-input-field").val(siddhiProcessName);
                              }

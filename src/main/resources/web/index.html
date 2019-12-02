@@ -2499,6 +2499,20 @@
                         </div>
                         <div id="step-3">
                             <div class="step-description-text">Use ${...} format to template the configurations</div>
+                            <br />
+                            <div class="dropdown" id="siddhi-config-main-dropdown-id">
+                                <button class="btn btn-default btn-circle btn-lg" type="button" data-toggle="dropdown">
+                                    <i class="fw fw-add"></i>
+                                </button>
+                                <ul class="dropdown-menu kube-persistence-dropdown" role="menu" id="siddhi-config-dropdown-id">
+                                    <li><a href="#" id="data-sources" class="dropdown-list-element">Data Sources</a></li>
+                                    <li><a href="#" id="metrics" class="dropdown-list-element">Metrics</a></li>
+                                    <li><a href="#" id="extensions" class="dropdown-list-element">Extensions</a></li>
+                                    <li><a href="#" id="references" class="dropdown-list-element">References</a></li>
+                                    <li><a href="#" id="transports" class="dropdown-list-element">Transports</a></li>
+                                </ul>
+                            </div>
+                            <br />
                             <div class='config-template-container' id='config-template-container-id'
                                  style='display: block'>
                             </div>
@@ -2600,8 +2614,12 @@
                 <div class="kube-config-sub-row">
                     <div class="clearfix">Persistence</div>
                     <div class="kube-input-group" id="persistent-select">
-                        <input type="radio" name="persistence" id="stateless" value="stateless"> Disable Persistence Volume<br>
-                        <input type="radio" name="persistence" id="backed-by-pv" value="backed-by-pv"> Enable Persistent Volume<br>
+                        <select class="kube-persistence-dropdown" id="kube-persistence-dropdown-id">
+                            <option value="disable-persistence">Disable State Persistence</option>
+                            <option value="file-system-persistence">File System Persistence</option>
+                            <option value="database-persistence">Database Persistence</option>
+                            <option value="amazon-s3-persistence">Amazon S3 Persistence</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -2624,7 +2642,7 @@
 
 
 <script src="/editor/commons/lib/requirejs-2.3.2/require.js"></script>
-<script type="text/javascript">
+<script type="text/javascript" async>
     requirejs.config({
         baseUrl: window.location.protocol + "//" + window.location.host + '/editor',
         paths: {
