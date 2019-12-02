@@ -150,11 +150,11 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                         contentType: "text/plain; charset=utf-8",
                         url: sampleServiceURL,
                         data: payload,
-                        async: false,
+                        async: true,
                         success: function (data, textStatus, xhr) {
                             var config =
                                 {
-                                    "sampleName": samples[i].replace(/^.*[\\\/]/, '').match(/[^.]*/i)[0],
+                                    "sampleName": payload.replace(/^.*[\\\/]/, '').match(/[^.]*/i)[0],
                                     "content": data.content,
                                     "parentContainer": "#sampleContent",
                                     "firstItem": i === 0,
