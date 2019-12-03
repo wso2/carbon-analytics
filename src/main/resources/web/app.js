@@ -148,6 +148,7 @@ requirejs.config({
         jarsSelectorDialog: "js/export-deployment-artifacts/jars-selector-dialog",
         siddhiAppSelectorDialog: "js/export-deployment-artifacts/siddhiapp-selector-dialog",
         templateConfigDialog: "js/export-deployment-artifacts/template-config-dialog",
+        templateConfigBlocks: "js/export-deployment-artifacts/template-config-blocks",
         dockerConfigDialog: "js/export-deployment-artifacts/docker-config-dialog",
         dockerImageTypeDialog: "js/export-deployment-artifacts/docker-image-type-dialog",
         fillTemplateValueDialog: "js/export-deployment-artifacts/fill-template-value-dialog",
