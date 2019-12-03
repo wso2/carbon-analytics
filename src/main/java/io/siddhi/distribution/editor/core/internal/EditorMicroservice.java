@@ -1339,34 +1339,6 @@ public class EditorMicroservice implements Microservice {
     }
 
     /**
-     * Export given Siddhi apps and other configurations to docker or kubernetes artifacts.
-     *
-     * @return Docker or Kubernetes artifacts
-     */
-    @GET
-    @Path("/deploymentConfigs")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getDeploymentConfigs() {
-        ExportUtils exportUtils = new ExportUtils(configProvider);
-        try {
-            JsonObject deploymentHolder = new JsonObject();
-            deploymentHolder.addProperty("deploymentYaml", exportUtils.exportConfigs());
-            return Response
-                    .status(Response.Status.OK)
-                    .entity(deploymentHolder)
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        } catch (IOException e) {
-            log.error("Cannot read deployment.yaml file. ", e);
-            return Response
-                    .status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Cannot read deployment.yaml file in TOOLING|RUNNER configuration. " +
-                            e.getMessage())
-                    .build();
-        }
-    }
-
-    /**
      * Get sample event for a particular event stream.
      *
      * @param appName    Siddhi app name.
