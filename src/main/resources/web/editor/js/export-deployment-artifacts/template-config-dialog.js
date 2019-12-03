@@ -66,6 +66,35 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                 $(needToDisableAttribute).removeClass('dropdown-list-element');
                 $(needToDisableAttribute).addClass('disabled-dropdown-list-element');
             });
+
+            $('#config-template-container-id #configurationEditorId').keyup(function(){
+                var currentConfig = self._editor.getSession().getValue("");
+                var dataSourceRegex = /(^dataSources|\n\s*dataSources)/gi
+                var metricsRegex = /(^metrics|\n\s*metrics)/gi
+                var extensionsRegex = /(^extensions|\n\s*extensions)/gi
+                var referencesRegex = /(^refs|\n\s*refs)/gi
+                var transportsRegex = /(^transports|\n\s*transports)/gi
+                if (currentConfig.match(dataSourceRegex) == null) {
+                    $("#siddhi-config-dropdown-id #data-sources").removeClass('disabled-dropdown-list-element');
+                    $("#siddhi-config-dropdown-id #data-sources").addClass('dropdown-list-element');
+                }
+                if (currentConfig.match(metricsRegex) == null) {
+                    $("#siddhi-config-dropdown-id #metrics").removeClass('disabled-dropdown-list-element');
+                    $("#siddhi-config-dropdown-id #metrics").addClass('dropdown-list-element');
+                }
+                if (currentConfig.match(extensionsRegex) == null) {
+                    $("#siddhi-config-dropdown-id #extensions").removeClass('disabled-dropdown-list-element');
+                    $("#siddhi-config-dropdown-id #extensions").addClass('dropdown-list-element');
+                }
+                if (currentConfig.match(referencesRegex) == null) {
+                    $("#siddhi-config-dropdown-id #references").removeClass('disabled-dropdown-list-element');
+                    $("#siddhi-config-dropdown-id #references").addClass('dropdown-list-element');
+                }
+                if (currentConfig.match(transportsRegex) == null) {
+                    $("#siddhi-config-dropdown-id #transports").removeClass('disabled-dropdown-list-element');
+                    $("#siddhi-config-dropdown-id #transports").addClass('dropdown-list-element');
+                }
+            });
         };
 
         function isJsonString(str) {

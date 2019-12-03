@@ -2472,7 +2472,7 @@
                         <li><a href="#step-1" class="link-disabled">Step 1<br/><small>Select Siddhi Apps</small></a></li>
                         <li><a href="#step-2" class="link-disabled">Step 2<br/><small>Template Siddhi Apps</small></a></li>
                         <li><a href="#step-3" class="link-disabled">Step 3<br/><small>Update Siddhi Runner<br/>Configurations</small></a></li>
-                        <li><a href="#step-4" class="link-disabled">Step 4<br/><small>Populate arguments <br/>template</small></a></li>
+                        <li><a href="#step-4" class="link-disabled">Step 4<br/><small>Populate Arguments <br/>Template</small></a></li>
                     </ul>
                     <div id="form-containers">
                         <div id="step-1" class="export-selector">
@@ -2500,11 +2500,11 @@
                         <div id="step-3">
                             <div class="step-description-text">Use ${...} format to template the configurations</div>
                             <br />
-                            <div class="dropdown" id="siddhi-config-main-dropdown-id">
-                                <button class="btn btn-default btn-circle btn-lg" type="button" data-toggle="dropdown">
+                            <div class="dropdown" id="siddhi-config-main-dropdown-id" align="right">
+                                <button class="btn btn-default btn-circle" id="deployment-config-add-button" type="button" data-toggle="dropdown">
                                     <i class="fw fw-add"></i>
                                 </button>
-                                <ul class="dropdown-menu kube-persistence-dropdown" role="menu" id="siddhi-config-dropdown-id">
+                                <ul class="dropdown-menu kube-persistence-right-dropdown" role="menu" id="siddhi-config-dropdown-id">
                                     <li><a href="#" id="data-sources" class="dropdown-list-element">Data Sources</a></li>
                                     <li><a href="#" id="metrics" class="dropdown-list-element">Metrics</a></li>
                                     <li><a href="#" id="extensions" class="dropdown-list-element">Extensions</a></li>
@@ -2531,13 +2531,13 @@
 <!-- Common steps for Docker and K8s export -->
 <div id="docker-config-common-step" class="export-selector">
     <div class='docker-config-container' id='docker-config-container-id'>
-        <div class='step-description' id="config-description">Select method to export artifacts:</div>
+        <div class='step-description' id="config-description">Select export mode:</div>
         <div class="docker-config-form">
             <div id='missing-docker-config-error-message' class='alert alert-danger' hidden>
-                Required to fill Docker Configurations
+                Required to fill Docker configurations
             </div>
             <div id='docker-name-upper-error' class='alert alert-danger' hidden>
-                Docker Image Tag cannot contain uppercase letters.
+                Docker image tag cannot contain uppercase letters.
             </div>
             <input class="docker-checkbox" type="checkbox" name="download-docker-artifacts" id="download-docker-artifacts" value="download"><label class="label-description" id="download-docker-artifacts-label">Download artifacts</label><br>
             <input class="docker-checkbox" type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"><label class="label-description">Push to docker registry</label><br>
@@ -2569,7 +2569,7 @@
 <!-- K8s export unique steps -->
 <div id="k8s-path-step-5" class="export-selector">
     <div class='docker-config-container' id='docker-image-type-container-id'>
-        <div class='step-description' id="docker-image-type">Select type of the Docker image:</div>
+        <div class='step-description' id="docker-image-type">Select Docker image:</div>
         <div class="docker-config-form">
             <div id='k8s-path-missing-docker-build-type-error-message' class='alert alert-danger' hidden>
                 Required to fill Docker Configurations
@@ -2577,8 +2577,12 @@
             <div id='k8s-path-missing-docker-build-type-upper-error' class='alert alert-danger' hidden>
                 Docker Image Tag cannot contain uppercase letters.
             </div>
-            <input class="docker-checkbox" type="radio" name="docker-image-type-name" id="docker-image-type-tobuild" value="tobuild" checked="checked"><label class="label-description">Build Docker Image</label><br>
-            <input class="docker-checkbox" type="radio" name="docker-image-type-name" id="docker-image-type-existing" value="existing" ><label class="label-description">Use Existing Image</label><br>
+            <input class="docker-checkbox" type="radio" name="docker-image-type-name" id="docker-image-type-tobuild" value="tobuild" checked="checked">
+            <label class="label-description">Build custom docker image with extensions and artifacts</label>
+            <br>
+            <input class="docker-checkbox" type="radio" name="docker-image-type-name" id="docker-image-type-existing" value="existing" >
+            <label class="label-description">Use an existing Docker image</label>
+            <br>
             <div class="docker-details-form" id="k8s-path-docker-image-name-form" hidden>
                 <div class="docker-details-row">
                     <label class="clearfix">* Docker Image:</label>
@@ -2590,7 +2594,7 @@
 </div>
 <div id="k8s-path-step-6" class="export-selector">
     <div class='export-siddhi-app-list' id='k8s-path-additional-bundles-list'>
-        <div class='step-description'>Add additional JARS</div>
+        <div class='step-description'>Add additional libraries</div>
         <div class='form-group'>
             <div class='export-dialog-form-scrollable-block-list'>
                 <div id='k8s-path-bundles-tree'></div>
@@ -2600,7 +2604,7 @@
 </div>
 <div id="k8s-path-step-8" class="export-selector">
     <div class="export-kube-config-container" id="kubernetes-configuration-step-id">
-        <div class="step-description">Add Deployment Configuration</div>
+        <div class="step-description">Add deployment configuration</div>
         <div class="kube-config-form">
             <div class="kube-config-row">
                 <div class="kube-config-sub-row">
@@ -2631,7 +2635,7 @@
 <!-- Docker export unique steps -->
 <div id="docker-path-step-5" class="export-selector">
     <div class='export-siddhi-app-list' id='docker-additional-bundles-list'>
-        <div class='step-description'>Add additional JARS</div>
+        <div class='step-description'>Add additional libraries</div>
         <div class='form-group'>
             <div class='export-dialog-form-scrollable-block-list'>
                 <div id='docker-path-bundles-tree'></div>

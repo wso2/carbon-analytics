@@ -22,13 +22,13 @@
            '        validationTimeout: 30000 \n' +
            '        isAutoCommit: false \n';
         this.sampleMetricsConfig =  'metrics: \n' +
-           '    # The root level configured for Metrics \n' +
-           '    rootLevel: INFO \n' +
-           '    levels: \n' +
-           '      jvm.buffers: \'OFF\' \n' +
-           '      jvm.class-loading: INFO \n' +
-           '      jvm.gc: DEBUG \n' +
-           '      jvm.memory: INFO \n';
+           '  enabled: true \n' +
+           'metrics.prometheus: \n' +
+           '  reporting: \n' +
+           '    prometheus: \n' +
+           '      - name: prometheus \n' +
+           '        enabled: true \n' +
+           '        serverURL: "http://localhost:9005" \n';
         this.sampleExtensionsConfig =  'extensions: \n' +
            '  - \n' +
            '    extension: \n' +
@@ -44,10 +44,17 @@
            '      properties: \n' +
            '        property1: value1 \n' +
            '        property2: value2 \n';
-        this.sampleTransportConfig =  'wso2.carbon: \n' +
-           '  id: siddhi-runner \n' +
-           '  name: Siddhi Runner Distribution \n' +
-           '  hostnameVerificationEnabled: true \n';
+        this.sampleTransportConfig =  'transports:  \n' +
+           '  databridge: \n' +
+           '  # Configuration used for the databridge communication \n' +
+           '    listenerConfigurations: \n' +
+           '      workerThreads: 10 \n' +
+           '    senderConfigurations: \n' +
+           '    # Configuration of the Data Agents - to publish events through databridge \n' +
+           '      agents: \n' +
+           '          agentConfiguration: \n' +
+           '            name: Thrift \n' +
+           '            dataEndpointClass: org.wso2.carbon.databridge.agent.endpoint.thrift.ThriftDataEndpoint \n';
      }
      TemplateConfigBlocks.prototype.constructor = TemplateConfigBlocks;
      TemplateConfigBlocks.prototype.getTemplatedConfig = function () {
