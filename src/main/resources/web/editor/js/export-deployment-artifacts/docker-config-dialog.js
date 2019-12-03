@@ -31,6 +31,7 @@ define(['require', 'lodash', 'jquery'],
                 dockerDownloadCheckboxInput.hide();
                 dockerPushCheckboxInput.hide();
                 dockerDownloadCheckboxText.hide();
+                self.stepDesciption.hide();
                 self.dockerDetailsForm.show();
             } else {
                 dockerDownloadCheckboxInput.prop('checked', true);

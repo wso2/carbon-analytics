@@ -116,7 +116,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             'class="link-disabled">Step 7<br/><small>Export Custom Docker Image</small>' +
                             '</a></li>');
                         formSteps.append('<li style="max-width: ' + k8sStepWidth.toString()  + '%;"><a href="#k8s-path-step-8" ' +
-                            'class="link-disabled">Step 8<br/><small>Add Kubernetes Configurations</small>' +
+                            'class="link-disabled">Step 8<br/><small>Add Deployment Configurations</small>' +
                             '</a></li>');
                         form.find('#form-containers').append(this._exportKubeStep5Container);
                         form.find('#form-containers').append(this._exportKubeStep6Container);

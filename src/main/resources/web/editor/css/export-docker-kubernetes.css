@@ -253,7 +253,7 @@ div#step-6 {
 }
 
 .kubernetes-config-editor {
-    height: 150px !important;
+    height: 200px !important;
     width: 80%; !important;
     margin-top: 10px !important;
 }
@@ -268,7 +268,14 @@ div#step-6 {
 .kube-persistence-dropdown {
     width: 40%;
     color: white;
-    background: #01aaad;
+    background: #617d8b;
+}
+
+.kube-persistence-right-dropdown {
+    width: 40%;
+    color: white;
+    background: #617d8b;
+    margin-left: 57%;
 }
 
 .btn-circle {
@@ -279,8 +286,13 @@ div#step-6 {
   font-size: 12px;
   line-height: 1.428571429;
   border-radius: 15px;
-  background: #01aaad
+  background: #617d8b
 }
+
+.btn-circle:hover {
+  background: #4c626d;
+}
+
 .btn-circle.btn-lg {
   width: 50px;
   height: 50px;
@@ -289,6 +301,7 @@ div#step-6 {
   line-height: 1.33;
   border-radius: 25px;
 }
+
 .btn-circle.btn-xl {
   width: 70px;
   height: 70px;
@@ -299,6 +312,10 @@ div#step-6 {
 }
 
 .kube-persistence-dropdown > li > a {
+  color: #ffffff;
+}
+
+.kube-persistence-right-dropdown > li > a {
   color: #ffffff;
 }
 

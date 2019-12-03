@@ -127,6 +127,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             this._editor3 = ace.edit(this.persistenceConfDivId);
             this._editor3.getSession().setValue("");
             this._editor3.resize(true);
+            this._editor3.setOption("minLines", 10);
             var obj3 = {
                 name: 'state-persistence',
                 content: this._editor3
