@@ -13,6 +13,15 @@
 }
 
 .file-dialog-form-control {
+    width: 100%;
+    background-color: #2C2C2C;
+    border-style: none;
+    height: 35px;
+    padding-left: 10px;
+    color: #fff;
+}
+
+.export-file-dialog-form-control {
     width: 83%;
     background-color: #2C2C2C;
     border-style: none;
