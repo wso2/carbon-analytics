@@ -84,7 +84,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', '../../../js/event-sim
                         }
                     });
 
-                    queryTextArea.on('input change keyup', function (event) {
+                    storeQueryModal.submit(function (event) {
                         var siddhiAppName = storeQueryModal.find("select[name='siddhi-app-name']").val();
                         var onDemandQuery = storeQueryModal.find("textarea[id='curlEditor']").val();
                         if (sessionStorage.getItem("onDemandTempStore") !== null) {
@@ -98,10 +98,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', '../../../js/event-sim
                             onDemandTempStore[siddhiAppName] = onDemandQuery;
                             sessionStorage.setItem("onDemandTempStore", JSON.stringify(onDemandTempStore));
                         }
-                        event.preventDefault();
-                    });
-
-                    storeQueryModal.submit(function (event) {
                         QueryStoreRestClient.retrieveStoresQuery(
                             storeQueryModal.find("select[name='siddhi-app-name']").val(),
                             storeQueryModal.find("textarea[id='curlEditor']").val(),
