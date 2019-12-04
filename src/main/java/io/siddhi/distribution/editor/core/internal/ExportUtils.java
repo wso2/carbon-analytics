@@ -76,6 +76,7 @@ public class ExportUtils {
     private static final String APPS_BLOCK_TEMPLATE = "\\{\\{APPS_BLOCK}}";
     private static final String EXPOSE_PORTS_BLOCK_TEMPLATE = "\\{\\{EXPORT_PORTS_BLOCK}}";
     private static final String DOCKER_BASE_IMAGE_TEMPLATE = "\\{\\{SIDDHI_RUNNER_BASE_IMAGE}}";
+    private static final String DOCKER_IMAGE_NAME_TEMPLATE = "\\{\\{DOCKER_IMAGE_NAME}}";
     private static final String PORT_BIND_TEMPLATE = "\\{\\{BIND_PORTS}}";
     private static final String CONFIG_BLOCK_VALUE =
             "COPY --chown=siddhi_user:siddhi_io \\$\\{CONFIG_FILE}/ \\$\\{USER_HOME}";
@@ -445,6 +446,17 @@ public class ExportUtils {
                 byte[] data = Files.readAllBytes(dockerReadmeFilePath);
                 String content = new String(data, StandardCharsets.UTF_8);
                 content = content.replaceAll(PORT_BIND_TEMPLATE, portBindingStr.toString());
+                if (exportAppsRequest.getDockerConfiguration() != null &&
+                        exportAppsRequest.getDockerConfiguration().getImageName() != null) {
+                    content = content.replaceAll(
+                            DOCKER_IMAGE_NAME_TEMPLATE,
+                            exportAppsRequest.getDockerConfiguration().getImageName()
+                    );
+                } else {
+                    content = content.replaceAll(
+                            DOCKER_IMAGE_NAME_TEMPLATE, Constants.DEFAULT_SIDDHI_DOCKER_IMAGE_NAME);
+                }
+
                 byte[] readmeContent = content.getBytes(StandardCharsets.UTF_8);
                 zipOutputStream.write(readmeContent, 0, readmeContent.length);
                 zipOutputStream.closeEntry();
