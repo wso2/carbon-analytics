@@ -44,17 +44,26 @@
            '      properties: \n' +
            '        property1: value1 \n' +
            '        property2: value2 \n';
-        this.sampleTransportConfig =  'transports:  \n' +
-           '  databridge: \n' +
-           '  # Configuration used for the databridge communication \n' +
+        this.sampleTransportConfig =  'transports: \n' +
+           '  http: \n' +
            '    listenerConfigurations: \n' +
-           '      workerThreads: 10 \n' +
-           '    senderConfigurations: \n' +
-           '    # Configuration of the Data Agents - to publish events through databridge \n' +
-           '      agents: \n' +
-           '          agentConfiguration: \n' +
-           '            name: Thrift \n' +
-           '            dataEndpointClass: org.wso2.carbon.databridge.agent.endpoint.thrift.ThriftDataEndpoint \n';
+           '      -  \n' +
+           '        id: "default" \n' +
+           '        host: "0.0.0.0" \n' +
+           '        port: 9090 \n' +
+           '      -  \n' +
+           '        id: "msf4j-https" \n' +
+           '        host: "0.0.0.0" \n' +
+           '        port: 9443 \n' +
+           '        scheme: https \n' +
+           '        sslConfig: \n' +
+           '          keyStore: "${carbon.home}/resources/security/wso2carbon.jks" \n' +
+           '          keyStorePassword: wso2carbon \n' +
+           '    transportProperties: \n' +
+           '      - name: "server.bootstrap.socket.timeout" \n' +
+           '        value: 60 \n' +
+           '      - name: "latency.metrics.enabled" \n' +
+           '        value: false  \n';
      }
      TemplateConfigBlocks.prototype.constructor = TemplateConfigBlocks;
      TemplateConfigBlocks.prototype.getTemplatedConfig = function () {
