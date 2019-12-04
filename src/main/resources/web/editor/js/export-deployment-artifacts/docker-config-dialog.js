@@ -44,9 +44,8 @@ define(['require', 'lodash', 'jquery'],
                 }
             });
 
-            self.container.find("#docker-push-checkbox").change(function() {
-                var pushDocker = self.container.find("#docker-push-checkbox").is(":checked");
-                if (!pushDocker) {
+            self.container.find("#docker-push-checkbox").change(function(event) {
+                if (!event.target.checked) {
                     self.missingDockerConfigErrorMessage.hide();
                     self.dockerNameInUpperError.hide();
                     self.dockerDetailsForm.hide();
@@ -60,9 +59,9 @@ define(['require', 'lodash', 'jquery'],
             self.container.find("#docker-details").on('input', function() {
                 var imageName = self.container.find("#docker-img-name-input-field-registry").val().trim()
                                 + "/" + self.container.find("#docker-img-name-input-field-image").val().trim();
-                var userName = self.container.find("#username").val();
-                var password = self.container.find("#password").val();
-                var email = self.container.find("#email").val();
+                var userName = self.container.find("#username").val().trim();
+                var password = self.container.find("#password").val().trim();
+                var email = self.container.find("#email").val().trim();
                 var pushDocker = self.container.find("#docker-push-checkbox").is(":checked");
                 if (pushDocker || self.exportType === "kubernetes") {
                     var upperCase = new RegExp('[A-Z]');
@@ -88,9 +87,9 @@ define(['require', 'lodash', 'jquery'],
                 templateKeyValue["imageName"] = self.container.find("#docker-img-name-input-field-image").val().trim();
             }
 
-            templateKeyValue["userName"] = self.container.find("#username").val();
-            templateKeyValue["password"] = self.container.find("#password").val();
-            templateKeyValue["email"] = self.container.find("#email").val();
+            templateKeyValue["userName"] = self.container.find("#username").val().trim();
+            templateKeyValue["password"] = self.container.find("#password").val().trim();
+            templateKeyValue["email"] = self.container.find("#email").val().trim();
             templateKeyValue["downloadDocker"] = self.container.find("#download-docker-artifacts").is(":checked");
             templateKeyValue["pushDocker"] = self.container.find("#docker-push-checkbox").is(":checked");
             return templateKeyValue;
@@ -109,11 +108,10 @@ define(['require', 'lodash', 'jquery'],
 
             var registryName = self.container.find("#docker-img-name-input-field-registry").val().trim()
             var imageName = self.container.find("#docker-img-name-input-field-image").val().trim();
-            var userName = self.container.find("#username").val();
-            var password = self.container.find("#password").val();
-            var email = self.container.find("#email").val();
+            var userName = self.container.find("#username").val().trim();
+            var password = self.container.find("#password").val().trim();
+            var email = self.container.find("#email").val().trim();
             if (pushDocker || self.exportType === "kubernetes") {
-
                 var upperCase = new RegExp('[A-Z]');
                 if (imageName.match(upperCase)) {
                     self.dockerNameInUpperError.show();
