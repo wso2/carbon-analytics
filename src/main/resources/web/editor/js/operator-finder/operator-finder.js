@@ -111,6 +111,8 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
                     //change the "|" as "," and "\n" as "<br/> in returnAttributes description to avoid md
                     // conversation bug.
                     e.syntax = sanitiseString(e.syntax);
+                    //To provide suitable md data for remarkable js
+                    e.description = e.description.replace(/```/g,"\n```\n");
                     operator.combinedExamples += "<h5>example " + (++i) + "</h5>" +
                         "<pre>" + e.syntax + "</pre>" +
                         "<p>" + e.description + "</p>";
