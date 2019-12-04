@@ -7,7 +7,7 @@ define(['require', 'lodash', 'jquery'],
         var DockerConfigDialog = function (options) {
             this.missingDockerConfigErrorMessage = options.templateHeader.find("#missing-docker-config-error-message");
             this.dockerNameInUpperError = options.templateHeader.find("#docker-name-upper-error");
-            this.stepDesciption = options.templateHeader.find("#docker-config-description");
+            this.stepDesciption = options.templateHeader.find("#config-description");
             this.container = options.templateHeader;
             this.payload = options.payload;
             this.exportType = options.exportType;

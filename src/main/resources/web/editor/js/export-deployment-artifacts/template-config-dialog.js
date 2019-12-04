@@ -109,7 +109,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
         TemplateConfigDialog.prototype.getTemplatedConfig = function () {
             var self = this;
             if (self.configEditor != undefined) {
-                return self.configEditor.session.getValue();
+                return self.configEditor.session.getValue().trim();
             }
         };
         return TemplateConfigDialog;

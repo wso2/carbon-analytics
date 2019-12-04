@@ -67,8 +67,13 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             });
 
             this.divId = "kubernetes-pv-editor-id";
-            var templateEntry = "<div class='kubernetes-config-editor' style='display:none' id='".concat(this.divId).concat("'></div>");
-            self.templateContainer.find('#persistent-select').append(templateEntry);
+            this.divParentId = "kubernetes-pv-editor-parent-id";
+            var pvcTemplateEntry = "<br /><br /><div id='".concat(this.divParentId);
+            pvcTemplateEntry = pvcTemplateEntry.concat("' class='clearfix'>Persistence volume claim configuration for Kubernetes<div class='kubernetes-config-editor' style='display:none' id='");
+            pvcTemplateEntry = pvcTemplateEntry.concat(this.divId).concat("'></div></div>");
+            if (self.templateContainer.find("#" + this.divParentId).length == 0) {
+                self.templateContainer.find('#persistent-select').append(pvcTemplateEntry);
+            }
             this._mainEditor = new SiddhiEditor({
                 divID: this.divId,
                 realTimeValidation: false,
@@ -92,8 +97,13 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             self.editorObjectArrayList.push(obj2);
 
             this.persistenceConfDivId = "kubernetes-persistence-type-editor-id";
-            var templateEntry = "<div class='kubernetes-config-editor' style='display:none' id='".concat(this.persistenceConfDivId).concat("'></div>");
-            self.templateContainer.find('#persistent-select').append(templateEntry);
+            this.persistenceConfDivParentId = "kubernetes-persistence-type-editor-parent-id";
+            var statePersistenceTemplateEntry = "<br /><div id='".concat(this.persistenceConfDivParentId);
+            statePersistenceTemplateEntry = statePersistenceTemplateEntry.concat("' class='clearfix'>State persistence configuration for Siddhi runtime<div class='kubernetes-config-editor' style='display:none' id='");
+            statePersistenceTemplateEntry = statePersistenceTemplateEntry.concat(this.persistenceConfDivId).concat("'></div></div>");
+            if (self.templateContainer.find("#" + this.persistenceConfDivParentId).length == 0) {
+                self.templateContainer.find('#persistent-select').append(statePersistenceTemplateEntry);
+            }
             this._mainEditor = new SiddhiEditor({
                 divID: this.persistenceConfDivId,
                 realTimeValidation: false,
@@ -133,6 +143,8 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                 content: this._editor3
             };
             self.editorObjectArrayList.push(obj3);
+            self.templateContainer.find("#" + self.persistenceConfDivParentId).hide();
+            self.templateContainer.find("#" + self.divParentId).hide();
 
             self.templateContainer.find('#kube-persistence-dropdown-id').change(function(){
                 var kubePersistenceOptions = self.templateContainer.find('#kube-persistence-dropdown-id')[0].options;
@@ -140,26 +152,34 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                     self.pvConfigsGiven = false;
                     self.statePersistenceConfigGiven = false;
                     self._editor3.getSession().setValue("");
+                    self.templateContainer.find("#" + self.persistenceConfDivParentId).hide();
                     self.templateContainer.find("#" + self.persistenceConfDivId).hide();
+                    self.templateContainer.find("#" + self.divParentId).hide();
                     self.templateContainer.find("#" + self.divId).hide();
                 } else if (kubePersistenceOptions[kubePersistenceOptions.selectedIndex].value == "file-system-persistence") {
                     self.pvConfigsGiven = true;
                     self.statePersistenceConfigGiven = true;
                     self._editor3.getSession().setValue(self.filePersistenceConfig);
+                    self.templateContainer.find("#" + self.persistenceConfDivParentId).show();
                     self.templateContainer.find("#" + self.persistenceConfDivId).show();
+                    self.templateContainer.find("#" + self.divParentId).show();
                     self.templateContainer.find("#" + self.divId).show();
                 } else if (kubePersistenceOptions[kubePersistenceOptions.selectedIndex].value == "database-persistence") {
                     self.pvConfigsGiven = false;
                     self.statePersistenceConfigGiven = true;
                     self._editor3.getSession().setValue(self.databasePersistenceConfig);
+                    self.templateContainer.find("#" + self.persistenceConfDivParentId).show();
                     self.templateContainer.find("#" + self.persistenceConfDivId).show();
+                    self.templateContainer.find("#" + self.divParentId).hide();
                     self.templateContainer.find("#" + self.divId).hide();
                 } else if (kubePersistenceOptions[kubePersistenceOptions.selectedIndex].value == "amazon-s3-persistence") {
                     self.pvConfigsGiven = false;
                     self.statePersistenceConfigGiven = true;
                     self._editor3.getSession().setValue(self.amazons3PersistenceConfig);
+                    self.templateContainer.find("#" + self.persistenceConfDivParentId).show();
                     self.templateContainer.find("#" + self.persistenceConfDivId).show();
                     self.templateContainer.find("#" + self.divId).hide();
+                    self.templateContainer.find("#" + self.divParentId).hide();
                 }
             });
         };
@@ -184,7 +204,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                     pvConfig = "\n" + editorObj.content.session.getValue().toString();
                 }
                 if(self.statePersistenceConfigGiven && editorObj.name == 'state-persistence') {
-                    statePersistenceConfig = "\n" + editorObj.content.session.getValue().toString();
+                    statePersistenceConfig = "\n" + editorObj.content.session.getValue().toString().trim();
                 }
             });
 
