@@ -7,11 +7,12 @@ define(['require', 'lodash', 'jquery'],
         var DockerConfigDialog = function (options) {
             this.missingDockerConfigErrorMessage = options.templateHeader.find("#missing-docker-config-error-message");
             this.dockerNameInUpperError = options.templateHeader.find("#docker-name-upper-error");
-            this.stepDesciption = options.templateHeader.find("#docker-config-description");
+            this.stepDesciption = options.templateHeader.find("#config-description");
             this.container = options.templateHeader;
             this.payload = options.payload;
             this.exportType = options.exportType;
-            this.dockerDetailsForm = options.templateHeader.find('#docker-details')
+            this.dockerDetailsForm = options.templateHeader.find('#docker-details');
+            this.dockerImageName = options.dockerImageName;
         };
 
         DockerConfigDialog.prototype.constructor = DockerConfigDialog;
@@ -19,9 +20,19 @@ define(['require', 'lodash', 'jquery'],
         DockerConfigDialog.prototype.render = function () {
             var self = this;
             var dockerDownloadCheckboxInput = self.container.find("#download-docker-artifacts");
+            var dockerDownloadCheckboxText = self.container.find("#download-docker-artifacts-label");
+            var dockerPushCheckboxInput = self.container.find("#docker-push-checkbox");
+            var dockerImageInput = self.container.find("#docker-img-name-input-field-image");
+            if (self.dockerImageName != "") {
+                dockerImageInput.val(self.dockerImageName);
+            }
             if (self.exportType === "kubernetes") {
-                dockerDownloadCheckboxInput.prop('checked', true);
-                dockerDownloadCheckboxInput.attr("disabled", true);
+                dockerPushCheckboxInput.prop('checked', true);
+                dockerDownloadCheckboxInput.hide();
+                dockerPushCheckboxInput.hide();
+                dockerDownloadCheckboxText.hide();
+                self.stepDesciption.hide();
+                self.dockerDetailsForm.show();
             } else {
                 dockerDownloadCheckboxInput.prop('checked', true);
             }
@@ -47,12 +58,13 @@ define(['require', 'lodash', 'jquery'],
             });
 
             self.container.find("#docker-details").on('input', function() {
-                var imageName = self.container.find("#docker-img-name-input-field").val();
-                var userName = self.container.find("#userName").val();
+                var imageName = self.container.find("#docker-img-name-input-field-registry").val().trim()
+                                + "/" + self.container.find("#docker-img-name-input-field-image").val().trim();
+                var userName = self.container.find("#username").val();
                 var password = self.container.find("#password").val();
                 var email = self.container.find("#email").val();
                 var pushDocker = self.container.find("#docker-push-checkbox").is(":checked");
-                if (pushDocker) {
+                if (pushDocker || self.exportType === "kubernetes") {
                     var upperCase = new RegExp('[A-Z]');
                     if (!imageName.match(upperCase)) {
                         self.dockerNameInUpperError.hide();
@@ -69,8 +81,14 @@ define(['require', 'lodash', 'jquery'],
         DockerConfigDialog.prototype.getDockerConfigs = function () {
             var self = this;
             var templateKeyValue = {};
-            templateKeyValue["imageName"] = self.container.find("#docker-img-name-input-field").val();
-            templateKeyValue["userName"] = self.container.find("#userName").val();
+            if (self.container.find("#docker-img-name-input-field-registry").val().trim() != "") {
+                templateKeyValue["imageName"] = self.container.find("#docker-img-name-input-field-registry").val().trim()
+                                                            + "/" + self.container.find("#docker-img-name-input-field-image").val().trim();
+            } else {
+                templateKeyValue["imageName"] = self.container.find("#docker-img-name-input-field-image").val().trim();
+            }
+
+            templateKeyValue["userName"] = self.container.find("#username").val();
             templateKeyValue["password"] = self.container.find("#password").val();
             templateKeyValue["email"] = self.container.find("#email").val();
             templateKeyValue["downloadDocker"] = self.container.find("#download-docker-artifacts").is(":checked");
@@ -87,14 +105,14 @@ define(['require', 'lodash', 'jquery'],
             if (!pushDocker && !downloadArtifacts) {
                 self.stepDesciption.css('opacity', '1.0');
                 self.stepDesciption.css('background-color', '#d9534f !important');
-                return false;
             }
 
-            var imageName = self.container.find("#docker-img-name-input-field").val();
-            var userName = self.container.find("#userName").val();
+            var registryName = self.container.find("#docker-img-name-input-field-registry").val().trim()
+            var imageName = self.container.find("#docker-img-name-input-field-image").val().trim();
+            var userName = self.container.find("#username").val();
             var password = self.container.find("#password").val();
             var email = self.container.find("#email").val();
-            if (pushDocker) {
+            if (pushDocker || self.exportType === "kubernetes") {
 
                 var upperCase = new RegExp('[A-Z]');
                 if (imageName.match(upperCase)) {
@@ -102,8 +120,8 @@ define(['require', 'lodash', 'jquery'],
                     return false;
                 }
 
-                if (imageName === "" || userName === "" || password === "" || email === "" ||
-                    imageName == null || userName == null || password == null || email == null
+                if (registryName === "" || imageName === "" || userName === "" || password === "" || email === "" ||
+                    registryName == null || imageName == null || userName == null || password == null || email == null
                 ) {
                     self.missingDockerConfigErrorMessage.show();
                     return false;

@@ -211,7 +211,6 @@ div#step-6 {
 
 .docker-details-row input {
     height: 30px !important;
-    width: 80% !important;
     background-color: #222222 !important;
 }
 
@@ -254,7 +253,74 @@ div#step-6 {
 }
 
 .kubernetes-config-editor {
-    height: 150px !important;
+    height: 200px !important;
     width: 80%; !important;
     margin-top: 10px !important;
+}
+
+.kube-export-persistence-dropdown {
+    text-transform: none;
+    color: #fefefe;
+    width: 30%;
+    background: #617d8b;
+}
+
+.kube-persistence-dropdown {
+    width: 40%;
+    color: white;
+    background: #617d8b;
+}
+
+.kube-persistence-right-dropdown {
+    width: 40%;
+    color: white;
+    background: #617d8b;
+    margin-left: 57%;
+}
+
+.btn-circle {
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+  background: #617d8b
+}
+
+.btn-circle:hover {
+  background: #4c626d;
+}
+
+.btn-circle.btn-lg {
+  width: 50px;
+  height: 50px;
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.33;
+  border-radius: 25px;
+}
+
+.btn-circle.btn-xl {
+  width: 70px;
+  height: 70px;
+  padding: 10px 16px;
+  font-size: 24px;
+  line-height: 1.33;
+  border-radius: 35px;
+}
+
+.kube-persistence-dropdown > li > a {
+  color: #ffffff;
+}
+
+.kube-persistence-right-dropdown > li > a {
+  color: #ffffff;
+}
+
+.disabled-dropdown-list-element {
+    pointer-events:none; //This makes it not clickable
+    opacity:0.6;
+    color: #aabcc5 !important;
 }

@@ -1219,7 +1219,9 @@ public class EditorMicroservice implements Microservice {
                         .build();
             }
             DockerBuilderStatus dockerBuilderStatus = new DockerBuilderStatus("", "");
-            if (exportAppsRequest != null && exportAppsRequest.getDockerConfiguration() != null) {
+            if (exportAppsRequest != null && exportAppsRequest.getDockerConfiguration() != null &&
+                    exportAppsRequest.getDockerConfiguration().isPushDocker()) {
+
                 DockerBuildConfig dockerBuildConfig = exportAppsRequest.getDockerConfiguration();
                 if ((StringUtils.isEmpty(dockerBuildConfig.getImageName())) ||
                         (StringUtils.isEmpty(dockerBuildConfig.getUserName())) ||
@@ -1235,7 +1237,7 @@ public class EditorMicroservice implements Microservice {
                             .build();
                 }
                 if (!dockerBuildConfig.getImageName().equals(
-                                dockerBuildConfig.getImageName().toLowerCase())
+                        dockerBuildConfig.getImageName().toLowerCase())
                 ) {
                     errorMessage = "Invalid docker image name " +
                             dockerBuildConfig.getImageName() +
@@ -1334,34 +1336,6 @@ public class EditorMicroservice implements Microservice {
                 .entity(dockerBuilderStatus)
                 .type(MediaType.APPLICATION_JSON)
                 .build();
-    }
-
-    /**
-     * Export given Siddhi apps and other configurations to docker or kubernetes artifacts.
-     *
-     * @return Docker or Kubernetes artifacts
-     */
-    @GET
-    @Path("/deploymentConfigs")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getDeploymentConfigs() {
-        ExportUtils exportUtils = new ExportUtils(configProvider);
-        try {
-            JsonObject deploymentHolder = new JsonObject();
-            deploymentHolder.addProperty("deploymentYaml", exportUtils.exportConfigs());
-            return Response
-                    .status(Response.Status.OK)
-                    .entity(deploymentHolder)
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        } catch (IOException e) {
-            log.error("Cannot read deployment.yaml file. ", e);
-            return Response
-                    .status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Cannot read deployment.yaml file in TOOLING|RUNNER configuration. " +
-                            e.getMessage())
-                    .build();
-        }
     }
 
     /**

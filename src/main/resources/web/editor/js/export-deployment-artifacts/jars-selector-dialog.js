@@ -4,7 +4,11 @@
 define(['jquery', 'lodash', 'log', 'file_browser', 'js_tree'],
     function ($, _, log, FileBrowser, jsTree) {
         var JarsSelectorDialog = function (application, form) {
-            var bundlesSelector = form.find("#bundlesTree");
+            if (form.find("#k8s-path-bundles-tree").length > 0) {
+                bundlesSelector = form.find("#k8s-path-bundles-tree");
+            } else {
+                bundlesSelector = form.find("#docker-path-bundles-tree");
+            }
             var bundlesBrowser = new FileBrowser({
                 container: bundlesSelector,
                 application: application,
