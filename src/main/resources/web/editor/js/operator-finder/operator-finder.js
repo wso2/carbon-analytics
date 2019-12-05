@@ -82,6 +82,28 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
         };
 
         /**
+         *Format the backticks according to the remarkable js.
+         * @param data
+         * @returns {string|*}
+         */
+        let preProcessCodeBlocks = function (data) {
+            let dataSplitArray = data.split("```");
+            let output = "";
+            if (dataSplitArray.length > 2 && dataSplitArray.length % 2 === 1) {
+                output = dataSplitArray[0];
+                for (let index = 1; index < dataSplitArray.length; index++) {
+                    if ((index % 2) === 1) {
+                        output += "\n```\n" + dataSplitArray[index].trim() + "\n```\n";
+                    } else {
+                        output += "\n" + dataSplitArray[index].trim() + "\n";
+                    }
+                }
+                return output;
+            }
+            return data;
+        };
+
+        /**
          * mdconvertion which converst md data into html.
          * @param operator extension object
          * @returns return extension object which contains converted md
@@ -111,6 +133,8 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
                     //change the "|" as "," and "\n" as "<br/> in returnAttributes description to avoid md
                     // conversation bug.
                     e.syntax = sanitiseString(e.syntax);
+                    //To provide suitable backtick data for remarkable js md conversion.
+                    e.description = preProcessCodeBlocks(e.description);
                     operator.combinedExamples += "<h5>example " + (++i) + "</h5>" +
                         "<pre>" + e.syntax + "</pre>" +
                         "<p>" + e.description + "</p>";
