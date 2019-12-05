@@ -570,6 +570,7 @@ define(['app/main', 'jquery'],
             openConsoleBtn: '.open-console-btn',
             closeConsoleBtn: '.close-console-btn',
             cleanConsoleBtn: '.clear-console-btn',
+            reloadConsoleBtn: '.reload-console-btn',
             headers: {
                 // relative selector within container for tab controller
                 container: ".output-headers",
