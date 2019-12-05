@@ -86,24 +86,22 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
          * @param data
          * @returns {string|*}
          */
-        let backtickFormation = function (data) {
+        let preProcessCodeBlocks = function (data) {
             let dataSplitArray = data.split("```");
             let output = "";
-            if (dataSplitArray.length > 2 && dataSplitArray.length % 2 == 1) {
-                for (let index = 0; index < dataSplitArray.length; index++) {
-                    if (index === 0) {
-                        output += dataSplitArray[index];
-                    } else if ((index % 2) === 1) {
+            if (dataSplitArray.length > 2 && dataSplitArray.length % 2 === 1) {
+                output = dataSplitArray[0];
+                for (let index = 1; index < dataSplitArray.length; index++) {
+                    if ((index % 2) === 1) {
                         output += "\n```\n" + dataSplitArray[index].trim() + "\n```\n";
-                    } else if ((index % 2) === 0) {
+                    } else {
                         output += "\n" + dataSplitArray[index].trim() + "\n";
                     }
                 }
                 return output;
-            } else {
-                return data;
             }
-        }
+            return data;
+        };
 
         /**
          * mdconvertion which converst md data into html.
@@ -136,7 +134,7 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
                     // conversation bug.
                     e.syntax = sanitiseString(e.syntax);
                     //To provide suitable backtick data for remarkable js md conversion.
-                    e.description = backtickFormation(e.description);
+                    e.description = preProcessCodeBlocks(e.description);
                     operator.combinedExamples += "<h5>example " + (++i) + "</h5>" +
                         "<pre>" + e.syntax + "</pre>" +
                         "<p>" + e.description + "</p>";
