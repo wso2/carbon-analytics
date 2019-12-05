@@ -155,7 +155,7 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
                         m.description + " | "
                         + m.defaultValue + " | "
                         + m.optional + " | "
-                        + m.dynamic + " | " + "\n";
+                        + m.isDynamic + " | " + "\n";
                 });
                 operator.parameterTable = markDownConvertor.render(operator.parameterTable);
             }
