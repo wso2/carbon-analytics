@@ -1727,9 +1727,19 @@ div.extension-table > table {
     font-style: normal;
     text-align: start;
     font-variant: normal;
+    table-layout: fixed;
+    word-break: break-word;
     width: 100%;
 }
 
+div.extension-table > table > thead > tr > th:nth-child(3) {
+    width: 35%;
+}
+
+div.extension-table > table > thead > tr > th:nth-child(5),
+div.extension-table > table > thead > tr > th:nth-child(6) {
+    width: 80px;
+}
 div.extension-table > table > tbody > tr > td > attributename > code,
 div.extension-table > table > tbody > tr > td > code {
     background: #383838 !important;
