@@ -17,6 +17,27 @@
  */
 
 {
+
+    // appDir: '../web',
+    // mainConfigFile: '../web/app.js',
+    // dir: '../../../../target/classes/web',
+    // generateSourceMaps: true,
+    // preserveLicenseComments: false,
+    // optimizeCss: "standard",
+    // "modules": [
+    //     {
+    //     // module names are relative to baseUrl
+    //     name: "../editor/js/app-main",
+    //         exclude: [
+    //             'commons/lib/enjoyhint/enjoyhint.min',
+    //             'commons/lib/ace-editor/mode/xquery/xqlint',
+    //             "commons/lib/ace-editor/mode/coffee/coffee",
+    //             "commons/lib/mCustomScrollbar_v3.1.5/js/jquery.mCustomScrollbar.concat.min",
+    //             "commons/lib/jquery-mousewheel_v3.1.13/test/browserify/bundle"
+    //         ]
+    //     }
+    // ]
+
     mainConfigFile: '../web/app.js',
     name: "app/app-main",
     out: '../../../../target/classes/web/editor/js/app-main.js',
