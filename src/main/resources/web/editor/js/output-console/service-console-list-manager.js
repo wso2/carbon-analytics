@@ -244,6 +244,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
  * @param link
  */
 var enableLink = function (link) {
+    link.removeAttribute('style');
     link.classList.remove('console-sync-btn-disable');
     link.href = link.getAttribute('data-href');
     link.removeAttribute('aria-disabled');
@@ -255,6 +256,7 @@ var enableLink = function (link) {
  */
 var disableLink = function (link) {
     link.classList.add('console-sync-btn-disable');
+    link.setAttribute('style', 'color: rgb(80, 80, 80)');
     link.setAttribute('data-href', link.href);
     link.href = '';
     link.setAttribute('aria-disabled', 'true');
