@@ -1800,3 +1800,16 @@ div.scrollbar > pre::-webkit-scrollbar-thumb {
     to(#555),
     color-stop(.6, #555))
 }
+
+.console-sync-btn-disable {
+    cursor: not-allowed;
+    opacity: 0.5;
+    color: #02aaad;
+    display: inline-block;
+    pointer-events: none;
+    text-decoration: none;
+}
+
+div.consoleIcon {
+    padding-bottom: 11px;
+}
