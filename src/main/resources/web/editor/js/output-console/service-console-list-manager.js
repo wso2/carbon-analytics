@@ -17,6 +17,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                     this._openConsoleBtn = $(_.get(options, 'openConsoleBtn'));
                     this._closeConsoleBtn = $(_.get(options, 'closeConsoleBtn'));
                     this._clearConsoleBtn = $(_.get(options, 'cleanConsoleBtn'));
+                    this._reloadConsoleBtn = $(_.get(options, 'reloadConsoleBtn'));
                     this.application = _.get(options, 'application');
                     this._options = options;
                     var self = this;
@@ -33,6 +34,11 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                         e.preventDefault();
                         e.stopPropagation();
                         self.application.commandManager.dispatch(_.get(self._options, 'commandClearConsole.id'));
+                    });
+                    this._reloadConsoleBtn.on('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self.initiateLogReader(self._options);
                     });
                     if (this.application.isRunningOnMacOS()) {
                         this._closeConsoleBtn.attr("title", "Close (" + _.get(self._options,
@@ -195,6 +201,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                             "type": colorDIffType,
                             "message": logMessage
                         };
+                        disableLink($(_.get(opts, 'reloadConsoleBtn'))[0]);
                         console.println(message);
                     };
                     ws.onerror = function (error) {
@@ -217,21 +224,40 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
                             opts.application.outputController.hideAllConsoles();
                         }
                         var logMessage = "Connection closed, backend is unavailable! " +
-                            "Refresh to reconnect the console.";
+                            "Please try reconnecting the console "+
+                            "by pressing the reload button "+
+                            "when backend is available.";
                         var message = {
                             "type": "ERROR",
                             "message": logMessage
                         };
+                        enableLink($(_.get(opts, 'reloadConsoleBtn'))[0]);
                         console.println(message);
-                        // not retrying
-                        // console.log('Editor console service has terminated. Reconnect will be attempted in 1 second.',
-                        //     error.reason);
-                        // setTimeout(function () {
-                        //     opts.application.outputController.initiateLogReader(opts);
-                        // }, 1000);
                     };
                 }
-
             });
         return OutputConsoleList;
     });
+
+/**
+ *enable the reconnect button when  backend is unavailable.
+ * @param link
+ */
+var enableLink = function (link) {
+    link.removeAttribute('style');
+    link.classList.remove('console-sync-btn-disable');
+    link.href = link.getAttribute('data-href');
+    link.removeAttribute('aria-disabled');
+}
+
+/**
+ *disable the reconnect button when backend is available.
+ * @param link
+ */
+var disableLink = function (link) {
+    link.classList.add('console-sync-btn-disable');
+    link.setAttribute('style', 'color: rgb(80, 80, 80)');
+    link.setAttribute('data-href', link.href);
+    link.href = '';
+    link.setAttribute('aria-disabled', 'true');
+}
