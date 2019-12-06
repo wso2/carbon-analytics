@@ -77,7 +77,7 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
          * @param data string variable
          * @returns {""} retrun string data
          */
-        let sanitiseString = function (data) {
+        var sanitiseString = function (data) {
             return data.replace(/[|]/g, '&#124;').replace(/[\n]/g, '<br/>');
         };
 
@@ -86,12 +86,12 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
          * @param data
          * @returns {string|*}
          */
-        let preProcessCodeBlocks = function (data) {
-            let dataSplitArray = data.split("```");
-            let output = "";
+        var preProcessCodeBlocks = function (data) {
+            var dataSplitArray = data.split("```");
+            var output = "";
             if (dataSplitArray.length > 2 && dataSplitArray.length % 2 === 1) {
                 output = dataSplitArray[0];
-                for (let index = 1; index < dataSplitArray.length; index++) {
+                for (var index = 1; index < dataSplitArray.length; index++) {
                     if ((index % 2) === 1) {
                         output += "\n```\n" + dataSplitArray[index].trim() + "\n```\n";
                     } else {

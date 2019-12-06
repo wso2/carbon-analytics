@@ -29,7 +29,7 @@ define(['require', 'lodash', 'jquery'],
         DockerImageTypeDialog.prototype.constructor = DockerImageTypeDialog;
 
         DockerImageTypeDialog.prototype.render = function () {
-            let self = this;
+            var self = this;
             this.templateContainer.show();
             self.templateContainer.find("#docker-image-type-tobuild").prop("checked", true);
             self.templateContainer.click(function(event){
