@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.siddhi.distribution</groupId>
         <artifactId>io.siddhi.distribution.parent</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.1.2</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
@@ -181,10 +181,10 @@
                                 <phase>compile</phase>
                                 <configuration>
                                     <tasks>
-                                        <move file="target/classes/web/editor/commons" todir="target/classes/web"/>
-                                        <move file="target/classes/web/editor/css" todir="target/classes/web"/>
-                                        <move file="target/classes/web/editor/images" todir="target/classes/web"/>
-                                        <move file="target/classes/web/editor/js" todir="target/classes/web"/>
+                                        <move file="target/classes/web/editor/commons" todir="target/classes/web" />
+                                        <move file="target/classes/web/editor/css" todir="target/classes/web" />
+                                        <move file="target/classes/web/editor/images" todir="target/classes/web" />
+                                        <move file="target/classes/web/editor/js" todir="target/classes/web" />
                                         <delete dir="target/classes/web/editor" />
                                     </tasks>
                                 </configuration>
