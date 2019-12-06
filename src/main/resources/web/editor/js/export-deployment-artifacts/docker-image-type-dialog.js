@@ -23,7 +23,7 @@ define(['require', 'lodash', 'jquery'],
             this.dockerNameMissingErrorMessage = options.templateHeader.find("#k8s-path-missing-docker-build-type-error-message");
             this.dockerNameInUpperError = options.templateHeader.find("#k8s-path-missing-docker-build-type-upper-error");
             this.templateContainer = options.templateHeader;
-            this.dockerImageNameForm = options.templateHeader.find('#k8s-path-docker-image-name-form')
+            this.dockerImageNameForm = options.templateHeader.find('#k8s-path-docker-image-name-form');
         };
 
         DockerImageTypeDialog.prototype.constructor = DockerImageTypeDialog;
@@ -37,6 +37,9 @@ define(['require', 'lodash', 'jquery'],
                 if (preBuiltImage) {
                     self.dockerImageNameForm.show();
                     self.templateContainer.find("#docker-image-type-tobuild").prop("checked", false);
+                    if (self.dockerImageNameForm.find("#built-docker-image-name-input-field").val() == "") {
+                        self.dockerImageNameForm.find("#built-docker-image-name-input-field").val("siddhiio/siddhi-runner-alpine:5.1.2")
+                    }
                 } else {
                     self.dockerImageNameForm.hide();
                     self.dockerNameMissingErrorMessage.hide();
