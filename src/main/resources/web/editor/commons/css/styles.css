@@ -1801,7 +1801,7 @@ div.scrollbar > pre::-webkit-scrollbar-thumb {
     color-stop(.6, #555))
 }
 
-.isDisabled {
+.console-sync-btn-disable {
     cursor: not-allowed;
     opacity: 0.5;
     color: #02aaad;

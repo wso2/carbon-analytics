@@ -244,11 +244,8 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
  * @param link
  */
 var enableLink = function (link) {
-// 1. Remove 'isDisabled' class from parent span
-    link.classList.remove('isDisabled');
-// 2. Set href
+    link.classList.remove('console-sync-btn-disable');
     link.href = link.getAttribute('data-href');
-// 3. Remove 'aria-disabled', better than setting to false
     link.removeAttribute('aria-disabled');
 }
 
@@ -257,12 +254,8 @@ var enableLink = function (link) {
  * @param link
  */
 var disableLink = function (link) {
-// 1. Add isDisabled class to parent span
-    link.classList.add('isDisabled');
-// 2. Store href so we can add it later
+    link.classList.add('console-sync-btn-disable');
     link.setAttribute('data-href', link.href);
-// 3. Remove href
     link.href = '';
-// 4. Set aria-disabled to 'true'
     link.setAttribute('aria-disabled', 'true');
 }
