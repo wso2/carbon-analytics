@@ -28,7 +28,7 @@
            '    prometheus: \n' +
            '      - name: prometheus \n' +
            '        enabled: true \n' +
-           '        serverURL: "http://localhost:9005" \n';
+           '        serverURL: "http://0.0.0.0:9005" \n';
         this.sampleExtensionsConfig =  'extensions: \n' +
            '  - \n' +
            '    extension: \n' +

@@ -28,7 +28,7 @@ define(['jquery', 'lodash', 'log', 'file_browser', 'js_tree'],
         SiddhiAppSelectorDialog.prototype.constructor = SiddhiAppSelectorDialog;
 
         SiddhiAppSelectorDialog.prototype.render = function () {
-            let self = this;
+            var self = this;
             var openFileWizardError = this.openFileWizardError;
             var fileBrowser = this.fileBrowser;
             var siddhiAppSelectorStep = this.siddhiAppSelectorStep;
@@ -83,8 +83,8 @@ define(['jquery', 'lodash', 'log', 'file_browser', 'js_tree'],
         };
 
         SiddhiAppSelectorDialog.prototype.getSiddhiProcessName = function () {
-            let self = this;
-            return self.siddhiProcessName;
+            var self = this;
+            return self.form.find("#sp-name-input-field").val();
         };
 
         return SiddhiAppSelectorDialog;
