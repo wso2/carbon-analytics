@@ -1805,10 +1805,6 @@ div.scrollbar > pre::-webkit-scrollbar-thumb {
     cursor: not-allowed;
     opacity: 0.5;
     color: #02aaad;
-}
-
-.isDisabled {
-    color: #02aaad;
     display: inline-block;
     pointer-events: none;
     text-decoration: none;

@@ -243,7 +243,7 @@ define(['log', 'jquery', 'lodash', 'output_console_list', 'workspace', 'service_
  *enable the reconnect button when  backend is unavailable.
  * @param link
  */
-let enableLink = function (link) {
+var enableLink = function (link) {
 // 1. Remove 'isDisabled' class from parent span
     link.classList.remove('isDisabled');
 // 2. Set href
@@ -256,7 +256,7 @@ let enableLink = function (link) {
  *disable the reconnect button when backend is available.
  * @param link
  */
-let disableLink = function (link) {
+var disableLink = function (link) {
 // 1. Add isDisabled class to parent span
     link.classList.add('isDisabled');
 // 2. Store href so we can add it later
