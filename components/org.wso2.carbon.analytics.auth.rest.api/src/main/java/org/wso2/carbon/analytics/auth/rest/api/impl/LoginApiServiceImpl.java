@@ -194,6 +194,22 @@ public class LoginApiServiceImpl extends LoginApiService {
                                 .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_REFRESH_TOKEN, refTokenPart2,
                                         AuthRESTAPIConstants.LOGIN_CONTEXT + appContext, true, true,
                                         refTokenValidityPeriod);
+                        if (IdPClientConstants.REFRESH_GRANT_TYPE.equals(grantType)
+                                && loginResponse.get(IdPClientConstants.ID_TOKEN_KEY) != null) {
+                            String idToken = loginResponse.get(IdPClientConstants.ID_TOKEN_KEY);
+                            String idTokenFirstHalf = idToken.substring(0, idToken.length()/2);
+                            String idTokenSecondHalf = idToken.substring(idToken.length()/2);
+                            userDTO.setiID(idTokenFirstHalf);
+                            NewCookie logoutContextIdToken = AuthUtil
+                                    .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_ID_TOKEN, idTokenSecondHalf,
+                                            AuthRESTAPIConstants.LOGOUT_CONTEXT
+                                                    + AuthRESTAPIConstants.LOGOUT_SSO_CONTEXT +  appContext,
+                                            true, true, -1);
+                            return Response.ok(userDTO, MediaType.APPLICATION_JSON)
+                                    .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
+                                            loginContextRefreshTokenCookie, logoutContextIdToken)
+                                    .build();
+                        }
                         return Response.ok(userDTO, MediaType.APPLICATION_JSON)
                                 .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
                                         loginContextRefreshTokenCookie)
