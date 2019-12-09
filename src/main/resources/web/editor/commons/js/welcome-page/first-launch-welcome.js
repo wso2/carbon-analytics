@@ -113,7 +113,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                     'target="_blank"><i class="fw fw-carbon"></i>Siddhi Query Guide</a></li>' +
                     '<li class="col-md-4"><a href="https://siddhi.io/community/"' +
                     'target="_blank"><i class="fw fw-info"></i>Q&A</a></li>' +
-                    '<li class="col-md-4"><a href="https://siddhi.io/en/v5.1/docs/api/5.1.0/"' +
+                    '<li class="col-md-4"><a href="https://siddhi.io/en/v5.1/docs/api/5.1.2/"' +
                     'target="_blank"><i class="fw fw-google-docs"></i>API Docs</a></li>'
                 );
 
