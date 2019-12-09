@@ -26,6 +26,7 @@ public class DockerBuildConfig {
     private String email;
     private String password;
     private String imageName;
+    private String dockerFileDownloadName;
     private boolean pushDocker;
 
     public String getUserName() {
@@ -48,6 +49,10 @@ public class DockerBuildConfig {
         return pushDocker;
     }
 
+    public String getDockerFileDownloadName() {
+        return dockerFileDownloadName;
+    }
+
     public void setUserName(String userName) {
         this.userName = userName;
     }
@@ -62,5 +67,9 @@ public class DockerBuildConfig {
 
     public void setImageName(String imageName) {
         this.imageName = imageName;
+    }
+
+    public void setDockerFileDownloadName(String dockerFileDownloadName) {
+        this.dockerFileDownloadName = dockerFileDownloadName;
     }
 }

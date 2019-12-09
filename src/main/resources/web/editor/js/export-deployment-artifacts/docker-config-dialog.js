@@ -6,8 +6,10 @@ define(['require', 'lodash', 'jquery'],
 
         var DockerConfigDialog = function (options) {
             this.missingDockerConfigErrorMessage = options.templateHeader.find("#missing-docker-config-error-message");
+            this.missingDockerFileNameErrorMessage = options.templateHeader.find("#missing-docker-file-name-error-message");
             this.dockerNameInUpperError = options.templateHeader.find("#docker-name-upper-error");
-            this.stepDesciption = options.templateHeader.find("#config-description");
+            this.stepDescription = options.templateHeader.find("#config-description");
+            this.fileNameInputForDocker = options.templateHeader.find("#file-name-for-docker-parent");
             this.container = options.templateHeader;
             this.payload = options.payload;
             this.exportType = options.exportType;
@@ -23,24 +25,35 @@ define(['require', 'lodash', 'jquery'],
             var dockerDownloadCheckboxText = self.container.find("#download-docker-artifacts-label");
             var dockerPushCheckboxInput = self.container.find("#docker-push-checkbox");
             var dockerImageInput = self.container.find("#docker-img-name-input-field-image");
+            var dockerFileInput = self.container.find("#file-name-for-docker");
             if (self.dockerImageName != "") {
                 dockerImageInput.val(self.dockerImageName);
+                dockerFileInput.val(self.dockerImageName);
             }
             if (self.exportType === "kubernetes") {
                 dockerPushCheckboxInput.prop('checked', true);
                 dockerDownloadCheckboxInput.hide();
                 dockerPushCheckboxInput.hide();
                 dockerDownloadCheckboxText.hide();
-                self.stepDesciption.hide();
+                self.stepDescription.hide();
                 self.dockerDetailsForm.show();
+                self.fileNameInputForDocker.hide();
             } else {
                 dockerDownloadCheckboxInput.prop('checked', true);
+                self.fileNameInputForDocker.show();
             }
 
             self.container.find("#download-docker-artifacts").change(function(event){
                 if (event.target.checked){
-                    self.stepDesciption.css('opacity', '0.6');
-                    self.stepDesciption.css('background-color', 'transparent');
+                    self.stepDescription.css('opacity', '0.6');
+                    self.stepDescription.css('background-color', 'transparent');
+                    if (self.container.find("#docker-push-checkbox").is(":checked")) {
+                        self.fileNameInputForDocker.hide();
+                    } else {
+                        self.fileNameInputForDocker.show();
+                    }
+                } else {
+                    self.fileNameInputForDocker.hide();
                 }
             });
 
@@ -49,10 +62,19 @@ define(['require', 'lodash', 'jquery'],
                     self.missingDockerConfigErrorMessage.hide();
                     self.dockerNameInUpperError.hide();
                     self.dockerDetailsForm.hide();
+                    self.fileNameInputForDocker.show();
                 } else {
                     self.dockerDetailsForm.show();
-                    self.stepDesciption.css('opacity', '0.6');
-                    self.stepDesciption.css('background-color', 'transparent');
+                    self.fileNameInputForDocker.hide();
+                    self.stepDescription.css('opacity', '0.6');
+                    self.stepDescription.css('background-color', 'transparent');
+                    self.fileNameInputForDocker.hide();
+                }
+            });
+
+            self.container.find("#file-name-for-docker").on('input', function() {
+                if (self.container.find("#file-name-for-docker").val().trim() != "" && self.container.find("#file-name-for-docker").val().trim() != null) {
+                    self.missingDockerFileNameErrorMessage.hide();
                 }
             });
 
@@ -92,6 +114,11 @@ define(['require', 'lodash', 'jquery'],
             templateKeyValue["email"] = self.container.find("#email").val().trim();
             templateKeyValue["downloadDocker"] = self.container.find("#download-docker-artifacts").is(":checked");
             templateKeyValue["pushDocker"] = self.container.find("#docker-push-checkbox").is(":checked");
+            if (self.exportType === "docker" && !self.container.find("#docker-push-checkbox").is(":checked")) {
+                templateKeyValue["dockerFileDownloadName"] = self.container.find("#file-name-for-docker").val().trim();
+            } else {
+                templateKeyValue["dockerFileDownloadName"] = "";
+            }
             return templateKeyValue;
         };
 
@@ -102,8 +129,9 @@ define(['require', 'lodash', 'jquery'],
             var downloadArtifacts = self.container.find("#download-docker-artifacts").is(":checked");
 
             if (!pushDocker && !downloadArtifacts) {
-                self.stepDesciption.css('opacity', '1.0');
-                self.stepDesciption.css('background-color', '#d9534f !important');
+                self.stepDescription.css('opacity', '1.0');
+                self.stepDescription.css('background-color', '#d9534f !important');
+                return false;
             }
 
             var registryName = self.container.find("#docker-img-name-input-field-registry").val().trim()
@@ -122,6 +150,14 @@ define(['require', 'lodash', 'jquery'],
                     registryName == null || imageName == null || userName == null || password == null || email == null
                 ) {
                     self.missingDockerConfigErrorMessage.show();
+                    return false;
+                }
+            }
+
+            if (downloadArtifacts) {
+                var downloadFileName = self.container.find("#file-name-for-docker").val().trim();
+                if (downloadFileName === "" || downloadFileName == null) {
+                    self.missingDockerFileNameErrorMessage.show();
                     return false;
                 }
             }
