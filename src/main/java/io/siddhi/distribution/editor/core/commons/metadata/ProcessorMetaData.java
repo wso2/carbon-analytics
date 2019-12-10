@@ -17,7 +17,6 @@
  */
 package io.siddhi.distribution.editor.core.commons.metadata;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -28,11 +27,13 @@ public class ProcessorMetaData {
 
     private String name;
     private String namespace;
+    private List<ExampleMetaData> examples;
     private String description;
     private List<ParameterMetaData> parameters;
     private List<String[]> parameterOverloads;
     private List<AttributeMetaData> returnAttributes;
-    private String[] examples;
+    private List<SyntaxMetaData> syntax;
+    private String type;
 
     public String getName() {
 
@@ -54,14 +55,12 @@ public class ProcessorMetaData {
         this.namespace = namespace;
     }
 
-    public String[] getExamples() {
-
-        return (examples != null) ? Arrays.copyOf(examples, examples.length) : new String[0];
+    public List<ExampleMetaData> getExamples() {
+        return examples;
     }
 
-    public void setExamples(String[] examples) {
-
-        this.examples = (examples != null) ? Arrays.copyOf(examples, examples.length) : null;
+    public void setExamples(List<ExampleMetaData> examples) {
+        this.examples = examples;
     }
 
     public String getDescription() {
@@ -84,14 +83,14 @@ public class ProcessorMetaData {
         this.parameters = parameters;
     }
 
-    public List<AttributeMetaData> getReturnAttributes() {
-
-        return returnAttributes;
-    }
-
     public void setReturnAttributes(List<AttributeMetaData> returnAttributes) {
 
         this.returnAttributes = returnAttributes;
+    }
+
+    public List<AttributeMetaData> getReturnAttributes() {
+
+        return returnAttributes;
     }
 
     public void setParameterOverloads(List<String[]> parameterOverloads) {
@@ -104,4 +103,22 @@ public class ProcessorMetaData {
         return parameterOverloads;
     }
 
+    public List<SyntaxMetaData> getSyntax() {
+        return syntax;
+    }
+
+    public void setSyntax(List<SyntaxMetaData> syntax) {
+        this.syntax = syntax;
+    }
+
+    public String getType() {
+        return type;
+
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
 }
+

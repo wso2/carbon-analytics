@@ -1,0 +1,445 @@
+/** contains css for file save dialog **/
+
+.btn-file-dialog {
+    background: #2C2C2C;
+    color: #ffffff;
+    text-transform: capitalize;
+}
+
+.btn-file-dialog:hover {
+    background-color: #F57E30;
+    border-color: #F57E30;
+    color: #fff;
+}
+
+.file-dialog-form-control {
+    width: 100%;
+    background-color: #2C2C2C;
+    border-style: none;
+    height: 35px;
+    padding-left: 10px;
+    color: #fff;
+}
+
+.export-file-dialog-form-control {
+    width: 83%;
+    background-color: #2C2C2C;
+    border-style: none;
+    height: 35px;
+    padding-left: 10px;
+    color: #fff;
+}
+
+.file-dialog-form-control-mini-input {
+    width: 40%;
+    background-color: #2C2C2C;
+    border-style: none;
+    height: 35px;
+    padding-left: 10px;
+    color: #fff;
+}
+
+.search-file-dialog-form-control {
+    width: 90%;
+    margin-left: 35px;
+    background-color: #2C2C2C;
+    border-style: none;
+    height: 35px;
+    padding-left: 10px;
+    color: #fff;
+}
+
+.server-property {
+    float: left;
+    display: inline-block;
+    margin-right: 35px;
+}
+
+.file-dialog-form-scrollable-block {
+    padding: 20px 20px;
+    overflow: auto;
+    height: 50%;
+    width: 90%;
+    background-color: #2C2C2C;
+    margin-left: 30px;
+}
+
+.file-dialog-form-btn {
+    float: right;
+    margin-right: 15px;
+}
+
+.folder-dialog-form-btn {
+    float: right;
+    margin-right: 43px;
+}
+
+.close-file-confirm-dialog-btn {
+    float: left;
+}
+
+.close-file-confirm-dialog {
+    width: 500px;
+}
+
+.errors-container {
+    margin: 50px 20px 20px 20px;
+}
+
+hr.style1 {
+    border-top: 1px solid #2C2C2C;
+    width: 100%;
+    padding: 0 0 5px;
+}
+
+.file-dialog {
+    width: 745px;
+}
+
+.file-dialog-title{
+    padding:0 0 10px 10px;
+}
+
+.file-dialog-label {
+    margin-top: 8px;
+    margin-left: 20px;
+    font-weight: 300;
+}
+
+.divider {
+    width: 5px;
+    height: auto;
+    display: inline-block;
+}
+
+.file-dialog-form-control::-webkit-input-placeholder { /* Chrome */
+    color: #ffffff;
+    opacity: 0.4;
+    font-style: italic;
+}
+
+.file-dialog-form-control:-ms-input-placeholder { /* IE 10+ */
+    color: #ffffff;
+    opacity: 0.4;
+    font-style: italic;
+}
+
+.file-dialog-form-control::-moz-placeholder { /* Firefox 19+ */
+    color: #ffffff;
+    opacity: 0.4;
+    font-style: italic;
+}
+
+hr.file-dialog-hr {
+    border-top: 1px solid #2C2C2C;
+    width: 100%;
+}
+
+.file-dialog-input-field {
+    float: left;
+    width: 82%;
+}
+
+.file-dialog-form-label {
+    margin-top: 8px;
+    font-weight: 300;
+}
+
+.close-confirm-dialog .file-dialog {
+    width: 500px;
+}
+
+.replace-confirm-dialog .file-dialog {
+    width: 500px;
+    top: 50px;
+}
+
+.delete-confirm-dialog .file-dialog {
+    width: 500px;
+    top: 50px;
+}
+
+.add-new-server-input {
+    width: 120px;
+    background-color: #222222;
+    border-style: none;
+    height: 35px;
+    padding-left: 10px;
+    color: #fff;
+}
+
+.file-dialog-form-toggle-password {
+    width: 120px;
+    background-color: #222222;
+    border-style: none;
+    height: 35px;
+    padding-left: 10px;
+    color: #fff;
+    /*alignment: right;*/
+    -webkit-text-security: disc;
+}
+
+.file-dialog-form-new-sever-container {
+    padding: 20px 20px;
+    overflow: auto;
+    height: max-content;
+    width: 90.15%;
+    background-color: #2C2C2C;
+    margin-left: 30px;
+}
+
+.add-new-button {
+    margin-top: 10px;
+    height: 35px;
+    width: 55px;
+    color: white;
+    background-color: #666666;
+    border: none;
+}
+
+.add-new-button:disabled
+.add-new-button:hover {
+    background-color: #595959;
+    border-color: #595959;
+    color: #fff;
+}
+
+.file-dialog-form-new-sever-container-toggle-divider {
+    width: 18px;
+    height: auto;
+    display: inline-block;
+}
+
+.file-dialog-form-divider {
+    height: 10px;
+}
+
+.toggle-divider {
+    width: 2em;
+    height: auto;
+    display: inline-block;
+}
+
+.host {
+    width: 200px;
+    height: auto;
+    display: inline-block;
+    font-size: 15px;
+}
+
+.credentials-password {
+    width: 100px;
+    height: auto;
+    display: inline-block;
+    -webkit-text-security: disc;
+    font-size: 15px;
+}
+
+.credentials-username {
+    width: 100px;
+    height: auto;
+    display: inline-block;
+    font-size: 15px;
+}
+
+.servers {
+    background-image: url(./images/down-arrow.png);
+    background-repeat: no-repeat;
+    background-position: 630px;
+    text-decoration-color: white;
+    background-color: #2C2C2C;
+    cursor: pointer;
+    width: 94%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    height: 35px;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    margin-left: 15px;
+    position: relative;
+}
+
+.add-new-server-title {
+    text-decoration-color: white;
+    background-color: #2C2C2C;
+    width: 94%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    height: 35px;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    margin-left: 15px;
+    position: relative;
+}
+
+.servers-active {
+    background-image: url(./images/right-arrow.png);
+}
+
+.servers:hover {
+    background-color: #161616;
+    /*transform: scale(1.01);*/
+
+}
+
+.server-list {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+}
+
+.vertical-divider {
+    height: 1px;
+    background-color: #222222;
+}
+
+.new-server {
+    display: block;
+    width: 100%;
+}
+
+.delete-button {
+    background-image: url(./images/delete_icon.png);
+    background-color: #2C2C2C;
+    height: 22px;
+    width: 22px;
+    background-repeat: round;
+    border-radius: 20px;
+    border: solid;
+    border-color: #2C2C2C;
+}
+
+.delete-button:hover {
+    background-color: #F57E30;
+}
+
+.siddhi-app-list {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+}
+
+.server-block {
+    width: 100%;
+    padding-left: 10px;
+}
+
+.server-block:hover {
+    background-color: #161616;
+}
+
+.deployment-status-title-container {
+    margin-left: 15px;
+    margin-right: -15px;
+}
+
+.deployment-status-container {
+    width: 94%;
+    margin-left: 15px;
+    background-color: #2C2C2C;
+    overflow: auto;
+    max-height: 200px;
+}
+
+.success-label {
+    color: #9FB622;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 13px;
+}
+
+.failure-label {
+    color: #f44336;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 13px;
+}
+
+.error-label {
+    color: #03a9f4;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 13px;
+}
+
+.deployment-status-title {
+    text-decoration-color: white;
+    background-color: #2C2C2C;
+    width: 94%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 13px;
+    height: 35px;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.loader-deployment {
+    border: 6px solid #f3f3f3; /* Light grey */
+    border-top: 6px solid #161616; /* Blue */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 2s linear infinite;
+    margin-left: 50%;
+    display: none;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.emptyFieldsAlert {
+    color: #f44336;
+    font-size: 14px;
+    margin-top: 6px;
+    margin-bottom: -12px;
+}
+
+.add-server-alert {
+    font-size: 13px;
+    color: #03a9f4;
+}
+
+.openFileWizardError-container {
+    margin-right: -15px;
+}
+
+.file-dialog-form-scrollable-block-list {
+    padding: 20px 20px 20px 20px;
+    overflow: auto;
+    max-height: 200px;
+    width: 90.15%;
+    background-color: #2C2C2C;
+    margin-left: 30px;
+}
+
+.button-container {
+    margin-right: 27px;
+}
+
+.clearfix {
+     display: block;
+     content: "";
+     clear: both;
+}

@@ -17,16 +17,21 @@
  */
 package io.siddhi.distribution.editor.core.util;
 
+import io.siddhi.annotation.Example;
 import io.siddhi.annotation.Extension;
 import io.siddhi.annotation.Parameter;
 import io.siddhi.annotation.ParameterOverload;
 import io.siddhi.annotation.ReturnAttribute;
+import io.siddhi.annotation.util.DataType;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.distribution.editor.core.commons.metadata.AttributeMetaData;
+import io.siddhi.distribution.editor.core.commons.metadata.ExampleMetaData;
 import io.siddhi.distribution.editor.core.commons.metadata.MetaData;
 import io.siddhi.distribution.editor.core.commons.metadata.ParameterMetaData;
 import io.siddhi.distribution.editor.core.commons.metadata.ProcessorMetaData;
+import io.siddhi.distribution.editor.core.commons.metadata.SyntaxMetaData;
 import io.siddhi.distribution.editor.core.internal.EditorDataHolder;
+import io.siddhi.distribution.editor.core.util.designview.constants.SiddhiCodeBuilderConstants;
 import io.siddhi.query.api.definition.AbstractDefinition;
 import io.siddhi.query.api.definition.AggregationDefinition;
 import io.siddhi.query.api.definition.StreamDefinition;
@@ -37,6 +42,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -435,6 +441,233 @@ public class SourceEditorUtils {
     }
 
     /**
+     * generate the parameter data type syntax for extension syntax generation.
+     *
+     * @param parameterName        parameter name from parameter
+     * @param parameterDataTypeMap Parameter datatype map
+     * @return Parameter Data Type
+     */
+    private static StringBuilder parameterDataTypeGeneration(String parameterName,
+                                                             Map<String, DataType[]> parameterDataTypeMap) {
+        StringBuilder parameterDataType = new StringBuilder(" <");
+        DataType[] parameterType = parameterDataTypeMap.get(parameterName);
+        for (int i = 0; i < parameterType.length; i++) {
+            DataType dataType = parameterType[i];
+            if (i != parameterType.length - 1) {
+                parameterDataType.append(dataType).append("|");
+            } else {
+                parameterDataType.append(dataType);
+            }
+        }
+        parameterDataType.append("> ");
+        return parameterDataType;
+    }
+
+    /**
+     * generate the syntax  for functions,windows,stream processor and aggregate function.
+     *
+     * @param extension            Extension data from extension anotation
+     * @param parameterDataTypeMap Parameter datatype map
+     * @return syntaxList
+     */
+    private static List<SyntaxMetaData> windowFunctionSyntaxGeneration(Extension extension,
+                                                                       Map<String, DataType[]> parameterDataTypeMap) {
+        List<SyntaxMetaData> syntaxList = new ArrayList<>();
+        StringBuilder syntax = new StringBuilder();
+        StringBuilder clipBoardSyntax = new StringBuilder();
+        //Add return syntax to the extension if it is a functions and aggregate functions
+        for (ReturnAttribute returnAttribute : extension.returnAttributes()) {
+            syntax.append("<");
+            for (int j = 0; j < (returnAttribute.type()).length; j++) {
+                if (j != returnAttribute.type().length - 1) {
+                    syntax.append(returnAttribute.type()[j]).append("|");
+                } else {
+                    syntax.append(returnAttribute.type()[j]);
+                }
+            }
+            syntax.append("> ");
+        }
+
+        // Add name syntax to the extension
+        if (!extension.namespace().isEmpty()) {
+            syntax.append(extension.namespace()).append(":");
+            clipBoardSyntax.append(extension.namespace()).append(":");
+        }
+        syntax.append(extension.name());
+        clipBoardSyntax.append(extension.name());
+
+        //Add parameter and its data type syntax to extension based on the parameter overloads
+        if (extension.parameterOverloads().length > 0) {
+            StringBuilder parameterSyntax;
+            StringBuilder parameterClipboardSyntax;
+            for (ParameterOverload parameterOverload : extension.parameterOverloads()) {
+                parameterSyntax = new StringBuilder();
+                parameterClipboardSyntax = new StringBuilder();
+
+                if (parameterOverload.parameterNames().length == 0) {
+                    parameterSyntax.append("()");
+                    parameterClipboardSyntax.append("()");
+                } else {
+                    parameterSyntax.append("(");
+                    parameterClipboardSyntax.append("( ");
+                    for (int j = 0; j < parameterOverload.parameterNames().length; j++) {
+                        String parameterName = parameterOverload.parameterNames()[j];
+                        if (parameterName.equalsIgnoreCase(SiddhiCodeBuilderConstants.THREE_DOTS)) {
+                            String paramName = parameterOverload.parameterNames()[j - 1];
+                            parameterSyntax.append(parameterDataTypeGeneration(paramName, parameterDataTypeMap))
+                                            .append(SiddhiCodeBuilderConstants.THREE_DOTS);
+                            parameterClipboardSyntax.append(paramName).append(SiddhiCodeBuilderConstants.THREE_DOTS);
+                        } else {
+                            parameterSyntax.append(
+                                    parameterDataTypeGeneration(parameterName, parameterDataTypeMap).toString());
+                            if (j != parameterOverload.parameterNames().length - 1) {
+                                parameterSyntax.append(parameterName).append(",");
+                                parameterClipboardSyntax.append(parameterName).append(",");
+                            } else {
+                                parameterSyntax.append(parameterName);
+                                parameterClipboardSyntax.append(parameterName);
+                            }
+                        }
+                    }
+                    parameterClipboardSyntax.append(" )");
+                    parameterSyntax.append(" )");
+                }
+                SyntaxMetaData syntaxMetaData = new SyntaxMetaData(
+                        syntax.toString() + parameterSyntax.toString(),
+                        clipBoardSyntax.toString() + parameterClipboardSyntax.toString());
+                syntaxList.add(syntaxMetaData);
+            }
+        } else {
+            syntax.append("(");
+            clipBoardSyntax.append("( ");
+            for (int i = 0; i < extension.parameters().length; i++) {
+                Parameter parameter = extension.parameters()[i];
+                syntax.append(parameterDataTypeGeneration(parameter.name(), parameterDataTypeMap));
+                if (i != extension.parameters().length - 1) {
+                    syntax.append(parameter.name()).append(",");
+                    clipBoardSyntax.append(parameter.name()).append(",");
+                } else {
+                    syntax.append(parameter.name());
+                    clipBoardSyntax.append(parameter.name());
+                }
+            }
+            syntax.append(" )");
+            clipBoardSyntax.append(" )");
+
+            SyntaxMetaData syntaxMetaData = new SyntaxMetaData(syntax.toString(), clipBoardSyntax.toString());
+            syntaxList.add(syntaxMetaData);
+        }
+        return syntaxList;
+    }
+
+    /**
+     * generate the syntax  for source and sink extension.
+     *
+     * @param extension            Extension data from extension anotation
+     * @param parameterDataTypeMap Parameter datatype map
+     * @return syntaxList
+     */
+    private static List<SyntaxMetaData> sourceSinkSyntaxGeneration(Extension extension,
+                                                                   Map<String, DataType[]> parameterDataTypeMap
+                                                                  ) {
+        StringBuilder syntax = new StringBuilder();
+        StringBuilder clipBoardSyntax = new StringBuilder();
+        if (!extension.namespace().isEmpty()) {
+            clipBoardSyntax.append("@").append(extension.namespace());
+            syntax.append("@").append(extension.namespace());
+        }
+        clipBoardSyntax.append("(type=\"").append(extension.name()).append("\", ");
+        syntax.append("(type=\"").append(extension.name()).append("\", ");
+
+        for (Parameter parameter : extension.parameters()) {
+            clipBoardSyntax.append(parameter.name()).append(" =\"\", ");
+            syntax.append(" ").append(parameter.name()).append("=")
+                    .append("\"").append(parameterDataTypeGeneration(parameter.name(), parameterDataTypeMap))
+                    .append("\",");
+        }
+        SyntaxMetaData syntaxMetaData = new SyntaxMetaData(syntax.append(" @map (...))").toString(),
+                clipBoardSyntax.append(" @map (...))").toString());
+        return Collections.singletonList(syntaxMetaData);
+    }
+
+    /**
+     * generate the syntax  for source mapper and sink mapper extension.
+     *
+     * @param extension            Extension data from extension anotation
+     * @param parameterDataTypeMap Parameter datatype map
+     * @return syntaxList
+     */
+    private static List<SyntaxMetaData> sourceSinkMapSyntaxGeneration(Extension extension,
+                                                                      Map<String, DataType[]> parameterDataTypeMap) {
+        StringBuilder syntax = new StringBuilder();
+        StringBuilder clipBoardSyntax = new StringBuilder();
+        if (!extension.namespace().isEmpty()) {
+            if (extension.namespace().equalsIgnoreCase("sinkMapper")) {
+                syntax.append("@sink");
+            } else {
+                syntax.append("@source");
+            }
+        }
+        clipBoardSyntax.append("@map(type= \"").append(extension.name()).append("\"");
+        syntax.append("(").append(SiddhiCodeBuilderConstants.THREE_DOTS)
+                .append("@map(type= \"").append(extension.name()).append("\"");
+
+        for (Parameter parameter : extension.parameters()) {
+            clipBoardSyntax.append(", ").append(parameter.name()).append(" =\"\"");
+            syntax.append(", ").append(parameter.name()).append("=")
+                    .append("\"").append(parameterDataTypeGeneration(parameter.name(), parameterDataTypeMap))
+                    .append("\"");
+        }
+
+        SyntaxMetaData syntaxMetaData = new SyntaxMetaData(syntax.append("))").toString(),
+                clipBoardSyntax.append(")").toString());
+        return Collections.singletonList(syntaxMetaData);
+    }
+
+    /**
+     * generate the syntax  for store  extension.
+     *
+     * @param extension            Extension data from extension anotation
+     * @param parameterDataTypeMap Parameter datatype map
+     * @return syntaxList
+     */
+    private static List<SyntaxMetaData> storeSyntaxGeneration(Extension extension,
+                                                              Map<String, DataType[]> parameterDataTypeMap) {
+        StringBuilder syntax = new StringBuilder();
+        StringBuilder clipBoardSyntax = new StringBuilder();
+        if (!extension.namespace().isEmpty()) {
+            clipBoardSyntax.append("@").append(extension.namespace());
+            syntax.append("@").append(extension.namespace());
+        }
+        clipBoardSyntax.append("(type=\"").append(extension.name()).append("\",");
+        syntax.append("(type=\"").append(extension.name()).append("\",");
+
+        for (int i = 0; i < extension.parameters().length; i++) {
+            Parameter parameter = extension.parameters()[i];
+            if (i != extension.parameters().length - 1) {
+                clipBoardSyntax.append(" ").append(parameter.name()).append(" =\"\",");
+                syntax.append(" ").append(parameter.name()).append("=")
+                        .append("\"").append(parameterDataTypeGeneration(parameter.name(), parameterDataTypeMap))
+                        .append("\",");
+            } else {
+                clipBoardSyntax.append(" ").append(parameter.name()).append(" =\"\"");
+                syntax.append(" ").append(parameter.name()).append("=")
+                        .append("\"").append(parameterDataTypeGeneration(parameter.name(), parameterDataTypeMap))
+                        .append("\"");
+            }
+        }
+        syntax.append(")\n")
+                .append("@PrimaryKey(\"PRIMARY_KEY\")\n")
+                .append("@Index(\"INDEX\")");
+        clipBoardSyntax.append(")\n")
+                .append("@PrimaryKey(\"PRIMARY_KEY\")\n")
+                .append("@Index(\"INDEX\")");
+
+        SyntaxMetaData syntaxMetaData = new SyntaxMetaData(syntax.toString(), clipBoardSyntax.toString());
+        return Collections.singletonList(syntaxMetaData);
+    }
+
+    /**
      * Generate processor meta data from the annotated data in the class.
      *
      * @param processorClass Class from which meta data should be extracted from
@@ -452,21 +685,24 @@ public class SourceEditorUtils {
         if (extensionAnnotation != null) {
             processorMetaData = new ProcessorMetaData();
             processorMetaData.setName(processorName);
-
+            processorMetaData.setType(processorType);
             // Adding Description annotation data
             processorMetaData.setDescription(extensionAnnotation.description());
 
             // Adding Namespace annotation data
             processorMetaData.setNamespace(extensionAnnotation.namespace());
 
-            // Adding Parameter annotation data
+            //  Adding Parameter annotation data
+            //define parameter map to generate parameter syntax
+            Map<String, DataType[]> parameterDataTypeMap = new HashMap<>();
             if (extensionAnnotation.parameters().length > 0) {
-                // When multiple parameters are present
                 List<ParameterMetaData> parameterMetaDataList = new ArrayList<>();
                 for (Parameter parameter : extensionAnnotation.parameters()) {
                     ParameterMetaData parameterMetaData = new ParameterMetaData();
+                    parameterDataTypeMap.put(parameter.name(), parameter.type());
                     parameterMetaData.setName(parameter.name());
                     parameterMetaData.setType(Arrays.asList(parameter.type()));
+                    parameterMetaData.setIsDynamic(parameter.dynamic());
                     parameterMetaData.setOptional(parameter.optional());
                     parameterMetaData.setDescription(parameter.description());
                     parameterMetaData.setDefaultValue(parameter.defaultValue());
@@ -474,6 +710,44 @@ public class SourceEditorUtils {
                 }
                 processorMetaData.setParameters(parameterMetaDataList);
             }
+
+            // Generate syntax annotation data for function, attribute aggregation,windows,stream
+            // function and stream
+            if (Constants.FUNCTION_EXECUTOR.equalsIgnoreCase(processorType) ||
+                    Constants.ATTRIBUTE_AGGREGATOR.equalsIgnoreCase(processorType) ||
+                    Constants.WINDOW_PROCESSOR.equalsIgnoreCase(processorType) ||
+                    Constants.STREAM_FUNCTION_PROCESSOR.equalsIgnoreCase(processorType) ||
+                    Constants.STREAM_PROCESSOR.equalsIgnoreCase(processorType)) {
+                processorMetaData.setSyntax(
+                        windowFunctionSyntaxGeneration(extensionAnnotation, parameterDataTypeMap));
+            }
+
+            //Generate syntax annotation data for source and sink
+            if (Constants.SOURCE.equals(processorType) || Constants.SINK.equals(processorType)) {
+                processorMetaData.setSyntax(
+                        sourceSinkSyntaxGeneration(extensionAnnotation, parameterDataTypeMap));
+            }
+
+            //Generate Syntax annotation data for source mapper and sink mapper
+            if (Constants.SOURCEMAP.equals(processorType) || Constants.SINKMAP.equals(processorType)) {
+                processorMetaData.setSyntax(
+                        sourceSinkMapSyntaxGeneration(extensionAnnotation, parameterDataTypeMap));
+            }
+
+            //Generate Syntax annotation data for store
+            if (Constants.STORE.equals(processorType)) {
+                processorMetaData.setSyntax(
+                        storeSyntaxGeneration(extensionAnnotation, parameterDataTypeMap));
+            }
+
+            //Adding Example annotation data
+            List<ExampleMetaData> examplesList = new ArrayList<>();
+            for (Example exampleAnnotation : extensionAnnotation.examples()) {
+                ExampleMetaData exampleMetaData =
+                        new ExampleMetaData(exampleAnnotation.syntax(), exampleAnnotation.description());
+                examplesList.add(exampleMetaData);
+            }
+            processorMetaData.setExamples(examplesList);
 
             // Adding ReturnEvent annotation data
             // Adding return event additional attributes
@@ -493,17 +767,6 @@ public class SourceEditorUtils {
                 }
                 processorMetaData.setReturnAttributes(attributeMetaDataList);
             }
-
-            // Adding Example annotation data
-            if (extensionAnnotation.examples().length > 0) {
-                String examples[] = new String[extensionAnnotation.examples().length];
-                for (int i = 0; i < extensionAnnotation.examples().length; i++) {
-                    examples[i] = "syntax: " + extensionAnnotation.examples()[i].syntax() + "\n" +
-                            "description: " + extensionAnnotation.examples()[i].description();
-                }
-                processorMetaData.setExamples(examples);
-            }
-
             //Adding parameter overloads data
             if (extensionAnnotation.parameterOverloads().length > 0) {
                 List<String[]> parameterOverloads = new ArrayList<>();
@@ -517,6 +780,7 @@ public class SourceEditorUtils {
     }
 
     public static String populateSiddhiAppWithVars(Map<String, String> envMap, String siddhiApp) {
+
         if (siddhiApp.contains("$")) {
             String envPattern = "\\$\\{(\\w+)\\}";
             Pattern expr = Pattern.compile(envPattern);

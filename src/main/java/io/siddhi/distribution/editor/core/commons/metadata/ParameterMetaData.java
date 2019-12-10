@@ -29,6 +29,7 @@ public class ParameterMetaData {
 
     private String name;
     private List<DataType> type;
+    private Boolean isDynamic;
     private Boolean optional;
     private String description;
     private String defaultValue;
@@ -51,6 +52,14 @@ public class ParameterMetaData {
     public void setType(List<DataType> type) {
 
         this.type = type;
+    }
+
+    public Boolean isDynamic() {
+        return isDynamic;
+    }
+
+    public void setIsDynamic(Boolean isDynamic) {
+        this.isDynamic = isDynamic;
     }
 
     public Boolean getOptional() {
