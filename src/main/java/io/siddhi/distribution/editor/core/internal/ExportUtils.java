@@ -153,30 +153,16 @@ public class ExportUtils {
         boolean buildDocker = false;
         if (exportType != null && exportType.equals(EXPORT_TYPE_DOCKER)) {
             if (exportAppsRequest.getDockerConfiguration() != null) {
-                if (exportAppsRequest.getDockerConfiguration().isPushDocker()) {
-                    if (exportAppsRequest.getDockerConfiguration().getImageName() != null &&
-                            !exportAppsRequest.getDockerConfiguration().getImageName().equals("")) {
-                        String dockerImageName = exportAppsRequest
-                                .getDockerConfiguration()
-                                .getImageName()
-                                .replaceAll("/", "-")
-                                .replaceAll(":", "-").trim();
-                        zipFileName = dockerImageName + ".zip";
-                        zipFileRoot = dockerImageName + File.separator;
-                    }
-                } else {
-                    if (exportAppsRequest.getDockerConfiguration().getDockerFileDownloadName() != null &&
-                            !exportAppsRequest.getDockerConfiguration().getDockerFileDownloadName().equals("")) {
-                        String dockerImageName = exportAppsRequest
-                                .getDockerConfiguration()
-                                .getDockerFileDownloadName()
-                                .replaceAll("/", "-")
-                                .replaceAll(":", "-").trim();
-                        zipFileName = dockerImageName + ".zip";
-                        zipFileRoot = dockerImageName + File.separator;
-                    }
+                if (exportAppsRequest.getDockerConfiguration().getImageName() != null &&
+                        !exportAppsRequest.getDockerConfiguration().getImageName().equals("")) {
+                    String dockerImageName = exportAppsRequest
+                            .getDockerConfiguration()
+                            .getImageName()
+                            .replaceAll("/", "-")
+                            .replaceAll(":", "-").trim();
+                    zipFileName = dockerImageName + ".zip";
+                    zipFileRoot = dockerImageName + File.separator;
                 }
-
             }
         }
         if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
