@@ -43,7 +43,6 @@ define(['require', 'log', 'jquery', 'lodash'],
             // design view container and toggle view button are enabled
             self.designViewContainer.addClass('disableContainer');
             self.toggleViewButton.addClass('disableContainer');
-            self.formUtils.changeHeightOfPerfectScroller();
 
             var siddhiAppConfig = self.configurationData.getSiddhiAppConfig();
             var siddhiAppName = siddhiAppConfig.getSiddhiAppName();
