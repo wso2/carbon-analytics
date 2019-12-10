@@ -1343,7 +1343,8 @@ public class EditorMicroservice implements Microservice {
         JsonObject dockerImageHolder = new JsonObject();
         dockerImageHolder.addProperty(
                 "defaultRunnerDockerImage",
-                "siddhiio/siddhi-runner-alpine:" + EditorDataHolder.getBundleContext().getBundle().getVersion().toString()
+                "siddhiio/siddhi-runner-alpine:" +
+                        EditorDataHolder.getBundleContext().getBundle().getVersion().toString()
         );
         return Response
                 .status(Response.Status.OK)

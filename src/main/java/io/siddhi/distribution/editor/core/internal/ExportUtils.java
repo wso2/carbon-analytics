@@ -144,7 +144,8 @@ public class ExportUtils {
      * @return Zip archive file
      * @throws DockerGenerationException if docker generation fails
      */
-    public File createZipFile() throws DockerGenerationException, KubernetesGenerationException {
+    public File createZipFile()
+            throws DockerGenerationException, KubernetesGenerationException {
 
         boolean jarsAdded = false;
         boolean bundlesAdded = false;
