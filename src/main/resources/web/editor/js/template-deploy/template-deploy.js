@@ -135,6 +135,7 @@ define(['jquery', 'lodash', 'log', 'handlebar', 'designViewUtils', 'app/source-e
                                 }
                             }
                         }, 1000);
+                        self.lastEdit = Date.now();
                     })
                 });
             } else {
