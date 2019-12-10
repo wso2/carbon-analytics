@@ -10,6 +10,8 @@ define(['require', 'lodash', 'jquery'],
             this.dockerNameInUpperError = options.templateHeader.find("#docker-name-upper-error");
             this.stepDescription = options.templateHeader.find("#config-description");
             this.fileNameInputForDocker = options.templateHeader.find("#file-name-for-docker-parent");
+            this.dockerImageInput = options.templateHeader.find("#docker-img-name-input-field-image");
+            this.dockerFileInput = options.templateHeader.find("#file-name-for-docker");
             this.container = options.templateHeader;
             this.payload = options.payload;
             this.exportType = options.exportType;
@@ -24,11 +26,10 @@ define(['require', 'lodash', 'jquery'],
             var dockerDownloadCheckboxInput = self.container.find("#download-docker-artifacts");
             var dockerDownloadCheckboxText = self.container.find("#download-docker-artifacts-label");
             var dockerPushCheckboxInput = self.container.find("#docker-push-checkbox");
-            var dockerImageInput = self.container.find("#docker-img-name-input-field-image");
-            var dockerFileInput = self.container.find("#file-name-for-docker");
+
             if (self.dockerImageName != "") {
-                dockerImageInput.val(self.dockerImageName);
-                dockerFileInput.val(self.dockerImageName);
+                self.dockerImageInput.val(self.dockerImageName);
+                self.dockerFileInput.val(self.dockerImageName);
             }
             if (self.exportType === "kubernetes") {
                 dockerPushCheckboxInput.prop('checked', true);
@@ -64,11 +65,14 @@ define(['require', 'lodash', 'jquery'],
                     self.dockerDetailsForm.hide();
                     self.fileNameInputForDocker.show();
                 } else {
-                    self.dockerDetailsForm.show();
                     self.fileNameInputForDocker.hide();
                     self.stepDescription.css('opacity', '0.6');
                     self.stepDescription.css('background-color', 'transparent');
                     self.fileNameInputForDocker.hide();
+                    self.dockerDetailsForm.show();
+                    if (self.dockerFileInput.val() != null && self.dockerFileInput.val() != "") {
+                        self.dockerImageInput.val(self.dockerFileInput.val());
+                    }
                 }
             });
 
@@ -102,12 +106,6 @@ define(['require', 'lodash', 'jquery'],
         DockerConfigDialog.prototype.getDockerConfigs = function () {
             var self = this;
             var templateKeyValue = {};
-            if (self.container.find("#docker-img-name-input-field-registry").val().trim() != "") {
-                templateKeyValue["imageName"] = self.container.find("#docker-img-name-input-field-registry").val().trim()
-                                                            + "/" + self.container.find("#docker-img-name-input-field-image").val().trim();
-            } else {
-                templateKeyValue["imageName"] = self.container.find("#docker-img-name-input-field-image").val().trim();
-            }
 
             templateKeyValue["userName"] = self.container.find("#username").val().trim();
             templateKeyValue["password"] = self.container.find("#password").val().trim();
@@ -115,9 +113,14 @@ define(['require', 'lodash', 'jquery'],
             templateKeyValue["downloadDocker"] = self.container.find("#download-docker-artifacts").is(":checked");
             templateKeyValue["pushDocker"] = self.container.find("#docker-push-checkbox").is(":checked");
             if (self.exportType === "docker" && !self.container.find("#docker-push-checkbox").is(":checked")) {
-                templateKeyValue["dockerFileDownloadName"] = self.container.find("#file-name-for-docker").val().trim();
+                templateKeyValue["imageName"] = self.container.find("#file-name-for-docker").val().trim();
             } else {
-                templateKeyValue["dockerFileDownloadName"] = "";
+                if (self.container.find("#docker-img-name-input-field-registry").val().trim() != "") {
+                    templateKeyValue["imageName"] = self.container.find("#docker-img-name-input-field-registry").val().trim()
+                                                                + "/" + self.container.find("#docker-img-name-input-field-image").val().trim();
+                } else {
+                    templateKeyValue["imageName"] = self.container.find("#docker-img-name-input-field-image").val().trim();
+                }
             }
             return templateKeyValue;
         };
