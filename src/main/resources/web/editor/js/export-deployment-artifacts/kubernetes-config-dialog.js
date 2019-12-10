@@ -201,7 +201,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                     messagingConfig = "\n" + messagingDefaultConfig;
                 }
                 if(self.pvConfigsGiven && editorObj.name == 'persistence') {
-                    pvConfig = "\n" + editorObj.content.session.getValue().toString();
+                    pvConfig = "\n" + editorObj.content.session.getValue().toString().trim();
                 }
                 if(self.statePersistenceConfigGiven && editorObj.name == 'state-persistence') {
                     statePersistenceConfig = "\n" + editorObj.content.session.getValue().toString().trim();

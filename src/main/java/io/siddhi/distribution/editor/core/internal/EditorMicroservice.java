@@ -1336,6 +1336,22 @@ public class EditorMicroservice implements Microservice {
                 .build();
     }
 
+    @GET
+    @Path("/runnerDefaultDockerImage")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRunnerDefaultDockerImage(@Context Request request) {
+        JsonObject dockerImageHolder = new JsonObject();
+        dockerImageHolder.addProperty(
+                "defaultRunnerDockerImage",
+                "siddhiio/siddhi-runner-alpine:" + EditorDataHolder.getBundleContext().getBundle().getVersion().toString()
+        );
+        return Response
+                .status(Response.Status.OK)
+                .entity(dockerImageHolder)
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+    }
+
     /**
      * Get sample event for a particular event stream.
      *
