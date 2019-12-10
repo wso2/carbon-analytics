@@ -55,6 +55,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this._dockerImageTypeModel;
                     this._exportUrl;
                     this._exportType;
+                    this._baseUrl;
                     this._isSkippedTemplateAppsStep = false;
                     this._isSkippedDockerConfigSteps = false;
 
@@ -63,6 +64,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     } else {
                         this._exportType = 'kubernetes';
                     }
+                    this._baseUrl = options.config.baseUrl;
                     this._exportUrl = options.config.baseUrl + "/export?exportType=" + this._exportType;
                     this._btnExportForm =  $('' +
                         '<form id="submit-form" method="post" enctype="application/x-www-form-urlencoded" target="export-download" >' +
@@ -225,7 +227,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                             } else if (stepNumber === 4) {
                                 if (self._exportType === 'kubernetes') {
                                     self._dockerImageTypeModel = new DockerImageTypeDialog({
-                                    templateHeader: exportContainer.find('#docker-image-type-container-id'),
+                                        templateHeader: exportContainer.find('#docker-image-type-container-id'),
+                                        baseUrl: self._baseUrl,
                                     });
                                     self._dockerImageTypeModel.render();
                                 } else {

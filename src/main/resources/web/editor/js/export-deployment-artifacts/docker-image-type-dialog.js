@@ -24,6 +24,7 @@ define(['require', 'lodash', 'jquery'],
             this.dockerNameInUpperError = options.templateHeader.find("#k8s-path-missing-docker-build-type-upper-error");
             this.templateContainer = options.templateHeader;
             this.dockerImageNameForm = options.templateHeader.find('#k8s-path-docker-image-name-form');
+            this.runnerDefaultDockerImageUrl = options.baseUrl + "/runnerDefaultDockerImage";
         };
 
         DockerImageTypeDialog.prototype.constructor = DockerImageTypeDialog;
@@ -38,7 +39,15 @@ define(['require', 'lodash', 'jquery'],
                     self.dockerImageNameForm.show();
                     self.templateContainer.find("#docker-image-type-tobuild").prop("checked", false);
                     if (self.dockerImageNameForm.find("#built-docker-image-name-input-field").val() == "") {
-                        self.dockerImageNameForm.find("#built-docker-image-name-input-field").val("siddhiio/siddhi-runner-alpine:5.1.2")
+                        var runnerDefaultDockerImage = "";
+                        $.ajax({
+                            url: self.runnerDefaultDockerImageUrl,
+                            success: function(dockerImageHolder) {
+                              runnerDefaultDockerImage = dockerImageHolder["defaultRunnerDockerImage"];
+                            },
+                            async:false
+                        });
+                        self.dockerImageNameForm.find("#built-docker-image-name-input-field").val(runnerDefaultDockerImage.toLowerCase());
                     }
                 } else {
                     self.dockerImageNameForm.hide();
