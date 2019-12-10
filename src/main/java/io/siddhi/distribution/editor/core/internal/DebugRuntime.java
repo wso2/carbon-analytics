@@ -138,10 +138,9 @@ public class DebugRuntime {
         }
         if (siddhiAppRuntime != null) {
             siddhiAppRuntime.shutdown();
-            siddhiAppRuntime = null;
+            mode = Mode.STOP;
         }
         callbackEventsQueue.clear();
-        createRuntime(siddhiApp);
     }
 
     public void reload(String siddhiApp) {
