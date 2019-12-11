@@ -134,6 +134,11 @@ hr.export-dialog-hr {
     background-color: transparent;
 }
 
+#step-3 > div.step-description-text {
+    width: 90%;
+    float: left;
+}
+
 .step-description-text {
     padding: 0px 5px 5px 5px;
     background-color: transparent;

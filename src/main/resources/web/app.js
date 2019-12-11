@@ -43,6 +43,7 @@ requirejs.config({
         // custom modules ////
         //////////////////////
         log: "commons/js/log/log",
+        version: "js/version/version",
         menu_bar: "commons/js/menu-bar/menu-bar",
         tool_bar: "commons/js/tool-bar/tool-bar",
         context_menu: "commons/js/context-menu/context-menu",

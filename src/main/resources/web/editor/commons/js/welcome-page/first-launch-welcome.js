@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
-define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_preview', 'workspace/file', 'enjoyhint', 'guide'],
-    function (require, _, log, $, Backbone, CommandManager, SamplePreviewView, File, EnjoyHint, Guide) {
+define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_preview', 'workspace/file', 'enjoyhint', 'guide', 'version'],
+    function (require, _, log, $, Backbone, CommandManager, SamplePreviewView, File, EnjoyHint, Guide, Version) {
 
         var FirstLaunchWelcomePage = Backbone.View.extend({
             initialize: function (options) {
@@ -74,6 +74,11 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 buttonWrap.append(newButton);
                 buttonWrap.append(openButton);
 
+                $('#query-guide-link-container').append('<a href="https://siddhi.io/en/v'+Version.MINOR_VERSION+
+                    '/docs/query-guide/" target="_blank"><i class="fw-info"></i> Siddhi Query Guide</a>');
+                $('#step-2 > div.step-description-text').append('Use ${...} format to template siddhi apps');
+                $('#step-3 > div.step-description-text').append('Use ${...} format to template the configurations');
+
                 var productNameWrapHeader = $('<img src="/editor/commons/images/siddhi-logo.svg">' +
                     '<h5 class="icontagline">Cloud Native Stream Processor</h5>');
                 productNameWrap.append(productNameWrapHeader);
@@ -105,15 +110,15 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 quickLinksPane.append(quickLinkHeader);
 
                 var bodyUlQuickLinkContent = $('<ul class="quick-links col-md-12 col-lg-8">' +
-                    '<li class="col-md-4"><a href="https://siddhi.io/en/v5.1/docs/quick-start/"' +
+                    '<li class="col-md-4"><a href="https://siddhi.io/en/v'+Version.MINOR_VERSION+'/docs/quick-start/"' +
                     'target="_blank"><i class="fw fw-list"></i>Quick Start Guide</a></li>' +
-                    '<li class="col-md-4"><a href="https://siddhi.io/en/v5.1/docs/"' +
+                    '<li class="col-md-4"><a href="https://siddhi.io/en/v'+Version.MINOR_VERSION+'/docs/"' +
                     'target="_blank"><i class="fw fw-google-docs"></i>Documentation</a></li>' +
-                    '<li class="col-md-4"><a href="https://siddhi.io/en/v5.1/docs/query-guide/"' +
+                    '<li class="col-md-4"><a href="https://siddhi.io/en/v'+Version.MINOR_VERSION+'/docs/query-guide/"' +
                     'target="_blank"><i class="fw fw-carbon"></i>Siddhi Query Guide</a></li>' +
                     '<li class="col-md-4"><a href="https://siddhi.io/community/"' +
                     'target="_blank"><i class="fw fw-info"></i>Q&A</a></li>' +
-                    '<li class="col-md-4"><a href="https://siddhi.io/en/v5.1/docs/api/5.1.2/"' +
+                    '<li class="col-md-4"><a href="https://siddhi.io/en/v'+Version.MINOR_VERSION+'/docs/api/'+Version.LATEST_PACK_VERSION+'/"' +
                     'target="_blank"><i class="fw fw-google-docs"></i>API Docs</a></li>'
                 );
 

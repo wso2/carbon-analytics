@@ -67,7 +67,7 @@
 </head>
 
 <body class="sticky-footer">
-
+<div id="mavenVersion" hidden>${project.version}</div>
 <!-- Start: header -->
 <header class="header header-default">
     <!-- Start: header - logo, title & menu-bar -->
@@ -94,9 +94,7 @@
                 <i class="fw fw-undo"></i>
             </a>
         </div>
-        <div id="query-guide-link-container" class="tool-bar pull-right">
-            <a href="https://siddhi.io/en/v5.1/docs/query-guide/" target="_blank"><i class="fw-info"></i> Siddhi Query Guide</a>
-        </div>
+        <div id="query-guide-link-container" class="tool-bar pull-right"></div>
     </div>
     <!-- End: header - logo, title & menu-bar -->
 </header>
@@ -2501,14 +2499,13 @@
                             </div>
                         </div>
                         <div id="step-2">
-                            <div class="step-description-text">Use ${...} format to template siddhi apps</div>
+                            <div class="step-description-text"></div>
                             <div id='siddhi-app-template-container-id'
                                  style='display: block'>
                             </div>
                         </div>
                         <div id="step-3">
-                            <div class="step-description-text">Use ${...} format to template the configurations</div>
-                            <br />
+                            <div class="step-description-text"></div>
                             <div class="dropdown" id="siddhi-config-main-dropdown-id" align="right">
                                 <button class="btn btn-default btn-circle" id="deployment-config-add-button" type="button" data-toggle="dropdown">
                                     <i class="fw fw-add"></i>

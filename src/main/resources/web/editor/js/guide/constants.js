@@ -10,9 +10,7 @@ define(function () {
      */
     var constants = {
         CONTENT: '@App:name(\'SweetFactory\')\n' +
-            '@App:description(\'Description of the plan\')\n' +
-            '\n' +
-            '-- Please refer to https://siddhi.io/en/v5.1/docs/quick-start/ on getting started with Siddhi editor. \n' +
+            '@App:description(\'Factory Analysis App\')\n' +
             '\n' +
             'define stream SweetProductionStream (name string, amount long);\n' +
             '@sink(type = \'log\', \n' +

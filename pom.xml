@@ -17,7 +17,8 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>io.siddhi.distribution</groupId>
         <artifactId>io.siddhi.distribution.parent</artifactId>
@@ -150,7 +151,24 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <configuration>
+                            <nonFilteredFileExtensions>
+                                <nonFilteredFileExtension>woff</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+                            </nonFilteredFileExtensions>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
@@ -181,11 +199,11 @@
                                 <phase>compile</phase>
                                 <configuration>
                                     <tasks>
-                                        <move file="target/classes/web/editor/commons" todir="target/classes/web" />
-                                        <move file="target/classes/web/editor/css" todir="target/classes/web" />
-                                        <move file="target/classes/web/editor/images" todir="target/classes/web" />
-                                        <move file="target/classes/web/editor/js" todir="target/classes/web" />
-                                        <delete dir="target/classes/web/editor" />
+                                        <move file="target/classes/web/editor/commons" todir="target/classes/web"/>
+                                        <move file="target/classes/web/editor/css" todir="target/classes/web"/>
+                                        <move file="target/classes/web/editor/images" todir="target/classes/web"/>
+                                        <move file="target/classes/web/editor/js" todir="target/classes/web"/>
+                                        <delete dir="target/classes/web/editor"/>
                                     </tasks>
                                 </configuration>
                                 <goals>
@@ -205,13 +223,16 @@
                                     <goal>unpack</goal>
                                 </goals>
                                 <configuration>
-                                    <markersDirectory>${project.build.directory}/dependencies/dependency-maven-plugin-markers</markersDirectory>
+                                    <markersDirectory>
+                                        ${project.build.directory}/dependencies/dependency-maven-plugin-markers
+                                    </markersDirectory>
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>com.spotify</groupId>
                                             <artifactId>docker-client</artifactId>
                                             <classifier>shaded</classifier>
-                                            <outputDirectory>${project.build.directory}/dependencies/docker-client</outputDirectory>
+                                            <outputDirectory>${project.build.directory}/dependencies/docker-client
+                                            </outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
