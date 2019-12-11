@@ -213,9 +213,8 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
                 }
             }
 
-            SiddhiEditor.prototype.onEnvironmentChange = function () {
+            self.resetValidations = function () {
                 clearErrorsAndTriggerOnChange();
-                self.checkForSemanticErrors();
             };
 
             /**

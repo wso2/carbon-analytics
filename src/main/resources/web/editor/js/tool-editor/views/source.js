@@ -104,6 +104,10 @@ define(['require', 'log', 'lodash', 'jquery', 'event_channel', 'app/source-edito
             return this._mainEditor.getRawExtensions();
         };
 
+        SourceView.prototype.onEnvironmentChange = function () {
+            this._mainEditor.resetValidations();
+        };
+
         /**
          * Binds a shortcut to ace editor so that it will trigger the command on source view upon key press.
          * All the commands registered app's command manager will be bound to source view upon render.

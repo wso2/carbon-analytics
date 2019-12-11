@@ -84,8 +84,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'event_channel', 'console', '
                     success: function (data) {
                         if (console != undefined) {
                             activeTab.getFile().setStopProcessRunning(false);
-                            activeTab.getSiddhiFileEditor().getSourceView().getMainEditor()
-                                .onEnvironmentChange();
+                            activeTab.getSiddhiFileEditor().getSourceView().onEnvironmentChange();
                             var msg = "";
                             activeTab.getFile().setRunStatus(false);
                             activeTab.getFile().save();

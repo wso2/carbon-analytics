@@ -36,8 +36,10 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 if(evt.newActiveTab._title != "welcome-page"){
                     if(tab.getSiddhiFileEditor() !== undefined){
                         tab.getSiddhiFileEditor().getSourceView().editorResize();
+                        tab.getSiddhiFileEditor().getSourceView().onEnvironmentChange();
                     }
                 }
+                app.tabController.setActiveTab(tab);
                 this.manageConsoles(evt);
             };
 
