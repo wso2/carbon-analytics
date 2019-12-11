@@ -38,7 +38,7 @@
 
 .operator-finder .result .heading h4 {
     float: left;
-    font: 14px Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;
+    font: small Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;
     width: calc(100% - 25px);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -117,7 +117,7 @@
 
 .modal-operator-details .modal-body tbody td:nth-child(1),
 .modal-operator-details .modal-body tbody td:nth-child(2) {
-    font: 14px Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;
+    font: small Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;
 }
 
 .modal-operator-details .operator-details-content {

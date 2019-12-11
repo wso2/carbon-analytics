@@ -166,6 +166,11 @@
                                 <nonFilteredFileExtension>woff</nonFilteredFileExtension>
                                 <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
                                 <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>svg</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>ico</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>js</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>css</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>json</nonFilteredFileExtension>
                             </nonFilteredFileExtensions>
                         </configuration>
                     </plugin>

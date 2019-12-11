@@ -1688,7 +1688,7 @@ div#syntax > table > tbody > tr > td,
 div.example > p,
 div.example > h5,
 div.example > pre {
-    font-size: 17px;
+    font-size: small;
     color: #b7b7b7;
 }
 
@@ -1723,7 +1723,7 @@ div.extension-table > table {
     background: #242424;
     color: #b7b7b7;
     font-weight: normal;
-    font-size: medium;
+    font-size: small;
     font-style: normal;
     text-align: start;
     font-variant: normal;
