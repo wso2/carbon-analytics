@@ -135,7 +135,7 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
                     e.syntax = sanitiseString(e.syntax);
                     //To provide suitable backtick data for remarkable js md conversion.
                     e.description = preProcessCodeBlocks(e.description);
-                    operator.combinedExamples += "<h5>example " + (++i) + "</h5>" +
+                    operator.combinedExamples += "<h5>Example " + (++i) + "</h5>" +
                         "<pre>" + e.syntax + "</pre>" +
                         "<p>" + e.description + "</p>";
                 });
