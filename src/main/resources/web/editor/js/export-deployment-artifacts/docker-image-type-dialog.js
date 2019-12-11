@@ -24,7 +24,6 @@ define(['require', 'lodash', 'jquery', 'version'],
             this.dockerNameInUpperError = options.templateHeader.find("#k8s-path-missing-docker-build-type-upper-error");
             this.templateContainer = options.templateHeader;
             this.dockerImageNameForm = options.templateHeader.find('#k8s-path-docker-image-name-form');
-            this.runnerDefaultDockerImageUrl = options.baseUrl + "/runnerDefaultDockerImage";
         };
 
         DockerImageTypeDialog.prototype.constructor = DockerImageTypeDialog;
