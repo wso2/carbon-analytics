@@ -267,9 +267,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             ErrorDTO errorDTO = new ErrorDTO();
             errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
             errorDTO.setDescription("Error occurred while reading configs from deployment.yaml. " + e.getMessage());
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(errorDTO)
-                    .build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
         }
     }
 
