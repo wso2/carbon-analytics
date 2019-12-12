@@ -177,10 +177,23 @@ public class LoginApiServiceImpl extends LoginApiService {
                     NewCookie accessTokenhttpOnlyCookie = AuthUtil
                             .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, accessTokenSecondHalf, appContext, true, true,
                                     -1);
-                    NewCookie logoutContextAccessToken = AuthUtil
-                            .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, accessTokenSecondHalf,
-                                    AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true,
-                                    -1);
+
+                    NewCookie logoutContextAccessToken;
+                    IdPClientConfiguration authConfigurations = DataHolder.getInstance()
+                            .getConfigProvider()
+                            .getConfigurationObject(IdPClientConfiguration.class);
+                    if (authConfigurations.isSsoEnabled()) {
+                        logoutContextAccessToken = AuthUtil
+                                .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, accessTokenSecondHalf,
+                                        AuthRESTAPIConstants.LOGOUT_CONTEXT + AuthRESTAPIConstants.LOGOUT_SSO_CONTEXT +
+                                                appContext , true, true, -1);
+                    } else {
+                        logoutContextAccessToken = AuthUtil
+                                .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, accessTokenSecondHalf,
+                                        AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true,
+                                        -1);
+                    }
+
                     if (refreshToken != null) {
                         int refTokenValidityPeriod = -1;
                         if (rememberMe) {
@@ -249,6 +262,12 @@ public class LoginApiServiceImpl extends LoginApiService {
             errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
             errorDTO.setDescription("Error in login to the uri '" + appName + "'. Error: " + e.getMessage());
             return Response.serverError().entity(errorDTO).build();
+        } catch (ConfigurationException e) {
+            LOG.debug("Error occurred while reading configs from deployment.yaml. " + e.getMessage()) ;
+            ErrorDTO errorDTO = new ErrorDTO();
+            errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
+            errorDTO.setDescription("Error occurred while reading configs from deployment.yaml. " + e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
         }
     }
 
