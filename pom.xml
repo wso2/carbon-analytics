@@ -17,12 +17,11 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>io.siddhi.distribution</groupId>
         <artifactId>io.siddhi.distribution.parent</artifactId>
-        <version>5.1.3-SNAPSHOT</version>
+        <version>5.1.2</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
@@ -204,11 +203,11 @@
                                 <phase>compile</phase>
                                 <configuration>
                                     <tasks>
-                                        <move file="target/classes/web/editor/commons" todir="target/classes/web"/>
-                                        <move file="target/classes/web/editor/css" todir="target/classes/web"/>
-                                        <move file="target/classes/web/editor/images" todir="target/classes/web"/>
-                                        <move file="target/classes/web/editor/js" todir="target/classes/web"/>
-                                        <delete dir="target/classes/web/editor"/>
+                                        <move file="target/classes/web/editor/commons" todir="target/classes/web" />
+                                        <move file="target/classes/web/editor/css" todir="target/classes/web" />
+                                        <move file="target/classes/web/editor/images" todir="target/classes/web" />
+                                        <move file="target/classes/web/editor/js" todir="target/classes/web" />
+                                        <delete dir="target/classes/web/editor" />
                                     </tasks>
                                 </configuration>
                                 <goals>
