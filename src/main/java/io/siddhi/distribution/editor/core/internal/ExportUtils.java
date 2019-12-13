@@ -152,7 +152,7 @@ public class ExportUtils {
         boolean configChanged = false;
         boolean envChanged = false;
         boolean buildDocker = false;
-        if (exportType != null && exportType.equals(EXPORT_TYPE_DOCKER)) {
+        if (EXPORT_TYPE_DOCKER.equals(exportType)) {
             if (exportAppsRequest.getDockerConfiguration() != null) {
                 if (exportAppsRequest.getDockerConfiguration().getImageName() != null &&
                         !exportAppsRequest.getDockerConfiguration().getImageName().equals("")) {
@@ -166,7 +166,7 @@ public class ExportUtils {
                 }
             }
         }
-        if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
+        if (EXPORT_TYPE_KUBERNETES.equals(exportType)) {
             zipFileName = "siddhi-kubernetes.zip";
             zipFileRoot = "siddhi-kubernetes" +  File.separator;
             if (exportAppsRequest.getKubernetesConfiguration() != null) {
@@ -408,7 +408,7 @@ public class ExportUtils {
             // Write the kubernetes file to the zip file and add README.md
             ZipEntry readmeEntry = new ZipEntry(Paths.get(zipFileRoot, GENERIC_README_FILE_NAME).toString());
             zipOutputStream.putNextEntry(readmeEntry);
-            if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
+            if (EXPORT_TYPE_KUBERNETES.equals(exportType)) {
                 // Add K8s README.md
                 if (!Files.isReadable(kubernetesReadmeFilePath)) {
                     throw new KubernetesGenerationException(
@@ -537,7 +537,7 @@ public class ExportUtils {
         }
         content = content.replaceAll(DOCKER_BASE_IMAGE_TEMPLATE, dockerBaseImgName);
 
-        if (exportType != null && exportType.equals(EXPORT_TYPE_KUBERNETES)) {
+        if (EXPORT_TYPE_KUBERNETES.equals(exportType)) {
             content = content.replaceAll(APPS_BLOCK_TEMPLATE, "");
         } else {
             content = content.replaceAll(APPS_BLOCK_TEMPLATE, APPS_BLOCK_VALUE);

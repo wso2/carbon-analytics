@@ -1205,13 +1205,12 @@ public class EditorMicroservice implements Microservice {
             File zipFile = exportUtils.createZipFile();
             String fileName = exportUtils.getZipFileName();
             boolean kubernetesEnabled = false;
-            if (exportType != null) {
-                if (exportType.equals(EXPORT_TYPE_KUBERNETES)) {
-                    kubernetesEnabled = true;
-                }
+            if (EXPORT_TYPE_KUBERNETES.equals(exportType)) {
+                kubernetesEnabled = true;
             }
 
-            if (requestType != null && requestType.equals(EXPORT_REQUEST_TYPE_DOWNLOAD_ONLY)) {
+
+            if (EXPORT_REQUEST_TYPE_DOWNLOAD_ONLY.equals(requestType)) {
                 return Response
                         .status(Response.Status.OK)
                         .entity(zipFile)
@@ -1261,7 +1260,7 @@ public class EditorMicroservice implements Microservice {
                 dockerBuilderStatusMap.put(dockerBuilderStatusKey, dockerBuilderStatus);
             }
 
-            if (requestType != null && requestType.equals(EXPORT_REQUEST_TYPE_BUILD_ONLY) && !kubernetesEnabled) {
+            if (EXPORT_REQUEST_TYPE_BUILD_ONLY.equals(requestType) && !kubernetesEnabled) {
                 return Response
                         .status(Response.Status.OK)
                         .header(EXPORT_REQUEST_GET_STATUS_HEADER, dockerBuilderStatusKey)
