@@ -218,9 +218,7 @@ export default class AuthManager {
                         this.discardSession();
                         reject();
                     }
-                    const {
-                        pID, lID, validityPeriod,
-                    } = response.data;
+                    const { pID, lID, validityPeriod, iID } = response.data;
                     const username =
                         AuthManager.isRememberMeSet() ? window.localStorage.getItem('username') :
                             AuthManager.getUser().username;
@@ -235,6 +233,11 @@ export default class AuthManager {
                         AuthManager.isRememberMeSet() ? REFRESH_TOKEN_VALIDITY_PERIOD : null;
                     AuthManager.setCookie(Constants.REFRESH_TOKEN_COOKIE, lID, refreshTokenValidityPeriod,
                         window.contextPath);
+                    // External IdP client of Streaming Integrator does not send the updated id token in the response.
+                    // Hence, added a if check.
+                    if (iID) {
+                        AuthManager.setCookie(Constants.ID_TOKEN_COOKIE, iID, 604800, window.contextPath);
+                    }
                     resolve();
                 })
                 .catch(error => reject(error));
