@@ -449,7 +449,7 @@ public class SourceEditorUtils {
      */
     private static StringBuilder parameterDataTypeGeneration(String parameterName,
                                                              Map<String, DataType[]> parameterDataTypeMap) {
-        StringBuilder parameterDataType = new StringBuilder(" <");
+        StringBuilder parameterDataType = new StringBuilder("<");
         DataType[] parameterType = parameterDataTypeMap.get(parameterName);
         for (int i = 0; i < parameterType.length; i++) {
             DataType dataType = parameterType[i];
@@ -459,7 +459,7 @@ public class SourceEditorUtils {
                 parameterDataType.append(dataType);
             }
         }
-        parameterDataType.append("> ");
+        parameterDataType.append(">");
         return parameterDataType;
     }
 
@@ -509,28 +509,28 @@ public class SourceEditorUtils {
                     parameterClipboardSyntax.append("()");
                 } else {
                     parameterSyntax.append("(");
-                    parameterClipboardSyntax.append("( ");
+                    parameterClipboardSyntax.append("(");
                     for (int j = 0; j < parameterOverload.parameterNames().length; j++) {
                         String parameterName = parameterOverload.parameterNames()[j];
                         if (parameterName.equalsIgnoreCase(SiddhiCodeBuilderConstants.THREE_DOTS)) {
                             String paramName = parameterOverload.parameterNames()[j - 1];
                             parameterSyntax.append(parameterDataTypeGeneration(paramName, parameterDataTypeMap))
-                                            .append(SiddhiCodeBuilderConstants.THREE_DOTS);
+                                    .append(" ").append(SiddhiCodeBuilderConstants.THREE_DOTS);
                             parameterClipboardSyntax.append(paramName).append(SiddhiCodeBuilderConstants.THREE_DOTS);
                         } else {
                             parameterSyntax.append(
                                     parameterDataTypeGeneration(parameterName, parameterDataTypeMap).toString());
                             if (j != parameterOverload.parameterNames().length - 1) {
-                                parameterSyntax.append(parameterName).append(",");
-                                parameterClipboardSyntax.append(parameterName).append(",");
+                                parameterSyntax.append(" ").append(parameterName).append(", ");
+                                parameterClipboardSyntax.append(parameterName).append(", ");
                             } else {
-                                parameterSyntax.append(parameterName);
+                                parameterSyntax.append(" ").append(parameterName);
                                 parameterClipboardSyntax.append(parameterName);
                             }
                         }
                     }
-                    parameterClipboardSyntax.append(" )");
-                    parameterSyntax.append(" )");
+                    parameterClipboardSyntax.append(")");
+                    parameterSyntax.append(")");
                 }
                 SyntaxMetaData syntaxMetaData = new SyntaxMetaData(
                         syntax.toString() + parameterSyntax.toString(),
@@ -539,20 +539,20 @@ public class SourceEditorUtils {
             }
         } else {
             syntax.append("(");
-            clipBoardSyntax.append("( ");
+            clipBoardSyntax.append("(");
             for (int i = 0; i < extension.parameters().length; i++) {
                 Parameter parameter = extension.parameters()[i];
                 syntax.append(parameterDataTypeGeneration(parameter.name(), parameterDataTypeMap));
                 if (i != extension.parameters().length - 1) {
-                    syntax.append(parameter.name()).append(",");
-                    clipBoardSyntax.append(parameter.name()).append(",");
+                    syntax.append(" ").append(parameter.name()).append(", ");
+                    clipBoardSyntax.append(parameter.name()).append(", ");
                 } else {
-                    syntax.append(parameter.name());
+                    syntax.append(" ").append(parameter.name());
                     clipBoardSyntax.append(parameter.name());
                 }
             }
-            syntax.append(" )");
-            clipBoardSyntax.append(" )");
+            syntax.append(")");
+            clipBoardSyntax.append(")");
 
             SyntaxMetaData syntaxMetaData = new SyntaxMetaData(syntax.toString(), clipBoardSyntax.toString());
             syntaxList.add(syntaxMetaData);
