@@ -44,7 +44,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                     var app = this.app;
                     var fileTab;
                     var notification_container = this.notification_container;
-                    // var workspaceServiceURL = app.config.services.workspace.endpoint;
                     var providedFileName;
                     var trimmedSiddhiAppName;
                     //check fileName is available or not.
@@ -57,8 +56,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                         providedFileName = fileTab.getTitle();
                         trimmedSiddhiAppName = trimSiddhiAppName(providedFileName);
                     }
-                    // var siddhiFileEditor = fileTab.getSiddhiFileEditor();
-                    // var content = siddhiFileEditor.getContent();
                     if (!_.isNil(this._fileDeleteModal)) {
                         this._fileDeleteModal.remove();
                     }

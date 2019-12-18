@@ -43,7 +43,6 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
              * custom plugin for jstree to add delete icon for each file in workspace-explorer.
              */
             (function ($, undefined) {
-                "use strict";
                 var _i = document.createElement('I');
                 _i.className = 'fw fw-delete jstree-deletebtn';
                 _i.setAttribute('role', 'presentation');
