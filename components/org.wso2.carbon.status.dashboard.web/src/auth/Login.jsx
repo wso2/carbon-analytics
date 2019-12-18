@@ -85,11 +85,11 @@ export default class Login extends Component {
         const queryString = this.props.location.search.replace(/^\?/, '');
         const params = Qs.parse(queryString);
         if (params.referrer) {
-            this.state.referrer = params.referrer;
+            this.setState({referrer: params.referrer});
         }
         // If the user already logged in set the state to redirect user to the referrer page.
         if (AuthManager.isLoggedIn()) {
-            this.state.authenticated = true;
+            this.setState({authenticated: true});
         }
     }
 
