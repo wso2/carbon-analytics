@@ -36,6 +36,43 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             this._showSamples = _.get(config, 'showSamples');
             this._showBundles = _.get(config, 'showBundles');
             this._multiSelect = _.get(config, 'multiSelect', false);
+            this._deleteIcon = _.get(config, 'deleteIcon', false);
+            var self = this;
+
+            /**
+             * custom plugin for jstree to add delete icon for each file in workspace-explorer.
+             */
+            (function ($, undefined) {
+                "use strict";
+                var _i = document.createElement('I');
+                _i.className = 'fw fw-delete jstree-deletebtn';
+                _i.setAttribute('role', 'presentation');
+                $.jstree.plugins.deletebtn = function (options, parent) {
+                    this.bind = function () {
+                        parent.bind.call(this);
+                        this.element
+                            .on("click.jstree", ".jstree-deletebtn", $.proxy(function (e) {
+                                e.stopImmediatePropagation();
+                                //get the siddhi file name to delete the file.
+                                var fileName = $(e.target).closest('.jstree-node')[0].innerText.trim();
+                                //call the delete function to delete the file when click icon.
+                                self.application.workspaceManager.openDeleteFileConfirmDialog(fileName);
+                            }, this));
+                    };
+                    this.teardown = function () {
+                        this.element.find(".jstree-deletebtn").remove();
+                        parent.teardown.call(this);
+                    };
+                    this.redraw_node = function (obj, deep, callback, force_draw) {
+                        obj = parent.redraw_node.call(this, obj, deep, callback, force_draw);
+                        if (obj) {
+                            var tmp = _i.cloneNode(true);
+                            obj.insertBefore(tmp, obj.childNodes[2]);
+                        }
+                        return obj;
+                    };
+                };
+            })(jQuery);
 
             this._treeConfig = {
                 'core': {
@@ -77,6 +114,11 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             if (this._multiSelect) {
                 this._plugins.push('checkbox');
             }
+
+            if (this._deleteIcon) {
+                this._plugins.push('deletebtn');
+            }
+
             this._contextMenuProvider = _.get(config, 'contextMenuProvider');
             if(!_.isNil(this._contextMenuProvider)){
                 this._plugins.push('contextmenu');

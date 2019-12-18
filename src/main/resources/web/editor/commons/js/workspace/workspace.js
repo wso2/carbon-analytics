@@ -550,7 +550,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 if(_.isNil(this._deleteFileDialog)){
                     this._deleteFileDialog = new Dialogs.DeleteConfirmDialog(app);
                 }
-                this._deleteFileDialog.render();
+                this._deleteFileDialog.render(options);
 
                 if(!_.isNil(options) && _.isFunction(options.callback)){
                     var isSaved = false;

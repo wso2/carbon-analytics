@@ -67,7 +67,8 @@ define(['lodash', 'log', 'file_browser', 'event_channel', 'context_menu', 'boots
             var fileBrowser = new FileBrowser({
                 container: body,
                 application: this.application, root: this.path,
-                fetchFiles: true
+                fetchFiles: true,
+                deleteIcon: true
             });
             fileBrowser.render();
             fileBrowser.on("double-click-node", function (node) {

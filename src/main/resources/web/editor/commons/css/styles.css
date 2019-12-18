@@ -1823,3 +1823,18 @@ div.scrollbar > pre::-webkit-scrollbar-thumb {
 div.consoleIcon {
     padding-bottom: 11px;
 }
+
+.jstree-deletebtn {
+    position: relative;
+    cursor: pointer;
+    padding-top: 8px;
+    float: right;
+    color: #505050;
+    padding-right: 6px;
+    font-size: 13px;
+
+}
+
+.jstree-deletebtn:hover {
+    color: white;
+}
