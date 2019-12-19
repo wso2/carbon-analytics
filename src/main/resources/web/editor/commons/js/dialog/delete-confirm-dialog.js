@@ -46,7 +46,7 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                     var notification_container = this.notification_container;
                     var providedFileName;
                     var trimmedSiddhiAppName;
-                    //check fileName is available or not.
+                    // Filename can be null when called through shortcut/file menu
                     if (!_.isNil(fileName)) {
                         providedFileName = fileName;
                         trimmedSiddhiAppName = trimSiddhiAppName(providedFileName);
