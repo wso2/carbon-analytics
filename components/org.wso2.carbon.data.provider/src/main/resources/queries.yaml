@@ -47,3 +47,11 @@ queries:
       record_greater_than: "SELECT * FROM ({{CUSTOM_QUERY}}) A_TABLE WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}} ORDER BY {{INCREMENTAL_COLUMN}} DESC"
     type: Microsoft SQL Server
     version: default
+  -
+    mappings:
+      record_delete: "DELETE FROM {{TABLE_NAME}} ORDER BY {{INCREMENTAL_COLUMN}} ASC LIMIT {{LIMIT_VALUE}}"
+      total_record_count: "SELECT COUNT(*) FROM {{TABLE_NAME}}"
+      record_limit: "{{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} DESC LIMIT {{LIMIT_VALUE}}"
+      record_greater_than: "SELECT * FROM ({{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} DESC ) AS A_TABLE WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}}"
+    type: DB2
+    version: default
