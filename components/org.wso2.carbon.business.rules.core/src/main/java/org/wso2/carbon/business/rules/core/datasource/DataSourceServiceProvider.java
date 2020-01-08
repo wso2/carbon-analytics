@@ -42,6 +42,7 @@ import javax.sql.DataSource;
  */
 public class DataSourceServiceProvider {
     private static final Logger log = LoggerFactory.getLogger(DataSourceServiceProvider.class);
+    private static final String DB2_DB_TYPE = "DB2";
     private static DataSourceServiceProvider dataSourceServiceProvider = new DataSourceServiceProvider();
     private HikariDataSource dataSource;
     private Connection conn;
@@ -76,8 +77,14 @@ public class DataSourceServiceProvider {
         try {
             conn = this.dataSource.getConnection();
             DatabaseMetaData databaseMetaData = conn.getMetaData();
-            queryManager = new QueryManager(databaseMetaData.getDatabaseProductName(),
-                    databaseMetaData.getDatabaseProductVersion(), DataHolder.getInstance().getConfigProvider());
+            String databaseProductName = databaseMetaData.getDatabaseProductName();
+            // DB2 product name changes with the specific versions(For an example DB2/LINUXX8664, DB2/NT). Hence, checks
+            // whether the product name contains "DB2".
+            if (databaseProductName.contains(DB2_DB_TYPE)) {
+                databaseProductName = DB2_DB_TYPE;
+            }
+            queryManager = new QueryManager(databaseProductName, databaseMetaData.getDatabaseProductVersion(),
+                    DataHolder.getInstance().getConfigProvider());
         } catch (SQLException | ConfigurationException | IOException | QueryMappingNotAvailableException e) {
             throw new BusinessRulesDatasourceInitializationException("Error initializing connection. ", e);
         } finally {
