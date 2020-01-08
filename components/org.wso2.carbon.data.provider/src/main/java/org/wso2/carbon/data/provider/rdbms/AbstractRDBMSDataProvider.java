@@ -60,6 +60,7 @@ import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDat
  */
 public class AbstractRDBMSDataProvider extends AbstractDataProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRDBMSDataProvider.class);
+    private static final String DB2_DB_TYPE = "DB2";
     private String recordLimitQuery;
     private String purgingQuery;
     private String totalRecordCountQuery;
@@ -86,6 +87,11 @@ public class AbstractRDBMSDataProvider extends AbstractDataProvider {
             connection = getConnection(rdbmsProviderConfig.getDatasourceName());
             String databaseName = connection.getMetaData().getDatabaseProductName();
             String databaseVersion = connection.getMetaData().getDatabaseProductVersion();
+            // DB2 product name changes with the specific versions(For an example DB2/LINUXX8664, DB2/NT). Hence, checks
+            // whether the product name contains "DB2".
+            if (databaseName.contains(DB2_DB_TYPE)) {
+                databaseName = DB2_DB_TYPE;
+            }
             RDBMSQueryManager rdbmsQueryManager = new RDBMSQueryManager(databaseName, databaseVersion);
             totalRecordCountQuery = rdbmsQueryManager.getQuery(TOTAL_RECORD_COUNT_QUERY);
             if (totalRecordCountQuery != null) {
