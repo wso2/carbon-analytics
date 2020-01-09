@@ -36,6 +36,7 @@ public class RDBMSConfiguration {
     private static RDBMSConfiguration config = new RDBMSConfiguration();
 
     private static final Logger log = Logger.getLogger(RDBMSConfiguration.class);
+    private static final String DB2_DB_TYPE = "db2";
 
     private RDBMSConfiguration() {
     }
@@ -47,6 +48,9 @@ public class RDBMSConfiguration {
     public RDBMSQueryConfigurationEntry getDatabaseQueryEntries(String databaseType, String databaseVersion,
                                                                 String tableName) {
         RDBMSQueryConfigurationEntry databaseQueryEntries = new RDBMSQueryConfigurationEntry();
+        if (databaseType.contains(DB2_DB_TYPE)) {
+            databaseType = DB2_DB_TYPE;
+        }
         try {
             QueryManager queryManager = new QueryManager(databaseType, databaseVersion,
                     StreamProcessorDataHolder.getInstance().getConfigProvider());
