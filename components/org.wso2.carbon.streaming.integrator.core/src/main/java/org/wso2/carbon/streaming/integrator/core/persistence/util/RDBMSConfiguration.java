@@ -48,7 +48,9 @@ public class RDBMSConfiguration {
     public RDBMSQueryConfigurationEntry getDatabaseQueryEntries(String databaseType, String databaseVersion,
                                                                 String tableName) {
         RDBMSQueryConfigurationEntry databaseQueryEntries = new RDBMSQueryConfigurationEntry();
-        if (databaseType.contains(DB2_DB_TYPE)) {
+        // DB2 product name changes with the specific versions(For an example DB2/LINUXX8664, DB2/NT). Hence, checks
+        // whether the product name contains "DB2".
+        if (databaseType.toLowerCase().contains(DB2_DB_TYPE)) {
             databaseType = DB2_DB_TYPE;
         }
         try {

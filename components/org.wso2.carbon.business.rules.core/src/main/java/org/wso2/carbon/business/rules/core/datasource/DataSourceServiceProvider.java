@@ -80,7 +80,7 @@ public class DataSourceServiceProvider {
             String databaseProductName = databaseMetaData.getDatabaseProductName();
             // DB2 product name changes with the specific versions(For an example DB2/LINUXX8664, DB2/NT). Hence, checks
             // whether the product name contains "DB2".
-            if (databaseProductName.contains(DB2_DB_TYPE)) {
+            if (databaseProductName.toLowerCase().contains(DB2_DB_TYPE.toLowerCase())) {
                 databaseProductName = DB2_DB_TYPE;
             }
             queryManager = new QueryManager(databaseProductName, databaseMetaData.getDatabaseProductVersion(),
