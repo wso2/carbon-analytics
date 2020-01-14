@@ -27,6 +27,7 @@ import org.wso2.carbon.streaming.integrator.core.persistence.exception.Datasourc
 import org.wso2.carbon.streaming.integrator.core.persistence.query.QueryManager;
 
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * Class used to get Database queries according to RDBMS type used.
@@ -50,7 +51,7 @@ public class RDBMSConfiguration {
         RDBMSQueryConfigurationEntry databaseQueryEntries = new RDBMSQueryConfigurationEntry();
         // DB2 product name changes with the specific versions(For an example DB2/LINUXX8664, DB2/NT). Hence, checks
         // whether the product name contains "DB2".
-        if (databaseType.toLowerCase().contains(DB2_DB_TYPE)) {
+        if (databaseType.toLowerCase(Locale.ENGLISH).contains(DB2_DB_TYPE)) {
             databaseType = DB2_DB_TYPE;
         }
         try {

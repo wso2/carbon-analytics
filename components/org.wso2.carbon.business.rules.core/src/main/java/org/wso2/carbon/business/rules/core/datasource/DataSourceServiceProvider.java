@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.Locale;
 import javax.sql.DataSource;
 
 /**
@@ -80,7 +81,7 @@ public class DataSourceServiceProvider {
             String databaseProductName = databaseMetaData.getDatabaseProductName();
             // DB2 product name changes with the specific versions(For an example DB2/LINUXX8664, DB2/NT). Hence, checks
             // whether the product name contains "DB2".
-            if (databaseProductName.toLowerCase().contains(DB2_DB_TYPE.toLowerCase())) {
+            if (databaseProductName.toLowerCase(Locale.ENGLISH).contains(DB2_DB_TYPE.toLowerCase(Locale.ENGLISH))) {
                 databaseProductName = DB2_DB_TYPE;
             }
             queryManager = new QueryManager(databaseProductName, databaseMetaData.getDatabaseProductVersion(),
