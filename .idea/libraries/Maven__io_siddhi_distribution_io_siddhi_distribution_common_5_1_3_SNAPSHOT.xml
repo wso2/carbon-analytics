@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: io.siddhi.distribution:io.siddhi.distribution.common:5.1.3-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/io/siddhi/distribution/io.siddhi.distribution.common/5.1.3-SNAPSHOT/io.siddhi.distribution.common-5.1.3-20200112.221300-35.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/io/siddhi/distribution/io.siddhi.distribution.common/5.1.3-SNAPSHOT/io.siddhi.distribution.common-5.1.3-20200112.221300-35-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/io/siddhi/distribution/io.siddhi.distribution.common/5.1.3-SNAPSHOT/io.siddhi.distribution.common-5.1.3-20200112.221300-35-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
