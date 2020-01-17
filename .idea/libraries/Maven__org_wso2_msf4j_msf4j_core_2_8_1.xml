@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.wso2.msf4j:msf4j-core:2.8.1">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/wso2/msf4j/msf4j-core/2.8.1/msf4j-core-2.8.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/wso2/msf4j/msf4j-core/2.8.1/msf4j-core-2.8.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/wso2/msf4j/msf4j-core/2.8.1/msf4j-core-2.8.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

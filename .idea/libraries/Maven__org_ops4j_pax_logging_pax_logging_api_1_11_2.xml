@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.ops4j.pax.logging:pax-logging-api:1.11.2">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/ops4j/pax/logging/pax-logging-api/1.11.2/pax-logging-api-1.11.2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/ops4j/pax/logging/pax-logging-api/1.11.2/pax-logging-api-1.11.2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/ops4j/pax/logging/pax-logging-api/1.11.2/pax-logging-api-1.11.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

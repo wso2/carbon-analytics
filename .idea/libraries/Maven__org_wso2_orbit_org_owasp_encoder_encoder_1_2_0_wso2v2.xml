@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.wso2.orbit.org.owasp.encoder:encoder:1.2.0.wso2v2">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/wso2/orbit/org/owasp/encoder/encoder/1.2.0.wso2v2/encoder-1.2.0.wso2v2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/wso2/orbit/org/owasp/encoder/encoder/1.2.0.wso2v2/encoder-1.2.0.wso2v2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/wso2/orbit/org/owasp/encoder/encoder/1.2.0.wso2v2/encoder-1.2.0.wso2v2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
