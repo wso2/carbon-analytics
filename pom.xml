@@ -1557,6 +1557,12 @@
                 <artifactId>xercesImpl</artifactId>
                 <version>${xerces.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-client</artifactId>
+                <classifier>shaded</classifier>
+                <version>${com.spotify.docker.client.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1568,6 +1574,7 @@
         <carbon.analytics-common.version>6.1.36</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[3.0.0, 4.0.0)</carbon.analytics.version.range>
+        <com.spotify.docker.client.version>8.16.0</com.spotify.docker.client.version>
 
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
@@ -1789,6 +1796,7 @@
         <javax.ws.rs.version.range>[2.0.0, 3.0.0)</javax.ws.rs.version.range>
         <javax.websocket.version.range>[1.1.0, 2.0.0)</javax.websocket.version.range>
         <slf4j.version.range>[1.7,2)</slf4j.version.range>
+        <org.yaml.snakeyaml.version.range>[1.0.0, 2.0.0)</org.yaml.snakeyaml.version.range>
         <gson.version.range>[2.5.0, 3.0.0)</gson.version.range>
         <ojdbc6.version>12.1.0.1-atlassian-hosted</ojdbc6.version>
 
