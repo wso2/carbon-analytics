@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="FrameworkDetectionExcludesConfiguration">
-    <file type="Osmorc" url="file://$PROJECT_DIR$" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.analytics.auth.rest.api" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.analytics.msf4j.interceptor.common" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.business.rules.core" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.business.rules.templates.editor.core" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.data.provider" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.editor.log.appender" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.event.simulator.core" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.health.check.core" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.permissions.rest.api" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.si.coordination.listener" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.si.metrics.core" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.siddhi.editor.core" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.siddhi.store.api.rest" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.streaming.integrator.common" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.streaming.integrator.core" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.carbon.streaming.integrator.statistics" />
+    <file type="Osmorc" url="file://$PROJECT_DIR$/components/org.wso2.siddhi.parser" />
   </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
