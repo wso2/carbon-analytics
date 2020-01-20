@@ -21,6 +21,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.analytics.message.tracer.handler.conf.EventingConfigData;
 import org.wso2.carbon.analytics.message.tracer.handler.conf.MessageTracerConfiguration;
 import org.wso2.carbon.analytics.message.tracer.handler.conf.MessageTracerConfigurationManager;
@@ -33,22 +38,9 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
-/**
- * @scr.component name="org.wso2.carbon.analytics.message.tracer.handler " immediate="true"
- * @scr.reference name="config.context.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
- * policy="dynamic" bind="setConfigurationContextService"
- * unbind="unsetConfigurationContextService"
- * @scr.reference name="org.wso2.carbon.registry.service"
- * interface="org.wso2.carbon.registry.core.service.RegistryService"
- * cardinality="1..1" policy="dynamic" bind="setRegistryService"
- * unbind="unsetRegistryService"
- * @scr.reference name="org.wso2.carbon.event.stream.core.EventStreamService"
- * interface="org.wso2.carbon.event.stream.core.EventStreamService"
- * cardinality="1..1" policy="dynamic" bind="setEventStreamService"
- * unbind="unsetEventStreamService"
- */
-
+@Component(
+        name = "org.wso2.carbon.analytics.message.tracer.handler",
+        immediate = true)
 public class MessageTracerServiceComponent {
 
     private static final Log LOG = LogFactory.getLog(MessageTracerServiceComponent.class);
@@ -57,6 +49,7 @@ public class MessageTracerServiceComponent {
 
     private static MessageTracerConfiguration msgTracerConfiguration;
 
+    @Activate
     protected void activate(ComponentContext context) {
 
         if (LOG.isDebugEnabled()) {
@@ -86,6 +79,13 @@ public class MessageTracerServiceComponent {
         }
     }
 
+    @Reference(
+            name = "config.context.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            bind = "setConfigurationContextService",
+            unbind = "unsetConfigurationContextService")
     protected void setConfigurationContextService(ConfigurationContextService configurationContextService) {
         configurationContext = configurationContextService.getServerConfigContext();
         ServiceHolder.setConfigurationContextService(configurationContextService);
@@ -97,6 +97,13 @@ public class MessageTracerServiceComponent {
         ServiceHolder.setConfigurationContextService(null);
     }
 
+    @Reference(
+            name = "org.wso2.carbon.registry.service",
+            service = org.wso2.carbon.registry.core.service.RegistryService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            bind = "setRegistryService",
+            unbind = "unsetRegistryService")
     protected void setRegistryService(RegistryService registryService) {
         ServiceHolder.setRegistryService(registryService);
     }
@@ -105,6 +112,13 @@ public class MessageTracerServiceComponent {
         ServiceHolder.setRegistryService(null);
     }
 
+    @Reference(
+            name = "org.wso2.carbon.event.stream.core.EventStreamService",
+            service = org.wso2.carbon.event.stream.core.EventStreamService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            bind = "setEventStreamService",
+            unbind = "unsetEventStreamService")
     protected void setEventStreamService(EventStreamService eventStreamService) {
         ServiceHolder.setEventStreamService(eventStreamService);
     }
