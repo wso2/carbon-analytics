@@ -395,7 +395,7 @@ header .tool-bar a:visited, header a:focus {
 
 header .tool-bar a:hover,
 header .tool-bar a.active {
-    color: #02979a;
+    color: #f47a1e;
 }
 
 header .tool-bar a.disabled {
