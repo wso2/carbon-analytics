@@ -19,22 +19,26 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query;
 
 /**
- * Represents the 'orderBy' clause of QueryConfig
+ * Represents the 'orderBy' clause of QueryConfig.
  */
 public class QueryOrderByConfig {
+
     private String value;
     private String order;
 
     public QueryOrderByConfig(String value, String order) {
+
         this.value = value;
         this.order = order;
     }
 
     public String getValue() {
+
         return value;
     }
 
     public String getOrder() {
+
         return order;
     }
 }

@@ -18,31 +18,37 @@
 package org.wso2.carbon.siddhi.editor.core.commons.response;
 
 /**
- * Store the attributes of a general response
- * All other responses inherits from this apart from custom responses generated using ResponseFactory
+ * Store the attributes of a general response.
+ * All other responses inherits from this apart from custom responses generated using ResponseFactory.
  */
 public class GeneralResponse {
+
     private Status status;
     private String message;
 
     public GeneralResponse(Status status, String message) {
+
         this.status = status;
         this.message = message;
     }
 
     public Status getStatus() {
+
         return status;
     }
 
     public void setStatus(Status status) {
+
         this.status = status;
     }
 
     public String getMessage() {
+
         return message;
     }
 
     public void setMessage(String message) {
+
         this.message = message;
     }
 }

@@ -31,13 +31,16 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.Stream
 import java.lang.reflect.Type;
 
 /**
- * De-serializer for StreamHandlerConfig class
+ * De-serializer for StreamHandlerConfig class.
  */
 public class StreamHandlerConfigDeserializer implements JsonDeserializer {
+
     private static final String TYPE = "type";
+
     @Override
     public Object deserialize(
             JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {
+
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         JsonPrimitive jsonPrimitive = (JsonPrimitive) jsonObject.get(TYPE);
         String streamHandlerType = jsonPrimitive.getAsString();

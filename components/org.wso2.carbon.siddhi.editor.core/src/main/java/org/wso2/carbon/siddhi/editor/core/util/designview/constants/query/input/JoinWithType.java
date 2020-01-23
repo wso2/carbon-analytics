@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.input;
 
 /**
- * Type of Join, of a Join Query
+ * Type of Join, of a Join Query.
  */
 public enum JoinWithType {
     JOIN,

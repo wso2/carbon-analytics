@@ -29,19 +29,20 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generates the code for a Siddhi query element
+ * Generates the code for a Siddhi query element.
  */
 public class QueryCodeGenerator {
 
     /**
-     * Generates the Siddhi code representation of a QueryConfig object
+     * Generates the Siddhi code representation of a QueryConfig object.
      *
-     * @param query The QueryConfig object
+     * @param query               The QueryConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given QueryConfig object
      * @throws CodeGenerationException Error when generating the code
      */
     public String generateQuery(QueryConfig query, boolean isGeneratingToolTip) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(query);
 
         StringBuilder queryStringBuilder = new StringBuilder();

@@ -20,9 +20,10 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
 /**
  * Contains all the generic String/char values that are needed by
- * the CodeGenerator class to build the entire Siddhi app string
+ * the CodeGenerator class to build the entire Siddhi app string.
  */
 public class SiddhiCodeBuilderConstants {
+
     // General chars
     public static final char ALL = '*';
     public static final char FULL_STOP = '.';
@@ -36,7 +37,6 @@ public class SiddhiCodeBuilderConstants {
     public static final String MULTI_DOUBLE_QUOTE = "\"\"";
     public static final char SPACE = ' ';
     public static final char HASH = '#';
-
     public static final String MULTI_DOUBLE_QUOTE_REGEX = "(.*)\"(.*)\"(.*)\"";
     // Brackets
     public static final char OPEN_BRACKET = '(';
@@ -119,6 +119,7 @@ public class SiddhiCodeBuilderConstants {
     public static final String ELEMENT_KEY_VALUE_SEPARATOR = " = ";
 
     private SiddhiCodeBuilderConstants() {
+
     }
 
 }

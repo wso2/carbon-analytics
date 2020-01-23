@@ -19,24 +19,29 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types;
 
 /**
- * Represents Siddhi Delete Query's output
+ * Represents Siddhi Delete Query's output.
  */
 public class DeleteOutputConfig extends OutputConfig {
+
     private String on;
 
     public DeleteOutputConfig() {
+
     }
 
     public DeleteOutputConfig(String eventType, String on) {
+
         super(eventType);
         this.on = on;
     }
 
     public String getOn() {
+
         return on;
     }
 
     public void setOn(String on) {
+
         this.on = on;
     }
 }

@@ -18,21 +18,23 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StoreConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import io.siddhi.query.api.annotation.Annotation;
 import io.siddhi.query.api.annotation.Element;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StoreConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create Store config
+ * Generator to create Store config.
  */
 public class StoreConfigGenerator extends CodeSegmentsPreserver {
+
     public StoreConfig generateStoreConfig(Annotation storeAnnotation) throws DesignGenerationException {
+
         String type = null;
-        List <String> options = new ArrayList<>();
+        List<String> options = new ArrayList<>();
         for (Element element : storeAnnotation.getElements()) {
             if (element.getKey().equalsIgnoreCase("TYPE")) {
                 type = element.getValue();

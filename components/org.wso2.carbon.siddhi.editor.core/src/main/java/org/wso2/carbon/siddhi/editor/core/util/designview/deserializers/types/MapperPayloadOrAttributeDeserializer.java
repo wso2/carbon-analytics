@@ -31,14 +31,16 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.MapperPayloa
 import java.lang.reflect.Type;
 
 /**
- * De-serializer for MapperPayloadOrAttribute class
+ * De-serializer for MapperPayloadOrAttribute class.
  */
 public class MapperPayloadOrAttributeDeserializer implements JsonDeserializer {
+
     private static final String TYPE = "type";
 
     @Override
     public Object deserialize(
             JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {
+
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         JsonPrimitive jsonPrimitive = (JsonPrimitive) jsonObject.get(TYPE);
         String mapperAttributeType = jsonPrimitive.getAsString();

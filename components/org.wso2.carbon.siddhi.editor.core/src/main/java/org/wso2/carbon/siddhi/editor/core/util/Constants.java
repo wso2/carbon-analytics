@@ -38,6 +38,7 @@ import java.util.Map;
  * Constants related to Editor.
  */
 public class Constants {
+
     public static final String RUNTIME_PATH = Utils.getRuntimePath().normalize().toString();
     public static final String CARBON_HOME = Utils.getCarbonHome().normalize().toString();
     public static final String DIRECTORY_DEPLOYMENT = "deployment";
@@ -52,24 +53,6 @@ public class Constants {
     public static final String DEPLOYMENT_PASSWORD = "password";
     public static final String SIDDHI_FILE_LIST = "siddhiFileList";
     public static final String SERVER_LIST = "serverList";
-    public static final String EXPORT_PROPERTIES_NAMESPACE = "export.properties";
-    public static final String DOCKER_BASE_IMAGE_PROPERTY = "dockerBaseImage";
-    public static final String DEFAULT_SI_DOCKER_BASE_IMAGE = "wso2/streaming-integrator:latest";
-
-    static final String FUNCTION_EXECUTOR = "FunctionExecutor";
-    static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregator";
-    static final String INCREMENTAL_AGGREGATOR = "IncrementalAggregator";
-    static final String WINDOW_PROCESSOR = "WindowProcessor";
-    static final String STREAM_FUNCTION_PROCESSOR = "StreamFunctionProcessor";
-    static final String STREAM_PROCESSOR = "StreamProcessor";
-    static final String SOURCE = "Source";
-    static final String SINK = "Sink";
-    static final String SOURCEMAP = "SourceMap";
-    static final String SINKMAP = "SinkMap";
-    static final String STORE = "Store";
-    static final Map<String, Class<?>> SUPER_CLASS_MAP;
-    static final Map<String, String> PACKAGE_NAME_MAP;
-
     public static final String XML_EVENT = "xml";
     public static final String JSON_EVENT = "json";
     public static final String TEXT_EVENT = "text";
@@ -83,6 +66,23 @@ public class Constants {
     public static final String ATTR_TYPE_BOOL = "bool";
     public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
     public static final String FAULT_STREAM_PREFIX = "!";
+    public static final String EXPORT_PROPERTIES_NAMESPACE = "exportConfigs";
+    public static final String DOCKER_BASE_IMAGE_PROPERTY = "dockerBaseImage";
+    public static final String DEFAULT_SIDDHI_DOCKER_BASE_IMAGE_NAME = "siddhiio/siddhi-runner-base-alpine";
+    public static final String DEFAULT_SIDDHI_DOCKER_IMAGE_NAME = "siddhiio/siddhi-runner-alpine:latest";
+    static final String FUNCTION_EXECUTOR = "FunctionExecutor";
+    static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregatorExecutor";
+    static final String INCREMENTAL_AGGREGATOR = "IncrementalAggregator";
+    static final String WINDOW_PROCESSOR = "WindowProcessor";
+    static final String STREAM_FUNCTION_PROCESSOR = "StreamFunctionProcessor";
+    static final String STREAM_PROCESSOR = "StreamProcessor";
+    static final String SOURCE = "Source";
+    static final String SINK = "Sink";
+    static final String SOURCEMAP = "SourceMap";
+    static final String SINKMAP = "SinkMap";
+    static final String STORE = "Store";
+    static final Map<String, Class<?>> SUPER_CLASS_MAP;
+    static final Map<String, String> PACKAGE_NAME_MAP;
 
     static {
         // Populating the processor super class map

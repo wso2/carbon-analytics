@@ -21,17 +21,20 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.StreamHandlerType;
 
 /**
- * Represents a Filter
+ * Represents a Filter.
  */
 public class FilterConfig extends StreamHandlerConfig {
+
     String value;
 
     public FilterConfig(String value) {
+
         super(StreamHandlerType.FILTER.toString());
         this.value = value;
     }
 
     public String getValue() {
+
         return value;
     }
 }

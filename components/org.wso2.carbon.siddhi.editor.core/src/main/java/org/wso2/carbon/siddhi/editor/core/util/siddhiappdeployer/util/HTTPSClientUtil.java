@@ -22,29 +22,32 @@ import feign.Response;
 import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppDeployerServiceStubException;
 
 /**
- * Contains HTTPS client related methods
+ * Contains HTTPS client related methods.
  */
 public class HTTPSClientUtil {
+
     private static final String PROTOCOL = "https";
 
     /**
-     * Avoids Instantiation
+     * Avoids Instantiation.
      */
     private HTTPSClientUtil() {
+
     }
 
     /**
-     * Generates an HTTPS URL with the given hostAndPort
+     * Generates an HTTPS URL with the given hostAndPort.
      *
      * @param hostAndPort Host and Port of the Worker node in {Host}:{Port} format
      * @return HTTPS URL
      */
     private static String generateURL(String hostAndPort) {
+
         return PROTOCOL + "://" + hostAndPort;
     }
 
     /**
-     * Produces a Response after doing a PUT request
+     * Produces a Response after doing a PUT request.
      *
      * @param hostAndPort Host and Port of the Worker node in {Host}:{Port} format
      * @param username    Username
@@ -55,6 +58,7 @@ public class HTTPSClientUtil {
      */
     public static Response doPutRequest(String hostAndPort, String username, String password, String payload)
             throws SiddhiAppDeployerServiceStubException {
+
         return SiddhiAppDeployerFactory.getSiddhiAppDeployerHttpsClient(generateURL(hostAndPort), username, password)
                 .doPutRequest(payload);
     }

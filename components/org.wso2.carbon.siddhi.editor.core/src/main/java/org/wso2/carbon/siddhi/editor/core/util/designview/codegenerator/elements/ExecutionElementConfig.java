@@ -43,6 +43,7 @@ public class ExecutionElementConfig {
     private List<String> outputStreams;
 
     public ExecutionElementConfig(QueryConfig query) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(query);
         this.type = CodeGeneratorConstants.QUERY;
         this.value = query;
@@ -51,6 +52,7 @@ public class ExecutionElementConfig {
     }
 
     public ExecutionElementConfig(PartitionConfig partition) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(partition);
         this.type = CodeGeneratorConstants.PARTITION;
         this.value = partition;
@@ -59,13 +61,14 @@ public class ExecutionElementConfig {
     }
 
     /**
-     * Identifies the names of the input streams of a query
+     * Identifies the names of the input streams of a query.
      *
      * @param query The query object to be used
      * @return The list of names of the given query's input streams
      * @throws CodeGenerationException Error when identifying input streams
      */
     private List<String> extractInputStreams(QueryConfig query) throws CodeGenerationException {
+
         List<String> inputStreamList = new LinkedList<>();
         switch (query.getQueryInput().getType().toUpperCase()) {
             case CodeGeneratorConstants.WINDOW:
@@ -101,13 +104,14 @@ public class ExecutionElementConfig {
     }
 
     /**
-     * Identifies the names of the input streams of a partition
+     * Identifies the names of the input streams of a partition.
      *
      * @param partition The partition object to be used
      * @return The list of names of the given partition's input streams
      * @throws CodeGenerationException Error when identifying input streams
      */
     private List<String> extractInputStreams(PartitionConfig partition) throws CodeGenerationException {
+
         List<String> inputStreamList = new LinkedList<>();
         for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
             for (QueryConfig query : queryList) {
@@ -124,13 +128,14 @@ public class ExecutionElementConfig {
     }
 
     /**
-     * Identifies the name of the output stream of a query
+     * Identifies the name of the output stream of a query.
      *
      * @param query The query object to be used
      * @return The name of the given query's output stream
      * @throws CodeGenerationException Error when identifying the output stream
      */
     private List<String> extractOutputStreams(QueryConfig query) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(query.getQueryOutput());
         List<String> outputStreamList = new LinkedList<>();
         outputStreamList.add(query.getQueryOutput().getTarget());
@@ -138,13 +143,14 @@ public class ExecutionElementConfig {
     }
 
     /**
-     * Identifies the names of the output streams of a partition
+     * Identifies the names of the output streams of a partition.
      *
      * @param partition The partition object to be used
      * @return The list of names of the given partition's output streams
      * @throws CodeGenerationException Error when identifying the output streams
      */
     private List<String> extractOutputStreams(PartitionConfig partition) throws CodeGenerationException {
+
         List<String> outputStreamList = new LinkedList<>();
         for (List<QueryConfig> queryList : partition.getQueryLists().values()) {
             for (QueryConfig query : queryList) {
@@ -158,18 +164,22 @@ public class ExecutionElementConfig {
     }
 
     public String getType() {
+
         return type;
     }
 
     public Object getValue() {
+
         return value;
     }
 
     public List<String> getInputStreams() {
+
         return inputStreams;
     }
 
     public List<String> getOutputStreams() {
+
         return outputStreams;
     }
 

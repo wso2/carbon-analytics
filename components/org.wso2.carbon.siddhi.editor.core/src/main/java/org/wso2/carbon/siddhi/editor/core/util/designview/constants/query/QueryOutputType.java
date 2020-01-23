@@ -19,11 +19,11 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants.query;
 
 /**
- * Type of a Query's Output
+ * Type of a Query's Output.
  */
 public enum QueryOutputType {
-        INSERT,
-        DELETE,
-        UPDATE,
-        UPDATE_OR_INSERT_INTO
+    INSERT,
+    DELETE,
+    UPDATE,
+    UPDATE_OR_INSERT_INTO
 }

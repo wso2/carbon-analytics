@@ -18,35 +18,41 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.*;
-import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import io.siddhi.query.api.SiddhiApp;
 import io.siddhi.query.api.execution.query.input.stream.InputStream;
 import io.siddhi.query.api.execution.query.input.stream.JoinInputStream;
 import io.siddhi.query.api.execution.query.input.stream.SingleInputStream;
 import io.siddhi.query.api.execution.query.input.stream.StateInputStream;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryInputType;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.JoinConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.PatternSequenceConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.WindowFilterProjectionConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 
 /**
- * Generator to create QueryInputConfig from Siddhi elements
+ * Generator to create QueryInputConfig from Siddhi elements.
  */
 public class QueryInputConfigGenerator {
+
     private String siddhiAppString;
     private SiddhiApp siddhiApp;
 
     public QueryInputConfigGenerator(String siddhiAppString, SiddhiApp siddhiApp) {
+
         this.siddhiAppString = siddhiAppString;
         this.siddhiApp = siddhiApp;
     }
 
     /**
-     * Generates Config for Query Input, from given Siddhi Query object and the complete Siddhi app string
-     * @param queryInputStream                  Siddhi Query InputStream object
-     * @return                                  QueryInputConfig object
-     * @throws DesignGenerationException        Error while generating config
+     * Generates Config for Query Input, from given Siddhi Query object and the complete Siddhi app string.
+     *
+     * @param queryInputStream Siddhi Query InputStream object
+     * @return QueryInputConfig object
+     * @throws DesignGenerationException Error while generating config
      */
     public QueryInputConfig generateQueryInputConfig(InputStream queryInputStream) throws DesignGenerationException {
+
         QueryInputType queryInputType = getQueryInputType(queryInputStream);
         if (queryInputType == QueryInputType.WINDOW_FILTER_PROJECTION) {
             return new WindowFilterProjectionConfigGenerator(siddhiAppString)
@@ -61,11 +67,13 @@ public class QueryInputConfigGenerator {
     }
 
     /**
-     * Gets the type of the Query's Input, with the given Siddhi InputStream object
-     * @param queryInputStream      Siddhi InputStream object, which contains data about the Query's input part
-     * @return                      QueryInputType
+     * Gets the type of the Query's Input, with the given Siddhi InputStream object.
+     *
+     * @param queryInputStream Siddhi InputStream object, which contains data about the Query's input part
+     * @return QueryInputType
      */
     private QueryInputType getQueryInputType(InputStream queryInputStream) {
+
         if (queryInputStream instanceof SingleInputStream) {
             return QueryInputType.WINDOW_FILTER_PROJECTION;
         } else if (queryInputStream instanceof JoinInputStream) {

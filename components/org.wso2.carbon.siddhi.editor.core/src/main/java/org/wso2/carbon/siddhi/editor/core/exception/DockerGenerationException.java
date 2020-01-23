@@ -24,10 +24,12 @@ package org.wso2.carbon.siddhi.editor.core.exception;
 public class DockerGenerationException extends Exception {
 
     public DockerGenerationException(String message) {
+
         super(message);
     }
 
     public DockerGenerationException(String message, Exception e) {
+
         super(message, e);
     }
 }

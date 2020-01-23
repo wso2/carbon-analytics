@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants.query;
 
 /**
- * Type of a Query List
+ * Type of a Query List.
  */
 public enum QueryListType {
     WINDOW_FILTER_PROJECTION,

@@ -24,14 +24,17 @@ import java.nio.file.Path;
  * Resolves an untrusted user-specified path against the API's base directory.
  */
 public class SecurityUtil {
+
     /**
      * Resolves an untrusted user-specified path against the API's base directory.
      * Paths that try to escape the base directory are rejected.
      *
      * @param baseDirPath the absolute path of the base directory that all user-specified paths should be within.
      * @param userPath    the untrusted path provided by the API user, expected to be relative to {@code baseDirPath}
+     * @return resolved path
      */
     public static Path resolvePath(final Path baseDirPath, final Path userPath) {
+
         final Path resolvedPath = baseDirPath.resolve(userPath).normalize();
         if (!baseDirPath.isAbsolute()) {
             throw new IllegalArgumentException("Base path must be absolute");

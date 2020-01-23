@@ -19,12 +19,14 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements;
 
 import io.siddhi.query.api.annotation.Annotation;
+
 import java.util.List;
 
 /**
- * Represents configuration of a Siddhi Table
+ * Represents configuration of a Siddhi Table.
  */
 public class TableConfig extends SiddhiElementConfig {
+
     private String name;
     private List<AttributeConfig> attributeList;
     private StoreConfig store;
@@ -37,6 +39,7 @@ public class TableConfig extends SiddhiElementConfig {
                        StoreConfig store,
                        List<String> annotationList,
                        List<Annotation> annotationListObjects) {
+
         super(id);
         this.name = name;
         this.attributeList = attributeList;
@@ -46,42 +49,52 @@ public class TableConfig extends SiddhiElementConfig {
     }
 
     public String getName() {
+
         return name;
     }
 
     public void setName(String name) {
+
         this.name = name;
     }
 
     public List<AttributeConfig> getAttributeList() {
+
         return attributeList;
     }
 
     public void setAttributeList(List<AttributeConfig> attributeList) {
+
         this.attributeList = attributeList;
     }
 
     public StoreConfig getStore() {
+
         return store;
     }
 
     public void setStore(StoreConfig store) {
+
         this.store = store;
     }
 
     public List<String> getAnnotationList() {
+
         return annotationList;
     }
 
     public void setAnnotationList(List<String> annotationList) {
+
         this.annotationList = annotationList;
     }
 
     public List<Annotation> getAnnotationListObjects() {
+
         return this.annotationListObjects;
     }
 
     public void setAnnotationListObjects(List<Annotation> annotationListObjects) {
+
         this.annotationListObjects = annotationListObjects;
     }
 

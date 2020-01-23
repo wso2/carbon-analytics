@@ -23,34 +23,41 @@ import java.util.List;
 
 /**
  * For storing attribute meta data of the the additional attributes added in return events of a stream processor
- * Used in JSON responses
+ * Used in JSON responses.
  */
 public class AttributeMetaData {
+
     private String name;
     private List<DataType> type;
     private String description;
 
     public String getName() {
+
         return name;
     }
 
     public void setName(String name) {
+
         this.name = name;
     }
 
     public List<DataType> getType() {
+
         return type;
     }
 
     public void setType(List<DataType> type) {
+
         this.type = type;
     }
 
     public String getDescription() {
+
         return description;
     }
 
     public void setDescription(String description) {
+
         this.description = description;
     }
 }

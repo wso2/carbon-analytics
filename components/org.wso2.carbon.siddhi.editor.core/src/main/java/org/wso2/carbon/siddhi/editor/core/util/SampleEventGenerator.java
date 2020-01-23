@@ -19,16 +19,19 @@
 package org.wso2.carbon.siddhi.editor.core.util;
 
 import com.google.gson.JsonObject;
+import io.siddhi.query.api.definition.Attribute;
+import io.siddhi.query.api.definition.StreamDefinition;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
-import io.siddhi.query.api.definition.Attribute;
-import io.siddhi.query.api.definition.StreamDefinition;
 
-import javax.xml.namespace.QName;
 import java.util.List;
 import java.util.Random;
+import javax.xml.namespace.QName;
 
+/**
+ * Class for sample event generation.
+ */
 public class SampleEventGenerator {
 
     private static double[] doubleValues = {1.23434, 4.504343, 5.443435, 20.44345, 90.34344};
@@ -39,9 +42,11 @@ public class SampleEventGenerator {
     private static String[] stringValues = {"data1", "data2", "data3", "data4", "data5"};
 
     private SampleEventGenerator() {
+
     }
 
     public static String generateXMLEvent(StreamDefinition streamDefinition) {
+
         OMFactory factory = OMAbstractFactory.getOMFactory();
         OMElement sampleEventsElement = factory.createOMElement(new QName(
                 Constants.SAMPLE_EVENTS_PARENT_TAG));
@@ -60,6 +65,7 @@ public class SampleEventGenerator {
     }
 
     public static String generateJSONEvent(StreamDefinition streamDefinition) {
+
         JsonObject jsonEventObject = new JsonObject();
         JsonObject innerParentObject = new JsonObject();
         List<Attribute> attributeList = streamDefinition.getAttributeList();
@@ -83,6 +89,7 @@ public class SampleEventGenerator {
     }
 
     public static String generateTextEvent(StreamDefinition streamDefinition) {
+
         StringBuilder sampleEvent = new StringBuilder();
         List<Attribute> attributeList = streamDefinition.getAttributeList();
         if (attributeList != null && attributeList.size() > 0) {
@@ -91,10 +98,12 @@ public class SampleEventGenerator {
                     sampleEvent.append(",\n");
                 }
                 if (Constants.ATTR_TYPE_STRING.equals(attributeList.get(i).getType().toString())) {
-                    sampleEvent.append(attributeList.get(i).getName()).append(Constants.EVENT_ATTRIBUTE_VALUE_SEPARATOR).
+                    sampleEvent.append(attributeList.get(i).getName()).
+                            append(Constants.EVENT_ATTRIBUTE_VALUE_SEPARATOR).
                             append("'").append(getSampleValue(attributeList.get(i).getType())).append("'");
                 } else {
-                    sampleEvent.append(attributeList.get(i).getName()).append(Constants.EVENT_ATTRIBUTE_VALUE_SEPARATOR).
+                    sampleEvent.append(attributeList.get(i).getName()).
+                            append(Constants.EVENT_ATTRIBUTE_VALUE_SEPARATOR).
                             append(getSampleValue(attributeList.get(i).getType()));
                 }
             }
@@ -103,6 +112,7 @@ public class SampleEventGenerator {
     }
 
     private static String getSampleValue(Attribute.Type attributeType) {
+
         Random rand = new Random();
         switch (attributeType.name().toLowerCase()) {
             case Constants.ATTR_TYPE_FLOAT: {

@@ -19,8 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
 /**
- * Contains generic String constants that are used by the
- * CodeGenerator & CodeGeneratorUtils class
+ * Contains generic String constants that are used by the CodeGenerator &amp; CodeGeneratorUtils class.
  */
 public class CodeGeneratorConstants {
 
@@ -63,6 +62,7 @@ public class CodeGeneratorConstants {
     public static final String PRIMARY_KEY_ANNOTATION = "@PRIMARYKEY";
 
     private CodeGeneratorConstants() {
+
     }
 
 }

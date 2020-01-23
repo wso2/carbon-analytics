@@ -21,9 +21,12 @@ package org.wso2.carbon.siddhi.editor.core.util;
  */
 public class LogEncoder {
 
-    private LogEncoder() {}
+    private LogEncoder() {
+
+    }
 
     public static String removeCRLFCharacters(String str) {
+
         if (str != null) {
             str = str.replace('\n', '_').replace('\r', '_');
         }

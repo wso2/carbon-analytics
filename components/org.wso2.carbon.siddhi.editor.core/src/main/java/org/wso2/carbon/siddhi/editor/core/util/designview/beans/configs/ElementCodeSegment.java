@@ -21,50 +21,61 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 import java.util.Arrays;
 
 /**
- * Represents Code segment of a Siddhi element in a Siddhi app, which is generated as a config
+ * Represents Code segment of a Siddhi element in a Siddhi app, which is generated as a config.
  */
 public class ElementCodeSegment implements Comparable<ElementCodeSegment> {
+
     private int[] queryContextStartIndex;
     private int[] queryContextEndIndex;
 
     public ElementCodeSegment(int[] queryContextStartIndex, int[] queryContextEndIndex) {
+
         this.queryContextStartIndex = new int[]{queryContextStartIndex[0], queryContextStartIndex[1]};
         this.queryContextEndIndex = new int[]{queryContextEndIndex[0], queryContextEndIndex[1]};
     }
 
     public int[] getQueryContextStartIndex() {
+
         return new int[]{queryContextStartIndex[0], queryContextStartIndex[1]};
     }
 
     public void setQueryContextStartIndex(int[] queryContextStartIndex) {
+
         this.queryContextStartIndex = new int[]{queryContextStartIndex[0], queryContextStartIndex[1]};
     }
 
     public int[] getQueryContextEndIndex() {
+
         return new int[]{queryContextEndIndex[0], queryContextEndIndex[1]};
     }
 
     public void setQueryContextEndIndex(int[] queryContextEndIndex) {
+
         this.queryContextEndIndex = new int[]{queryContextEndIndex[0], queryContextEndIndex[1]};
     }
 
     public int getStartLine() {
+
         return queryContextStartIndex[0];
     }
 
     public int getStartColumn() {
+
         return queryContextStartIndex[1];
     }
 
     public int getEndLine() {
+
         return queryContextEndIndex[0];
     }
 
     public int getEndColumn() {
+
         return queryContextEndIndex[1];
     }
 
     public boolean isValid() {
+
         if (getStartLine() == getEndLine()) {
             return (getEndColumn() - getStartColumn() > 0);
         }
@@ -73,7 +84,10 @@ public class ElementCodeSegment implements Comparable<ElementCodeSegment> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+
+        if (this == o) {
+            return true;
+        }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
@@ -84,6 +98,7 @@ public class ElementCodeSegment implements Comparable<ElementCodeSegment> {
 
     @Override
     public int hashCode() {
+
         int result = Arrays.hashCode(getQueryContextStartIndex());
         result = 31 * result + Arrays.hashCode(getQueryContextEndIndex());
         return result;
@@ -91,6 +106,7 @@ public class ElementCodeSegment implements Comparable<ElementCodeSegment> {
 
     @Override
     public int compareTo(ElementCodeSegment elementCodeSegment) {
+
         if (getStartLine() > elementCodeSegment.getStartLine()) {
             return 1;
         } else if (getStartLine() == elementCodeSegment.getStartLine()) {

@@ -1,0 +1,331 @@
+/** contains css for export save dialog **/
+.export-dialog-form-scrollable-block {
+    padding: 20px 20px;
+    overflow: auto;
+    height: 50%;
+    width: 90%;
+    background-color: #2C2C2C;
+    margin-left: 30px;
+}
+
+.errors-container {
+    margin: 50px 20px 20px 20px;
+}
+
+hr.style1 {
+    border-top: 1px solid #2C2C2C;
+    width: 100%;
+    padding: 0 0 5px;
+}
+
+.export-dialog {
+    width: 93%;
+}
+
+.export-dialog .form-group {
+    margin: 10px 0;
+}
+
+.export-dialog .modal-body {
+}
+
+.export-dialog .modal-body .sw-container{
+    margin-top: 12px;
+}
+
+.export-dialog-title {
+    padding:0 0 10px 10px;
+}
+
+.export-dialog-label {
+    margin-top: 8px;
+    margin-left: 20px;
+    font-weight: 300;
+}
+
+hr.export-dialog-hr {
+    border-top: 1px solid #2C2C2C;
+    width: 100%;
+}
+
+.export-dialog-form-label {
+    margin-top: 8px;
+    font-weight: 300;
+}
+
+.export-dialog-form-divider {
+    height: 10px;
+}
+
+.openDockerWizardError-container {
+    padding: 10px 0 10px 0;
+    background-color: transparent;
+    color: white;
+    width: 100%;
+}
+
+.export-dialog-form-scrollable-block-list {
+    padding: 0px 10px;
+    overflow: auto;
+    width: 100%;
+    background-color: #2C2C2C;
+}
+
+.siddhi-app-template-header {
+    background-repeat: no-repeat;
+    background-position: 630px;
+    text-decoration-color: white;
+    background-color: #2C2C2C;
+    cursor: pointer;
+    width: 100%;
+    border: 1px solid black;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    height: 35px;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    margin-left: 15px;
+    position: relative;
+}
+
+.siddhi-app-template-header:hover {
+    color: white;
+}
+
+
+.siddhi-app-template-container{
+    height: 80% !important;
+}
+
+.config-template-container {
+    height: 98% !important
+}
+
+.kubernetes-configuration-step {
+
+}
+
+.template-value-elements {
+    margin: 10px;
+    padding: 15px;
+}
+
+.sub-template-value-element-div .option {
+    align-items: center;
+    padding: 5px;
+}
+.sub-template-value-element-div .option > div {
+    min-width: 100px;
+}
+.sub-template-value-element-div .option input {
+    color: #fff !important;
+    width: 75%;
+    background-color: #222222;
+    border-style: none;
+    height: 35px;
+    padding-left: 10px;
+    margin-top: 1px;
+}
+
+.step-description {
+    padding: 5px;
+    background-color: transparent;
+}
+
+#step-3 > div.step-description-text {
+    width: 90%;
+    float: left;
+}
+
+.step-description-text {
+    padding: 0px 5px 5px 5px;
+    background-color: transparent;
+}
+
+div#step-6 {
+    height: fit-content !important;
+    min-height: 98%;
+}
+
+.export-siddhi-app-list {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.export-selector {
+    background-color: #2C2C2C !important;
+    height: 98% !important;
+}
+
+.docker_export_header {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.sw-theme-default > ul.step-anchor.docker_export_header li {
+    max-width: 16.65%;
+}
+
+.link-disabled {
+    pointer-events: none;
+}
+
+.docker-config-container {
+    padding: 10px;
+}
+
+.docker-config-form {
+    padding-top: 20px;
+    padding-left: 20px;
+}
+
+.sw-theme-default > ul.step-anchor > li > a, .sw-theme-default > ul.step-anchor > li > a:hover {
+    height: initial;
+}
+
+.sw-theme-default > ul.step-anchor > li > a::after {
+    bottom: auto;
+    top: 0px;
+}
+
+.label-description {
+    padding-top: 2px;
+    padding-left: 8px;
+}
+
+.docker-config-container input {
+    margin: 0 0 0 !important;
+}
+
+.docker-details-form {
+    margin-left: 20px;
+}
+
+.docker-details-row {
+    padding: 5px;
+}
+
+.export-form-input {
+    padding-top: 2px;
+}
+
+.docker-details-row input {
+    height: 30px !important;
+    background-color: #222222 !important;
+}
+
+.export-kube-config-container {
+    display: block;
+    overflow: auto;
+    width: 100%;
+    background-color: #2C2C2C !important;
+    padding: 10px;
+}
+
+.kube-config-form {
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow: auto;
+    width: 100%;
+    background-color: transparent;
+    margin: auto;
+}
+
+.kube-config-row {
+    padding-bottom: 10px;
+    padding-left: 10px;
+    margin-top: 10px;
+}
+
+.kube-config-sub-row {
+    padding: 10px 10px 5px;
+}
+
+.kube-input-group {
+    padding: 5px 5px 5px 10px;
+}
+
+.siddhi-process-name-input {
+    height: 30px !important;
+    background-color: #222222 !important;
+    margin-top: 2px;
+    width: 80%;
+}
+
+.kubernetes-config-editor {
+    height: 200px !important;
+    width: 80%; !important;
+    margin-top: 10px !important;
+}
+
+.kube-export-persistence-dropdown {
+    text-transform: none;
+    color: #fefefe;
+    width: 30%;
+    background: #617d8b;
+}
+
+.kube-persistence-dropdown {
+    width: 40%;
+    color: white;
+    background: #617d8b;
+}
+
+.kube-persistence-right-dropdown {
+    width: 40%;
+    color: white;
+    background: #617d8b;
+    margin-left: 57%;
+}
+
+.btn-circle {
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+  background: #617d8b
+}
+
+.btn-circle:hover {
+  background: #4c626d;
+}
+
+.btn-circle.btn-lg {
+  width: 50px;
+  height: 50px;
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.33;
+  border-radius: 25px;
+}
+
+.btn-circle.btn-xl {
+  width: 70px;
+  height: 70px;
+  padding: 10px 16px;
+  font-size: 24px;
+  line-height: 1.33;
+  border-radius: 35px;
+}
+
+.kube-persistence-dropdown > li > a {
+  color: #ffffff;
+}
+
+.kube-persistence-right-dropdown > li > a {
+  color: #ffffff;
+}
+
+.disabled-dropdown-list-element {
+    pointer-events:none; //This makes it not clickable
+    opacity:0.6;
+    color: #aabcc5 !important;
+}

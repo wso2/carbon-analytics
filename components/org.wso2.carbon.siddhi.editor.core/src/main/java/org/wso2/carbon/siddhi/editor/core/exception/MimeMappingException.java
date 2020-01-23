@@ -25,14 +25,17 @@ package org.wso2.carbon.siddhi.editor.core.exception;
 public class MimeMappingException extends RuntimeException {
 
     public MimeMappingException(String msg) {
+
         super(msg);
     }
 
     public MimeMappingException(Exception cause) {
+
         super(cause);
     }
 
     public MimeMappingException(String msg, Exception cause) {
+
         super(msg, cause);
     }
 

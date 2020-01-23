@@ -21,33 +21,40 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
 
 /**
- * Represents Siddhi Partition with element
+ * Represents Siddhi Partition with element.
  */
 public class PartitionWithElement extends SiddhiElementConfig {
+
     private String expression;
     private String streamName;
 
     public PartitionWithElement() {
+
     }
 
     public PartitionWithElement(String expression, String streamName) {
+
         this.expression = expression;
         this.streamName = streamName;
     }
 
     public String getExpression() {
+
         return expression;
     }
 
-    public String getStreamName() {
-        return streamName;
-    }
-
     public void setExpression(String expression) {
+
         this.expression = expression;
     }
 
+    public String getStreamName() {
+
+        return streamName;
+    }
+
     public void setStreamName(String streamName) {
+
         this.streamName = streamName;
     }
 }

@@ -23,25 +23,30 @@ import java.util.List;
 
 /**
  * For storing return value meta data of a processor
- * Used in JSON responses
+ * Used in JSON responses.
  */
 public class ReturnTypeMetaData {
+
     private List<DataType> type;
     private String description;
 
     public List<DataType> getType() {
+
         return type;
     }
 
     public void setType(List<DataType> type) {
+
         this.type = type;
     }
 
     public String getDescription() {
+
         return description;
     }
 
     public void setDescription(String description) {
+
         this.description = description;
     }
 }

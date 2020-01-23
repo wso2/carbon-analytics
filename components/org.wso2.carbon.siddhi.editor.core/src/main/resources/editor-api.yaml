@@ -1,0 +1,53 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Siddhi Editor Application Service
+  description: This provides information about the REST APIs available for Siddhi Editor backens.
+  contact:
+    name: Siddhi-io
+    url: 'https://siddhi.io'
+    email: siddhi-dev@googlegroups.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+schemes:
+  - http
+  - https
+host: localhost
+basePath: /editor
+consumes:
+  - text/plain
+produces:
+  - application/json
+paths:
+  /artifact/listSiddhiApps:
+    get:
+      summary: Lists Siddhi Applications and it's modes.
+      description: |
+        Provides the name list of Siddhi Applications that exist along with it's modes.
+      produces:
+        - application/json
+      parameters:
+        - name: envVar
+          in: query
+          description: Environment variables that needs to be populated (encoded)
+          required: false
+          type: string
+      responses:
+        '200':
+          description: The Siddhi Application's statuses are successfully retrieved.
+          schema:
+            type: array
+            items : 
+              type: object
+              $ref: '#/definitions/SiddhiAppStatus'
+definitions:
+  SiddhiAppStatus:
+    type: object
+    properties:
+      siddhiAppName:
+        type: string
+        description: Siddhi App Name
+      mode:
+        type: string
+        description: Mode of the siddhi app - RUN/STOP/FAULTY

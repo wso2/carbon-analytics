@@ -19,31 +19,37 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs;
 
 /**
- * Represents Code segment of a Comment in a Siddhi app
+ * Represents Code segment of a Comment in a Siddhi app.
  */
 public class CommentCodeSegment extends ElementCodeSegment {
+
     private String content;
 
     public CommentCodeSegment(int[] queryContextStartIndex, int[] queryContextEndIndex, String content) {
+
         super(queryContextStartIndex, queryContextEndIndex);
         this.content = content;
     }
 
     public String getContent() {
+
         return content;
     }
 
     public void setContent(String content) {
+
         this.content = content;
     }
 
     @Override
     public boolean equals(Object o) {
+
         return super.equals(o);
     }
 
     @Override
     public int hashCode() {
+
         return super.hashCode();
     }
 }

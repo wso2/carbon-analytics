@@ -19,16 +19,19 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input;
 
 /**
- * Represents the 'input' part of a Siddhi Query
+ * Represents the 'input' part of a Siddhi Query.
  */
 public abstract class QueryInputConfig {
+
     private String type;
 
     public QueryInputConfig(String type) {
+
         this.type = type;
     }
 
     public String getType() {
+
         return type;
     }
 }

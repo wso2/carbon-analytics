@@ -23,9 +23,10 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import java.util.List;
 
 /**
- * Represents a Join element of Join QueryInputConfig
+ * Represents a Join element of Join QueryInputConfig.
  */
 public class JoinElementConfig {
+
     private String type;
     private String from;
     private List<StreamHandlerConfig> streamHandlerList;
@@ -33,6 +34,7 @@ public class JoinElementConfig {
     private boolean isUnidirectional;
 
     public JoinElementConfig() {
+
     }
 
     public JoinElementConfig(String type,
@@ -40,6 +42,7 @@ public class JoinElementConfig {
                              List<StreamHandlerConfig> streamHandlerList,
                              String as,
                              boolean isUnidirectional) {
+
         this.type = type;
         this.from = from;
         this.streamHandlerList = streamHandlerList;
@@ -48,42 +51,52 @@ public class JoinElementConfig {
     }
 
     public String getType() {
+
         return type;
     }
 
-    public String getFrom() {
-        return from;
-    }
-
-    public List<StreamHandlerConfig> getStreamHandlerList() {
-        return streamHandlerList;
-    }
-
-    public String getAs() {
-        return as;
-    }
-
-    public boolean isUnidirectional() {
-        return isUnidirectional;
-    }
-
     public void setType(String type) {
+
         this.type = type;
     }
 
+    public String getFrom() {
+
+        return from;
+    }
+
     public void setFrom(String from) {
+
         this.from = from;
     }
 
+    public List<StreamHandlerConfig> getStreamHandlerList() {
+
+        return streamHandlerList;
+    }
+
     public void setStreamHandlerList(List<StreamHandlerConfig> streamHandlerList) {
+
         this.streamHandlerList = streamHandlerList;
     }
 
+    public String getAs() {
+
+        return as;
+    }
+
     public void setAs(String as) {
+
         this.as = as;
     }
 
+    public boolean isUnidirectional() {
+
+        return isUnidirectional;
+    }
+
     public void setUnidirectional(boolean unidirectional) {
+
         isUnidirectional = unidirectional;
     }
 }

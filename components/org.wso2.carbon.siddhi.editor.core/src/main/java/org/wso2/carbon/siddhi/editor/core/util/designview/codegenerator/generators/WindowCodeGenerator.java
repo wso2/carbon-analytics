@@ -25,19 +25,20 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generates the code for a Siddhi window element
+ * Generates the code for a Siddhi window element.
  */
 public class WindowCodeGenerator {
 
     /**
-     * Generates the Siddhi code representation of a WindowConfig object
+     * Generates the Siddhi code representation of a WindowConfig object.
      *
-     * @param window The WindowConfig object
+     * @param window              The WindowConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given WindowConfig object
      * @throws CodeGenerationException Error when generating the code
      */
     public String generateWindow(WindowConfig window, boolean isGeneratingToolTip) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(window);
 
         StringBuilder windowStringBuilder = new StringBuilder();

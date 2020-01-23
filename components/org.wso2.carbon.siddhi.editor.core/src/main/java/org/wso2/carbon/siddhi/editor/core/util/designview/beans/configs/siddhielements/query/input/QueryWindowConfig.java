@@ -21,22 +21,26 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 import java.util.List;
 
 /**
- * Represents a Siddhi Window, inside the 'input' part of a Siddhi Query
+ * Represents a Siddhi Window, inside the 'input' part of a Siddhi Query.
  */
 public class QueryWindowConfig {
+
     private String function;
     private List<String> parameters;
 
     public QueryWindowConfig(String function, List<String> parameters) {
+
         this.function = function;
         this.parameters = parameters;
     }
 
     public String getFunction() {
+
         return function;
     }
 
     public List<String> getParameters() {
+
         return parameters;
     }
 }

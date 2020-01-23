@@ -18,32 +18,53 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
+/**
+ * Class for count state element configuration.
+ */
 public class CountStateElementConfig implements StateElementConfig {
+
     private StreamStateElementConfig streamStateElement;
+    private String within;
     private int min;
     private int max;
 
     public StreamStateElementConfig getStreamStateElement() {
+
         return streamStateElement;
     }
 
     public void setStreamStateElement(StreamStateElementConfig streamStateElement) {
+
         this.streamStateElement = streamStateElement;
     }
 
+    public String getWithin() {
+
+        return within;
+    }
+
+    public void setWithin(String within) {
+
+        this.within = within;
+    }
+
     public int getMin() {
+
         return min;
     }
 
     public void setMin(int min) {
+
         this.min = min;
     }
 
     public int getMax() {
+
         return max;
     }
 
     public void setMax(int max) {
+
         this.max = max;
     }
 }

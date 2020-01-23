@@ -21,9 +21,10 @@ package org.wso2.carbon.siddhi.editor.core.util;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
 
 /**
- * Used for holding the meta data of the processors available in the siddhi engine
+ * Used for holding the meta data of the processors available in the siddhi engine.
  */
 public class MetaDataHolder {
+
     private static MetaData inBuiltProcessorMetaData = SourceEditorUtils.getInBuiltProcessorMetaData();
 
     private MetaDataHolder() {
@@ -31,11 +32,12 @@ public class MetaDataHolder {
     }
 
     /**
-     * Returns the in built processor meta data
+     * Returns the in built processor meta data.
      *
      * @return In-built processor meta data
      */
     public static MetaData getInBuiltProcessorMetaData() {
+
         return inBuiltProcessorMetaData;
     }
 }

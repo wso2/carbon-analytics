@@ -19,17 +19,20 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler;
 
 /**
- * Represents a Function|Window
+ * Represents a Function|Window.
  */
 public class FunctionWindowConfig extends StreamHandlerConfig {
+
     private FunctionWindowValue value;
 
     public FunctionWindowConfig(String type, FunctionWindowValue value) {
+
         super(type);
         this.value = value;
     }
 
     public FunctionWindowValue getValue() {
+
         return value;
     }
 }

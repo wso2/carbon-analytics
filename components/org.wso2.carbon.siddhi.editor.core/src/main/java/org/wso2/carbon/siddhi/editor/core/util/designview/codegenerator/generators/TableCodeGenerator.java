@@ -24,19 +24,20 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generates the code for a Siddhi table element
+ * Generates the code for a Siddhi table element.
  */
 public class TableCodeGenerator {
 
     /**
-     * Generates the Siddhi code representation of a TableConfig object
+     * Generates the Siddhi code representation of a TableConfig object.
      *
-     * @param table The TableConfig object
+     * @param table               The TableConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given TableConfig object
      * @throws CodeGenerationException Error when generating the code
      */
     public String generateTable(TableConfig table, boolean isGeneratingToolTip) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(table);
         StringBuilder tableStringBuilder = new StringBuilder();
         if (!isGeneratingToolTip) {
@@ -55,7 +56,7 @@ public class TableCodeGenerator {
                 .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET)
                 .append(SiddhiCodeBuilderConstants.SEMI_COLON);
 
-        return  tableStringBuilder.toString();
+        return tableStringBuilder.toString();
     }
 
 }

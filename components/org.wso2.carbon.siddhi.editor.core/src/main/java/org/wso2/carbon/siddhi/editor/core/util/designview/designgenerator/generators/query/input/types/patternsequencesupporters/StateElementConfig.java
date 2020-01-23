@@ -18,5 +18,9 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
+/**
+ * Interface for state element configuration.
+ */
 public interface StateElementConfig {
+
 }

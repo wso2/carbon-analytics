@@ -131,35 +131,166 @@
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.analytics.idp.client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-client</artifactId>
+            <classifier>shaded</classifier>
+        </dependency>
     </dependencies>
 
     <properties>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
-        <Private-Package>
-            org.wso2.carbon.siddhi.editor.core.internal,
-            org.wso2.carbon.siddhi.editor.core.internal.*,
-        </Private-Package>
-        <export.package>
-            org.wso2.carbon.siddhi.editor.core.*
-        </export.package>
-        <import.package>
-            org.osgi.framework.*;version="${osgi.framework.import.version.range}",
-            org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
-            io.siddhi.*;version="${siddhi.version.range}",
-            org.wso2.carbon.streaming.integrator.common.*;version="${carbon.analytics.version.range}",
-            org.wso2.carbon.editor.log.appender.*,
-            org.wso2.msf4j.*;version="${msf4j.import.version.range}",
-            javax.management.*,
-            javax.ws.rs.*;version="${javax.ws.rs.version.range}",
-            com.fasterxml.jackson.core.*;version="${com.fasterxml.jackson.core.version.range}",
-            com.fasterxml.jackson.databind.*;version="${com.fasterxml.jackson.core.version.range}",
-            *;resolution:=optional
-        </import.package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1",
-            osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer";serviceCount="1"
+            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
         </carbon.component>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>extract-dependency</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <!--<filtering>true</filtering>-->
+                    </resource>
+                </resources>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <configuration>
+                            <nonFilteredFileExtensions>
+                                <nonFilteredFileExtension>woff</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>svg</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>ico</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>js</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>css</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>json</nonFilteredFileExtension>
+                            </nonFilteredFileExtensions>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>node</executable>
+                                    <workingDirectory>${basedir}/src/main/resources/tools</workingDirectory>
+                                    <arguments>
+                                        <argument>r.js</argument>
+                                        <argument>-o</argument>
+                                        <argument>build.js</argument>
+                                        <!--<argument>optimize=none</argument>-->
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <tasks>
+                                        <move file="target/classes/web/editor/commons" todir="target/classes/web" />
+                                        <move file="target/classes/web/editor/css" todir="target/classes/web" />
+                                        <move file="target/classes/web/editor/images" todir="target/classes/web" />
+                                        <move file="target/classes/web/editor/js" todir="target/classes/web" />
+                                        <delete dir="target/classes/web/editor" />
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-dependencies</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <markersDirectory>
+                                        ${project.build.directory}/dependencies/dependency-maven-plugin-markers
+                                    </markersDirectory>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>com.spotify</groupId>
+                                            <artifactId>docker-client</artifactId>
+                                            <classifier>shaded</classifier>
+                                            <outputDirectory>${project.build.directory}/dependencies/docker-client
+                                            </outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <instructions>
+                                <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                                <Bundle-Name>${project.artifactId}</Bundle-Name>
+                                <Include-Resource>
+                                    web=target/classes/web,
+                                    target/classes/mime-map.properties,
+                                    META-INF=target/classes/META-INF,
+                                    META-INF/services=${project.build.directory}/dependencies/docker-client/META-INF/services
+                                </Include-Resource>
+                                <Private-Package>
+                                    org.wso2.carbon.siddhi.editor.core.internal,
+                                    org.wso2.carbon.siddhi.editor.core.internal.*,
+                                    com.spotify.docker.*,
+                                    com.kenai.*,
+                                    org.apache.commons.*,
+                                    jni.*,
+                                    jersey.repackaged.com.*
+                                </Private-Package>
+                                <Export-Package>
+                                    org.wso2.carbon.siddhi.editor.core.*
+                                </Export-Package>
+                                <Import-Package>
+                                    org.osgi.framework.*;version="${osgi.framework.import.version.range}",
+                                    org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
+                                    io.siddhi.*;version="${siddhi.version.range}",
+                                    org.wso2.carbon.streaming.integrator.common.*;version="${carbon.analytics.version.range}",
+                                    org.wso2.carbon.editor.log.appender.*,
+                                    org.wso2.msf4j.*;version="${msf4j.import.version.range}",
+                                    javax.management.*,
+                                    javax.ws.rs.*;version="${javax.ws.rs.version.range}",
+                                    com.fasterxml.jackson.core.*;version="${com.fasterxml.jackson.core.version.range}",
+                                    com.fasterxml.jackson.databind.*;version="${com.fasterxml.jackson.core.version.range}",
+                                    *;resolution:=optional
+                                </Import-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <build>
         <pluginManagement>

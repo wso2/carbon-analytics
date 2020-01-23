@@ -21,22 +21,26 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 import java.util.List;
 
 /**
- * Represents value of a Function|Window
+ * Represents value of a Function|Window.
  */
 public class FunctionWindowValue {
+
     private String function;
     private List<String> parameters;
 
     public FunctionWindowValue(String function, List<String> parameters) {
+
         this.function = function;
         this.parameters = parameters;
     }
 
     public String getFunction() {
+
         return function;
     }
 
     public List<String> getParameters() {
+
         return parameters;
     }
 }

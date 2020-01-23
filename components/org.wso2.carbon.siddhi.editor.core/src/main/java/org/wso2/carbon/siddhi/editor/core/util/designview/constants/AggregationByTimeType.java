@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
 /**
- * Type of an AggregationByTime Config
+ * Type of an AggregationByTime Config.
  */
 public enum AggregationByTimeType {
     INTERVAL,

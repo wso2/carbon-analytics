@@ -24,6 +24,7 @@ import java.util.Map;
  * Request wrapper for Validation Request.
  */
 public class ValidationRequest {
+
     private String siddhiApp;
     private List<String> missingStreams;
     private List<String> missingAggregationDefinitions;
@@ -31,34 +32,42 @@ public class ValidationRequest {
     private Map<String, String> variables;
 
     public String getSiddhiApp() {
+
         return siddhiApp;
     }
 
     public void setSiddhiApp(String siddhiApp) {
+
         this.siddhiApp = siddhiApp;
     }
 
     public List<String> getMissingStreams() {
+
         return missingStreams;
     }
 
     public void setMissingStreams(List<String> missingStreams) {
+
         this.missingStreams = missingStreams;
     }
 
     public List<String> getMissingAggregationDefinitions() {
+
         return missingAggregationDefinitions;
     }
 
     public void setMissingAggregationDefinitions(List<String> missingAggregationDefinitions) {
+
         this.missingAggregationDefinitions = missingAggregationDefinitions;
     }
 
     public List<List<String>> getMissingInnerStreams() {
+
         return missingInnerStreams;
     }
 
     public void setMissingInnerStreams(List<List<String>> missingInnerStreams) {
+
         this.missingInnerStreams = missingInnerStreams;
     }
 

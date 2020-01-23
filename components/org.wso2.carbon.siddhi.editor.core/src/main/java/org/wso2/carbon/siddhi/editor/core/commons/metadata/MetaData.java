@@ -22,9 +22,10 @@ import java.util.List;
 
 /**
  * For storing meta data for a extension namespace or in-built processors
- * Used in JSON responses
+ * Used in JSON responses.
  */
 public class MetaData {
+
     private List<ProcessorMetaData> functions;
     private List<ProcessorMetaData> streamProcessors;
     private List<ProcessorMetaData> windowProcessors;
@@ -35,6 +36,7 @@ public class MetaData {
     private List<ProcessorMetaData> stores;
 
     public MetaData() {
+
         functions = new LinkedList<>();
         streamProcessors = new LinkedList<>();
         windowProcessors = new LinkedList<>();
@@ -46,66 +48,82 @@ public class MetaData {
     }
 
     public List<ProcessorMetaData> getFunctions() {
+
         return functions;
     }
 
     public void setFunctions(List<ProcessorMetaData> functions) {
+
         this.functions = functions;
     }
 
     public List<ProcessorMetaData> getStreamProcessors() {
+
         return streamProcessors;
     }
 
     public void setStreamProcessors(List<ProcessorMetaData> streamProcessors) {
+
         this.streamProcessors = streamProcessors;
     }
 
     public List<ProcessorMetaData> getWindowProcessors() {
+
         return windowProcessors;
     }
 
     public void setWindowProcessors(List<ProcessorMetaData> windowProcessors) {
+
         this.windowProcessors = windowProcessors;
     }
 
     public List<ProcessorMetaData> getSources() {
+
         return sources;
     }
 
     public void setSources(List<ProcessorMetaData> sources) {
+
         this.sources = sources;
     }
 
     public List<ProcessorMetaData> getSinks() {
+
         return sinks;
     }
 
     public void setSinks(List<ProcessorMetaData> sinks) {
+
         this.sinks = sinks;
     }
 
     public List<ProcessorMetaData> getSourceMaps() {
+
         return sourceMaps;
     }
 
     public void setSourceMaps(List<ProcessorMetaData> sourceMaps) {
+
         this.sourceMaps = sourceMaps;
     }
 
     public List<ProcessorMetaData> getSinkMaps() {
+
         return sinkMaps;
     }
 
     public void setSinkMaps(List<ProcessorMetaData> sinkMaps) {
+
         this.sinkMaps = sinkMaps;
     }
 
     public List<ProcessorMetaData> getStores() {
+
         return stores;
     }
 
     public void setStores(List<ProcessorMetaData> stores) {
+
         this.stores = stores;
     }
 }
