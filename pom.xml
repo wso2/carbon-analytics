@@ -1565,7 +1565,7 @@
         <siddhi.version>5.1.12</siddhi.version>
         <siddhi.bundle.version>5.1.12</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.1.40</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.1.41</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[3.0.0, 4.0.0)</carbon.analytics.version.range>
 
@@ -1618,7 +1618,7 @@
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
 
         <!--Dashboard-->
-        <carbon.uiserver.version>1.0.3</carbon.uiserver.version>
+        <carbon.uiserver.version>1.0.4</carbon.uiserver.version>
         <carbon.uiserver.version.range>[0.19.3, 2.0.0)</carbon.uiserver.version.range>
 
         <!-- Maven plugins -->
@@ -1676,7 +1676,7 @@
         <carbon.securevault.version>5.0.13</carbon.securevault.version>
 
         <!-- Clustering Dependencies -->
-        <carbon.coordination.version>2.1.1</carbon.coordination.version>
+        <carbon.coordination.version>2.1.5</carbon.coordination.version>
 
         <slf4j.version>1.7.12</slf4j.version>
         <slf4j.logging.package.import.version.range>[1.7.1, 2.0.0)
