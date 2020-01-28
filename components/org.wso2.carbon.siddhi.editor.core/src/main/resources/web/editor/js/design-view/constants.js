@@ -113,9 +113,11 @@ define(function () {
         DESC: "desc",
         BATCH_WINDOW_PROCESSOR: "batch",
         MULTI_VALUE: "...",
-        EXTENSION_INSTALLED: "installed",
-        EXTENSION_NOT_INSTALLED: "not-installed",
-        EXTENSION_PARTIALLY_INSTALLED: "partially-installed"
+        EXTENSION_INSTALLED: "INSTALLED",
+        EXTENSION_NOT_INSTALLED: "NOT_INSTALLED",
+        EXTENSION_PARTIALLY_INSTALLED: "PARTIALLY_INSTALLED",
+        INSTALL: "Install",
+        UNINSTALL: "UnInstall"
     };
 
     return constants;

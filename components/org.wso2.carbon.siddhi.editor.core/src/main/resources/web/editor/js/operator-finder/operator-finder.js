@@ -309,11 +309,11 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils','
         /**
          * functions to get the not installed extension array details.
          */
-        var getNotInstalledExtensionDetails = function () {
+        var getUninstalledExtensionDetails = function () {
             var notInstalledExtension = [];
-            var extensionDetails = self._application.utils.getExtensionDetails();
+            var extensionDetails = self._application.utils.getExtensionDetailsMap();
             extensionDetails.forEach(function (extension) {
-                if (extension.status === Constants.EXTENSION_NOT_INSTALLED) {
+                if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED) {
                     notInstalledExtension.push(extension);
                 }
             });
@@ -325,10 +325,10 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils','
          * @param operatorExtensionName
          * @returns {extension Object}
          */
-        var getNotInstalledExtensionObject = function (operatorExtensionName) {
-            var notInstalledExtensionArray = getNotInstalledExtensionDetails();
+        var getNotInstalledExtensionObject = function (operatorExtension) {
+            var notInstalledExtensionArray = getUninstalledExtensionDetails();
             for (var extension of notInstalledExtensionArray) {
-                if (((operatorExtensionName.name.trim().toLowerCase()).indexOf(extension.name.trim().toLowerCase())) > -1) return extension;
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) return extension;
             }
         };
         /**
@@ -336,10 +336,10 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils','
          * @param operatorExtensionName
          * return true/false.
          */
-        var isNotInstalledExtension = function (operatorExtensionName) {
-            var notInstalledExtensionArray = getNotInstalledExtensionDetails();
+        var isNotInstalledExtension = function (operatorExtension) {
+            var notInstalledExtensionArray = getUninstalledExtensionDetails();
             for (var extension of notInstalledExtensionArray) {
-                if (((operatorExtensionName.name.trim().toLowerCase()).indexOf(extension.name.trim().toLowerCase())) > -1) return true;
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) return true;
             }
         };
 
@@ -368,7 +368,7 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils','
                     if (isNotInstalledExtension(operatorExtension)) {
                         keyResult.push({
                             extension: getNotInstalledExtensionObject(operatorExtension),
-                            status: "Not-Installed",
+                            status: Constants.EXTENSION_NOT_INSTALLED,
                             fqn: operatorExtension.fqn,
                             htmlFqn: result.fqn.text,
                             type: operatorExtension.type,
@@ -387,8 +387,8 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils','
                 } else if (result.description.status) {
                     if (isNotInstalledExtension(operatorExtension)) {
                         descriptionResult.push({
-                            extension: getNotInstalledExtensionObject(operatorExtension.name),
-                            status: "Not-Installed",
+                            extension: getNotInstalledExtensionObject(operatorExtension),
+                            status: Constants.EXTENSION_NOT_INSTALLED,
                             fqn: operatorExtension.fqn,
                             htmlFqn: result.fqn.text,
                             type: operatorExtension.type,
@@ -528,11 +528,54 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils','
             //Event handler for extension installation modal open.
             resultContent.on('click', 'a.extension-install-btn', function (e) {
                     e.preventDefault();
-                    var extensionObject = {
-                        name: $(this).data('extension-name'),
-                        status: $(this).data('extension-status')
-                    };
+                    var extensionObject = getNotInstalledExtensionObject({name:$(this).data('extension-name')});
                     self._application.utils.extensionUpdate(extensionObject);
+                }
+            );
+            //Event handler for partially extension installation modal open.
+            resultContent.on('click', 'a.partial-extension-install-btn', function (e) {
+                    e.preventDefault();
+                    var extensionName = {name:$(this).data('extension-name')};
+                    var extension = getNotInstalledExtensionObject(extensionName);
+                self._partialModel = $(
+                    '<div class="modal fade" id="' + extension.extensionInfo.name + '">' +
+                    '<div class="modal-dialog">' +
+                    '<div class="modal-content">' +
+                    '<div class="modal-header">' +
+                    "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+                    "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
+                    "</button>" +
+                    '<h2 class="modal-title file-dialog-title" id="partialExtenName">'
+                    + extension.extensionInfo.name +
+                    '</h2>' +
+                    '<hr class="style1">' +
+                    '</div>' +
+                    '<div id="modalBodyId" class="modal-body">' +
+                    '</div>' +
+                    '<div class="modal-footer">' +
+                    '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>');
+
+                var modalBody = self._partialModel.find("div").filter("#modalBodyId");
+
+                if (extension.manuallyInstall) {
+                    extension.manuallyInstall.forEach(function (dependency) {
+                        modalBody.append($('<h3>' + dependency.name + ' </h3>' +
+                            '<h4>Description</h4>' +
+                            '<div id="partialExtenDescription" style = "text-align:justify">'
+                            + dependency.download.info.description +
+                            '</div>' +
+                            '<h4>Install</h4>' +
+                            '<div id="partialExtenInstall" style = "text-align:justify" >'
+                            + dependency.download.info.install +
+                            '</div>'));
+                    });
+                }
+                self._partialModel.modal('show');
+
                 }
             );
 

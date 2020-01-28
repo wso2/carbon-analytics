@@ -19,54 +19,93 @@ define(['require', 'jquery','constants'],
         /**
          * Get the extension details array from back end.
          */
-        Utils.prototype.getExtensionDetails = function () {
+        Utils.prototype.getExtensionDetailsMap = function () {
             // extension details array need to be retrieve from backend.
-            return [{name: "ex1", status: "installed"},
-                {name: "ex2fgdfgdfg", status: "installed"},
-                {
-                    name: "ex7tyjyjyukuu", status: "partially-installed",
-                    info: {
-                        description: "this ex7 extension gives the string conversion features to Siddhi" +
-                            " app",
-                        install: "To install this ex7 extension you have to set  all dependency of it."
-                    }
-                },
-                {name: "grpc", status: "not-installed"},
-                {
-                    name: "ex4aerertrtrt", status: "partially-installed",
-                    info: {
-                        description: " this ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi" + " this ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi" + " this ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi" + " this ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi" + " this ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi" + " this ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi" + " this ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi"
-                        ,
-                        install: "To install this ex4 extension you have to set  all dependency of it" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi" + " this ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi" + " this ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi" + " this ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi" + " this ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi" + " this ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi" + " this ex4 extension gives the string conversion features to Siddhi" +
-                            " app.This ex4 extension gives the string conversion features to Siddhi"
-                        ,
-                    }
-                },
-                {name: "kafka", status: "not-installed"},
-                {
-                    name: "ex6tyjyjyukuu", status: "partially-installed",
-                    info: {
-                        description: "this ex6 extension gives the string conversion features to Siddhi" +
-                            " app",
-                        install: "To install this ex6 extension you have to set  all dependency of it."
-                    }
-                },
-            ];
+          return new Map(Object.entries({
+              "kafka": {
+                  "extensionStatus": "INSTALLED",
+                  "extensionInfo": {
+                      "name": "kafka",
+                      "version": "5.0.8-SNAPSHOT"
+                  }
+              },
+              "redis": {
+                  "extensionStatus": "NOT_INSTALLED",
+                  "extensionInfo": {
+                      "name": "redis",
+                      "version": "3.1.2-SNAPSHOT"
+                  },
+                  "manuallyInstall" : [
+                      {
+                          "name": "redis-clients",
+                          "version": "2.3.0",
+                          "download": {
+                              "info": {"description":"redis clients is like a one extension",
+                                  "install":"by using this way we can install redis-clients"
+                              },
+                              "autoDownloadable": false,
+                              "url": "https://repo1.maven.org/maven2/org/apache/redis/redis_2.11/2.1.1/redis_2.11-2.1.1.jar"
+                          },
+                          "type": "BUNDLE",
+                          "lookupRegex": "kafka-clients-(.+).jar"
+                      },
+                      { "name": "redis-server",
+                          "version": "2.3.0",
+                          "download": {
+                              "info": {"description":"redis clients is like a one extension",
+                                  "install":"by using this way we can install redis-clients"},
+                              "autoDownloadable": false,
+                              "url": "https://repo1.maven.org/maven2/org/apache/redis/redis_2.11/2.1.1/kafka_2.11-2.1.1.jar"
+                          },
+                          "type": "BUNDLE",
+                          "lookupRegex": "kafka-server-(.+).jar"}
+                  ]
+              },
+              "grpc": {
+                  "extensionStatus": "PARTIALLY_INSTALLED",
+                  "extensionInfo": {
+                      "name": "grpc",
+                      "version": "3.1.2-SNAPSHOT"
+                  },
+                  "manuallyInstall" : [
+                      {
+                          "name": "grpc-clients",
+                          "version": "2.3.0",
+                          "download": {
+                              "info": {
+                                  "description":"grpc clients is like a one extension",
+                                  "install":"by using this way we can install grpc-clients"
+                              },
+                              "autoDownloadable": false,
+                              "url": "https://repo1.maven.org/maven2/org/apache/grpc/grpc_2.11/2.1.1/grpc_2.11-2.1.1.jar"
+                          },
+                          "type": "BUNDLE",
+                          "lookupRegex": "grpc-clients-(.+).jar"
+                      },
+                      { "name": "grpc-server",
+                          "version": "2.3.0",
+                          "download": {
+                              "info": {
+                                  "description":"grpc server is like a one extension",
+                                  "install":"by using this way we can install grpc-server"
+                              },
+                              "autoDownloadable": false,
+                              "url": "https://repo1.maven.org/maven2/org/apache/grpc/grpc_2.11/2.1.1/grpc_2.11-2.1.1.jar"
+                          },
+                          "type": "BUNDLE",
+                          "lookupRegex": "grpc-server-(.+).jar"}
+                  ]
+              },
+              "nats": {
+                  "extensionStatus": "NOT_INSTALLED",
+                  "extensionInfo": {
+                      "name": "nats",
+                      "version": "3.1.2-SNAPSHOT"
+                  },
+              }
+          }));
+
+
         };
 
         /**
@@ -92,12 +131,12 @@ define(['require', 'jquery','constants'],
                 "<form class='form-horizontal' onsubmit='return false'>" +
                 "<div class='form-group'>" +
                 "<label for='configName' class='col-sm-9 file-dialog-label'>" +
-                "Are you sure to " + ((extension.status === "not-installed") ? 'install' : 'unInstall') + " " + extension.name + " ?" +
+                "Are you sure to " + ((extension.extensionStatus.trim().toUpperCase()=== Constants.EXTENSION_NOT_INSTALLED) ? 'install' : 'unInstall') + " " + extension.extensionInfo.name + " ?" +
                 "</label>" +
                 "</div>" +
                 "<div class='form-group'>" +
                 "<div class='file-dialog-form-btn'>" +
-                "<button id='installUninstallId' type='button' class='btn btn-primary'>" + ((extension.status === Constants.EXTENSION_NOT_INSTALLED) ? 'install' : 'unInstall') +
+                "<button id='installUninstallId' type='button' class='btn btn-primary'>" + ((extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED) ? 'install' : 'unInstall') +
                 "</button>" +
                 "<div class='divider'/>" +
                 "<button type='cancelButton' class='btn btn-default' data-dismiss='modal'>cancel</button>" +
@@ -113,8 +152,8 @@ define(['require', 'jquery','constants'],
             self.extensionInstallUninstallAlertModal.find("button").filter("#installUninstallId").click(function () {
                 self.extensionInstallUninstallAlertModal.modal('hide');
                 var updateData = {
-                    "name": extension.name,
-                    "action": (extension.status === Constants.EXTENSION_NOT_INSTALLED) ? 'install' : 'unInstall'
+                    "name": extension.extensionInfo.name,
+                    "action": (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED) ? 'install' : 'unInstall'
                 };
                 alert(updateData.name + " " + updateData.action);
                 //this updateData goes to back end.

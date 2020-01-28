@@ -1844,6 +1844,7 @@ div.consoleIcon {
     font-weight: bold;
 }
 
+.partial-extension-install-btn,
 .extension-install-btn {
     color: whitesmoke;
 }

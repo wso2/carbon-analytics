@@ -2,8 +2,8 @@
  * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-define(['require', 'lodash', 'jquery','constants'],
-    function (require, _, $,Constants) {
+define(['require', 'lodash', 'jquery', 'constants'],
+    function (require, _, $, Constants) {
         return function (app) {
 
             /**
@@ -11,7 +11,7 @@ define(['require', 'lodash', 'jquery','constants'],
              */
             this.initialize = function (options) {
                 this.dialog_containers = $(_.get(options.config.dialog, 'container'));
-                this.extensionList = app.utils.getExtensionDetails();
+                this.extensionList = app.utils.getExtensionDetailsMap();
             },
                 /**
                  * show function for display the ExtensionInstallDialog.
@@ -82,75 +82,49 @@ define(['require', 'lodash', 'jquery','constants'],
                     });
                     var extensionContainer = extensionModelOpen.find("div").filter("#extensionTableId");
 
-
-                    //extension array from backend which has details about extensions.
-                    var extensionLists = app.utils.getExtensionDetails();
+                    //extension objects from backend which has details about extensions.
+                    var extensionLists = app.utils.getExtensionDetailsMap();
                     var extensionTable = $('<table class="table table-hover data-table"' +
                         ' id="extensionTableId"><tbody></tbody></table>');
                     //define the map to store Partially extension modal based on key
                     var partialExtensionDetailModal = new Map();
-                    extensionLists.forEach(function (extension) {
+                    extensionLists.forEach(function (extension, key) {
                         var extensionTableBodyData;
-                        if (extension.status.trim().toLowerCase() === Constants.EXTENSION_INSTALLED) {
-                            extensionTableBodyData = $('<tr><td>' + extension.name + '</td><td>Installed</td><td><button' +
+
+                        if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_INSTALLED) {
+                            extensionTableBodyData = $('<tr><td>' + extension.extensionInfo.name + '</td><td>Installed</td><td><button' +
                                 ' class="btn btn-block btn' +
-                                ' btn-primary">UnInstall</button></td></tr>');
+                                ' btn-primary">' + Constants.UNINSTALL + '</button></td></tr>');
                             extensionTableBodyData.find("button").click(function () {
                                 app.utils.extensionUpdate(extension);
                             });
-                        } else if (extension.status.trim().toLowerCase() === Constants.EXTENSION_PARTIALLY_INSTALLED) {
-                            var partialExtensionIndex = extensionLists.indexOf(extension);
-                            extensionTableBodyData = $('<tr><td>' + extension.name + '</td><td>Partially-Installed' +
+                        } else if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_PARTIALLY_INSTALLED) {
+                            extensionTableBodyData = $('<tr><td>' + extension.extensionInfo.name + '</td><td>Partially-Installed' +
                                 '&nbsp; &nbsp;<a data-toggle="modal"' +
-                                ' id="' + partialExtensionIndex + '"><i class="fw' +
+                                ' id="' + key + '"><i class="fw' +
                                 ' fw-info"></i></a></td><td><button' +
                                 ' class="btn btn-block btn' +
-                                ' btn-primary">UnInstall</button></td></tr>');
-
-                            var partialModel = $(
-                                '<div class="modal fade" id="' + partialExtensionIndex + '">' +
-                                '<div class="modal-dialog">' +
-                                '<div class="modal-content">' +
-                                '<div class="modal-header">' +
-                                "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
-                                "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
-                                "</button>" +
-                                '<h3 class="modal-title file-dialog-title" id="partialExtenName">'
-                                + extension.name +
-                                '</h3>' +
-                                '<hr class="style1">' +
-                                '</div>' +
-                                '<div class="modal-body">' +
-                                '<h3>Description</h3>' +
-                                '<div id="partialExtenDescription" style = "text-align:justify">'
-                                + extension.info.description +
-                                '</div>' +
-                                '<h3>Install</h3>' +
-                                '<div id="partialExtenInstall" style = "text-align:justify" >'
-                                + extension.info.install +
-                                '</div>' +
-                                '</div>' +
-                                '<div class="modal-footer">' +
-                                '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-                                '</div>' +
-                                '</div>' +
-                                '</div>' +
-                                '</div>');
-
-                            partialExtensionDetailModal.set(partialExtensionIndex, partialModel);
-
-                            extensionTableBodyData.find("a").filter("#" + partialExtensionIndex).click(function () {
-                                extensionPartialModelDisplay(partialExtensionDetailModal.get(partialExtensionIndex));
-                            });
-
+                                ' btn-primary">' + Constants.UNINSTALL + '</button></td></tr>');
+                            createAlertModalBoxForNotAndPartialExtension(extension, key, extensionTableBodyData);
                             extensionTableBodyData.find("button").click(function () {
                                 app.utils.extensionUpdate(extension);
                             });
 
-                        } else if (extension.status.trim().toLowerCase() === Constants.EXTENSION_NOT_INSTALLED) {
-                            extensionTableBodyData = $('<tr><td>' + extension.name + '</td><td>Not-Installed</td><td><button' +
-                                ' class="btn btn-block btn' +
-                                ' btn-primary">Install</button></td></tr>');
+                        } else if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED) {
+                            if (extension.manuallyInstall) {
+                                extensionTableBodyData = $('<tr><td>' + extension.extensionInfo.name + '</td><td>Not-Installed' +
+                                    '&nbsp; &nbsp;<a data-toggle="modal"' +
+                                    ' id="' + key + '"><i class="fw' +
+                                    ' fw-info"></i></a></td><td><button' +
+                                    ' class="btn btn-block btn' +
+                                    ' btn-primary">' + Constants.INSTALL + '</button></td></tr>');
+                                createAlertModalBoxForNotAndPartialExtension(extension, key, extensionTableBodyData);
+                            } else {
+                                extensionTableBodyData = $('<tr><td>' + extension.extensionInfo.name + '</td><td>Not-Installed</td><td><button' +
+                                    ' class="btn btn-block btn' +
+                                    ' btn-primary">' + Constants.INSTALL + '</button></td></tr>');
+                            }
+
                             extensionTableBodyData.find("button").click(function () {
                                 app.utils.extensionUpdate(extension);
                             });
@@ -166,6 +140,58 @@ define(['require', 'lodash', 'jquery','constants'],
                     $(this.dialog_containers).append(extensionModelOpen);
                     extensionInstallError.hide();
                     this._extensionListModal = extensionModelOpen;
+
+                    /**
+                     * create a alert details model box for extension dependency.
+                     * @param extension object
+                     * @param key map key for object
+                     * @param extensionTableBodyData is modal body
+                     */
+                    function createAlertModalBoxForNotAndPartialExtension(extension, key, extensionTableBodyData) {
+                        var partialModel = $(
+                            '<div class="modal fade" id="' + key + '">' +
+                            '<div class="modal-dialog">' +
+                            '<div class="modal-content">' +
+                            '<div class="modal-header">' +
+                            "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+                            "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
+                            "</button>" +
+                            '<h2 class="modal-title file-dialog-title" id="partialExtenName">'
+                            + extension.extensionInfo.name +
+                            '</h2>' +
+                            '<hr class="style1">' +
+                            '</div>' +
+                            '<div id="modalBodyId" class="modal-body">' +
+                            '</div>' +
+                            '<div class="modal-footer">' +
+                            '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>');
+
+                        var modalBody = partialModel.find("div").filter("#modalBodyId");
+
+                        if (extension.manuallyInstall) {
+                            extension.manuallyInstall.forEach(function (dependency) {
+                                modalBody.append($('<h3>' + dependency.name + ' </h3>' +
+                                    '<h4>Description</h4>' +
+                                    '<div id="partialExtenDescription" style = "text-align:justify">'
+                                    + dependency.download.info.description +
+                                    '</div>' +
+                                    '<h4>Install</h4>' +
+                                    '<div id="partialExtenInstall" style = "text-align:justify" >'
+                                    + dependency.download.info.install +
+                                    '</div>'));
+                            });
+                        }
+
+                        partialExtensionDetailModal.set(key, partialModel);
+
+                        extensionTableBodyData.find("a").filter("#" + key).click(function () {
+                            extensionPartialModelDisplay(partialExtensionDetailModal.get(key));
+                        });
+                    };
 
                     /**
                      * search function for seek the extensions.

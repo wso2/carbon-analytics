@@ -2364,13 +2364,22 @@
             <a href="#" class="expand-description">More...</a>
             {{#if status}}
             &nbsp;&nbsp;
-            <span class="extension-not-install"> {{{status}}}</span>
+            <span class="extension-not-install"> {{status}}</span>
             &nbsp;&nbsp;
-            <a href="#" data-extension-name="{{extension.name}}" data-extension-status="{{extension.status}}"
+            {{#if extension.manuallyInstall}}
+            <a href="#" data-extension-name="{{extension.extensionInfo.name}}"
+               title="Cant Install directly Click here to get Details"
+               class="partial-extension-install-btn">
+                <i class="fw fw-warning"></i>
+            </a>
+            {{else}}
+            <a href="#" data-extension-name="{{extension.extensionInfo.name}}"
                title="Click here to Install"
                class="extension-install-btn">
                 <i class="fw fw-download"></i>
             </a>
+            {{/if}}
+
             {{/if}}
             <ul>
                 <li>
