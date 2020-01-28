@@ -61,6 +61,24 @@ define([], function () {
                 disabled: false
             },
             {
+                id: "extensionInstall",
+                label: "Extension Installation",
+                command: {
+                    id: "extension-install-dialog",
+                    shortcuts: {
+                        mac: {
+                            key: "command+alt+i",
+                            label: "\u2318\u2325I"
+                        },
+                        other: {
+                            key: "ctrl+alt+i",
+                            label: "Ctrl+Alt+I"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
                 id: "save",
                 label: "Save",
                 command: {

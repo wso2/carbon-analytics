@@ -112,7 +112,10 @@ define(function () {
         ASC:"asc",
         DESC: "desc",
         BATCH_WINDOW_PROCESSOR: "batch",
-        MULTI_VALUE: "..."
+        MULTI_VALUE: "...",
+        EXTENSION_INSTALLED: "installed",
+        EXTENSION_NOT_INSTALLED: "not-installed",
+        EXTENSION_PARTIALLY_INSTALLED: "partially-installed"
     };
 
     return constants;

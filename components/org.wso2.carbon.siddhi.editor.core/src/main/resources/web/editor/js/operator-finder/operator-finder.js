@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
-define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 'app/source-editor/completion-engine'],
-    function ($, _, log,Remarkable, Handlebars, DesignViewUtils, CompletionEngine) {
+define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils','constants', 'app/source-editor/completion-engine'],
+    function ($, _, log,Remarkable, Handlebars, DesignViewUtils,Constants, CompletionEngine) {
         /**
          * Load operators from the Completion engine.
          *
@@ -251,6 +251,7 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
             }
         };
 
+        var self;
         /**
          * Initializes the module.
          *
@@ -258,6 +259,7 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
          * @constructor
          */
         var OperatorFinder = function (options) {
+            self = this;
             this._options = options;
             this._application = options.application;
             this._activateBtn = $(options.activateBtn);
@@ -305,6 +307,43 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
         };
 
         /**
+         * functions to get the not installed extension array details.
+         */
+        var getNotInstalledExtensionDetails = function () {
+            var notInstalledExtension = [];
+            var extensionDetails = self._application.utils.getExtensionDetails();
+            extensionDetails.forEach(function (extension) {
+                if (extension.status === Constants.EXTENSION_NOT_INSTALLED) {
+                    notInstalledExtension.push(extension);
+                }
+            });
+            return notInstalledExtension;
+        };
+
+        /**
+         * get the not-installed extension object based on extension name.
+         * @param operatorExtensionName
+         * @returns {extension Object}
+         */
+        var getNotInstalledExtensionObject = function (operatorExtensionName) {
+            var notInstalledExtensionArray = getNotInstalledExtensionDetails();
+            for (var extension of notInstalledExtensionArray) {
+                if (((operatorExtensionName.name.trim().toLowerCase()).indexOf(extension.name.trim().toLowerCase())) > -1) return extension;
+            }
+        };
+        /**
+         * check the whether operator extension is installed or not.
+         * @param operatorExtensionName
+         * return true/false.
+         */
+        var isNotInstalledExtension = function (operatorExtensionName) {
+            var notInstalledExtensionArray = getNotInstalledExtensionDetails();
+            for (var extension of notInstalledExtensionArray) {
+                if (((operatorExtensionName.name.trim().toLowerCase()).indexOf(extension.name.trim().toLowerCase())) > -1) return true;
+            }
+        };
+
+        /**
          * Searches operators using the given query.
          *
          * @param query String query
@@ -320,27 +359,51 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
                 });
             }
             var keyResult = [], descriptionResult = [], combineResults;
-            this._operators.forEach(function (e, i) {
+            this._operators.forEach(function (operatorExtension, i) {
                 var result = {
-                    fqn: hasToken(e.fqn, tokens),
-                    description: hasToken(e.description, tokens)
+                    fqn: hasToken(operatorExtension.fqn, tokens),
+                    description: hasToken(operatorExtension.description, tokens)
                 };
                 if (result.fqn.status) {
-                    keyResult.push({
-                        fqn: e.fqn,
-                        htmlFqn: result.fqn.text,
-                        type: e.type,
-                        description: result.description.text,
-                        index: i
-                    });
+                    if (isNotInstalledExtension(operatorExtension)) {
+                        keyResult.push({
+                            extension: getNotInstalledExtensionObject(operatorExtension),
+                            status: "Not-Installed",
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    } else {
+                        keyResult.push({
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    }
                 } else if (result.description.status) {
-                    descriptionResult.push({
-                        fqn: e.fqn,
-                        htmlFqn: result.fqn.text,
-                        type: e.type,
-                        description: result.description.text,
-                        index: i
-                    });
+                    if (isNotInstalledExtension(operatorExtension)) {
+                        descriptionResult.push({
+                            extension: getNotInstalledExtensionObject(operatorExtension.name),
+                            status: "Not-Installed",
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    } else {
+                        descriptionResult.push({
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    }
                 }
             });
             combineResults = keyResult.concat(descriptionResult);
@@ -461,6 +524,17 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
                 $('#operator-search-input-field').val(query);
                 self.renderSearchResults(query);
             });
+
+            //Event handler for extension installation modal open.
+            resultContent.on('click', 'a.extension-install-btn', function (e) {
+                    e.preventDefault();
+                    var extensionObject = {
+                        name: $(this).data('extension-name'),
+                        status: $(this).data('extension-status')
+                    };
+                    self._application.utils.extensionUpdate(extensionObject);
+                }
+            );
 
             resultContent.on('click', 'a.more-info', function (e) {
                 e.preventDefault();
