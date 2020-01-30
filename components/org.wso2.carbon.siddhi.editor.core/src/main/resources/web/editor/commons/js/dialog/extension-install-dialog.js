@@ -11,7 +11,7 @@ define(['require', 'lodash', 'jquery', 'constants'],
              */
             this.initialize = function (options) {
                 this.dialog_containers = $(_.get(options.config.dialog, 'container'));
-                this.extensionList = app.utils.getExtensionDetailsMap();
+                this.extensionList = app.utils.extensionData;
             },
                 /**
                  * show function for display the ExtensionInstallDialog.
@@ -82,61 +82,57 @@ define(['require', 'lodash', 'jquery', 'constants'],
                     });
                     var extensionContainer = extensionModelOpen.find("div").filter("#extensionTableId");
 
-                    //extension objects from backend which has details about extensions.
-                    var extensionLists = app.utils.getExtensionDetailsMap();
-                    var extensionTable = $('<table class="table table-hover data-table"' +
-                        ' id="extensionTableId"><tbody></tbody></table>');
                     //define the map to store Partially extension modal based on key
                     var partialExtensionDetailModal = new Map();
-                    extensionLists.forEach(function (extension, key) {
-                        var extensionTableBodyData;
+                    extensionsRendering();
+                    var callbackUpdateForExtensionFileBrowser = function (updatedExtension, isUpdated) {
+                        if (isUpdated) {
+                            app.utils.extensionData.set(updatedExtension.extensionInfo.name, updatedExtension);
+                            extensionsRendering();
+                        }
+                    };
+                    var extensionTable;
 
-                        if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_INSTALLED) {
-                            extensionTableBodyData = $('<tr><td>' + extension.extensionInfo.name + '</td><td>Installed</td><td><button' +
-                                ' class="btn btn-block btn' +
-                                ' btn-primary">' + Constants.UNINSTALL + '</button></td></tr>');
-                            extensionTableBodyData.find("button").click(function () {
-                                app.utils.extensionUpdate(extension);
-                            });
-                        } else if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_PARTIALLY_INSTALLED) {
-                            extensionTableBodyData = $('<tr><td>' + extension.extensionInfo.name + '</td><td>Partially-Installed' +
-                                '&nbsp; &nbsp;<a data-toggle="modal"' +
-                                ' id="' + key + '"><i class="fw' +
-                                ' fw-info"></i></a></td><td><button' +
-                                ' class="btn btn-block btn' +
-                                ' btn-primary">' + Constants.UNINSTALL + '</button></td></tr>');
-                            createAlertModalBoxForNotAndPartialExtension(extension, key, extensionTableBodyData);
-                            extensionTableBodyData.find("button").click(function () {
-                                app.utils.extensionUpdate(extension);
-                            });
-
-                        } else if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED) {
-                            if (extension.manuallyInstall) {
-                                extensionTableBodyData = $('<tr><td>' + extension.extensionInfo.name + '</td><td>Not-Installed' +
+                    function extensionsRendering() {
+                        extensionContainer.empty();
+                        extensionTable = $('<table class="table table-hover data-table"' +
+                            ' id="extensionTableId"><tbody></tbody></table>');
+                        app.utils.extensionData.forEach(function (extension, key) {
+                            var extensionTableBodyData;
+                            if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_INSTALLED) {
+                                extensionTableBodyData = $('<tr><td>' + extension.extensionInfo.name + '</td><td>Installed</td><td><button' +
+                                    ' class="btn btn-block btn' +
+                                    ' btn-primary">' + Constants.UNINSTALL + '</button></td></tr>');
+                                extensionTableBodyData.find("button").click(function () {
+                                    app.utils.extensionUpdateThroughFile(extension, callbackUpdateForExtensionFileBrowser);
+                                });
+                            } else if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_PARTIALLY_INSTALLED) {
+                                extensionTableBodyData = $('<tr><td>' + extension.extensionInfo.name + '</td><td>Partially-Installed' +
                                     '&nbsp; &nbsp;<a data-toggle="modal"' +
                                     ' id="' + key + '"><i class="fw' +
                                     ' fw-info"></i></a></td><td><button' +
                                     ' class="btn btn-block btn' +
-                                    ' btn-primary">' + Constants.INSTALL + '</button></td></tr>');
+                                    ' btn-primary">' + Constants.UNINSTALL + '</button></td></tr>');
                                 createAlertModalBoxForNotAndPartialExtension(extension, key, extensionTableBodyData);
-                            } else {
+                                extensionTableBodyData.find("button").click(function () {
+                                    app.utils.extensionUpdateThroughFile(extension, callbackUpdateForExtensionFileBrowser);
+                                });
+
+                            } else if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED) {
                                 extensionTableBodyData = $('<tr><td>' + extension.extensionInfo.name + '</td><td>Not-Installed</td><td><button' +
                                     ' class="btn btn-block btn' +
                                     ' btn-primary">' + Constants.INSTALL + '</button></td></tr>');
+                                extensionTableBodyData.find("button").click(function () {
+                                    app.utils.extensionUpdateThroughFile(extension, callbackUpdateForExtensionFileBrowser);
+                                });
                             }
-
-                            extensionTableBodyData.find("button").click(function () {
-                                app.utils.extensionUpdate(extension);
-                            });
-                        }
-                        extensionTable.append(extensionTableBodyData);
-                    });
-
-                    extensionContainer.append(extensionTable);
+                            extensionTable.append(extensionTableBodyData);
+                        });
+                        extensionContainer.append(extensionTable);
+                    }
                     extensionSearch.keyup(function () {
                         searchExtension(extensionTable, extensionSearch.val());
                     });
-
                     $(this.dialog_containers).append(extensionModelOpen);
                     extensionInstallError.hide();
                     this._extensionListModal = extensionModelOpen;

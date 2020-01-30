@@ -1,10 +1,11 @@
 /**
  * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
-define(['require', 'jquery','constants'],
-    function (require, $,Constants) {
+define(['require', 'jquery', 'constants'],
+    function (require, $, Constants) {
         var self = this;
         var Utils = function () {
+            this.extensionData = getExtensionDetails();
         };
 
         var rest_client_constants = {
@@ -17,102 +18,109 @@ define(['require', 'jquery','constants'],
         };
 
         /**
-         * Get the extension details array from back end.
+         * getting extension data from back end.
+         * @returns {Map|Map}
          */
-        Utils.prototype.getExtensionDetailsMap = function () {
-            // extension details array need to be retrieve from backend.
-          return new Map(Object.entries({
-              "kafka": {
-                  "extensionStatus": "INSTALLED",
-                  "extensionInfo": {
-                      "name": "kafka",
-                      "version": "5.0.8-SNAPSHOT"
-                  }
-              },
-              "redis": {
-                  "extensionStatus": "NOT_INSTALLED",
-                  "extensionInfo": {
-                      "name": "redis",
-                      "version": "3.1.2-SNAPSHOT"
-                  },
-                  "manuallyInstall" : [
-                      {
-                          "name": "redis-clients",
-                          "version": "2.3.0",
-                          "download": {
-                              "info": {"description":"redis clients is like a one extension",
-                                  "install":"by using this way we can install redis-clients"
-                              },
-                              "autoDownloadable": false,
-                              "url": "https://repo1.maven.org/maven2/org/apache/redis/redis_2.11/2.1.1/redis_2.11-2.1.1.jar"
-                          },
-                          "type": "BUNDLE",
-                          "lookupRegex": "kafka-clients-(.+).jar"
-                      },
-                      { "name": "redis-server",
-                          "version": "2.3.0",
-                          "download": {
-                              "info": {"description":"redis clients is like a one extension",
-                                  "install":"by using this way we can install redis-clients"},
-                              "autoDownloadable": false,
-                              "url": "https://repo1.maven.org/maven2/org/apache/redis/redis_2.11/2.1.1/kafka_2.11-2.1.1.jar"
-                          },
-                          "type": "BUNDLE",
-                          "lookupRegex": "kafka-server-(.+).jar"}
-                  ]
-              },
-              "grpc": {
-                  "extensionStatus": "PARTIALLY_INSTALLED",
-                  "extensionInfo": {
-                      "name": "grpc",
-                      "version": "3.1.2-SNAPSHOT"
-                  },
-                  "manuallyInstall" : [
-                      {
-                          "name": "grpc-clients",
-                          "version": "2.3.0",
-                          "download": {
-                              "info": {
-                                  "description":"grpc clients is like a one extension",
-                                  "install":"by using this way we can install grpc-clients"
-                              },
-                              "autoDownloadable": false,
-                              "url": "https://repo1.maven.org/maven2/org/apache/grpc/grpc_2.11/2.1.1/grpc_2.11-2.1.1.jar"
-                          },
-                          "type": "BUNDLE",
-                          "lookupRegex": "grpc-clients-(.+).jar"
-                      },
-                      { "name": "grpc-server",
-                          "version": "2.3.0",
-                          "download": {
-                              "info": {
-                                  "description":"grpc server is like a one extension",
-                                  "install":"by using this way we can install grpc-server"
-                              },
-                              "autoDownloadable": false,
-                              "url": "https://repo1.maven.org/maven2/org/apache/grpc/grpc_2.11/2.1.1/grpc_2.11-2.1.1.jar"
-                          },
-                          "type": "BUNDLE",
-                          "lookupRegex": "grpc-server-(.+).jar"}
-                  ]
-              },
-              "nats": {
-                  "extensionStatus": "NOT_INSTALLED",
-                  "extensionInfo": {
-                      "name": "nats",
-                      "version": "3.1.2-SNAPSHOT"
-                  },
-              }
-          }));
-
-
-        };
-
+        function getExtensionDetails() {
+            return new Map(Object.entries({
+                "kafka": {
+                    "extensionStatus": "NOT_INSTALLED",
+                    "extensionInfo": {
+                        "name": "kafka",
+                        "version": "5.0.8-SNAPSHOT"
+                    }
+                },
+                "redis": {
+                    "extensionStatus": "NOT_INSTALLED",
+                    "extensionInfo": {
+                        "name": "redis",
+                        "version": "3.1.2-SNAPSHOT"
+                    },
+                    "manuallyInstall": [
+                        {
+                            "name": "redis-clients",
+                            "version": "2.3.0",
+                            "download": {
+                                "info": {
+                                    "description": "redis clients is like a one extension",
+                                    "install": "by using this way we can install redis-clients"
+                                },
+                                "autoDownloadable": false,
+                                "url": "https://repo1.maven.org/maven2/org/apache/redis/redis_2.11/2.1.1/redis_2.11-2.1.1.jar"
+                            },
+                            "type": "BUNDLE",
+                            "lookupRegex": "kafka-clients-(.+).jar"
+                        },
+                        {
+                            "name": "redis-server",
+                            "version": "2.3.0",
+                            "download": {
+                                "info": {
+                                    "description": "redis clients is like a one extension",
+                                    "install": "by using this way we can install redis-clients"
+                                },
+                                "autoDownloadable": false,
+                                "url": "https://repo1.maven.org/maven2/org/apache/redis/redis_2.11/2.1.1/kafka_2.11-2.1.1.jar"
+                            },
+                            "type": "BUNDLE",
+                            "lookupRegex": "kafka-server-(.+).jar"
+                        }
+                    ]
+                },
+                "grpc": {
+                    "extensionStatus": "NOT_INSTALLED",
+                    "extensionInfo": {
+                        "name": "grpc",
+                        "version": "3.1.2-SNAPSHOT"
+                    },
+                    "manuallyInstall": [
+                        {
+                            "name": "grpc-clients",
+                            "version": "2.3.0",
+                            "download": {
+                                "info": {
+                                    "description": "grpc clients is like a one extension",
+                                    "install": "by using this way we can install grpc-clients"
+                                },
+                                "autoDownloadable": false,
+                                "url": "https://repo1.maven.org/maven2/org/apache/grpc/grpc_2.11/2.1.1/grpc_2.11-2.1.1.jar"
+                            },
+                            "type": "BUNDLE",
+                            "lookupRegex": "grpc-clients-(.+).jar"
+                        },
+                        {
+                            "name": "grpc-server",
+                            "version": "2.3.0",
+                            "download": {
+                                "info": {
+                                    "description": "grpc server is like a one extension",
+                                    "install": "by using this way we can install grpc-server"
+                                },
+                                "autoDownloadable": false,
+                                "url": "https://repo1.maven.org/maven2/org/apache/grpc/grpc_2.11/2.1.1/grpc_2.11-2.1.1.jar"
+                            },
+                            "type": "BUNDLE",
+                            "lookupRegex": "grpc-server-(.+).jar"
+                        }
+                    ]
+                },
+                "nats": {
+                    "extensionStatus": "NOT_INSTALLED",
+                    "extensionInfo": {
+                        "name": "nats",
+                        "version": "3.1.2-SNAPSHOT"
+                    },
+                }
+            }));
+        }
         /**
          * provide the update details about the extension
          * @param extension
+         * @param callbackUpdater
+         * @param key
+         * @param callback
          */
-        Utils.prototype.extensionUpdate = function (extension) {
+        Utils.prototype.extensionUpdateThroughFile = function (extension,callbackUpdater) {
             self.extensionInstallUninstallAlertModal = $(
                 "<div class='modal fade' id='extensionAlertModal' tabindex='-1' role='dialog'" +
                 " aria-tydden='true'>" +
@@ -131,7 +139,7 @@ define(['require', 'jquery','constants'],
                 "<form class='form-horizontal' onsubmit='return false'>" +
                 "<div class='form-group'>" +
                 "<label for='configName' class='col-sm-9 file-dialog-label'>" +
-                "Are you sure to " + ((extension.extensionStatus.trim().toUpperCase()=== Constants.EXTENSION_NOT_INSTALLED) ? 'install' : 'unInstall') + " " + extension.extensionInfo.name + " ?" +
+                "Are you sure to " + ((extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED) ? 'install' : 'unInstall') + " " + extension.extensionInfo.name + " ?" +
                 "</label>" +
                 "</div>" +
                 "<div class='form-group'>" +
@@ -153,10 +161,56 @@ define(['require', 'jquery','constants'],
                 self.extensionInstallUninstallAlertModal.modal('hide');
                 var updateData = {
                     "name": extension.extensionInfo.name,
-                    "action": (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED) ? 'install' : 'unInstall'
+                    "action": (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED)
+                        ? Constants.INSTALL : Constants.UNINSTALL
                 };
-                alert(updateData.name + " " + updateData.action);
                 //this updateData goes to back end.
+                alert(updateData.name + " " + updateData.action);
+                //this updatedExtension data should come from backend.
+                var updatedExtension = {
+                    // "extensionStatus": "PARTIALLY_INSTALLED",
+                    //     "extensionInfo": {
+                    //     "name": "redis",
+                    //         "version": "3.1.2-SNAPSHOT"
+                    // },
+                    // "manuallyInstall": [
+                    //     {
+                    //         "name": "redis-clients",
+                    //         "version": "2.3.0",
+                    //         "download": {
+                    //             "info": {
+                    //                 "description": "redis clients is like a one extension",
+                    //                 "install": "by using this way we can install redis-clients"
+                    //             },
+                    //             "autoDownloadable": false,
+                    //             "url": "https://repo1.maven.org/maven2/org/apache/redis/redis_2.11/2.1.1/redis_2.11-2.1.1.jar"
+                    //         },
+                    //         "type": "BUNDLE",
+                    //         "lookupRegex": "kafka-clients-(.+).jar"
+                    //     },
+                    //     {
+                    //         "name": "redis-server",
+                    //         "version": "2.3.0",
+                    //         "download": {
+                    //             "info": {
+                    //                 "description": "redis clients is like a one extension",
+                    //                 "install": "by using this way we can install redis-clients"
+                    //             },
+                    //             "autoDownloadable": false,
+                    //             "url": "https://repo1.maven.org/maven2/org/apache/redis/redis_2.11/2.1.1/kafka_2.11-2.1.1.jar"
+                    //         },
+                    //         "type": "BUNDLE",
+                    //         "lookupRegex": "kafka-server-(.+).jar"
+                    //     }
+                    // ]
+                    "extensionStatus": "INSTALLED",
+                    "extensionInfo": {
+                        "name": "kafka",
+                        "version": "5.0.8-SNAPSHOT"
+                    }
+                };
+                //call back function changes the front design based on the updated  json data from back end
+                callbackUpdater(updatedExtension, true);
             });
         };
 

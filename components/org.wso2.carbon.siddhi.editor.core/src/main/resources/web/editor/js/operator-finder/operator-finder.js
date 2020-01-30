@@ -1,14 +1,13 @@
 /**
  * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
-define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils','constants', 'app/source-editor/completion-engine'],
-    function ($, _, log,Remarkable, Handlebars, DesignViewUtils,Constants, CompletionEngine) {
+define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils', 'constants', 'app/source-editor/completion-engine'],
+    function ($, _, log, Remarkable, Handlebars, DesignViewUtils, Constants, CompletionEngine) {
         /**
          * Load operators from the Completion engine.
          *
          * @param callback Callback function
          */
-
         var constants = {
             STORE: 'store',
             SINK: 'sink',
@@ -311,15 +310,61 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils','
          */
         var getUninstalledExtensionDetails = function () {
             var notInstalledExtension = [];
-            var extensionDetails = self._application.utils.getExtensionDetailsMap();
-            extensionDetails.forEach(function (extension) {
+            self._application.utils.extensionData.forEach(function (extension) {
                 if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED) {
                     notInstalledExtension.push(extension);
                 }
             });
             return notInstalledExtension;
         };
+        /**
+         *get the partial install extension details.
+         * @returns {[array]}
+         */
+        var getPartiallyInstalledExtensionDetails = function () {
+            var partiallyInstalledExtension = [];
+            self._application.utils.extensionData.forEach(function (extension) {
+                if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_PARTIALLY_INSTALLED) {
+                    partiallyInstalledExtension.push(extension);
+                }
+            });
+            return partiallyInstalledExtension;
+        };
+        /**
+         *get the Installed extension details
+         * @returns {*}
+         */
+        var getInstalledExtensionDetails = function () {
+            var installedExtension = [];
+            self._application.utils.extensionData.forEach(function (extension) {
+                if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_INSTALLED) {
+                    installedExtension.push(extension);
+                }
+            });
+            return installedExtension;
+        };
 
+        /**
+         * get the partial intall extension object.
+         * @param operatorExtension
+         * @returns {Array}
+         */
+        var getPartiallyInstalledExtensionObject = function (operatorExtension) {
+            var partiallyInstalledExtensionObject = getPartiallyInstalledExtensionDetails();
+            for (var extension of partiallyInstalledExtensionObject) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) return extension;
+            }
+        };
+        /**
+         * get the installed extension object
+         * @param operatorExtension
+         */
+        var getInstalledExtensionObject = function (operatorExtension) {
+            var installedExtensionObject = getInstalledExtensionDetails();
+            for (var extension of installedExtensionObject) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) return extension;
+            }
+        };
         /**
          * get the not-installed extension object based on extension name.
          * @param operatorExtensionName
@@ -344,8 +389,30 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils','
         };
 
         /**
+         * check the whether operator extension is partially installed or not.
+         * @param operatorExtension
+         * @returns {boolean}
+         */
+        var isPartialInstalledExtension = function (operatorExtension) {
+            var partiallyInstalledExtensionArray = getPartiallyInstalledExtensionDetails();
+            for (var extension of partiallyInstalledExtensionArray) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) return true;
+            }
+        };
+        /**
+         * check the whether operator extension  installed or not.
+         * @param operatorExtension
+         * @returns {boolean}
+         */
+        var isInstalledExtension = function (operatorExtension) {
+            var installedExtensionArray = getInstalledExtensionDetails();
+            for (var extension of installedExtensionArray) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) return true;
+            }
+        };
+
+        /**
          * Searches operators using the given query.
-         *
          * @param query String query
          * @returns {{results: Array, hasResults: boolean, hasQuery: boolean, namespaces: *}} Search results
          */
@@ -368,14 +435,34 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils','
                     if (isNotInstalledExtension(operatorExtension)) {
                         keyResult.push({
                             extension: getNotInstalledExtensionObject(operatorExtension),
-                            status: Constants.EXTENSION_NOT_INSTALLED,
+                            notInstall: Constants.EXTENSION_NOT_INSTALLED,
                             fqn: operatorExtension.fqn,
                             htmlFqn: result.fqn.text,
                             type: operatorExtension.type,
                             description: result.description.text,
                             index: i
                         });
-                    } else {
+                    } else if (isPartialInstalledExtension(operatorExtension)) {
+                        keyResult.push({
+                            extension: getPartiallyInstalledExtensionObject(operatorExtension),
+                            partialInstall: Constants.EXTENSION_PARTIALLY_INSTALLED,
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    } else if (isInstalledExtension(operatorExtension)) {
+                        keyResult.push({
+                            extension: getInstalledExtensionObject(operatorExtension),
+                            install: Constants.EXTENSION_INSTALLED,
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    }else {
                         keyResult.push({
                             fqn: operatorExtension.fqn,
                             htmlFqn: result.fqn.text,
@@ -388,14 +475,34 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils','
                     if (isNotInstalledExtension(operatorExtension)) {
                         descriptionResult.push({
                             extension: getNotInstalledExtensionObject(operatorExtension),
-                            status: Constants.EXTENSION_NOT_INSTALLED,
+                            notInstall: Constants.EXTENSION_NOT_INSTALLED,
                             fqn: operatorExtension.fqn,
                             htmlFqn: result.fqn.text,
                             type: operatorExtension.type,
                             description: result.description.text,
                             index: i
                         });
-                    } else {
+                    } else if (isPartialInstalledExtension(operatorExtension)) {
+                        descriptionResult.push({
+                            extension: getPartiallyInstalledExtensionObject(operatorExtension),
+                            partialInstall: Constants.EXTENSION_PARTIALLY_INSTALLED,
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    } else if (isInstalledExtension(operatorExtension)) {
+                        descriptionResult.push({
+                            extension: getInstalledExtensionObject(operatorExtension),
+                            install: Constants.EXTENSION_INSTALLED,
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    }else {
                         descriptionResult.push({
                             fqn: operatorExtension.fqn,
                             htmlFqn: result.fqn.text,
@@ -527,16 +634,24 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils','
 
             //Event handler for extension installation modal open.
             resultContent.on('click', 'a.extension-install-btn', function (e) {
+                var innerSelf = this;
                     e.preventDefault();
-                    var extensionObject = getNotInstalledExtensionObject({name:$(this).data('extension-name')});
-                    self._application.utils.extensionUpdate(extensionObject);
+                var callbackUpdater = function (updatedExtension, isUpdated) {
+                    if (isUpdated) {
+                        self._application.utils.extensionData.set(updatedExtension.extensionInfo.name, updatedExtension);
+                        self.renderSearchResults($(innerSelf).data('extension-name'));
+                    }
+                };
+                var extensionObject = getNotInstalledExtensionObject({name: $(this).data('extension-name')});
+                self._application.utils.extensionUpdateThroughFile(extensionObject, callbackUpdater);
                 }
             );
+
             //Event handler for partially extension installation modal open.
             resultContent.on('click', 'a.partial-extension-install-btn', function (e) {
                     e.preventDefault();
-                    var extensionName = {name:$(this).data('extension-name')};
-                    var extension = getNotInstalledExtensionObject(extensionName);
+                var extensionName = {name: $(this).data('extension-names')};
+                var extension = getPartiallyInstalledExtensionObject(extensionName);
                 self._partialModel = $(
                     '<div class="modal fade" id="' + extension.extensionInfo.name + '">' +
                     '<div class="modal-dialog">' +
