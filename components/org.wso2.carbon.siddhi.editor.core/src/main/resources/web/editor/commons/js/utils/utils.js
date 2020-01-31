@@ -165,7 +165,7 @@ define(['require', 'jquery', 'constants'],
                         ? Constants.INSTALL : Constants.UNINSTALL
                 };
                 //this updateData goes to back end.
-                alert(updateData.name + " " + updateData.action);
+                console.log(updateData.name + " " + updateData.action);
                 //this updatedExtension data should come from backend.
                 var updatedExtension = {
                     "extensionStatus": "INSTALLED",
