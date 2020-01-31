@@ -274,6 +274,9 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                 searchResults: Handlebars.compile($('#operators-search-results-template').html()),
                 moreDetails: Handlebars.compile($('#operator-details-template').html())
             };
+            this._notInstalledExtensionArray = getNotInstalledExtensionDetails();
+            this._installedExtensionArray = getInstalledExtensionDetails();
+            this._partiallyInstalledExtensionArray = getPartiallyInstalledExtensionDetails();
         };
 
         /**
@@ -308,7 +311,7 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
         /**
          * functions to get the not installed extension array details.
          */
-        var getUninstalledExtensionDetails = function () {
+        var getNotInstalledExtensionDetails = function () {
             var notInstalledExtension = [];
             self._application.utils.extensionData.forEach(function (extension) {
                 if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED) {
@@ -350,9 +353,8 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
          * @returns {Array}
          */
         var getPartiallyInstalledExtensionObject = function (operatorExtension) {
-            var partiallyInstalledExtensionObject = getPartiallyInstalledExtensionDetails();
-            for (var extension of partiallyInstalledExtensionObject) {
-                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) return extension;
+            for (var extension of self._partiallyInstalledExtensionArray) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return extension;}
             }
         };
         /**
@@ -360,9 +362,8 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
          * @param operatorExtension
          */
         var getInstalledExtensionObject = function (operatorExtension) {
-            var installedExtensionObject = getInstalledExtensionDetails();
-            for (var extension of installedExtensionObject) {
-                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) return extension;
+            for (var extension of self._installedExtensionArray) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return extension;}
             }
         };
         /**
@@ -371,9 +372,8 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
          * @returns {extension Object}
          */
         var getNotInstalledExtensionObject = function (operatorExtension) {
-            var notInstalledExtensionArray = getUninstalledExtensionDetails();
-            for (var extension of notInstalledExtensionArray) {
-                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) return extension;
+            for (var extension of self._notInstalledExtensionArray) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return extension;}
             }
         };
         /**
@@ -382,9 +382,8 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
          * return true/false.
          */
         var isNotInstalledExtension = function (operatorExtension) {
-            var notInstalledExtensionArray = getUninstalledExtensionDetails();
-            for (var extension of notInstalledExtensionArray) {
-                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) return true;
+            for (var extension of self._notInstalledExtensionArray) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return true;}
             }
         };
 
@@ -394,9 +393,8 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
          * @returns {boolean}
          */
         var isPartialInstalledExtension = function (operatorExtension) {
-            var partiallyInstalledExtensionArray = getPartiallyInstalledExtensionDetails();
-            for (var extension of partiallyInstalledExtensionArray) {
-                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) return true;
+            for (var extension of self._partiallyInstalledExtensionArray) {
+                if ( ( (operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return true;}
             }
         };
         /**
@@ -407,7 +405,7 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
         var isInstalledExtension = function (operatorExtension) {
             var installedExtensionArray = getInstalledExtensionDetails();
             for (var extension of installedExtensionArray) {
-                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) return true;
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return true;}
             }
         };
 

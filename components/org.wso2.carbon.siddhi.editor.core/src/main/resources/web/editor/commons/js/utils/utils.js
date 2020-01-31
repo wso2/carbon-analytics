@@ -168,41 +168,6 @@ define(['require', 'jquery', 'constants'],
                 alert(updateData.name + " " + updateData.action);
                 //this updatedExtension data should come from backend.
                 var updatedExtension = {
-                    // "extensionStatus": "PARTIALLY_INSTALLED",
-                    //     "extensionInfo": {
-                    //     "name": "redis",
-                    //         "version": "3.1.2-SNAPSHOT"
-                    // },
-                    // "manuallyInstall": [
-                    //     {
-                    //         "name": "redis-clients",
-                    //         "version": "2.3.0",
-                    //         "download": {
-                    //             "info": {
-                    //                 "description": "redis clients is like a one extension",
-                    //                 "install": "by using this way we can install redis-clients"
-                    //             },
-                    //             "autoDownloadable": false,
-                    //             "url": "https://repo1.maven.org/maven2/org/apache/redis/redis_2.11/2.1.1/redis_2.11-2.1.1.jar"
-                    //         },
-                    //         "type": "BUNDLE",
-                    //         "lookupRegex": "kafka-clients-(.+).jar"
-                    //     },
-                    //     {
-                    //         "name": "redis-server",
-                    //         "version": "2.3.0",
-                    //         "download": {
-                    //             "info": {
-                    //                 "description": "redis clients is like a one extension",
-                    //                 "install": "by using this way we can install redis-clients"
-                    //             },
-                    //             "autoDownloadable": false,
-                    //             "url": "https://repo1.maven.org/maven2/org/apache/redis/redis_2.11/2.1.1/kafka_2.11-2.1.1.jar"
-                    //         },
-                    //         "type": "BUNDLE",
-                    //         "lookupRegex": "kafka-server-(.+).jar"
-                    //     }
-                    // ]
                     "extensionStatus": "INSTALLED",
                     "extensionInfo": {
                         "name": "kafka",

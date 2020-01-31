@@ -84,16 +84,16 @@ define(['require', 'lodash', 'jquery', 'constants'],
 
                     //define the map to store Partially extension modal based on key
                     var partialExtensionDetailModal = new Map();
-                    extensionsRendering();
-                    var callbackUpdateForExtensionFileBrowser = function (updatedExtension, isUpdated) {
+                    renderExtensions();
+                    var callbackExtensionFileBrowser = function (updatedExtension, isUpdated) {
                         if (isUpdated) {
-                            app.utils.extensionData.set(updatedExtension.extensionInfo.name, updatedExtension);
-                            extensionsRendering();
+                            app.utils.extensionData.set(updatedExtension.extensionInfo.name,updatedExtension);
+                            renderExtensions();
                         }
                     };
                     var extensionTable;
 
-                    function extensionsRendering() {
+                    function renderExtensions() {
                         extensionContainer.empty();
                         extensionTable = $('<table class="table table-hover data-table"' +
                             ' id="extensionTableId"><tbody></tbody></table>');
@@ -103,9 +103,7 @@ define(['require', 'lodash', 'jquery', 'constants'],
                                 extensionTableBodyData = $('<tr><td>' + extension.extensionInfo.name + '</td><td>Installed</td><td><button' +
                                     ' class="btn btn-block btn' +
                                     ' btn-primary">' + Constants.UNINSTALL + '</button></td></tr>');
-                                extensionTableBodyData.find("button").click(function () {
-                                    app.utils.extensionUpdateThroughFile(extension, callbackUpdateForExtensionFileBrowser);
-                                });
+                                extensionButtonFunctionInsert(extensionTableBodyData,extension);
                             } else if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_PARTIALLY_INSTALLED) {
                                 extensionTableBodyData = $('<tr><td>' + extension.extensionInfo.name + '</td><td>Partially-Installed' +
                                     '&nbsp; &nbsp;<a data-toggle="modal"' +
@@ -114,17 +112,13 @@ define(['require', 'lodash', 'jquery', 'constants'],
                                     ' class="btn btn-block btn' +
                                     ' btn-primary">' + Constants.UNINSTALL + '</button></td></tr>');
                                 createAlertModalBoxForNotAndPartialExtension(extension, key, extensionTableBodyData);
-                                extensionTableBodyData.find("button").click(function () {
-                                    app.utils.extensionUpdateThroughFile(extension, callbackUpdateForExtensionFileBrowser);
-                                });
+                                extensionButtonFunctionInsert(extensionTableBodyData,extension);
 
                             } else if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED) {
                                 extensionTableBodyData = $('<tr><td>' + extension.extensionInfo.name + '</td><td>Not-Installed</td><td><button' +
                                     ' class="btn btn-block btn' +
                                     ' btn-primary">' + Constants.INSTALL + '</button></td></tr>');
-                                extensionTableBodyData.find("button").click(function () {
-                                    app.utils.extensionUpdateThroughFile(extension, callbackUpdateForExtensionFileBrowser);
-                                });
+                                extensionButtonFunctionInsert(extensionTableBodyData,extension);
                             }
                             extensionTable.append(extensionTableBodyData);
                         });
@@ -136,6 +130,19 @@ define(['require', 'lodash', 'jquery', 'constants'],
                     $(this.dialog_containers).append(extensionModelOpen);
                     extensionInstallError.hide();
                     this._extensionListModal = extensionModelOpen;
+
+                    /**
+                     * insert the onclick function for extension button.
+                     * @param extensionTableBodyData
+                     * @param extension
+                     * @param callbackExtensionFileBrowser
+                     * @returns {*}
+                     */
+                    function extensionButtonFunctionInsert(extensionTableBodyData,extension) {
+                       return extensionTableBodyData.find("button").click(function () {
+                            app.utils.extensionUpdateThroughFile(extension,callbackExtensionFileBrowser);
+                        });
+                    }
 
                     /**
                      * create a alert details model box for extension dependency.
