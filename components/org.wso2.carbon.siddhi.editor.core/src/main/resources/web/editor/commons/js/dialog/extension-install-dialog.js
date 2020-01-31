@@ -88,12 +88,12 @@ define(['require', 'lodash', 'jquery', 'constants'],
                     var callbackExtensionFileBrowser = function (updatedExtension, isUpdated) {
                         if (isUpdated) {
                             app.utils.extensionData.set(updatedExtension.extensionInfo.name,updatedExtension);
-                            renderExtensions();
+                            self.renderExtensions();
                         }
                     };
                     var extensionTable;
 
-                    function renderExtensions() {
+                   this.renderExtensions = function () {
                         extensionContainer.empty();
                         extensionTable = $('<table class="table table-hover data-table"' +
                             ' id="extensionTableId"><tbody></tbody></table>');
