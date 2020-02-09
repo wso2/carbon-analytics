@@ -49,6 +49,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.DeflaterOutputStream;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
@@ -109,6 +110,8 @@ public class LoginApiServiceImpl extends LoginApiService {
             idPClientProperties.put(IdPClientConstants.APP_NAME, trimmedAppName);
             idPClientProperties.put(IdPClientConstants.GRANT_TYPE, grantType);
             idPClientProperties.put(IdPClientConstants.REMEMBER_ME, rememberMe.toString());
+            String domain = AuthUtil.getDomainFromHeader(request);
+            idPClientProperties.put("Domain", domain);
             String refToken;
             if (IdPClientConstants.REFRESH_GRANT_TYPE.equals(grantType)) {
                 refToken = AuthUtil

@@ -17,7 +17,9 @@
  */
 package org.wso2.carbon.analytics.auth.rest.api.util;
 
+import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.streaming.integrator.common.utils.SPConstants;
+import org.wso2.msf4j.Request;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -106,5 +108,14 @@ public class AuthUtil {
                     .append(AuthRESTAPIConstants.DEFAULT_EXPIRES_COOKIE).append(COOKIE_VALUE_SEPERATOR);
         }
         return new NewCookie(name, stringBuilder.toString());
+    }
+
+    public static String getDomainFromHeader(Request request) {
+
+       String tenantDomain = request.getHeader("X-WSO2-Tenant");
+        if(tenantDomain == null) {
+            tenantDomain = "carbon.super";
+        }
+        return tenantDomain;
     }
 }
