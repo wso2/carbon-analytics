@@ -110,6 +110,12 @@ public class AuthUtil {
         return new NewCookie(name, stringBuilder.toString());
     }
 
+    /**
+     * Set tenant domain via X-WSO2-Tenant header. This method is specifically implemented to
+     * support custom URLs for dashboard portal in api-cloud.
+     * @param request
+     * @return value of X-WSO2-Tenant header.
+     */
     public static String getDomainFromHeader(Request request) {
 
        String tenantDomain = request.getHeader("X-WSO2-Tenant");
