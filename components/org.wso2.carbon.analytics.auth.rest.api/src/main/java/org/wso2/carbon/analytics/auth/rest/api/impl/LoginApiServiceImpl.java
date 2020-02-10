@@ -109,6 +109,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             idPClientProperties.put(IdPClientConstants.APP_NAME, trimmedAppName);
             idPClientProperties.put(IdPClientConstants.GRANT_TYPE, grantType);
             idPClientProperties.put(IdPClientConstants.REMEMBER_ME, rememberMe.toString());
+            idPClientProperties.put("Domain", AuthUtil.getDomainFromHeader(request));
             String refToken;
             if (IdPClientConstants.REFRESH_GRANT_TYPE.equals(grantType)) {
                 refToken = AuthUtil
