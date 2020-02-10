@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.analytics.auth.rest.api.util;
 
-import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.streaming.integrator.common.utils.SPConstants;
 import org.wso2.msf4j.Request;
 
