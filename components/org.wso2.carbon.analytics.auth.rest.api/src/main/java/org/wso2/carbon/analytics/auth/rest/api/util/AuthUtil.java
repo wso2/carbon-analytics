@@ -117,8 +117,8 @@ public class AuthUtil {
      */
     public static String getDomainFromHeader(Request request) {
 
-       String tenantDomain = request.getHeader("X-WSO2-Tenant");
-        if(tenantDomain == null) {
+        String tenantDomain = request.getHeader("X-WSO2-Tenant");
+        if (tenantDomain == null) {
             tenantDomain = "carbon.super";
         }
         return tenantDomain;
