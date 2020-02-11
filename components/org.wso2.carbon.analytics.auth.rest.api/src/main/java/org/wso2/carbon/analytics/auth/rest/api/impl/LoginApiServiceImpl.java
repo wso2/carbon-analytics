@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.auth.rest.api.LoginApiService;
 import org.wso2.carbon.analytics.auth.rest.api.NotFoundException;
+import org.wso2.carbon.analytics.auth.rest.api.StringUtil;
 import org.wso2.carbon.analytics.auth.rest.api.dto.ErrorDTO;
 import org.wso2.carbon.analytics.auth.rest.api.dto.RedirectionDTO;
 import org.wso2.carbon.analytics.auth.rest.api.dto.UserDTO;
@@ -43,6 +44,7 @@ import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClient;
 import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.streaming.integrator.common.utils.SPConstants;
+import org.wso2.carbon.utils.StringUtils;
 import org.wso2.msf4j.Request;
 
 import java.net.URI;
@@ -109,7 +111,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             idPClientProperties.put(IdPClientConstants.APP_NAME, trimmedAppName);
             idPClientProperties.put(IdPClientConstants.GRANT_TYPE, grantType);
             idPClientProperties.put(IdPClientConstants.REMEMBER_ME, rememberMe.toString());
-            idPClientProperties.put("Domain", AuthUtil.getDomainFromHeader(request));
+            idPClientProperties.put(IdPClientConstants.DOMAIN, AuthUtil.getDomainFromHeader(request));
             String refToken;
             if (IdPClientConstants.REFRESH_GRANT_TYPE.equals(grantType)) {
                 refToken = AuthUtil
@@ -284,7 +286,14 @@ public class LoginApiServiceImpl extends LoginApiService {
             String requestCode = requestUrl.substring(requestUrl.lastIndexOf("?code=") + 6);
             try {
                 ExternalIdPClient oAuth2IdPClient = (ExternalIdPClient) idPClient;
-                Map<String, String> authCodeloginResponse = oAuth2IdPClient.authCodeLogin(appName, requestCode);
+                Map<String, String> authCodeloginResponse;
+                if (request.getHeader(IdPClientConstants.DOMAIN) != null) {
+                    Map<String, String> properties = new HashMap<>();
+                    properties.put(IdPClientConstants.DOMAIN, AuthUtil.getDomainFromHeader(request));
+                    authCodeloginResponse = oAuth2IdPClient.authCodeLogin(appName, requestCode, properties);
+                } else {
+                    authCodeloginResponse = oAuth2IdPClient.authCodeLogin(appName, requestCode);
+                }
                 String loginStatus = authCodeloginResponse.get(IdPClientConstants.LOGIN_STATUS);
                 if (loginStatus.equals(IdPClientConstants.LoginStatus.LOGIN_SUCCESS)) {
                     UserDTO userDTO = new UserDTO();
