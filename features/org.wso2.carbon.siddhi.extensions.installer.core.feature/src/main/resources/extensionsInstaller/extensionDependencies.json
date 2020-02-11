@@ -1,0 +1,68 @@
+{
+  "kafka": {
+    "extension": {
+      "name": "kafka",
+      "version": "5.0.8-SNAPSHOT"
+    },
+    "dependencies": [
+      {
+        "name": "kafka-clients",
+        "version": "2.3.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/apache/kafka/kafka_2.11/2.1.1/kafka_2.11-2.1.1.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          },
+          {
+            "type": "JAR",
+            "usedBy": "SAMPLES"
+          }
+        ],
+        "lookupRegex": "kafka_(.+).jar"
+      },
+      {
+        "name": "zookeeper",
+        "version": "3.4.9",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/apache/zookeeper/zookeeper/3.4.9/zookeeper-3.4.9.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "SAMPLES"
+          }
+        ],
+        "lookupRegex": "zookeeper-(.+).jar"
+      }
+    ]
+  },
+
+  "redis": {
+    "extension": {
+      "name": "redis",
+      "version": "3.1.2-SNAPSHOT"
+    },
+    "dependencies": [
+      {
+        "name": "jedis",
+        "version": "2.9.3",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/redis/clients/jedis/2.9.3/jedis-2.9.3.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "SAMPLES"
+          }
+        ],
+        "lookupRegex": "jedis-(.+).jar"
+      }
+    ]
+  }
+}

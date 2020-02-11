@@ -36,6 +36,10 @@
         <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
     </Match>
     <Match>
+        <Package name="org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models"/>
+        <Bug pattern="UWF_UNWRITTEN_FIELD"/>
+    </Match>
+    <Match>
         <Class name="org.wso2.carbon.business.rules.templates.editor.core.internal.TemplatesEditorMicroservice"/>
         <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
     </Match>
