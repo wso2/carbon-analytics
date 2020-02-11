@@ -71,10 +71,10 @@
 
     <properties>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
-        <Private-Package>
+        <private.package>
             org.wso2.carbon.siddhi.extensions.installer.core.internal,
             org.wso2.carbon.siddhi.extensions.installer.core.internal.*,
-        </Private-Package>
+        </private.package>
         <export.package>
             org.wso2.carbon.siddhi.extensions.installer.core.*
         </export.package>
