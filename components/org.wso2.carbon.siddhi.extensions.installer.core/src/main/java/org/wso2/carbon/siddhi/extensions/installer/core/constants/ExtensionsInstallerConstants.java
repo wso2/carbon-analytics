@@ -24,6 +24,7 @@ import org.wso2.carbon.utils.Utils;
  * Contains constants used in Siddhi Extensions Installer.
  */
 public class ExtensionsInstallerConstants {
+
     private ExtensionsInstallerConstants() {
     }
 
@@ -35,4 +36,5 @@ public class ExtensionsInstallerConstants {
     public static final String RUNTIME_BUNDLES_LOCATION = CARBON_HOME + "/lib";
     public static final String SAMPLES_JARS_LOCATION = CARBON_HOME + "/samples/sample-clients/lib";
     public static final String SAMPLES_BUNDLES_LOCATION = CARBON_HOME + "/samples/sample-clients/lib";
+
 }

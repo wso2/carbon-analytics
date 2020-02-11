@@ -52,7 +52,6 @@ import java.util.Map;
 )
 @Path("/siddhi-extensions")
 public class SiddhiExtensionsInstallerMicroservice implements Microservice {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SiddhiExtensionsInstallerMicroservice.class);
 
     private Map<String, ExtensionConfig> extensionConfigs;
 
@@ -177,4 +176,5 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
     protected void stop() throws Exception {
 
     }
+
 }

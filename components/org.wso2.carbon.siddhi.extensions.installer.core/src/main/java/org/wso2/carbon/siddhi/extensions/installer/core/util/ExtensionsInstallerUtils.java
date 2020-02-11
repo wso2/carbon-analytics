@@ -45,6 +45,7 @@ import java.util.Map;
  * Contains utility methods that are used in Siddhi Extensions Installer.
  */
 public class ExtensionsInstallerUtils {
+
     private ExtensionsInstallerUtils() {
         // Prevents instantiation.
     }
@@ -166,4 +167,5 @@ public class ExtensionsInstallerUtils {
         }
         throw new ExtensionsInstallerException(String.format("Invalid value: %s for 'usedBy' property.", usage));
     }
+
 }

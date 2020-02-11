@@ -38,16 +38,16 @@ import org.wso2.msf4j.MicroservicesServer;
 )
 public class StartupComponent {
 
-    private static final Logger logger = LoggerFactory.getLogger(StartupComponent.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StartupComponent.class);
 
     @Activate
     protected void start(BundleContext bundleContext) {
-        logger.info("Siddhi Extensions Installer Core Startup Listener Service Component is Activated.");
+        LOGGER.info("Siddhi Extensions Installer Core Startup Listener Service Component is Activated.");
     }
 
     @Deactivate
     protected void stop() {
-        logger.info("Siddhi Extensions Installer Core Startup Listener Service Component is Deactivated.");
+        LOGGER.info("Siddhi Extensions Installer Core Startup Listener Service Component is Deactivated.");
     }
 
     @Reference(service = MicroservicesServer.class,
@@ -55,10 +55,11 @@ public class StartupComponent {
         policy = ReferencePolicy.DYNAMIC,
         unbind = "unsetMicroservicesServer")
     protected void setMicroservicesServer(MicroservicesServer microservicesServer) {
-        logger.debug("Microservices server registered to startup component of server.");
+        LOGGER.debug("Microservices server registered to startup component of server.");
     }
 
     protected void unsetMicroservicesServer(MicroservicesServer microservicesServer) {
-        logger.debug("Microservices server unregistered from startup component of server.");
+        LOGGER.debug("Microservices server unregistered from startup component of server.");
     }
+
 }
