@@ -19,7 +19,7 @@
 package org.wso2.carbon.event.simulator.core.internal.generator.database.core;
 
 import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.pool.PoolInitializationException;
+import com.zaxxer.hikari.pool.HikariPool.PoolInitializationException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
