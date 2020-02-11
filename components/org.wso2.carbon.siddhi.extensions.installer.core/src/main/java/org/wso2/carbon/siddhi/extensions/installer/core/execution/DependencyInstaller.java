@@ -27,22 +27,22 @@ import java.util.Map;
  */
 public interface DependencyInstaller {
 
-	/**
-	 * Installs dependencies of the extension, that is denoted by the given id.
-	 *
-	 * @param extensionId Id of the extension.
-	 * @throws ExtensionsInstallerException Failure occurred when installing dependencies for the extension.
-	 * @return Information about artifacts related to the installation's completion.
-	 */
-	Map<String, Object> installDependenciesFor(String extensionId) throws ExtensionsInstallerException;
+    /**
+     * Installs dependencies of the extension, that is denoted by the given id.
+     *
+     * @param extensionId Id of the extension.
+     * @return Information about artifacts related to the installation's completion.
+     * @throws ExtensionsInstallerException Failure occurred when installing dependencies for the extension.
+     */
+    Map<String, Object> installDependenciesFor(String extensionId) throws ExtensionsInstallerException;
 
-	/**
-	 * Un-installs dependencies of the extension, that is denoted by the given id.
-	 *
-	 * @param extensionId Id of the extension.
-	 * @throws ExtensionsInstallerException Failure occurred when un-installing dependencies of the extension.
-	 * @return Information about artifacts related to the un-installation's completion.
-	 */
-	Map<String, Object> unInstallDependenciesFor(String extensionId) throws ExtensionsInstallerException;
+    /**
+     * Un-installs dependencies of the extension, that is denoted by the given id.
+     *
+     * @param extensionId Id of the extension.
+     * @return Information about artifacts related to the un-installation's completion.
+     * @throws ExtensionsInstallerException Failure occurred when un-installing dependencies of the extension.
+     */
+    Map<String, Object> unInstallDependenciesFor(String extensionId) throws ExtensionsInstallerException;
 
 }

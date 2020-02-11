@@ -33,8 +33,8 @@ import org.wso2.msf4j.MicroservicesServer;
  * Startup component of Siddhi Extensions Installer.
  */
 @Component(
-        service = StartupComponent.class,
-        immediate = true
+    service = StartupComponent.class,
+    immediate = true
 )
 public class StartupComponent {
 
@@ -51,9 +51,9 @@ public class StartupComponent {
     }
 
     @Reference(service = MicroservicesServer.class,
-            cardinality = ReferenceCardinality.AT_LEAST_ONE,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unsetMicroservicesServer")
+        cardinality = ReferenceCardinality.AT_LEAST_ONE,
+        policy = ReferencePolicy.DYNAMIC,
+        unbind = "unsetMicroservicesServer")
     protected void setMicroservicesServer(MicroservicesServer microservicesServer) {
         logger.debug("Microservices server registered to startup component of server.");
     }

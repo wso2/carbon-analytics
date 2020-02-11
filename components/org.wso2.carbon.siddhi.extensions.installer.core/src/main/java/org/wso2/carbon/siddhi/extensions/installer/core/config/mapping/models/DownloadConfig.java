@@ -21,17 +21,17 @@ package org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models;
 /**
  * Contains a dependency's download configuration.
  */
-public class DependencyDownloadConfig {
+public class DownloadConfig {
 
-	private boolean autoDownloadable;
-	private String url;
+    private boolean autoDownloadable;
+    private String url;
 
-	public boolean isAutoDownloadable() {
-		return autoDownloadable;
-	}
+    public boolean isAutoDownloadable() {
+        return autoDownloadable;
+    }
 
-	public String getUrl() {
-		return url;
-	}
+    public String getUrl() {
+        return url;
+    }
 
 }

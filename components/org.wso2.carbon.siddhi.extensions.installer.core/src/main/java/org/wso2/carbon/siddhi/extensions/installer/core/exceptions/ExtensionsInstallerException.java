@@ -23,12 +23,12 @@ package org.wso2.carbon.siddhi.extensions.installer.core.exceptions;
  */
 public class ExtensionsInstallerException extends Exception {
 
-	public ExtensionsInstallerException(String message) {
-		super(message);
-	}
+    public ExtensionsInstallerException(String message) {
+        super(message);
+    }
 
-	public ExtensionsInstallerException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public ExtensionsInstallerException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
 }

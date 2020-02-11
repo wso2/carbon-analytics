@@ -39,38 +39,38 @@ import java.util.Map;
  */
 public class ConfigMapper {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigMapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigMapper.class);
 
-	private ConfigMapper() {
-		// Prevents instantiation.
-	}
+    private ConfigMapper() {
+        // Prevents instantiation.
+    }
 
-	/**
-	 * Maps the given JSON configuration of extensions and their dependencies, to Java Object.
-	 *
-	 * @param configFileLocation Location of the JSON configuration file.
-	 * @return A map that contains extension configurations,
-	 * denoted by extension ids.
-	 * @throws ExtensionsInstallerException Failed to read and map configurations.
-	 */
-	public static Map<String, ExtensionConfig> loadAllExtensionConfigs(String configFileLocation)
-			throws ExtensionsInstallerException {
-		Gson gson = new Gson();
-		Type mapType = new TypeToken<Map<String, ExtensionConfig>>() {
-		}.getType();
-		try (Reader reader = new InputStreamReader(new FileInputStream(configFileLocation), StandardCharsets.UTF_8)) {
-			return gson.fromJson(reader, mapType);
-		} catch (FileNotFoundException e) {
-			String errorMessage =
-					String.format("Configuration file not found in: %s.", configFileLocation);
-			LOGGER.error(errorMessage, e);
-			throw new ExtensionsInstallerException(errorMessage, e);
-		} catch (IOException e) {
-			String errorMessage =
-					String.format("Unable to read configuration file: %s.", configFileLocation);
-			LOGGER.error(errorMessage, e);
-			throw new ExtensionsInstallerException(errorMessage, e);
-		}
-	}
+    /**
+     * Maps the given JSON configuration of extensions and their dependencies, to Java Object.
+     *
+     * @param configFileLocation Location of the JSON configuration file.
+     * @return A map that contains extension configurations,
+     * denoted by extension ids.
+     * @throws ExtensionsInstallerException Failed to read and map configurations.
+     */
+    public static Map<String, ExtensionConfig> loadAllExtensionConfigs(String configFileLocation)
+        throws ExtensionsInstallerException {
+        Gson gson = new Gson();
+        Type mapType = new TypeToken<Map<String, ExtensionConfig>>() {
+        }.getType();
+        try (Reader reader = new InputStreamReader(new FileInputStream(configFileLocation), StandardCharsets.UTF_8)) {
+            return gson.fromJson(reader, mapType);
+        } catch (FileNotFoundException e) {
+            String errorMessage =
+                String.format("Configuration file not found in: %s.", configFileLocation);
+            LOGGER.error(errorMessage, e);
+            throw new ExtensionsInstallerException(errorMessage, e);
+        } catch (IOException e) {
+            String errorMessage =
+                String.format("Unable to read configuration file: %s.", configFileLocation);
+            LOGGER.error(errorMessage, e);
+            throw new ExtensionsInstallerException(errorMessage, e);
+        }
+    }
 
 }

@@ -25,33 +25,33 @@ import java.util.Set;
  */
 public class DependencyConfig {
 
-	private String name;
-	private String version;
-	private DependencyDownloadConfig download;
-	private String lookupRegex;
-	private Set<UsageConfig> usages;
+    private String name;
+    private String version;
+    private DownloadConfig download;
+    private String lookupRegex;
+    private Set<UsageConfig> usages;
 
-	public boolean isAutoDownloadable() {
-		if (download != null) {
-			return download.isAutoDownloadable();
-		}
-		return false;
-	}
+    public boolean isAutoDownloadable() {
+        if (download != null) {
+            return download.isAutoDownloadable();
+        }
+        return false;
+    }
 
-	public DependencyDownloadConfig getDownload() {
-		return download;
-	}
+    public DownloadConfig getDownload() {
+        return download;
+    }
 
-	public String getLookupRegex() {
-		return lookupRegex;
-	}
+    public String getLookupRegex() {
+        return lookupRegex;
+    }
 
-	public Set<UsageConfig> getUsages() {
-		return usages;
-	}
+    public Set<UsageConfig> getUsages() {
+        return usages;
+    }
 
-	public String getRepresentableName() {
-		return name + "-" + version;
-	}
+    public String getRepresentableName() {
+        return name + "-" + version;
+    }
 
 }

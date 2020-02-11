@@ -29,34 +29,34 @@ import java.util.Map;
  */
 public interface DependencyRetriever {
 
-	/**
-	 * Retrieves installation statuses of all the extensions that have been configured in the configuration file.
-	 * Possible installation statuses are
-	 * {@link ExtensionInstallationStatus}
-	 *
-	 * @throws ExtensionsInstallerException Failed to retrieve installation statuses.
-	 * @return Map containing extension information and their installation statuses.
-	 */
-	Map<String, Map<String, Object>> getAllExtensionStatuses() throws ExtensionsInstallerException;
+    /**
+     * Retrieves installation statuses of all the extensions that have been configured in the configuration file.
+     * Possible installation statuses are
+     * {@link ExtensionInstallationStatus}
+     *
+     * @return Map containing extension information and their installation statuses.
+     * @throws ExtensionsInstallerException Failed to retrieve installation statuses.
+     */
+    Map<String, Map<String, Object>> getAllExtensionStatuses() throws ExtensionsInstallerException;
 
-	/**
-	 * Retrieves installation status of the extension which has the given id.
-	 * Possible installation statuses are
-	 * {@link ExtensionInstallationStatus}
-	 *
-	 * @param extensionId Id of the extension.
-	 * @throws ExtensionsInstallerException Failed to retrieve installation status.
-	 * @return Map containing extension information and its installation status.
-	 */
-	Map<String, Object> getExtensionStatusFor(String extensionId) throws ExtensionsInstallerException;
+    /**
+     * Retrieves installation status of the extension which has the given id.
+     * Possible installation statuses are
+     * {@link ExtensionInstallationStatus}
+     *
+     * @param extensionId Id of the extension.
+     * @return Map containing extension information and its installation status.
+     * @throws ExtensionsInstallerException Failed to retrieve installation status.
+     */
+    Map<String, Object> getExtensionStatusFor(String extensionId) throws ExtensionsInstallerException;
 
-	/**
-	 * Retrieves statuses of all the dependencies, of the extension that has the given id.
-	 *
-	 * @param extensionId Id of the extension.
-	 * @throws ExtensionsInstallerException Failed to retrieve dependency statuses.
-	 * @return Statuses of dependencies.
-	 */
-	List<Map<String, Object>> getDependencyStatusesFor(String extensionId) throws ExtensionsInstallerException;
+    /**
+     * Retrieves statuses of all the dependencies, of the extension that has the given id.
+     *
+     * @param extensionId Id of the extension.
+     * @return Statuses of dependencies.
+     * @throws ExtensionsInstallerException Failed to retrieve dependency statuses.
+     */
+    List<Map<String, Object>> getDependencyStatusesFor(String extensionId) throws ExtensionsInstallerException;
 
 }

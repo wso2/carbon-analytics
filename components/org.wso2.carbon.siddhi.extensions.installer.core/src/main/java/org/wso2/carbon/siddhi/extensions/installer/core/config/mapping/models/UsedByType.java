@@ -23,7 +23,5 @@ package org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models;
  * The correct folder inside the base folder will then be decided based on the {@link UsageType}.
  */
 public enum UsedByType {
-
-	SAMPLES, RUNTIME
-
+    SAMPLES, RUNTIME
 }

@@ -24,14 +24,15 @@ import org.wso2.carbon.utils.Utils;
  * Contains constants used in Siddhi Extensions Installer.
  */
 public class ExtensionsInstallerConstants {
-	private ExtensionsInstallerConstants() {}
+    private ExtensionsInstallerConstants() {
+    }
 
-	public static final String CONFIG_FILE_LOCATION =
-			Utils.getRuntimePath().normalize().toString() + "/resources/extensionsInstaller/extensionDependencies.json";
-	private static final String CARBON_HOME = Utils.getCarbonHome().normalize().toString();
-	// TODO Finalize the following locations after a kernel bump
-	public static final String RUNTIME_JARS_LOCATION = CARBON_HOME + "/lib";
-	public static final String RUNTIME_BUNDLES_LOCATION = CARBON_HOME + "/lib";
-	public static final String SAMPLES_JARS_LOCATION = CARBON_HOME + "/samples/sample-clients/lib";
-	public static final String SAMPLES_BUNDLES_LOCATION = CARBON_HOME + "/samples/sample-clients/lib";
+    public static final String CONFIG_FILE_LOCATION =
+        Utils.getRuntimePath().normalize().toString() + "/resources/extensionsInstaller/extensionDependencies.json";
+    private static final String CARBON_HOME = Utils.getCarbonHome().normalize().toString();
+    // TODO Finalize the following locations after a kernel bump
+    public static final String RUNTIME_JARS_LOCATION = CARBON_HOME + "/lib";
+    public static final String RUNTIME_BUNDLES_LOCATION = CARBON_HOME + "/lib";
+    public static final String SAMPLES_JARS_LOCATION = CARBON_HOME + "/samples/sample-clients/lib";
+    public static final String SAMPLES_BUNDLES_LOCATION = CARBON_HOME + "/samples/sample-clients/lib";
 }

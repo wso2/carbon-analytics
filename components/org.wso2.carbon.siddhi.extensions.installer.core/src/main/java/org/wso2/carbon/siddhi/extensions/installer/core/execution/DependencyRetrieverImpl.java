@@ -38,91 +38,91 @@ import java.util.Map;
  */
 public class DependencyRetrieverImpl implements DependencyRetriever {
 
-	private final Map<String, ExtensionConfig> extensionConfigs;
+    private final Map<String, ExtensionConfig> extensionConfigs;
 
-	public DependencyRetrieverImpl(Map<String, ExtensionConfig> extensionConfigs) {
-		this.extensionConfigs = extensionConfigs;
-	}
+    public DependencyRetrieverImpl(Map<String, ExtensionConfig> extensionConfigs) {
+        this.extensionConfigs = extensionConfigs;
+    }
 
-	@Override
-	public Map<String, Map<String, Object>> getAllExtensionStatuses() throws ExtensionsInstallerException {
-		Map<String, Map<String, Object>> extensionStatuses = new HashMap<>();
-		for (Map.Entry<String, ExtensionConfig> extension : extensionConfigs.entrySet()) {
-			extensionStatuses.put(extension.getKey(), getExtensionStatus(extension.getValue()));
-		}
-		return extensionStatuses;
-	}
+    @Override
+    public Map<String, Map<String, Object>> getAllExtensionStatuses() throws ExtensionsInstallerException {
+        Map<String, Map<String, Object>> extensionStatuses = new HashMap<>();
+        for (Map.Entry<String, ExtensionConfig> extension : extensionConfigs.entrySet()) {
+            extensionStatuses.put(extension.getKey(), getExtensionStatus(extension.getValue()));
+        }
+        return extensionStatuses;
+    }
 
-	@Override
-	public Map<String, Object> getExtensionStatusFor(String extensionId) throws ExtensionsInstallerException {
-		ExtensionConfig extension = ExtensionsInstallerUtils.findExtension(extensionId, extensionConfigs);
-		return getExtensionStatus(extension);
-	}
+    @Override
+    public Map<String, Object> getExtensionStatusFor(String extensionId) throws ExtensionsInstallerException {
+        ExtensionConfig extension = ExtensionsInstallerUtils.findExtension(extensionId, extensionConfigs);
+        return getExtensionStatus(extension);
+    }
 
-	private Map<String, Object> getExtensionStatus(ExtensionConfig extension) throws ExtensionsInstallerException {
-		return ResponseEntityCreator.createExtensionStatusResponse(
-				extension, getExtensionInstallationStatus(extension), extension.getManuallyInstallableDependencies());
-	}
+    private Map<String, Object> getExtensionStatus(ExtensionConfig extension) throws ExtensionsInstallerException {
+        return ResponseEntityCreator.createExtensionStatusResponse(
+            extension, getExtensionInstallationStatus(extension), extension.getManuallyInstallableDependencies());
+    }
 
-	private ExtensionInstallationStatus getExtensionInstallationStatus(ExtensionConfig extension)
-			throws ExtensionsInstallerException {
-		List<DependencyConfig> dependencies = extension.getDependencies();
-		if (dependencies != null) {
-			int installedDependenciesCount = 0;
-			for (DependencyConfig dependency : dependencies) {
-				if (isDependencyInstalled(dependency)) {
-					installedDependenciesCount++;
-				}
-			}
-			return ExtensionsInstallerUtils
-					.getInstallationStatus(installedDependenciesCount, dependencies.size());
-		}
-		throw new ExtensionsInstallerException("No dependencies were specified.");
-	}
+    private ExtensionInstallationStatus getExtensionInstallationStatus(ExtensionConfig extension)
+        throws ExtensionsInstallerException {
+        List<DependencyConfig> dependencies = extension.getDependencies();
+        if (dependencies != null) {
+            int installedDependenciesCount = 0;
+            for (DependencyConfig dependency : dependencies) {
+                if (isDependencyInstalled(dependency)) {
+                    installedDependenciesCount++;
+                }
+            }
+            return ExtensionsInstallerUtils
+                .getInstallationStatus(installedDependenciesCount, dependencies.size());
+        }
+        throw new ExtensionsInstallerException("No dependencies were specified.");
+    }
 
-	private boolean isDependencyInstalled(DependencyConfig dependency) throws ExtensionsInstallerException {
-		String lookupRegex = dependency.getLookupRegex();
-		if (lookupRegex != null) {
-			for (UsageConfig usage : dependency.getUsages()) {
-				String usageDirectoryPath = ExtensionsInstallerUtils.getDirectoryPathFor(usage);
-				if (!doesUsageFileExist(lookupRegex, usageDirectoryPath)) {
-					return false;
-				}
-			}
-			return true;
-		} else {
-			throw new ExtensionsInstallerException("Unable to find property: 'lookupRegex'.");
-		}
-	}
+    private boolean isDependencyInstalled(DependencyConfig dependency) throws ExtensionsInstallerException {
+        String lookupRegex = dependency.getLookupRegex();
+        if (lookupRegex != null) {
+            for (UsageConfig usage : dependency.getUsages()) {
+                String usageDirectoryPath = ExtensionsInstallerUtils.getDirectoryPathFor(usage);
+                if (!doesUsageFileExist(lookupRegex, usageDirectoryPath)) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            throw new ExtensionsInstallerException("Unable to find property: 'lookupRegex'.");
+        }
+    }
 
-	private boolean doesUsageFileExist(String regexPattern, String directoryPath)
-			throws ExtensionsInstallerException {
-		try {
-			List<Path> filteredFiles = ExtensionsInstallerUtils.listMatchingFiles(regexPattern, directoryPath);
-			return !filteredFiles.isEmpty();
-		} catch (IOException e) {
-			throw new ExtensionsInstallerException(
-					String.format("Failed when matching files for regex pattern: %s in directory: %s.",
-							regexPattern, directoryPath), e);
-		}
-	}
+    private boolean doesUsageFileExist(String regexPattern, String directoryPath)
+        throws ExtensionsInstallerException {
+        try {
+            List<Path> filteredFiles = ExtensionsInstallerUtils.listMatchingFiles(regexPattern, directoryPath);
+            return !filteredFiles.isEmpty();
+        } catch (IOException e) {
+            throw new ExtensionsInstallerException(
+                String.format("Failed when matching files for regex pattern: %s in directory: %s.",
+                    regexPattern, directoryPath), e);
+        }
+    }
 
-	@Override
-	public List<Map<String, Object>> getDependencyStatusesFor(String extensionId) throws ExtensionsInstallerException {
-		ExtensionConfig extension = ExtensionsInstallerUtils.findExtension(extensionId, extensionConfigs);
+    @Override
+    public List<Map<String, Object>> getDependencyStatusesFor(String extensionId) throws ExtensionsInstallerException {
+        ExtensionConfig extension = ExtensionsInstallerUtils.findExtension(extensionId, extensionConfigs);
 
-		List<Map<String, Object>> dependencyStatuses = new ArrayList<>();
-		List<DependencyConfig> dependencies = extension.getDependencies();
-		if (dependencies != null) {
-			for (DependencyConfig dependency : dependencies) {
-				dependencyStatuses.add(
-						ResponseEntityCreator.createDependencyStatusResponse(
-								dependency, isDependencyInstalled(dependency)));
-			}
-			return dependencyStatuses;
-		}
-		throw new ExtensionsInstallerException(
-				String.format("No dependencies were specified for extension: %s.", extensionId));
-	}
+        List<Map<String, Object>> dependencyStatuses = new ArrayList<>();
+        List<DependencyConfig> dependencies = extension.getDependencies();
+        if (dependencies != null) {
+            for (DependencyConfig dependency : dependencies) {
+                dependencyStatuses.add(
+                    ResponseEntityCreator.createDependencyStatusResponse(
+                        dependency, isDependencyInstalled(dependency)));
+            }
+            return dependencyStatuses;
+        }
+        throw new ExtensionsInstallerException(
+            String.format("No dependencies were specified for extension: %s.", extensionId));
+    }
 
 }

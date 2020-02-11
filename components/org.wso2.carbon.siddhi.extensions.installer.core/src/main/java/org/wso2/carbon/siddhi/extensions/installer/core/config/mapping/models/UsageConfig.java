@@ -30,29 +30,32 @@ import java.util.Objects;
  */
 public class UsageConfig {
 
-	private UsageType type;
-	private UsedByType usedBy;
+    private UsageType type;
+    private UsedByType usedBy;
 
-	public UsageType getType() {
-		return type;
-	}
+    public UsageType getType() {
+        return type;
+    }
 
-	public UsedByType getUsedBy() {
-		return usedBy;
-	}
+    public UsedByType getUsedBy() {
+        return usedBy;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		UsageConfig that = (UsageConfig) o;
-		return type == that.type &&
-				usedBy == that.usedBy;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UsageConfig that = (UsageConfig) o;
+        return type == that.type && usedBy == that.usedBy;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(type, usedBy);
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, usedBy);
+    }
 
 }

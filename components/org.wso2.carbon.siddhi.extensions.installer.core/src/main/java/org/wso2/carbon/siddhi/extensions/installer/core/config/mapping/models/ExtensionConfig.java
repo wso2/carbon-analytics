@@ -28,23 +28,23 @@ import java.util.stream.Collectors;
  */
 public class ExtensionConfig {
 
-	private Map<String, String> extension;
-	private List<DependencyConfig> dependencies;
+    private Map<String, String> extension;
+    private List<DependencyConfig> dependencies;
 
-	public List<DependencyConfig> getManuallyInstallableDependencies() {
-		if (dependencies != null) {
-			return dependencies.stream().filter(dependency -> !dependency.isAutoDownloadable())
-					.collect(Collectors.toList());
-		}
-		return Collections.emptyList();
-	}
+    public List<DependencyConfig> getManuallyInstallableDependencies() {
+        if (dependencies != null) {
+            return dependencies.stream().filter(dependency -> !dependency.isAutoDownloadable())
+                .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
 
-	public Map<String, String> getExtensionInfo() {
-		return extension;
-	}
+    public Map<String, String> getExtensionInfo() {
+        return extension;
+    }
 
-	public List<DependencyConfig> getDependencies() {
-		return dependencies;
-	}
+    public List<DependencyConfig> getDependencies() {
+        return dependencies;
+    }
 
 }

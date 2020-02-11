@@ -25,12 +25,18 @@ import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.Us
  * The status is based on {@link UsageConfig}.
  */
 public enum ExtensionInstallationStatus {
-	/** Jars for all the extension usages are present. **/
-	INSTALLED,
+    /**
+     * Jars for all the extension usages are present.
+     **/
+    INSTALLED,
 
-	/** Jars for none of the extension usages are present. **/
-	NOT_INSTALLED,
+    /**
+     * Jars for none of the extension usages are present.
+     **/
+    NOT_INSTALLED,
 
-	/** Jars for some of the extension usages are missing. **/
-	PARTIALLY_INSTALLED,
+    /**
+     * Jars for some of the extension usages are missing.
+     **/
+    PARTIALLY_INSTALLED,
 }

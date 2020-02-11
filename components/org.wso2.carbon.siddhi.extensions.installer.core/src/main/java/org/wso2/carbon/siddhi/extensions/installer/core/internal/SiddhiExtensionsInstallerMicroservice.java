@@ -47,134 +47,134 @@ import java.util.Map;
  * Exposes Siddhi Extensions Installer as a micro-service.
  */
 @Component(
-		service = Microservice.class,
-		immediate = true
+    service = Microservice.class,
+    immediate = true
 )
 @Path("/siddhi-extensions")
 public class SiddhiExtensionsInstallerMicroservice implements Microservice {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SiddhiExtensionsInstallerMicroservice.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SiddhiExtensionsInstallerMicroservice.class);
 
-	private Map<String, ExtensionConfig> extensionConfigs;
+    private Map<String, ExtensionConfig> extensionConfigs;
 
-	public SiddhiExtensionsInstallerMicroservice() {
-		// Prevents instantiation.
-	}
+    public SiddhiExtensionsInstallerMicroservice() {
+        // Prevents instantiation.
+    }
 
-	@GET
-	@Path("/status")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllExtensionStatuses() {
-		try {
-			DependencyRetriever dependencyRetriever = new DependencyRetrieverImpl(extensionConfigs);
-			return Response
-					.status(Response.Status.OK)
-					.entity(dependencyRetriever.getAllExtensionStatuses())
-					.type(MediaType.APPLICATION_JSON)
-					.build();
-		} catch (ExtensionsInstallerException e) {
-			return Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(e.getMessage())
-					.build();
-		}
-	}
+    @GET
+    @Path("/status")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllExtensionStatuses() {
+        try {
+            DependencyRetriever dependencyRetriever = new DependencyRetrieverImpl(extensionConfigs);
+            return Response
+                .status(Response.Status.OK)
+                .entity(dependencyRetriever.getAllExtensionStatuses())
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+        } catch (ExtensionsInstallerException e) {
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+    }
 
-	@GET
-	@Path("/status/{extensionId}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getExtensionStatus(@PathParam("extensionId") String extensionId) {
-		try {
-			DependencyRetriever dependencyRetriever = new DependencyRetrieverImpl(extensionConfigs);
-			return Response
-					.status(Response.Status.OK)
-					.entity(dependencyRetriever.getExtensionStatusFor(extensionId))
-					.type(MediaType.APPLICATION_JSON)
-					.build();
-		} catch (ExtensionsInstallerException e) {
-			return Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(e.getMessage())
-					.build();
-		}
-	}
+    @GET
+    @Path("/status/{extensionId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getExtensionStatus(@PathParam("extensionId") String extensionId) {
+        try {
+            DependencyRetriever dependencyRetriever = new DependencyRetrieverImpl(extensionConfigs);
+            return Response
+                .status(Response.Status.OK)
+                .entity(dependencyRetriever.getExtensionStatusFor(extensionId))
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+        } catch (ExtensionsInstallerException e) {
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+    }
 
-	@GET
-	@Path("/status/{extensionId}/dependencies")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getDependencyStatuses(@PathParam("extensionId") String extensionId) {
-		try {
-			DependencyRetriever dependencyRetriever = new DependencyRetrieverImpl(extensionConfigs);
-			return Response
-					.status(Response.Status.OK)
-					.entity(dependencyRetriever.getDependencyStatusesFor(extensionId))
-					.type(MediaType.APPLICATION_JSON)
-					.build();
-		} catch (ExtensionsInstallerException e) {
-			return Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(e.getMessage())
-					.build();
-		}
-	}
+    @GET
+    @Path("/status/{extensionId}/dependencies")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDependencyStatuses(@PathParam("extensionId") String extensionId) {
+        try {
+            DependencyRetriever dependencyRetriever = new DependencyRetrieverImpl(extensionConfigs);
+            return Response
+                .status(Response.Status.OK)
+                .entity(dependencyRetriever.getDependencyStatusesFor(extensionId))
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+        } catch (ExtensionsInstallerException e) {
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+    }
 
-	@POST
-	@Path("/{extensionId}/install")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response installDependencies(@PathParam("extensionId") String extensionId) {
-		try {
-			DependencyInstaller dependencyInstaller = new DependencyInstallerImpl(extensionConfigs);
-			return Response
-					.status(Response.Status.OK)
-					.entity(dependencyInstaller.installDependenciesFor(extensionId))
-					.type(MediaType.APPLICATION_JSON)
-					.build();
-		} catch (ExtensionsInstallerException e) {
-			return Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(e.getMessage())
-					.build();
-		}
-	}
+    @POST
+    @Path("/{extensionId}/install")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response installDependencies(@PathParam("extensionId") String extensionId) {
+        try {
+            DependencyInstaller dependencyInstaller = new DependencyInstallerImpl(extensionConfigs);
+            return Response
+                .status(Response.Status.OK)
+                .entity(dependencyInstaller.installDependenciesFor(extensionId))
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+        } catch (ExtensionsInstallerException e) {
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+    }
 
-	@POST
-	@Path("/{extensionId}/uninstall")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response uninstallDependencies(@PathParam("extensionId") String extensionId) {
-		try {
-			DependencyInstaller dependencyInstaller = new DependencyInstallerImpl(extensionConfigs);
-			return Response
-					.status(Response.Status.OK)
-					.entity(dependencyInstaller.unInstallDependenciesFor(extensionId))
-					.type(MediaType.APPLICATION_JSON)
-					.build();
-		} catch (ExtensionsInstallerException e) {
-			return Response
-					.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(e.getMessage())
-					.build();
-		}
-	}
+    @POST
+    @Path("/{extensionId}/uninstall")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response uninstallDependencies(@PathParam("extensionId") String extensionId) {
+        try {
+            DependencyInstaller dependencyInstaller = new DependencyInstallerImpl(extensionConfigs);
+            return Response
+                .status(Response.Status.OK)
+                .entity(dependencyInstaller.unInstallDependenciesFor(extensionId))
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+        } catch (ExtensionsInstallerException e) {
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+    }
 
-	/**
-	 * This is the activation method of SiddhiExtensionsInstallerMicroservice.
-	 * This will be called when its references are satisfied.
-	 *
-	 * @param bundleContext	the bundle context instance of this bundle.
-	 * @throws Exception	Error occurred while executing the activate method.
-	 */
-	@Activate
-	protected void start(BundleContext bundleContext) throws Exception {
-		extensionConfigs = ConfigMapper.loadAllExtensionConfigs(ExtensionsInstallerConstants.CONFIG_FILE_LOCATION);
-	}
+    /**
+     * This is the activation method of SiddhiExtensionsInstallerMicroservice.
+     * This will be called when its references are satisfied.
+     *
+     * @param bundleContext the bundle context instance of this bundle.
+     * @throws Exception Error occurred while executing the activate method.
+     */
+    @Activate
+    protected void start(BundleContext bundleContext) throws Exception {
+        extensionConfigs = ConfigMapper.loadAllExtensionConfigs(ExtensionsInstallerConstants.CONFIG_FILE_LOCATION);
+    }
 
-	/**
-	 * This is the deactivation method of SiddhiExtensionsInstallerMicroservice.
-	 * This will be called when this component is being stopped or references are satisfied during runtime.
-	 *
-	 * @throws Exception	Error occurred while executing the de-activate method.
-	 */
-	@Deactivate
-	protected void stop() throws Exception {
+    /**
+     * This is the deactivation method of SiddhiExtensionsInstallerMicroservice.
+     * This will be called when this component is being stopped or references are satisfied during runtime.
+     *
+     * @throws Exception Error occurred while executing the de-activate method.
+     */
+    @Deactivate
+    protected void stop() throws Exception {
 
-	}
+    }
 }

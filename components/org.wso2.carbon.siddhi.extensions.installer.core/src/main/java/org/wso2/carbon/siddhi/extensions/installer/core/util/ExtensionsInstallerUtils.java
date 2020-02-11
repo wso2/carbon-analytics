@@ -52,27 +52,27 @@ public class ExtensionsInstallerUtils {
     /**
      * Returns the extension which has the given id, from the given map of extension configurations.
      *
-     * @param extensionId					Id of the extension.
-     * @param extensionConfigs				Configurations of all available extensions.
-     * @return								Configuration of the found extension.
-     * @throws ExtensionsInstallerException	No such extension was found.
+     * @param extensionId      Id of the extension.
+     * @param extensionConfigs Configurations of all available extensions.
+     * @return Configuration of the found extension.
+     * @throws ExtensionsInstallerException No such extension was found.
      */
     public static ExtensionConfig findExtension(String extensionId, Map<String, ExtensionConfig> extensionConfigs)
-            throws ExtensionsInstallerException {
+        throws ExtensionsInstallerException {
         ExtensionConfig extensionConfig = extensionConfigs.get(extensionId);
         if (extensionConfig != null) {
             return extensionConfig;
         }
         throw new ExtensionsInstallerException(
-                String.format("Configuration for extension: %s was not found.", extensionId));
+            String.format("Configuration for extension: %s was not found.", extensionId));
     }
 
     /**
      * Returns the installation status of an extension, based on the given counts of its installed dependencies.
      *
-     * @param installedDependenciesCount	Actual count of successfully installed dependencies.
-     * @param expectedDependenciesCount		Expected count of successfully installed dependencies.
-     * @return								Installation status of the extension.
+     * @param installedDependenciesCount Actual count of successfully installed dependencies.
+     * @param expectedDependenciesCount  Expected count of successfully installed dependencies.
+     * @return Installation status of the extension.
      */
     public static ExtensionInstallationStatus getInstallationStatus(int installedDependenciesCount,
                                                                     int expectedDependenciesCount) {
@@ -88,9 +88,9 @@ public class ExtensionsInstallerUtils {
     /**
      * Returns the un-installation status of an extension, based on the given counts of its un-installed dependencies.
      *
-     * @param uninstalledDependenciesCount	Actual count of successfully un-installed dependencies.
-     * @param expectedDependenciesCount		Expected count of successfully un-installed dependencies.
-     * @return								Un-installation status of the extension.
+     * @param uninstalledDependenciesCount Actual count of successfully un-installed dependencies.
+     * @param expectedDependenciesCount    Expected count of successfully un-installed dependencies.
+     * @return Un-installation status of the extension.
      */
     public static ExtensionUnInstallationStatus getUnInstallationStatus(int uninstalledDependenciesCount,
                                                                         int expectedDependenciesCount) {
@@ -106,10 +106,10 @@ public class ExtensionsInstallerUtils {
     /**
      * Returns files of which, name matches the given regex pattern, from the given directory path.
      *
-     * @param regexPattern	Regex pattern for file name.
-     * @param directoryPath	Path of the directory.
-     * @return				List of matching files.
-     * @throws IOException	Failure occurred while walking the file tree.
+     * @param regexPattern  Regex pattern for file name.
+     * @param directoryPath Path of the directory.
+     * @return List of matching files.
+     * @throws IOException Failure occurred while walking the file tree.
      */
     public static List<Path> listMatchingFiles(String regexPattern, String directoryPath) throws IOException {
         final String PATH_MATCHER_SYNTAX = "regex:";
@@ -138,12 +138,11 @@ public class ExtensionsInstallerUtils {
     /**
      * Returns the directory path where the jar should be put to, for the given usage of a dependency.
      *
-     * @param usage							Configuration of a dependency's usage.
-     * @return								Directory path of the given usage.
-     * @throws ExtensionsInstallerException	Invalid usage type and/or used by type.
+     * @param usage Configuration of a dependency's usage.
+     * @return Directory path of the given usage.
+     * @throws ExtensionsInstallerException Invalid usage type and/or used by type.
      */
-    public static String getDirectoryPathFor(UsageConfig usage)
-            throws ExtensionsInstallerException {
+    public static String getDirectoryPathFor(UsageConfig usage) throws ExtensionsInstallerException {
         UsageType usageType = usage.getType();
         UsedByType usedBy = usage.getUsedBy();
         if (usageType != null && usedBy != null) {
@@ -154,7 +153,7 @@ public class ExtensionsInstallerUtils {
                     return ExtensionsInstallerConstants.RUNTIME_BUNDLES_LOCATION;
                 }
                 throw new ExtensionsInstallerException(
-                        String.format("Invalid value: %s for usage type.", usageType));
+                    String.format("Invalid value: %s for usage type.", usageType));
             } else if (usedBy == UsedByType.SAMPLES) {
                 if (usageType == UsageType.JAR) {
                     return ExtensionsInstallerConstants.SAMPLES_JARS_LOCATION;
@@ -162,7 +161,7 @@ public class ExtensionsInstallerUtils {
                     return ExtensionsInstallerConstants.SAMPLES_BUNDLES_LOCATION;
                 }
                 throw new ExtensionsInstallerException(
-                        String.format("Invalid value: %s for dependency type.", usageType));
+                    String.format("Invalid value: %s for dependency type.", usageType));
             }
         }
         throw new ExtensionsInstallerException(String.format("Invalid value: %s for 'usedBy' property.", usage));

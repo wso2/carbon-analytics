@@ -25,7 +25,5 @@ package org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models;
  * Necessary jar to bundle conversion will be done during pack start-up.
  */
 public enum UsageType {
-
-	JAR, BUNDLE
-
+    JAR, BUNDLE
 }

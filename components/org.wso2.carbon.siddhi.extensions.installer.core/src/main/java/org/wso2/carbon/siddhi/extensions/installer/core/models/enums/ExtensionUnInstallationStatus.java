@@ -22,7 +22,7 @@ package org.wso2.carbon.siddhi.extensions.installer.core.models.enums;
  * Denotes the status of an extension's un-installation.
  */
 public enum ExtensionUnInstallationStatus {
-	UNINSTALLED,
-	NOT_UNINSTALLED,
-	PARTIALLY_UNINSTALLED,
+    UNINSTALLED,
+    NOT_UNINSTALLED,
+    PARTIALLY_UNINSTALLED,
 }
