@@ -37,6 +37,8 @@ public class AuthRESTAPIConstants {
     public static final String LOGOUT_CONTEXT = "/logout";
     public static final String LOGOUT_SSO_CONTEXT = "/slo";
 
+    public static final String X_WSO2_TENANT_HEADER =  "X-WSO2-Tenant";
+
     public static final int REFRESH_TOKEN_VALIDITY_PERIOD = 604800;
 
     private AuthRESTAPIConstants() {
