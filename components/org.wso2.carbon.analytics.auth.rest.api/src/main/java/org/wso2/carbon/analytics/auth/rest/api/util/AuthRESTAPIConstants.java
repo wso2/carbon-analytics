@@ -27,6 +27,7 @@ public class AuthRESTAPIConstants {
     public static final String WSO2_SP_ID_TOKEN = "FID";
     public static final String WSO2_SP_USER_DTO = "USER_DTO";
     public static final String ID_TOKEN_HEADER = "Fid";
+    public static final String DOMAIN_HEADER =  "X-WSO2-Tenant";
 
     public static final String HTTP_ONLY_COOKIE = "HttpOnly";
     public static final String SECURE_COOKIE = "Secure";
