@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.auth.rest.api.LoginApiService;
 import org.wso2.carbon.analytics.auth.rest.api.NotFoundException;
-import org.wso2.carbon.analytics.auth.rest.api.StringUtil;
 import org.wso2.carbon.analytics.auth.rest.api.dto.ErrorDTO;
 import org.wso2.carbon.analytics.auth.rest.api.dto.RedirectionDTO;
 import org.wso2.carbon.analytics.auth.rest.api.dto.UserDTO;
@@ -44,7 +43,6 @@ import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClient;
 import org.wso2.carbon.analytics.idp.client.external.ExternalIdPClientConstants;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.streaming.integrator.common.utils.SPConstants;
-import org.wso2.carbon.utils.StringUtils;
 import org.wso2.msf4j.Request;
 
 import java.net.URI;
