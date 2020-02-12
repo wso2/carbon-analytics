@@ -285,7 +285,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             try {
                 ExternalIdPClient oAuth2IdPClient = (ExternalIdPClient) idPClient;
                 Map<String, String> authCodeloginResponse;
-                if (request.getHeader(IdPClientConstants.DOMAIN) != null) {
+                if (request.getHeader("X-WSO2-Tenant") != null) {
                     Map<String, String> properties = new HashMap<>();
                     properties.put(IdPClientConstants.DOMAIN, AuthUtil.getDomainFromHeader(request));
                     authCodeloginResponse = oAuth2IdPClient.authCodeLogin(appName, requestCode, properties);
