@@ -1571,7 +1571,7 @@
         <siddhi.version>5.1.12</siddhi.version>
         <siddhi.bundle.version>5.1.12</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.1.42</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.1.44</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[3.0.0, 4.0.0)</carbon.analytics.version.range>
         <com.spotify.docker.client.version>8.16.0</com.spotify.docker.client.version>
@@ -1625,7 +1625,7 @@
         <mavan.findbugsplugin.exclude.file>findbugs-exclude.xml</mavan.findbugsplugin.exclude.file>
 
         <!--Dashboard-->
-        <carbon.uiserver.version>1.0.4</carbon.uiserver.version>
+        <carbon.uiserver.version>1.0.5</carbon.uiserver.version>
         <carbon.uiserver.version.range>[0.19.3, 2.0.0)</carbon.uiserver.version.range>
 
         <!-- Maven plugins -->
@@ -1659,7 +1659,7 @@
         <!-- Dependencies -->
         <carbon.kernel.version>5.2.12</carbon.kernel.version>
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
-        <carbon.kernel.pax.version>5.2.8</carbon.kernel.pax.version>
+        <carbon.kernel.pax.version>5.2.12</carbon.kernel.pax.version>
 
         <netty.version>4.1.19.Final</netty.version>
         <org.wso2.transport.http.netty.version>6.0.289</org.wso2.transport.http.netty.version>
@@ -1683,7 +1683,7 @@
         <carbon.securevault.version>5.0.13</carbon.securevault.version>
 
         <!-- Clustering Dependencies -->
-        <carbon.coordination.version>2.1.6</carbon.coordination.version>
+        <carbon.coordination.version>2.1.7</carbon.coordination.version>
 
         <slf4j.version>1.7.12</slf4j.version>
         <slf4j.logging.package.import.version.range>[1.7.1, 2.0.0)
