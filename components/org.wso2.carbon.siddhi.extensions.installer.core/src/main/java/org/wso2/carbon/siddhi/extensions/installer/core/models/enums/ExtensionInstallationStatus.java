@@ -22,6 +22,7 @@ import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.Us
 
 /**
  * Denotes the status of an extension's installation.
+ * This is used when retrieving an extension's status, as well as after installing an extension.
  * The status is based on {@link UsageConfig}.
  */
 public enum ExtensionInstallationStatus {

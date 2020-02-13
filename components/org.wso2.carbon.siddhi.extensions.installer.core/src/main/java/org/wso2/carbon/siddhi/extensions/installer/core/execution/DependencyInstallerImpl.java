@@ -22,10 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.DependencyConfig;
-import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.DownloadConfig;
-import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.ExtensionConfig;
-import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.UsageConfig;
+import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.*;
 import org.wso2.carbon.siddhi.extensions.installer.core.exceptions.ExtensionsInstallerException;
 import org.wso2.carbon.siddhi.extensions.installer.core.models.enums.ExtensionInstallationStatus;
 import org.wso2.carbon.siddhi.extensions.installer.core.models.enums.ExtensionUnInstallationStatus;
@@ -116,7 +113,7 @@ public class DependencyInstallerImpl implements DependencyInstaller {
         if (usages != null) {
             List<File> fileDestinations = new ArrayList<>(usages.size());
             for (UsageConfig usage : usages) {
-                fileDestinations.add(new File(ExtensionsInstallerUtils.getDirectoryPathFor(usage), fileName));
+                fileDestinations.add(new File(ExtensionsInstallerUtils.getInstallationLocation(usage), fileName));
             }
             return fileDestinations;
         }
@@ -219,24 +216,16 @@ public class DependencyInstallerImpl implements DependencyInstaller {
         if (lookupRegex != null) {
             boolean hasFailures = false;
             for (UsageConfig usage : dependency.getUsages()) {
-                String usageDirectoryPath = ExtensionsInstallerUtils.getDirectoryPathFor(usage);
-                try {
-					/*
-					Ideally there will be just one usage file,
-					unless a jar with a different version (but with the same name) is manually placed in the directory.
-					*/
-                    List<Path> usageFiles =
-                        ExtensionsInstallerUtils.listMatchingFiles(lookupRegex, usageDirectoryPath);
-                    if (!usageFiles.isEmpty()) {
-                        boolean isCompletelyDeleted = deleteUsageFiles(usageFiles);
-                        if (!isCompletelyDeleted) {
-                            hasFailures = true;
-                        }
-                    }
-                } catch (IOException e) {
-                    hasFailures = true;
-                    LOGGER.error(String.format(
-                        "Failed to list matching files for lookup regex: %s.", dependency.getLookupRegex()));
+                // Delete jar(s) for the usage from the final directory.
+                boolean deletedInFinalDirectory =
+                    deleteMatchingJars(lookupRegex, ExtensionsInstallerUtils.getBundleLocation(usage));
+                hasFailures = !deletedInFinalDirectory;
+
+                // Only for non-bundle usages, delete jar(s) from the initial directory as well.
+                if (usage.getType() == UsageType.JAR) {
+                    boolean deletedInInitialDirectory =
+                        deleteMatchingJars(lookupRegex, ExtensionsInstallerUtils.getInstallationLocation(usage));
+                    hasFailures = hasFailures || !deletedInInitialDirectory;
                 }
             }
             return !hasFailures;
@@ -245,18 +234,35 @@ public class DependencyInstallerImpl implements DependencyInstaller {
         }
     }
 
-    private boolean deleteUsageFiles(List<Path> usageFiles) {
+    private boolean deleteMatchingJars(String lookupRegex, String directoryPath) {
+        boolean allJarsDeleted = false;
+        try {
+            /*
+			Ideally there will be just one matching jar,
+			unless a jar with a different version (but with the same name) is manually placed in the directory.
+			*/
+            List<Path> versionedJarFiles = ExtensionsInstallerUtils.listMatchingFiles(lookupRegex, directoryPath);
+            if (!versionedJarFiles.isEmpty()) {
+                allJarsDeleted = deleteJarFiles(versionedJarFiles);
+            }
+        } catch (IOException e) {
+            LOGGER.error(String.format("Failed to list matching files for lookup regex: %s.", lookupRegex));
+        }
+        return allJarsDeleted;
+    }
+
+    private boolean deleteJarFiles(List<Path> jarFiles) {
         boolean hasFailures = false;
-        for (Path file : usageFiles) {
+        for (Path jarFile : jarFiles) {
             try {
-                Files.delete(file);
+                Files.deleteIfExists(jarFile);
             } catch (IOException e) {
 				/*
 				Where multiple files are present, deletion status will be failure even if there is a single failure.
 				Remaining files are attempted to be deleted, without stopping after the very first failure.
 				 */
                 hasFailures = true;
-                LOGGER.error(String.format("Failed to delete the file: %s.", file.getFileName()), e);
+                LOGGER.error(String.format("Failed to delete the file: %s.", jarFile.getFileName()), e);
             }
         }
         return !hasFailures;

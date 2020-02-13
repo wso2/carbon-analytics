@@ -32,9 +32,9 @@ public class ExtensionsInstallerConstants {
         Utils.getRuntimePath().normalize().toString() + "/resources/extensionsInstaller/extensionDependencies.json";
     private static final String CARBON_HOME = Utils.getCarbonHome().normalize().toString();
     // TODO Finalize the following locations after a kernel bump
-    public static final String RUNTIME_JARS_LOCATION = CARBON_HOME + "/lib";
-    public static final String RUNTIME_BUNDLES_LOCATION = CARBON_HOME + "/lib";
-    public static final String SAMPLES_JARS_LOCATION = CARBON_HOME + "/samples/sample-clients/lib";
-    public static final String SAMPLES_BUNDLES_LOCATION = CARBON_HOME + "/samples/sample-clients/lib";
+    public static final String RUNTIME_JARS_LOCATION = CARBON_HOME + "/jars";
+    public static final String RUNTIME_LIB_LOCATION = CARBON_HOME + "/lib";
+    public static final String SAMPLES_JARS_LOCATION = CARBON_HOME + "/samples/sample-clients/jars";
+    public static final String SAMPLES_LIB_LOCATION = CARBON_HOME + "/samples/sample-clients/lib";
 
 }

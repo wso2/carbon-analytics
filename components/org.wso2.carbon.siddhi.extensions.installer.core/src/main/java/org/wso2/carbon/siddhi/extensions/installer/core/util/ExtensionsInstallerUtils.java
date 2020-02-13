@@ -137,13 +137,15 @@ public class ExtensionsInstallerUtils {
     }
 
     /**
-     * Returns the directory path where the jar should be put to, for the given usage of a dependency.
+     * Returns the directory path, where the jar for the given usage is initially put during an installation.
+     * Only for bundles, this location will be same as the location retrieved through
+     * {@link #getBundleLocation(UsageConfig)}.
      *
      * @param usage Configuration of a dependency's usage.
-     * @return Directory path of the given usage.
+     * @return Directory path for installation.
      * @throws ExtensionsInstallerException Invalid usage type and/or used by type.
      */
-    public static String getDirectoryPathFor(UsageConfig usage) throws ExtensionsInstallerException {
+    public static String getInstallationLocation(UsageConfig usage) throws ExtensionsInstallerException {
         UsageType usageType = usage.getType();
         UsedByType usedBy = usage.getUsedBy();
         if (usageType != null && usedBy != null) {
@@ -151,7 +153,7 @@ public class ExtensionsInstallerUtils {
                 if (usageType == UsageType.JAR) {
                     return ExtensionsInstallerConstants.RUNTIME_JARS_LOCATION;
                 } else if (usageType == UsageType.BUNDLE) {
-                    return ExtensionsInstallerConstants.RUNTIME_BUNDLES_LOCATION;
+                    return ExtensionsInstallerConstants.RUNTIME_LIB_LOCATION;
                 }
                 throw new ExtensionsInstallerException(
                     String.format("Invalid value: %s for usage type.", usageType));
@@ -159,10 +161,29 @@ public class ExtensionsInstallerUtils {
                 if (usageType == UsageType.JAR) {
                     return ExtensionsInstallerConstants.SAMPLES_JARS_LOCATION;
                 } else if (usageType == UsageType.BUNDLE) {
-                    return ExtensionsInstallerConstants.SAMPLES_BUNDLES_LOCATION;
+                    return ExtensionsInstallerConstants.SAMPLES_LIB_LOCATION;
                 }
                 throw new ExtensionsInstallerException(
                     String.format("Invalid value: %s for dependency type.", usageType));
+            }
+        }
+        throw new ExtensionsInstallerException(String.format("Invalid value: %s for 'usedBy' property.", usage));
+    }
+
+    /**
+     * Returns the directory path, where the bundled jar for the given usage is finally available.
+     *
+     * @param usage Configuration of a dependency's usage.
+     * @return Directory path of the bundled jar.
+     * @throws ExtensionsInstallerException Invalid used by type.
+     */
+    public static String getBundleLocation(UsageConfig usage) throws ExtensionsInstallerException {
+        UsedByType usedBy = usage.getUsedBy();
+        if (usedBy != null) {
+            if (usedBy == UsedByType.RUNTIME) {
+                return ExtensionsInstallerConstants.RUNTIME_LIB_LOCATION;
+            } else if (usedBy == UsedByType.SAMPLES) {
+                return ExtensionsInstallerConstants.SAMPLES_LIB_LOCATION;
             }
         }
         throw new ExtensionsInstallerException(String.format("Invalid value: %s for 'usedBy' property.", usage));

@@ -25,7 +25,7 @@ import java.util.Objects;
  * A 'usage' refers to an instance of the jar file, in a particular directory.
  * The directory path of the usage is decided based on the {@link UsedByType} and the {@link UsageType}, by the method:
  * {@link
- * org.wso2.carbon.siddhi.extensions.installer.core.util.ExtensionsInstallerUtils#getDirectoryPathFor(UsageConfig)}.
+ * org.wso2.carbon.siddhi.extensions.installer.core.util.ExtensionsInstallerUtils#getInstallationLocation(UsageConfig)}.
  * An extension's dependency can have one or many usages.
  */
 public class UsageConfig {

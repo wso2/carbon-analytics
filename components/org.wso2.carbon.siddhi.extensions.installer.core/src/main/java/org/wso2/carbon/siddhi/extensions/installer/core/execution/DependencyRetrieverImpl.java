@@ -84,7 +84,7 @@ public class DependencyRetrieverImpl implements DependencyRetriever {
         String lookupRegex = dependency.getLookupRegex();
         if (lookupRegex != null) {
             for (UsageConfig usage : dependency.getUsages()) {
-                String usageDirectoryPath = ExtensionsInstallerUtils.getDirectoryPathFor(usage);
+                String usageDirectoryPath = ExtensionsInstallerUtils.getBundleLocation(usage);
                 if (!doesUsageFileExist(lookupRegex, usageDirectoryPath)) {
                     return false;
                 }
