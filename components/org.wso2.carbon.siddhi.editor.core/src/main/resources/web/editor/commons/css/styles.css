@@ -1838,3 +1838,13 @@ div.consoleIcon {
 .jstree-deletebtn:hover {
     color: white;
 }
+
+.extension-not-install {
+    color: wheat;
+    font-weight: bold;
+}
+
+.partial-extension-install-btn,
+.extension-install-btn {
+    color: whitesmoke;
+}

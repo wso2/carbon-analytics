@@ -1,14 +1,13 @@
 /**
  * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
-define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 'app/source-editor/completion-engine'],
-    function ($, _, log,Remarkable, Handlebars, DesignViewUtils, CompletionEngine) {
+define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils', 'constants', 'app/source-editor/completion-engine'],
+    function ($, _, log, Remarkable, Handlebars, DesignViewUtils, Constants, CompletionEngine) {
         /**
          * Load operators from the Completion engine.
          *
          * @param callback Callback function
          */
-
         var constants = {
             STORE: 'store',
             SINK: 'sink',
@@ -251,6 +250,7 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
             }
         };
 
+        var self;
         /**
          * Initializes the module.
          *
@@ -258,6 +258,7 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
          * @constructor
          */
         var OperatorFinder = function (options) {
+            self = this;
             this._options = options;
             this._application = options.application;
             this._activateBtn = $(options.activateBtn);
@@ -273,6 +274,9 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
                 searchResults: Handlebars.compile($('#operators-search-results-template').html()),
                 moreDetails: Handlebars.compile($('#operator-details-template').html())
             };
+            this._notInstalledExtensionArray = getNotInstalledExtensionDetails();
+            this._installedExtensionArray = getInstalledExtensionDetails();
+            this._partiallyInstalledExtensionArray = getPartiallyInstalledExtensionDetails();
         };
 
         /**
@@ -305,8 +309,108 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
         };
 
         /**
+         * functions to get the not installed extension array details.
+         */
+        var getNotInstalledExtensionDetails = function () {
+            var notInstalledExtension = [];
+            self._application.utils.extensionData.forEach(function (extension) {
+                if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED) {
+                    notInstalledExtension.push(extension);
+                }
+            });
+            return notInstalledExtension;
+        };
+        /**
+         *get the partial install extension details.
+         * @returns {[array]}
+         */
+        var getPartiallyInstalledExtensionDetails = function () {
+            var partiallyInstalledExtension = [];
+            self._application.utils.extensionData.forEach(function (extension) {
+                if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_PARTIALLY_INSTALLED) {
+                    partiallyInstalledExtension.push(extension);
+                }
+            });
+            return partiallyInstalledExtension;
+        };
+        /**
+         *get the Installed extension details
+         * @returns {*}
+         */
+        var getInstalledExtensionDetails = function () {
+            var installedExtension = [];
+            self._application.utils.extensionData.forEach(function (extension) {
+                if (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_INSTALLED) {
+                    installedExtension.push(extension);
+                }
+            });
+            return installedExtension;
+        };
+
+        /**
+         * get the partial intall extension object.
+         * @param operatorExtension
+         * @returns {Array}
+         */
+        var getPartiallyInstalledExtensionObject = function (operatorExtension) {
+            for (var extension of self._partiallyInstalledExtensionArray) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return extension;}
+            }
+        };
+        /**
+         * get the installed extension object
+         * @param operatorExtension
+         */
+        var getInstalledExtensionObject = function (operatorExtension) {
+            for (var extension of self._installedExtensionArray) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return extension;}
+            }
+        };
+        /**
+         * get the not-installed extension object based on extension name.
+         * @param operatorExtensionName
+         * @returns {extension Object}
+         */
+        var getNotInstalledExtensionObject = function (operatorExtension) {
+            for (var extension of self._notInstalledExtensionArray) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return extension;}
+            }
+        };
+        /**
+         * check the whether operator extension is installed or not.
+         * @param operatorExtensionName
+         * return true/false.
+         */
+        var isNotInstalledExtension = function (operatorExtension) {
+            for (var extension of self._notInstalledExtensionArray) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return true;}
+            }
+        };
+
+        /**
+         * check the whether operator extension is partially installed or not.
+         * @param operatorExtension
+         * @returns {boolean}
+         */
+        var isPartialInstalledExtension = function (operatorExtension) {
+            for (var extension of self._partiallyInstalledExtensionArray) {
+                if ( ( (operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return true;}
+            }
+        };
+        /**
+         * check the whether operator extension  installed or not.
+         * @param operatorExtension
+         * @returns {boolean}
+         */
+        var isInstalledExtension = function (operatorExtension) {
+            var installedExtensionArray = getInstalledExtensionDetails();
+            for (var extension of installedExtensionArray) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return true;}
+            }
+        };
+
+        /**
          * Searches operators using the given query.
-         *
          * @param query String query
          * @returns {{results: Array, hasResults: boolean, hasQuery: boolean, namespaces: *}} Search results
          */
@@ -320,27 +424,91 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
                 });
             }
             var keyResult = [], descriptionResult = [], combineResults;
-            this._operators.forEach(function (e, i) {
+            this._operators.forEach(function (operatorExtension, i) {
                 var result = {
-                    fqn: hasToken(e.fqn, tokens),
-                    description: hasToken(e.description, tokens)
+                    fqn: hasToken(operatorExtension.fqn, tokens),
+                    description: hasToken(operatorExtension.description, tokens)
                 };
                 if (result.fqn.status) {
-                    keyResult.push({
-                        fqn: e.fqn,
-                        htmlFqn: result.fqn.text,
-                        type: e.type,
-                        description: result.description.text,
-                        index: i
-                    });
+                    if (isNotInstalledExtension(operatorExtension)) {
+                        keyResult.push({
+                            extension: getNotInstalledExtensionObject(operatorExtension),
+                            notInstall: Constants.EXTENSION_NOT_INSTALLED,
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    } else if (isPartialInstalledExtension(operatorExtension)) {
+                        keyResult.push({
+                            extension: getPartiallyInstalledExtensionObject(operatorExtension),
+                            partialInstall: Constants.EXTENSION_PARTIALLY_INSTALLED,
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    } else if (isInstalledExtension(operatorExtension)) {
+                        keyResult.push({
+                            extension: getInstalledExtensionObject(operatorExtension),
+                            install: Constants.EXTENSION_INSTALLED,
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    }else {
+                        keyResult.push({
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    }
                 } else if (result.description.status) {
-                    descriptionResult.push({
-                        fqn: e.fqn,
-                        htmlFqn: result.fqn.text,
-                        type: e.type,
-                        description: result.description.text,
-                        index: i
-                    });
+                    if (isNotInstalledExtension(operatorExtension)) {
+                        descriptionResult.push({
+                            extension: getNotInstalledExtensionObject(operatorExtension),
+                            notInstall: Constants.EXTENSION_NOT_INSTALLED,
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    } else if (isPartialInstalledExtension(operatorExtension)) {
+                        descriptionResult.push({
+                            extension: getPartiallyInstalledExtensionObject(operatorExtension),
+                            partialInstall: Constants.EXTENSION_PARTIALLY_INSTALLED,
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    } else if (isInstalledExtension(operatorExtension)) {
+                        descriptionResult.push({
+                            extension: getInstalledExtensionObject(operatorExtension),
+                            install: Constants.EXTENSION_INSTALLED,
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    }else {
+                        descriptionResult.push({
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    }
                 }
             });
             combineResults = keyResult.concat(descriptionResult);
@@ -461,6 +629,68 @@ define(['jquery', 'lodash', 'log','remarkable', 'handlebar', 'designViewUtils', 
                 $('#operator-search-input-field').val(query);
                 self.renderSearchResults(query);
             });
+
+            //Event handler for extension installation modal open.
+            resultContent.on('click', 'a.extension-install-btn', function (e) {
+                var innerSelf = this;
+                    e.preventDefault();
+                var callbackUpdater = function (updatedExtension, isUpdated) {
+                    if (isUpdated) {
+                        self._application.utils.extensionData.set(updatedExtension.extensionInfo.name, updatedExtension);
+                        self.renderSearchResults($(innerSelf).data('extension-name'));
+                    }
+                };
+                var extensionObject = getNotInstalledExtensionObject({name: $(this).data('extension-name')});
+                self._application.utils.extensionUpdateThroughFile(extensionObject, callbackUpdater);
+                }
+            );
+
+            //Event handler for partially extension installation modal open.
+            resultContent.on('click', 'a.partial-extension-install-btn', function (e) {
+                    e.preventDefault();
+                var extensionName = {name: $(this).data('extension-names')};
+                var extension = getPartiallyInstalledExtensionObject(extensionName);
+                self._partialModel = $(
+                    '<div class="modal fade" id="' + extension.extensionInfo.name + '">' +
+                    '<div class="modal-dialog">' +
+                    '<div class="modal-content">' +
+                    '<div class="modal-header">' +
+                    "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+                    "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
+                    "</button>" +
+                    '<h2 class="modal-title file-dialog-title" id="partialExtenName">'
+                    + extension.extensionInfo.name +
+                    '</h2>' +
+                    '<hr class="style1">' +
+                    '</div>' +
+                    '<div id="modalBodyId" class="modal-body">' +
+                    '</div>' +
+                    '<div class="modal-footer">' +
+                    '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>');
+
+                var modalBody = self._partialModel.find("div").filter("#modalBodyId");
+
+                if (extension.manuallyInstall) {
+                    extension.manuallyInstall.forEach(function (dependency) {
+                        modalBody.append($('<h3>' + dependency.name + ' </h3>' +
+                            '<h4>Description</h4>' +
+                            '<div id="partialExtenDescription" style = "text-align:justify">'
+                            + dependency.download.info.description +
+                            '</div>' +
+                            '<h4>Install</h4>' +
+                            '<div id="partialExtenInstall" style = "text-align:justify" >'
+                            + dependency.download.info.install +
+                            '</div>'));
+                    });
+                }
+                self._partialModel.modal('show');
+
+                }
+            );
 
             resultContent.on('click', 'a.more-info', function (e) {
                 e.preventDefault();

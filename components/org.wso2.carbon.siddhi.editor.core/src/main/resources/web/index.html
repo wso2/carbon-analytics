@@ -2362,6 +2362,35 @@
         <p class="description">{{{description}}}</p>
         <div class="icon-bar">
             <a href="#" class="expand-description">More...</a>
+            &nbsp;&nbsp;
+            {{#if install}}
+            <span id="InstallBtnId">
+            <span class="extension-not-install"> {{install}}</span>
+                 </span>
+            {{/if}}
+            {{#if notInstall}}
+            <span id="notInstallBtnId">
+            <span class="extension-not-install"> {{notInstall}}</span>
+            &nbsp;&nbsp;
+               <a href="#" data-extension-name="{{extension.extensionInfo.name}}"
+                  title="Click here to Install"
+                  class="extension-install-btn">
+                <i class="fw fw-download"></i>
+            </a>
+                 </span>
+            {{/if}}
+
+            {{#if partialInstall}}
+            <span id="partialBtnId">
+             <span class="extension-not-install"> {{partialInstall}}</span>
+            &nbsp;&nbsp;
+            <a href="#" data-extension-names ="{{extension.extensionInfo.name}}"
+               title="Cant Install directly Click here to get Details"
+               class="partial-extension-install-btn">
+                <i class="fw fw-warning"></i>
+            </a>
+                 <span>
+ {{/if}}
             <ul>
                 <li>
                     <span class="copy-status-msg" style="display: none">Copied to Clipboard!</span>

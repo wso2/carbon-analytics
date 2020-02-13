@@ -621,6 +621,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._openSampleFileDialog.show();
             };
 
+            this.openExtensionInstallDialog = function openExtensionInstallDialog() {
+                if(_.isNil(this._ExtensionInstallDialog)){
+                    this._ExtensionInstallDialog = new Dialogs.ExtensionInstallDialog(app);
+                }
+                this._ExtensionInstallDialog.render();
+                this._ExtensionInstallDialog.show();
+            };
+
             this.openQueryStore = function openQueryStore(options){
                 if(_.isNil(this._queryStoreApi)){
                     var opts = _.cloneDeep(_.get(app.config, 'query_store_api'));
@@ -771,6 +779,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             // Open Sample file open dialog
             app.commandManager.registerHandler('open-sample-file-open-dialog', this.openSampleFileOpenDialog, this);
             app.commandManager.registerHandler('query-store', this.openQueryStore, this);
+
+            //Open Extension install dialog
+            app.commandManager.registerHandler('extension-install-dialog', this.openExtensionInstallDialog , this);
 
             //Run hint tour
             app.commandManager.registerHandler('tour-guide', this.runGuide, this);
