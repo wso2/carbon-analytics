@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
 /**
- * Partition With Types
+ * Partition With Types.
  */
 public enum PartitionWithTypes {
     VALUE,

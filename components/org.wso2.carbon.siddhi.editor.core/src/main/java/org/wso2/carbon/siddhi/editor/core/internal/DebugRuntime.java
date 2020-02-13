@@ -18,13 +18,15 @@
 
 package org.wso2.carbon.siddhi.editor.core.internal;
 
-import org.wso2.carbon.siddhi.editor.core.exception.InvalidExecutionStateException;
-import org.wso2.carbon.siddhi.editor.core.exception.NoSuchStreamException;
-import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.debugger.SiddhiDebugger;
 import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.query.api.definition.Attribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.wso2.carbon.siddhi.editor.core.exception.InvalidExecutionStateException;
+import org.wso2.carbon.siddhi.editor.core.exception.NoSuchStreamException;
+import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 
 import java.util.ArrayList;
@@ -33,13 +35,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * Class for debugger runtime implementation.
+ */
 public class DebugRuntime {
+
     private String siddhiAppName;
     private Mode mode = Mode.STOP;
     private transient String siddhiApp;
     private transient SiddhiAppRuntime siddhiAppRuntime;
     private transient SiddhiDebugger debugger;
     private transient LinkedBlockingQueue<DebugCallbackEvent> callbackEventsQueue;
+    private Throwable caughtException;
+    private static final Logger log = LoggerFactory.getLogger(DebugRuntime.class);
 
     public DebugRuntime(String siddhiAppName, String siddhiApp) {
         this.siddhiAppName = siddhiAppName;
@@ -56,25 +64,28 @@ public class DebugRuntime {
     }
 
     public String getSiddhiAppName() {
+
         return siddhiAppName;
     }
 
     public Mode getMode() {
+
         return mode;
     }
 
     public void setMode(Mode mode) {
+
         this.mode = mode;
     }
 
     public SiddhiDebugger getDebugger() {
+
         return debugger;
     }
 
     public String getSiddhiApp() {
         return siddhiApp;
     }
-
 
     public void start() {
         if (Mode.STOP.equals(mode)) {
@@ -83,14 +94,19 @@ public class DebugRuntime {
                 mode = Mode.RUN;
             } catch (Throwable e) {
                 mode = Mode.FAULTY;
-                throw new InvalidExecutionStateException("Siddhi App '" + siddhiAppName + "' is in faulty state.", e);
+                String errorMessage = "Siddhi App '" + siddhiAppName + "' is in faulty state.";
+                log.error(errorMessage, e);
+                throw new InvalidExecutionStateException(errorMessage, e);
             }
         } else {
-            throw new InvalidExecutionStateException("Siddhi App '" + siddhiAppName + "' is in faulty state.");
+            String errorMessage = "Siddhi App '" + siddhiAppName + "' is in faulty state.";
+            log.error(errorMessage, caughtException);
+            throw new InvalidExecutionStateException(errorMessage);
         }
     }
 
     public void debug() {
+
         if (Mode.STOP.equals(mode)) {
             try {
                 debugger = siddhiAppRuntime.debug();
@@ -101,15 +117,20 @@ public class DebugRuntime {
                 });
                 mode = Mode.DEBUG;
             } catch (Throwable e) {
+                String errorMessage = "Siddhi App '" + siddhiAppName + "' is in faulty state.";
+                log.error(errorMessage, e);
                 mode = Mode.FAULTY;
-                throw new InvalidExecutionStateException("Siddhi App '" + siddhiAppName + "' is in faulty state.", e);
+                throw new InvalidExecutionStateException(errorMessage, e);
             }
         } else {
-            throw new InvalidExecutionStateException("Siddhi App '" + siddhiAppName + "' is in faulty state.");
+            String errorMessage = "Siddhi App '" + siddhiAppName + "' is in faulty state.";
+            log.error(errorMessage, caughtException);
+            throw new InvalidExecutionStateException(errorMessage);
         }
     }
 
     public void stop() {
+
         if (debugger != null) {
             debugger.releaseAllBreakPoints();
             debugger.play();
@@ -117,13 +138,13 @@ public class DebugRuntime {
         }
         if (siddhiAppRuntime != null) {
             siddhiAppRuntime.shutdown();
-            siddhiAppRuntime = null;
+            mode = Mode.STOP;
         }
         callbackEventsQueue.clear();
-        createRuntime(siddhiApp);
     }
 
     public void reload(String siddhiApp) {
+
         this.siddhiApp = siddhiApp;
         stop();
     }
@@ -137,6 +158,7 @@ public class DebugRuntime {
     }
 
     public List<String> getQueries() {
+
         if (!Mode.FAULTY.equals(mode)) {
             return new ArrayList<>(siddhiAppRuntime.getQueryNames());
         } else {
@@ -145,6 +167,7 @@ public class DebugRuntime {
     }
 
     public InputHandler getInputHandler(String streamName) {
+
         if (!Mode.FAULTY.equals(mode)) {
             return siddhiAppRuntime.getInputHandler(streamName);
         } else {
@@ -153,6 +176,7 @@ public class DebugRuntime {
     }
 
     public List<Attribute> getStreamAttributes(String streamName) {
+
         if (!Mode.FAULTY.equals(mode)) {
             if (siddhiAppRuntime.getStreamDefinitionMap().containsKey(streamName)) {
                 return siddhiAppRuntime.getStreamDefinitionMap().get(streamName).getAttributeList();
@@ -166,6 +190,7 @@ public class DebugRuntime {
     }
 
     public LinkedBlockingQueue<DebugCallbackEvent> getCallbackEventsQueue() {
+
         return callbackEventsQueue;
     }
 
@@ -179,14 +204,24 @@ public class DebugRuntime {
                 mode = Mode.FAULTY;
             }
         } catch (Exception e) {
+            caughtException = e;
             mode = Mode.FAULTY;
         }
+    }
+
+    public void setSiddhiAppRuntime(SiddhiAppRuntime siddhiAppRuntime) {
+        this.siddhiAppRuntime = siddhiAppRuntime;
     }
 
     public SiddhiAppRuntime getSiddhiAppRuntime() {
         return siddhiAppRuntime;
     }
 
-    public enum Mode {RUN, DEBUG, STOP, FAULTY}
+    /**
+     * Enum whichholds debugger modes.
+     */
+    public enum Mode {
+        RUN, DEBUG, STOP, FAULTY
+    }
 
 }

@@ -18,25 +18,27 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
 import io.siddhi.query.api.annotation.Annotation;
 import io.siddhi.query.api.definition.StreamDefinition;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * Generator to create Stream definition config
+ * Generator to create Stream definition config.
  */
 public class StreamDefinitionConfigGenerator extends CodeSegmentsPreserver {
+
     /**
-     * Generates StreamConfig object, with given Siddhi StreamDefinition
+     * Generates StreamConfig object, with given Siddhi StreamDefinition.
      *
      * @param streamDefinition Siddhi StreamDefinition object
      * @return StreamConfig object
      */
     public StreamConfig generateStreamConfig(StreamDefinition streamDefinition) {
+
         List<String> annotationConfigs = new ArrayList<>();
         List<Annotation> annotationListObjects = new ArrayList<>();
         List<String> streamElementAnnotationNames = new ArrayList<>(Arrays.asList("SOURCE", "SINK", "STORE"));

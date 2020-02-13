@@ -53,6 +53,7 @@ public class LocalFSWorkspace implements Workspace {
 
     @Override
     public JsonArray listRoots() throws IOException {
+
         final Iterable<Path> rootDirs = FileSystems.getDefault().getRootDirectories();
         JsonArray rootArray = new JsonArray();
         for (Path root : rootDirs) {
@@ -83,17 +84,21 @@ public class LocalFSWorkspace implements Workspace {
 
     @Override
     public JsonArray listDirectoryFiles(String path) throws IOException {
+
         String location = "";
         if (path.equals("")) {
             location = (Paths.get(Constants.RUNTIME_PATH, Constants.DIRECTORY_DEPLOYMENT)).toString();
         }
+
         List<String> directories = new ArrayList<>();
         directories.add("\"" + Constants.DIRECTORY_WORKSPACE + "\"");
+
         return FileJsonObjectReaderUtil.listDirectoryInPath(location, directories);
     }
 
     @Override
     public JsonArray listDirectoriesInPath(String path) throws IOException {
+
         Path ioPath = Paths.get(path);
         JsonArray dirs = new JsonArray();
         Iterator<Path> iterator = Files.list(ioPath).iterator();
@@ -109,6 +114,7 @@ public class LocalFSWorkspace implements Workspace {
 
     @Override
     public JsonObject read(Path path) throws IOException {
+
         byte[] fileContent = Files.readAllBytes(path);
         JsonObject content = new JsonObject();
         content.addProperty(CONTENT, new String(fileContent, Charset.defaultCharset()));
@@ -117,6 +123,7 @@ public class LocalFSWorkspace implements Workspace {
 
     @Override
     public void delete(String path, String type) throws IOException {
+
         Path ioPath = Paths.get(path);
         if (FOLDER_TYPE.equals(type)) {
             Files.walk(ioPath, FileVisitOption.FOLLOW_LINKS)
@@ -130,6 +137,7 @@ public class LocalFSWorkspace implements Workspace {
 
     @Override
     public void create(String path, String type) throws IOException {
+
         Path ioPath = Paths.get(path);
         if (FOLDER_TYPE.equals(type)) {
             Files.createDirectories(ioPath);
@@ -141,6 +149,7 @@ public class LocalFSWorkspace implements Workspace {
     @Override
     public void log(String loggerID, String timestamp, String level,
                     String url, String message, String layout) throws IOException {
+
         Logger frontEndLog = LoggerFactory.getLogger(loggerID);
         String logMessage = "client-timestamp: " + timestamp + ", page: " + url + ", message: " + message;
         switch (level) {
@@ -175,6 +184,7 @@ public class LocalFSWorkspace implements Workspace {
 
     @Override
     public JsonObject exists(Path path) throws IOException {
+
         JsonObject result = new JsonObject();
         boolean exists = Files.exists(path);
         result.addProperty("file", path.toString());
@@ -183,6 +193,7 @@ public class LocalFSWorkspace implements Workspace {
     }
 
     public JsonArray listSamplesInPath(Map<String, String> sampleMap) {
+
         JsonArray samples = new JsonArray();
         sampleMap.entrySet().stream().forEach(entry -> {
             JsonObject sampleObject = new JsonObject();

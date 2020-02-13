@@ -25,6 +25,7 @@ import org.wso2.carbon.siddhi.editor.core.internal.EditorDataHolder;
  * Factory used to create a HTTP client for Siddhi Query APIs.
  */
 public class SiddhiStoreQueryClientFactory {
+
     private static final int CLIENT_CONNECTION_TIMEOUT = 5000;
     private static final int CLIENT_READ_TIMEOUT = 5000;
 
@@ -37,6 +38,7 @@ public class SiddhiStoreQueryClientFactory {
      * @return SiddhiStoreQueryServiceStub instance which acts as the HTTPS client
      */
     public static SiddhiStoreQueryServiceStub getStoreQueryHTTPClient(String url, String username, String password) {
+
         return EditorDataHolder
                 .getInstance()
                 .getClientBuilderService()
@@ -45,6 +47,7 @@ public class SiddhiStoreQueryClientFactory {
     }
 
     public static SiddhiStoreQueryServiceStub getStoreQueryHTTPClient(String url) {
+
         return getStoreQueryHTTPClient(url, "", "");
     }
 }

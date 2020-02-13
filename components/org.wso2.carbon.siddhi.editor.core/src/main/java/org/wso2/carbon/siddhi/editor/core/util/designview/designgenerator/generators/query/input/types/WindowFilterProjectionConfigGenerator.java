@@ -18,35 +18,39 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.streamhandler.StreamHandlerConfigGenerator;
-import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import io.siddhi.query.api.execution.query.input.handler.StreamFunction;
 import io.siddhi.query.api.execution.query.input.handler.StreamHandler;
 import io.siddhi.query.api.execution.query.input.handler.Window;
 import io.siddhi.query.api.execution.query.input.stream.InputStream;
 import io.siddhi.query.api.execution.query.input.stream.SingleInputStream;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.windowfilterprojection.WindowFilterProjectionConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.streamhandler.StreamHandlerConfigGenerator;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 
 import java.util.List;
 
 /**
- * Generates WindowFilterProjection Query Input Config with given Siddhi elements
+ * Generates WindowFilterProjection Query Input Config with given Siddhi elements.
  */
 public class WindowFilterProjectionConfigGenerator {
+
     private String siddhiAppString;
 
     public WindowFilterProjectionConfigGenerator(String siddhiAppString) {
+
         this.siddhiAppString = siddhiAppString;
     }
 
     /**
-     * Generates a WindowFilterProjectionConfig object, from the given Siddhi Query InputStream object
-     * @param queryInputStream                  Siddhi Query InputStream object
-     * @return                                  WindowFilterProjectionConfig object
-     * @throws DesignGenerationException        Error while generating config
+     * Generates a WindowFilterProjectionConfig object, from the given Siddhi Query InputStream object.
+     *
+     * @param queryInputStream Siddhi Query InputStream object
+     * @return WindowFilterProjectionConfig object
+     * @throws DesignGenerationException Error while generating config
      */
     public WindowFilterProjectionConfig generateWindowFilterProjectionConfig(InputStream queryInputStream)
             throws DesignGenerationException {
+
         return new WindowFilterProjectionConfig(
                 getType(queryInputStream).toString(),
                 queryInputStream.getUniqueStreamIds().get(0),
@@ -55,11 +59,13 @@ public class WindowFilterProjectionConfigGenerator {
     }
 
     /**
-     * Returns the type of WindowFilterProjection Config to generate, from the given Siddhi Query object
-     * @param queryInputStream     Siddhi Query InputStream object
-     * @return                     Type of WindowFilterProjection Query to generate
+     * Returns the type of WindowFilterProjection Config to generate, from the given Siddhi Query object.
+     *
+     * @param queryInputStream Siddhi Query InputStream object
+     * @return Type of WindowFilterProjection Query to generate
      */
     private WindowFilterProjectionQueryType getType(InputStream queryInputStream) {
+
         List<StreamHandler> streamHandlers = ((SingleInputStream) queryInputStream).getStreamHandlers();
         if (streamHandlers.isEmpty()) {
             return WindowFilterProjectionQueryType.PROJECTION;
@@ -79,7 +85,7 @@ public class WindowFilterProjectionConfigGenerator {
     }
 
     /**
-     * Specific Type of the WindowFilterProjection Query
+     * Specific Type of the WindowFilterProjection Query.
      */
     private enum WindowFilterProjectionQueryType {
         PROJECTION,

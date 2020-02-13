@@ -23,9 +23,10 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.NodeType;
 import java.util.Objects;
 
 /**
- * Represents a connection between two Siddhi app design view elements
+ * Represents a connection between two Siddhi app design view elements.
  */
 public class Edge {
+
     private String id;
     private String parentId;
     private NodeType parentType;
@@ -34,11 +35,13 @@ public class Edge {
     private boolean fromFaultStream;
 
     public Edge(String id, String parentId, NodeType parentType, String childId, NodeType childType) {
+
         this(id, parentId, parentType, childId, childType, false);
     }
 
     public Edge(String id, String parentId, NodeType parentType, String childId, NodeType childType,
                 boolean fromFaultStream) {
+
         this.id = id;
         this.parentId = parentId;
         this.parentType = parentType;
@@ -48,35 +51,43 @@ public class Edge {
     }
 
     public String getId() {
+
         return id;
     }
 
     public String getParentId() {
+
         return parentId;
     }
 
     public NodeType getParentType() {
+
         return parentType;
     }
 
     public String getChildId() {
+
         return childId;
     }
 
     public NodeType getChildType() {
+
         return childType;
     }
 
     public boolean isFromFaultStream() {
+
         return fromFaultStream;
     }
 
     public void setFromFaultStream(boolean fromFaultStream) {
+
         this.fromFaultStream = fromFaultStream;
     }
 
     @Override
     public boolean equals(Object o) {
+
         if (this == o) {
             return true;
         }
@@ -89,6 +100,7 @@ public class Edge {
 
     @Override
     public int hashCode() {
+
         return Objects.hash(id);
     }
 }

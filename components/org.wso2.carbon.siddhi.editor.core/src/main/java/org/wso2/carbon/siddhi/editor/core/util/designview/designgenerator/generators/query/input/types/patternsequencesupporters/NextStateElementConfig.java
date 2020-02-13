@@ -18,23 +18,42 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
+/**
+ * Class for next state element configuration.
+ */
 public class NextStateElementConfig implements StateElementConfig {
+
     private StateElementConfig stateElement;
     private StateElementConfig nextStateElement;
+    private String within;
 
     public StateElementConfig getStateElement() {
+
         return stateElement;
     }
 
     public void setStateElement(StateElementConfig stateElement) {
+
         this.stateElement = stateElement;
     }
 
     public StateElementConfig getNextStateElement() {
+
         return nextStateElement;
     }
 
     public void setNextStateElement(StateElementConfig nextStateElement) {
+
         this.nextStateElement = nextStateElement;
+    }
+
+    public String getWithin() {
+
+        return within;
+    }
+
+    public void setWithin(String within) {
+
+        this.within = within;
     }
 }

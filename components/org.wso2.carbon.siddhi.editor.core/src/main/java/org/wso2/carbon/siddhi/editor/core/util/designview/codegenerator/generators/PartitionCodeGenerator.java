@@ -30,21 +30,22 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Generates the code for a Siddhi partition element
+ * Generates the code for a Siddhi partition element.
  */
 public class PartitionCodeGenerator {
 
     /**
-     * Generates the Siddhi code representation of a PartitionConfig object
+     * Generates the Siddhi code representation of a PartitionConfig object.
      *
-     * @param partition       The PartitionConfig object
-     * @param definitionNames The names of all the Siddhi definition objects (including inner streams)
+     * @param partition           The PartitionConfig object
+     * @param definitionNames     The names of all the Siddhi definition objects (including inner streams)
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given PartitionConfig object
      * @throws CodeGenerationException Error when generating the code
      */
     public String generatePartition(PartitionConfig partition, List<String> definitionNames,
                                     boolean isGeneratingToolTip) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(partition);
 
         StringBuilder partitionStringBuilder = new StringBuilder();
@@ -91,13 +92,14 @@ public class PartitionCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a partition's PartitionWithElement list
+     * Generates the Siddhi code representation of a partition's PartitionWithElement list.
      *
      * @param partitionWith The PartitionWithElement list
      * @return The Siddhi code representation of the given PartitionWithElement list
      * @throws CodeGenerationException Error when generating the code
      */
     private String generatePartitionWith(List<PartitionWithElement> partitionWith) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(partitionWith);
 
         StringBuilder partitionWithStringBuilder = new StringBuilder();
@@ -114,7 +116,7 @@ public class PartitionCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a PartitionWithElement object
+     * Generates the Siddhi code representation of a PartitionWithElement object.
      *
      * @param partitionWithElement The PartitionWithElement object
      * @return The Siddhi code representation of the given PartitionWithElement object
@@ -122,6 +124,7 @@ public class PartitionCodeGenerator {
      */
     private String generatePartitionWithElement(PartitionWithElement partitionWithElement)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(partitionWithElement);
 
         return partitionWithElement.getExpression() +

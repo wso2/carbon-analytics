@@ -23,52 +23,72 @@ import java.util.List;
 
 /**
  * For storing parameter meta data of a processor or expression executor
- * Used in JSON responses
+ * Used in JSON responses.
  */
 public class ParameterMetaData {
+
     private String name;
     private List<DataType> type;
+    private Boolean isDynamic;
     private Boolean optional;
     private String description;
     private String defaultValue;
 
     public String getName() {
+
         return name;
     }
 
     public void setName(String name) {
+
         this.name = name;
     }
 
     public List<DataType> getType() {
+
         return type;
     }
 
     public void setType(List<DataType> type) {
+
         this.type = type;
     }
 
+    public Boolean isDynamic() {
+        return isDynamic;
+    }
+
+    public void setIsDynamic(Boolean isDynamic) {
+        this.isDynamic = isDynamic;
+    }
+
     public Boolean getOptional() {
+
         return optional;
     }
 
     public void setOptional(Boolean optional) {
+
         this.optional = optional;
     }
 
     public String getDescription() {
+
         return description;
     }
 
     public void setDescription(String description) {
+
         this.description = description;
     }
 
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
+    public String getDefaultValue() {
+
+        return this.defaultValue;
     }
 
-    public  String getDefaultValue() {
-        return  this.defaultValue;
+    public void setDefaultValue(String defaultValue) {
+
+        this.defaultValue = defaultValue;
     }
 }

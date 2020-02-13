@@ -20,10 +20,9 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.deserializers;
 
 import com.google.gson.GsonBuilder;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.aggregation.aggregationbytimeperiod.AggregateByTimePeriod;
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
-
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.attributesselection.AttributesSelectionConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.input.QueryInputConfig;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.QueryOutputConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.streamhandler.StreamHandlerConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperPayloadOrAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.types.AggregateByTimePeriodDeSerializer;
@@ -34,21 +33,25 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.types.Qu
 import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.types.StreamHandlerConfigDeserializer;
 
 /**
- * Handles De-serializer registrations with GsonBuilder, for required classes
+ * Handles De-serializer registrations with GsonBuilder, for required classes.
  */
 public class DeserializersRegisterer {
+
     /**
-     * Prevents Instantiation
+     * Prevents Instantiation.
      */
     private DeserializersRegisterer() {
+
     }
 
     /**
      * Returns a GsonBuilder with de-serializers registered as TypeAdapters,
-     * for the classes whose concrete types are not directly found in the JSON
-     * @return          GsonBuilder object with registered TypeAdapters
+     * for the classes whose concrete types are not directly found in the JSON.
+     *
+     * @return GsonBuilder object with registered TypeAdapters
      */
     public static GsonBuilder getGsonBuilder() {
+
         GsonBuilder gsonBuilder = new GsonBuilder();
         // Register de-serializers for required classes
         gsonBuilder.registerTypeAdapter(AttributesSelectionConfig.class, new AttributesSelectionConfigDeSerializer());

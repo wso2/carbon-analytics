@@ -25,12 +25,15 @@ import org.wso2.carbon.siddhi.editor.core.exception.SiddhiStoreQueryHelperExcept
 import org.wso2.transport.http.netty.contract.config.ListenerConfiguration;
 import org.wso2.transport.http.netty.contract.config.TransportsConfiguration;
 
+import java.util.HashMap;
+
 /**
  * Utility class to access the Siddhi Store API.
  */
 public class StoreQueryAPIHelper {
+
     private static final Logger logger = Logger.getLogger(StoreQueryAPIHelper.class);
-    private static final String STORE_QUERY_API_CONFIG_NAMESPACE = "siddhi.stores.query.api";
+    private static final String STORE_API_CONFIG = "storeRESTAPI";
     private ConfigProvider configProvider;
 
     /**
@@ -39,6 +42,7 @@ public class StoreQueryAPIHelper {
      * @param configProvider ConfigProvider object
      */
     public StoreQueryAPIHelper(ConfigProvider configProvider) {
+
         this.configProvider = configProvider;
     }
 
@@ -47,21 +51,39 @@ public class StoreQueryAPIHelper {
      *
      * @param query Query to be executed
      * @return HTTP Response
+     * @throws SiddhiStoreQueryHelperException when executing store queries
      */
     public Response executeStoreQuery(String query) throws SiddhiStoreQueryHelperException {
-        return StoreQueryHTTPClient.executeStoreQuery(getStoreAPIHost(), query);
+
+        // TODO: 9/23/19 Temporary fix till  https://github.com/siddhi-io/distribution/issues/426 is solved
+        try {
+            HashMap<String, String> storeAPIConfig = (HashMap<String, String>)
+                                                            configProvider.getConfigurationObject(STORE_API_CONFIG);
+            String url;
+            if (storeAPIConfig != null) {
+                String host = storeAPIConfig.get("host") != null ? storeAPIConfig.get("host") : "0.0.0.0";
+                String port = storeAPIConfig.get("port") != null ? storeAPIConfig.get("port") : "9390";
+                url = host + ":" + port;
+            } else {
+                url = "0.0.0.0:9390";
+            }
+            return StoreQueryHTTPClient.executeStoreQuery(url, query);
+        } catch (ConfigurationException e) {
+            throw new SiddhiStoreQueryHelperException("Cannot read store query API configurations.", e);
+        }
     }
 
     /**
      * Get store API host with the port from the deployment.yaml.
      *
      * @return Host with the port
-     * @throws SiddhiStoreQueryHelperException
+     * @throws SiddhiStoreQueryHelperException when executing store queries
      */
     private String getStoreAPIHost() throws SiddhiStoreQueryHelperException {
+
         try {
             TransportsConfiguration transportsConfiguration = this.configProvider.getConfigurationObject
-                    (STORE_QUERY_API_CONFIG_NAMESPACE, TransportsConfiguration.class);
+                    ("transports", TransportsConfiguration.class);
             for (ListenerConfiguration listenerConfiguration : transportsConfiguration.getListenerConfigurations()) {
                 if ("default".equals(listenerConfiguration.getId())) {
                     logger.debug("Default configurations found in listener configurations.");

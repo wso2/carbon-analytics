@@ -18,6 +18,7 @@
 package org.wso2.carbon.analytics.auth.rest.api.util;
 
 import org.wso2.carbon.streaming.integrator.common.utils.SPConstants;
+import org.wso2.msf4j.Request;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -106,5 +107,20 @@ public class AuthUtil {
                     .append(AuthRESTAPIConstants.DEFAULT_EXPIRES_COOKIE).append(COOKIE_VALUE_SEPERATOR);
         }
         return new NewCookie(name, stringBuilder.toString());
+    }
+
+    /**
+     * Set tenant domain via X-WSO2-Tenant header. This method is specifically implemented to
+     * support custom URLs for dashboard portal in api-cloud.
+     * @param request
+     * @return value of X-WSO2-Tenant header.
+     */
+    public static String getDomainFromHeader(Request request) {
+
+        String tenantDomain = request.getHeader(AuthRESTAPIConstants.DOMAIN_HEADER);
+        if (tenantDomain == null) {
+            tenantDomain = "carbon.super";
+        }
+        return tenantDomain;
     }
 }

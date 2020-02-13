@@ -25,15 +25,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create AnnotationConfig
+ * Generator to create AnnotationConfig.
  */
 public class AnnotationConfigGenerator extends CodeSegmentsPreserver {
+
     /**
-     * Generates AnnotationConfig String for the given Siddhi Annotation
-     * @param annotation    Siddhi Annotation
-     * @return              String representing the Annotation
+     * Generates AnnotationConfig String for the given Siddhi Annotation.
+     *
+     * @param annotation Siddhi Annotation
+     * @return String representing the Annotation
      */
     public String generateAnnotationConfig(Annotation annotation) {
+
         StringBuilder annotationConfig = new StringBuilder();
         annotationConfig.append("@");
         annotationConfig.append(annotation.getName());
@@ -54,11 +57,13 @@ public class AnnotationConfigGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a string list of annotations, from the given list of Siddhi Annotations
-     * @param annotations       List of Siddhi Annotation objects
-     * @return                  List of strings, each representing an Annotation
+     * Generates a string list of annotations, from the given list of Siddhi Annotations.
+     *
+     * @param annotations List of Siddhi Annotation objects
+     * @return List of strings, each representing an Annotation
      */
     public List<String> generateAnnotationConfigList(List<Annotation> annotations) {
+
         List<String> annotationList = new ArrayList<>();
         for (Annotation annotation : annotations) {
             annotationList.add(generateAnnotationConfig(annotation));

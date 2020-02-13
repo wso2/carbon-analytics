@@ -32,20 +32,21 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGenerato
 import java.util.List;
 
 /**
- * Generates the code for a Siddhi aggregation element
+ * Generates the code for a Siddhi aggregation element.
  */
 public class AggregationCodeGenerator {
 
     /**
-     * Generates the Siddhi code representation of a AggregationConfig object
+     * Generates the Siddhi code representation of a AggregationConfig object.
      *
-     * @param aggregation The AggregationConfig object
+     * @param aggregation         The AggregationConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given AggregationConfig object
      * @throws CodeGenerationException Error when generating the code
      */
     public String generateAggregation(AggregationConfig aggregation, boolean isGeneratingToolTip)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregation);
 
         StringBuilder aggregationStringBuilder = new StringBuilder();
@@ -87,12 +88,13 @@ public class AggregationCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a aggregation definition's annotations
+     * Generates the Siddhi code representation of a aggregation definition's annotations.
      *
      * @param annotations The list of annotations of an aggregation definition
      * @return The Siddhi code representation of the given annotation list
      */
     private String generateAggregationAnnotations(List<String> annotations) {
+
         if (annotations == null || annotations.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
@@ -112,7 +114,7 @@ public class AggregationCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a AggregateByTimePeriod object
+     * Generates the Siddhi code representation of a AggregateByTimePeriod object.
      *
      * @param aggregateByTimePeriod The AggregateByTimePeriod object
      * @return The Siddhi code representation of the given AggregateByTimePeriod object
@@ -120,6 +122,7 @@ public class AggregationCodeGenerator {
      */
     private String generateAggregateByTimePeriod(AggregateByTimePeriod aggregateByTimePeriod)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregateByTimePeriod);
 
         StringBuilder aggregateByTimePeriodStringBuilder = new StringBuilder();
@@ -141,7 +144,7 @@ public class AggregationCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a AggregateByTimeInterval object
+     * Generates the Siddhi code representation of a AggregateByTimeInterval object.
      *
      * @param aggregateByTimeInterval The AggregateByTimeInterval object
      * @return The Siddhi code representation of the given AggregateByTimeInterval object
@@ -149,6 +152,7 @@ public class AggregationCodeGenerator {
      */
     private String generateAggregateByTimeInterval(AggregateByTimeInterval aggregateByTimeInterval)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregateByTimeInterval);
 
         StringBuilder aggregateByTimeIntervalStringBuilder = new StringBuilder();
@@ -164,7 +168,7 @@ public class AggregationCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a AggregateByTimeRange object
+     * Generates the Siddhi code representation of a AggregateByTimeRange object.
      *
      * @param aggregateByTimeRange The AggregateByTimeRange object
      * @return The Siddhi code representation of the given AggregateByTimeRange object
@@ -172,6 +176,7 @@ public class AggregationCodeGenerator {
      */
     private String generateAggregateByTimeRange(AggregateByTimeRange aggregateByTimeRange)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(aggregateByTimeRange);
 
         return aggregateByTimeRange.getValue().getMin().toLowerCase() +

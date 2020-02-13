@@ -18,24 +18,26 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators;
 
+import io.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.definition.TableDefinition;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StoreConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.TableConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
-import io.siddhi.query.api.annotation.Annotation;
-import io.siddhi.query.api.definition.TableDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generator to create TableConfig
+ * Generator to create TableConfig.
  */
 public class TableConfigGenerator extends CodeSegmentsPreserver {
+
     /**
-     * Generates TableConfig object from the given Siddhi TableDefinition
+     * Generates TableConfig object from the given Siddhi TableDefinition.
      *
      * @param tableDefinition Siddhi TableDefinition
      * @return TableConfig object
+     * @throws DesignGenerationException when Siddhi editor designer fails     *
      */
     public TableConfig generateTableConfig(TableDefinition tableDefinition) throws DesignGenerationException {
         // 'store' and annotations

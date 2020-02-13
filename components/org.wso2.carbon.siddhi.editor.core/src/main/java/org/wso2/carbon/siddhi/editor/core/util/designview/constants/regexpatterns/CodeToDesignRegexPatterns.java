@@ -19,16 +19,18 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants.regexpatterns;
 
 /**
- * Has Regex pattern string constants, related to Code to Design
+ * Has Regex pattern string constants, related to Code to Design.
  */
 public class CodeToDesignRegexPatterns {
+
     public static final String SOURCE_ANNOTATION_CONTENT = "@source\\s*\\(\\s*(.+)\\s*\\)[^.]";
     public static final String SOURCE_SINK_MAP_ANNOTATION_CONTENT = "@map\\s*\\(\\s*(.+)\\s*\\)";
     public static final String MAP_TYPE = "type\\s*=\\'\\s*(.+)\\s*\\'\\s*[,)]";
 
     /**
-     * Avoids Instantiation
+     * Avoids Instantiation.
      */
     private CodeToDesignRegexPatterns() {
+
     }
 }

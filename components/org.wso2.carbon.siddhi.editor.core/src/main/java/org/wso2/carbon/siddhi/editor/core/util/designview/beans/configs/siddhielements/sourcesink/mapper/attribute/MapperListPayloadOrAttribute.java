@@ -23,21 +23,25 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.MapperPayloa
 import java.util.List;
 
 /**
- * Represents a list of values in the Mapper
+ * Represents a list of values in the Mapper.
  */
 public class MapperListPayloadOrAttribute extends MapperPayloadOrAttribute {
+
     private List<String> value;
 
     public MapperListPayloadOrAttribute(String payloadOrAttribute, List<String> value) {
+
         super(payloadOrAttribute, MapperPayloadOrAttributeType.LIST.toString());
         this.value = value;
     }
 
     public List<String> getValue() {
+
         return value;
     }
 
     public void setValue(List<String> value) {
+
         this.value = value;
     }
 }

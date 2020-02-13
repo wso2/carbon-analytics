@@ -18,32 +18,36 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
-import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.builders.EventFlowBuilder;
-import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.exception.SiddhiAppCreationException;
 import io.siddhi.query.api.SiddhiApp;
 import io.siddhi.query.compiler.SiddhiCompiler;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
+import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.builders.EventFlowBuilder;
+import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
 
 /**
- * Generator to create Config objects from Siddhi Code
+ * Generator to create Config objects from Siddhi Code.
  */
 public class DesignGenerator {
+
     private SiddhiManager siddhiManager;
 
     public void setSiddhiManager(SiddhiManager siddhiManager) {
+
         this.siddhiManager = siddhiManager;
     }
 
     /**
-     * Gets EventFlow configuration for a given Siddhi app code string
-     * @param siddhiAppString                   Code representation of the Siddhi app
-     * @return                                  Event flow representation of the Siddhi app
-     * @throws DesignGenerationException        Error while generating config
+     * Gets EventFlow configuration for a given Siddhi app code string.
+     *
+     * @param siddhiAppString Code representation of the Siddhi app
+     * @return Event flow representation of the Siddhi app
+     * @throws DesignGenerationException Error while generating config
      */
     public EventFlow getEventFlow(String siddhiAppString) throws DesignGenerationException {
+
         SiddhiApp siddhiApp;
         SiddhiAppRuntime siddhiAppRuntime;
         try {

@@ -28,7 +28,9 @@ import java.util.Enumeration;
  * Host address finder.
  */
 public class HostAddressFinder {
+
     public static String findAddress(String hostname) throws SocketException {
+
         if (hostname.trim().equals("localhost") || hostname.trim().equals("127.0.0.1") || hostname.trim().equals
                 ("0.0.0.0") || hostname.trim().equals("::1")) {
             Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();

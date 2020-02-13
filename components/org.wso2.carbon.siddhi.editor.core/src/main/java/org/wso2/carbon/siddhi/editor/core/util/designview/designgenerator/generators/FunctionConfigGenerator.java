@@ -18,20 +18,22 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators;
 
-import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.FunctionConfig;
 import io.siddhi.query.api.definition.FunctionDefinition;
+import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.FunctionConfig;
 
 /**
- * Generator to create FunctionConfig
+ * Generator to create FunctionConfig.
  */
 public class FunctionConfigGenerator extends CodeSegmentsPreserver {
+
     /**
-     * Generates FunctionConfig from the given Siddhi FunctionDefinition
+     * Generates FunctionConfig from the given Siddhi FunctionDefinition.
      *
      * @param functionDefinition Siddhi FunctionDefinition
      * @return FunctionConfig object
      */
     public FunctionConfig generateFunctionConfig(FunctionDefinition functionDefinition) {
+
         FunctionConfig functionConfig = new FunctionConfig(functionDefinition.getId(), functionDefinition.getLanguage(),
                 functionDefinition.getReturnType().toString(), functionDefinition.getBody());
         preserveAndBindCodeSegment(functionDefinition, functionConfig);

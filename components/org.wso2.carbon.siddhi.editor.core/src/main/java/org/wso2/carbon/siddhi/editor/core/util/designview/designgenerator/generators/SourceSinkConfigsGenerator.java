@@ -18,6 +18,10 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators;
 
+import io.siddhi.core.stream.input.source.Source;
+import io.siddhi.core.stream.output.sink.Sink;
+import io.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.annotation.Element;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.SourceSinkConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.MapperConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperListPayloadOrAttribute;
@@ -25,10 +29,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhiel
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.sourcesink.mapper.attribute.MapperPayloadOrAttribute;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.MapperPayloadOrAttributeType;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
-import io.siddhi.core.stream.input.source.Source;
-import io.siddhi.core.stream.output.sink.Sink;
-import io.siddhi.query.api.annotation.Annotation;
-import io.siddhi.query.api.annotation.Element;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,45 +36,51 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Generator to create Source or Sink config
+ * Generator to create Source or Sink config.
  */
 public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
+
     private static final String TYPE = "TYPE";
     private static final String SINK_ID = "SINK.ID";
-    private static final String SOURCE_ID = "SOURCE.ID";
     private static final String MAP = "MAP";
 
     /**
-     * Generates a list of Source configs
-     * @param sourceList                        List of Siddhi Sources
-     * @return                                  List of SourceSinkConfigs
-     * @throws DesignGenerationException        Error while generating SourceConfigs
+     * Generates a list of Source configs.
+     *
+     * @param sourceList List of Siddhi Sources
+     * @return List of SourceSinkConfigs
+     * @throws DesignGenerationException Error while generating SourceConfigs
      */
     public List<SourceSinkConfig> generateSourceConfigs(List<Source> sourceList) throws DesignGenerationException {
+
         return generateSourceOrSinkConfigs(SourceOrSinkAnnotation.SOURCE, sourceList);
     }
 
     /**
-     * Generates a list of Sink configs
-     * @param sinkList                          List of Siddhi Sinks
-     * @return                                  List of SourceSinkConfigs
-     * @throws DesignGenerationException        Error while generating SinkConfigs
+     * Generates a list of Sink configs.
+     *
+     * @param sinkList List of Siddhi Sinks
+     * @return List of SourceSinkConfigs
+     * @throws DesignGenerationException Error while generating SinkConfigs
      */
     public List<SourceSinkConfig> generateSinkConfigs(List<Sink> sinkList) throws DesignGenerationException {
+
         return generateSourceOrSinkConfigs(SourceOrSinkAnnotation.SINK, sinkList);
     }
 
     /**
      * Generates a list of Source/Sink configs based on the given sourceOrSinkAnnotation,
-     * and the given list of Siddhi Sources/Sinks
-     * @param sourceOrSinkAnnotation            The annotation, whether 'source' or 'sink'
-     * @param sourceOrSinkList                  List of Siddhi Sources/Sinks
-     * @param <T>                               Generic Type that is either a Siddhi Source/Sink
-     * @return                                  List of SourceSinkConfigs
-     * @throws DesignGenerationException        Error while generating Source or Sink Configs
+     * and the given list of Siddhi Sources/Sinks.
+     *
+     * @param sourceOrSinkAnnotation The annotation, whether 'source' or 'sink'
+     * @param sourceOrSinkList       List of Siddhi Sources/Sinks
+     * @param <T>                    Generic Type that is either a Siddhi Source/Sink
+     * @return List of SourceSinkConfigs
+     * @throws DesignGenerationException Error while generating Source or Sink Configs
      */
     private <T> List<SourceSinkConfig> generateSourceOrSinkConfigs(
             SourceOrSinkAnnotation sourceOrSinkAnnotation, List<T> sourceOrSinkList) throws DesignGenerationException {
+
         Map<Annotation, String> connectedElementsMap =
                 getSourceOrSinkAnnotationStreamIdMap(sourceOrSinkAnnotation, sourceOrSinkList);
         List<SourceSinkConfig> sourceOrSinkConfigs = new ArrayList<>();
@@ -85,16 +91,18 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates config for a Siddhi Source/Sink
-     * @param annotationType                        The annotation, whether 'source' or 'sink'
-     * @param sourceOrSinkAndConnectedElement       Object which contains the complete details of the Source/Sink,
-     *                                              and the element name, to which it is connected to
-     * @return                                      SourceSinkConfig
-     * @throws DesignGenerationException            Error while generating Source or Sink Configs
+     * Generates config for a Siddhi Source/Sink.
+     *
+     * @param annotationType                  The annotation, whether 'source' or 'sink'
+     * @param sourceOrSinkAndConnectedElement Object which contains the complete details of the Source/Sink,
+     *                                        and the element name, to which it is connected to
+     * @return SourceSinkConfig
+     * @throws DesignGenerationException Error while generating Source or Sink Configs
      */
     private SourceSinkConfig generateSourceOrSinkConfig(SourceOrSinkAnnotation annotationType,
                                                         Map.Entry<Annotation, String> sourceOrSinkAndConnectedElement)
             throws DesignGenerationException {
+
         String connectedElementName = sourceOrSinkAndConnectedElement.getValue();
         // Options of the Source/Sink
         String type = null;
@@ -134,12 +142,14 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates config for a Mapper
-     * @param mapAnnotation                     Siddhi annotation that contains details of a Siddhi Mapper
-     * @return                                  MapperConfig object
-     * @throws DesignGenerationException        Error while generating MapperConfig
+     * Generates config for a Mapper.
+     *
+     * @param mapAnnotation Siddhi annotation that contains details of a Siddhi Mapper
+     * @return MapperConfig object
+     * @throws DesignGenerationException Error while generating MapperConfig
      */
     private MapperConfig generateMapperConfig(Annotation mapAnnotation) throws DesignGenerationException {
+
         String type = null;
         List<String> options = new ArrayList<>();
         for (Element element : mapAnnotation.getElements()) {
@@ -162,11 +172,13 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates MapperPayloadOrAttribute object, with the given Siddhi Annotation
-     * @param attributesOrPayloadAnnotation         Siddhi Annotation, denoting @attribute or @payload
-     * @return                                      MapperPayloadOrAttribute object
+     * Generates MapperPayloadOrAttribute object, with the given Siddhi Annotation.
+     *
+     * @param attributesOrPayloadAnnotation Siddhi Annotation, denoting @attribute or @payload
+     * @return MapperPayloadOrAttribute object
      */
     private MapperPayloadOrAttribute generateMapperPayloadOrAttributes(Annotation attributesOrPayloadAnnotation) {
+
         List<PayloadOrAttributeElement> elements = new ArrayList<>();
         for (Element element : attributesOrPayloadAnnotation.getElements()) {
             elements.add(generatePayloadOrAttributesElement(element));
@@ -179,11 +191,13 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a PayloadOrAttributeElement object from the given Siddhi Element object
-     * @param element       Siddhi Element object
-     * @return              PayloadOrAttributeElement object
+     * Generates a PayloadOrAttributeElement object from the given Siddhi Element object.
+     *
+     * @param element Siddhi Element object
+     * @return PayloadOrAttributeElement object
      */
     private PayloadOrAttributeElement generatePayloadOrAttributesElement(Element element) {
+
         PayloadOrAttributeElement payloadOrAttributeElement = new PayloadOrAttributeElement();
         payloadOrAttributeElement.key = element.getKey();
         payloadOrAttributeElement.value = element.getValue();
@@ -191,11 +205,13 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Gets type of the MapperPayloadOrAttribute
-     * @param elements      List of PayloadOrAttributeElements
-     * @return              MapperPayloadOrAttributeType
+     * Gets type of the MapperPayloadOrAttribute.
+     *
+     * @param elements List of PayloadOrAttributeElements
+     * @return MapperPayloadOrAttributeType
      */
     private MapperPayloadOrAttributeType getMapperAttributeOrPayloadType(List<PayloadOrAttributeElement> elements) {
+
         for (PayloadOrAttributeElement element : elements) {
             // Either all the keys are null, or all the keys are not null
             if (element.key != null) {
@@ -206,13 +222,15 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a MapperListPayloadOrAttribute object with the given annotation type and list of elements
-     * @param annotationType        Type of the Siddhi annotation, whether 'attributes' or 'payload'
-     * @param elements              List of PayloadOrAttributeElements
-     * @return                      MapperListPayloadOrAttribute object
+     * Generates a MapperListPayloadOrAttribute object with the given annotation type and list of elements.
+     *
+     * @param annotationType Type of the Siddhi annotation, whether 'attributes' or 'payload'
+     * @param elements       List of PayloadOrAttributeElements
+     * @return MapperListPayloadOrAttribute object
      */
     private MapperListPayloadOrAttribute generateMapperListAttribute(
             String annotationType, List<PayloadOrAttributeElement> elements) {
+
         List<String> values = new ArrayList<>();
         for (PayloadOrAttributeElement element : elements) {
             values.add(element.value);
@@ -221,13 +239,15 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a MapperMapPayloadOrAttribute object with the given annotation type and list of elements
-     * @param annotationType        Type of the Siddhi annotation, whether 'attributes' or 'payload'
-     * @param elements              List of PayloadOrAttributeElements
-     * @return                      MapperMapPayloadOrAttribute object
+     * Generates a MapperMapPayloadOrAttribute object with the given annotation type and list of elements.
+     *
+     * @param annotationType Type of the Siddhi annotation, whether 'attributes' or 'payload'
+     * @param elements       List of PayloadOrAttributeElements
+     * @return MapperMapPayloadOrAttribute object
      */
     private MapperMapPayloadOrAttribute generateMapperMapAttribute(
             String annotationType, List<PayloadOrAttributeElement> elements) {
+
         Map<String, String> values = new HashMap<>();
         for (PayloadOrAttributeElement element : elements) {
             values.put(element.key, element.value);
@@ -236,15 +256,17 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Generates a map that contains Siddhi Annotation for Source/Sink, and their respective connected element names
-     * @param sourceOrSinkAnnotation            Annotation, that is either 'Source' or 'Sink'
-     * @param sourceOrSinkList                  List of Siddhi Sources/Sinks
-     * @param <T>                               Generic Type for Siddhi Source/Sink
-     * @return                                  Map of Siddhi Annotations for Source/Sink, and connected element names
-     * @throws DesignGenerationException        Mandatory properties are null
+     * Generates a map that contains Siddhi Annotation for Source/Sink, and their respective connected element names.
+     *
+     * @param sourceOrSinkAnnotation Annotation, that is either 'Source' or 'Sink'
+     * @param sourceOrSinkList       List of Siddhi Sources/Sinks
+     * @param <T>                    Generic Type for Siddhi Source/Sink
+     * @return Map of Siddhi Annotations for Source/Sink, and connected element names
+     * @throws DesignGenerationException Mandatory properties are null
      */
     private <T> Map<Annotation, String> getSourceOrSinkAnnotationStreamIdMap(
             SourceOrSinkAnnotation sourceOrSinkAnnotation, List<T> sourceOrSinkList) throws DesignGenerationException {
+
         Map<Annotation, String> connectedElements = new HashMap<>();
         for (T sourceOrSink : sourceOrSinkList) {
             List<Annotation> streamDefinitionAnnotations = null;
@@ -262,7 +284,7 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
             if (streamId == null) {
                 throw new DesignGenerationException("Unable to find the name for the stream definition");
             }
-            for(Annotation streamDefinitionAnnotation : streamDefinitionAnnotations) {
+            for (Annotation streamDefinitionAnnotation : streamDefinitionAnnotations) {
                 if (streamDefinitionAnnotation.getName().equalsIgnoreCase(sourceOrSinkAnnotation.toString())) {
                     connectedElements.put(streamDefinitionAnnotation, streamId);
                 }
@@ -272,18 +294,19 @@ public class SourceSinkConfigsGenerator extends CodeSegmentsPreserver {
     }
 
     /**
-     * Represents a PayloadOrAttribute element
-     */
-    private static class PayloadOrAttributeElement {
-        private String key;
-        private String value;
-    }
-
-    /**
-     * Type of the SourceSinkConfig
+     * Type of the SourceSinkConfig.
      */
     private enum SourceOrSinkAnnotation {
         SOURCE,
         SINK;
+    }
+
+    /**
+     * Represents a PayloadOrAttribute element.
+     */
+    private static class PayloadOrAttributeElement {
+
+        private String key;
+        private String value;
     }
 }

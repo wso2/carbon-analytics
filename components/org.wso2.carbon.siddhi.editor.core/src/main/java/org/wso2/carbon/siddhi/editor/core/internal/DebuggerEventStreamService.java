@@ -18,25 +18,26 @@
 
 package org.wso2.carbon.siddhi.editor.core.internal;
 
-
+import io.siddhi.core.event.Event;
+import io.siddhi.query.api.definition.Attribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.editor.core.exception.NoSuchStreamException;
 import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 import org.wso2.carbon.streaming.integrator.common.exception.ResourceNotFoundException;
-import io.siddhi.core.event.Event;
-import io.siddhi.query.api.definition.Attribute;
 
 import java.util.List;
 
 /**
- * Class which provides necessary apis for event stream related operations
+ * Class which provides necessary apis for event stream related operations.
  */
 public class DebuggerEventStreamService implements EventStreamService {
+
     private static Logger log = LoggerFactory.getLogger(DebuggerEventStreamService.class);
 
     @Override
     public List<String> getStreamNames(String siddhiAppName) {
+
         DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
         if (runtimeHolder != null) {
             return runtimeHolder.getStreams();
@@ -47,7 +48,9 @@ public class DebuggerEventStreamService implements EventStreamService {
     }
 
     @Override
-    public List<Attribute> getStreamAttributes(String siddhiAppName, String streamName) throws ResourceNotFoundException {
+    public List<Attribute> getStreamAttributes(String siddhiAppName, String streamName)
+            throws ResourceNotFoundException {
+
         DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
         if (runtimeHolder != null) {
             try {
@@ -64,6 +67,7 @@ public class DebuggerEventStreamService implements EventStreamService {
 
     @Override
     public void pushEvent(String siddhiAppName, String streamName, Event event) {
+
         DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
         if (runtimeHolder != null) {
             try {

@@ -18,20 +18,21 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.partition;
 
+import io.siddhi.query.api.annotation.Annotation;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.SiddhiElementConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.StreamConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.QueryConfig;
 import org.wso2.carbon.siddhi.editor.core.util.designview.constants.query.QueryListType;
-import io.siddhi.query.api.annotation.Annotation;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Represents Siddhi Partition
+ * Represents Siddhi Partition.
  */
 public class PartitionConfig extends SiddhiElementConfig {
+
     private Map<QueryListType, List<QueryConfig>> queryLists;
     private List<StreamConfig> streamList;
     private List<PartitionWithElement> partitionWith;
@@ -40,51 +41,63 @@ public class PartitionConfig extends SiddhiElementConfig {
     private Map<String, String> connectorsAndStreams = new HashMap<>();
 
     public Map<QueryListType, List<QueryConfig>> getQueryLists() {
+
         return queryLists;
     }
 
-    public List<StreamConfig> getStreamList() {
-        return streamList;
-    }
-
-    public List<PartitionWithElement> getPartitionWith() {
-        return partitionWith;
-    }
-
-    public List<String> getAnnotationList() {
-        return annotationList;
-    }
-
-    public List<Annotation> getAnnotationListObjects() {
-        return annotationListObjects;
-    }
-
-    public Map<String, String> getConnectorsAndStreams() {
-        return connectorsAndStreams;
-    }
-
     public void setQueryLists(Map<QueryListType, List<QueryConfig>> queryLists) {
+
         this.queryLists = queryLists;
     }
 
+    public List<StreamConfig> getStreamList() {
+
+        return streamList;
+    }
+
     public void setStreamList(List<StreamConfig> streamList) {
+
         this.streamList = streamList;
     }
 
+    public List<PartitionWithElement> getPartitionWith() {
+
+        return partitionWith;
+    }
+
     public void setPartitionWith(List<PartitionWithElement> partitionWith) {
+
         this.partitionWith = partitionWith;
     }
 
+    public List<String> getAnnotationList() {
+
+        return annotationList;
+    }
+
     public void setAnnotationList(List<String> annotationList) {
+
         this.annotationList = annotationList;
     }
 
-    public void setConnectorsAndStreams(Map<String, String> connectorsAndStreams) {
-        this.connectorsAndStreams = connectorsAndStreams;
+    public List<Annotation> getAnnotationListObjects() {
+
+        return annotationListObjects;
     }
 
     public void setAnnotationListObjects(List<Annotation> annotationListObjects) {
+
         this.annotationListObjects = annotationListObjects;
+    }
+
+    public Map<String, String> getConnectorsAndStreams() {
+
+        return connectorsAndStreams;
+    }
+
+    public void setConnectorsAndStreams(Map<String, String> connectorsAndStreams) {
+
+        this.connectorsAndStreams = connectorsAndStreams;
     }
 
 }

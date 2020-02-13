@@ -19,19 +19,22 @@
 package org.wso2.carbon.siddhi.editor.core.exception;
 
 /**
- * This exception will be thrown in case a where it tries to run or debug an un deployed siddhi app
+ * This exception will be thrown in case a where it tries to run or debug an un deployed siddhi app.
  */
 public class NoSuchStreamException extends RuntimeException {
 
     public NoSuchStreamException(String msg) {
+
         super(msg);
     }
 
     public NoSuchStreamException(Exception cause) {
+
         super(cause);
     }
 
     public NoSuchStreamException(String msg, Exception cause) {
+
         super(msg, cause);
     }
 

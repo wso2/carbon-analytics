@@ -21,28 +21,33 @@ package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhie
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.OutputConfig;
 
 /**
- * Represents Output part of a Siddhi Query
+ * Represents Output part of a Siddhi Query.
  */
 public class QueryOutputConfig {
+
     private String type;
     private OutputConfig output;
     private String target;
 
     public QueryOutputConfig(String type, OutputConfig output, String target) {
+
         this.type = type;
         this.output = output;
         this.target = target;
     }
 
     public String getType() {
+
         return type;
     }
 
     public OutputConfig getOutput() {
+
         return output;
     }
 
     public String getTarget() {
+
         return target;
     }
 }

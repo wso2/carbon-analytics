@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.constants;
 
 /**
- * Types of nodes in design view, which represent Siddhi app elements
+ * Types of nodes in design view, which represent Siddhi app elements.
  */
 public enum NodeType {
     STREAM,

@@ -19,22 +19,23 @@
 
 package org.wso2.carbon.siddhi.editor.core;
 
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.util.statistics.metrics.Level;
 import org.wso2.carbon.siddhi.editor.core.internal.DebugRuntime;
 import org.wso2.carbon.siddhi.editor.core.internal.EditorDataHolder;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
-import io.siddhi.core.SiddhiAppRuntime;
-import io.siddhi.core.util.statistics.metrics.Level;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This class contains the implementations of the apis related to SiddhiAppRuntimes
+ * This class contains the implementations of the apis related to SiddhiAppRuntimes.
  */
 public class EditorSiddhiAppRuntimeService implements SiddhiAppRuntimeService {
 
     @Override
     public Map<String, SiddhiAppRuntime> getActiveSiddhiAppRuntimes() {
+
         Map<String, DebugRuntime> siddhiApps = EditorDataHolder.getSiddhiAppMap();
         Map<String, SiddhiAppRuntime> siddhiAppRuntimes = new HashMap<>();
         for (Map.Entry<String, DebugRuntime> entry : siddhiApps.entrySet()) {
@@ -47,7 +48,7 @@ public class EditorSiddhiAppRuntimeService implements SiddhiAppRuntimeService {
     }
 
     @Override
-    public void enableSiddhiAppStatistics(Level statsEnabled) {
+    public void enableSiddhiAppStatistics(Level enabledStatsLevel) {
         //ignore the editor runtime statistics
     }
 }

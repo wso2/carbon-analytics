@@ -18,14 +18,20 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.input.types.patternsequencesupporters;
 
+/**
+ * Absent stream state element configuration class.
+ */
 public class AbsentStreamStateElementConfig extends StreamStateElementConfig {
+
     private String waitingTime;
 
     public String getWaitingTime() {
+
         return waitingTime;
     }
 
     public void setWaitingTime(String waitingTime) {
+
         this.waitingTime = waitingTime;
     }
 }

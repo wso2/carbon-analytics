@@ -86,6 +86,7 @@ public class LogoutApiServiceImpl extends LogoutApiService {
                 Map<String, String> logoutProperties = new HashMap<>();
                 logoutProperties.put(IdPClientConstants.APP_NAME, trimmedAppName);
                 logoutProperties.put(IdPClientConstants.ACCESS_TOKEN, accessToken);
+                logoutProperties.put(IdPClientConstants.DOMAIN, AuthUtil.getDomainFromHeader(request));
 
                 DataHolder.getInstance().getIdPClient().logout(logoutProperties);
 
@@ -134,6 +135,7 @@ public class LogoutApiServiceImpl extends LogoutApiService {
                 logoutProperties.put(IdPClientConstants.APP_NAME, appName);
                 logoutProperties.put(IdPClientConstants.ACCESS_TOKEN, accessToken);
                 logoutProperties.put(IdPClientConstants.ID_TOKEN_KEY, idToken);
+                logoutProperties.put(IdPClientConstants.DOMAIN, AuthUtil.getDomainFromHeader(request));
                 Map<String, String> returnProperties = DataHolder.getInstance().getIdPClient().logout(logoutProperties);
 
                 boolean doReturnProperties = Boolean.

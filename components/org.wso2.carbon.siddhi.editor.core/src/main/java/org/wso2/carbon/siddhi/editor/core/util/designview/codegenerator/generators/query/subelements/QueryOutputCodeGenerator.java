@@ -30,18 +30,23 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generates the code for a output element of a Siddhi query
+ * Generates the code for a output element of a Siddhi query.
  */
 public class QueryOutputCodeGenerator {
 
+    private QueryOutputCodeGenerator() {
+
+    }
+
     /**
-     * Generates the Siddhi code representation of a QueryOutputConfig object
+     * Generates the Siddhi code representation of a QueryOutputConfig object.
      *
      * @param queryOutput The QueryOutputConfig object
      * @return The Siddhi code representation of the given QueryOutputConfig object
      * @throws CodeGenerationException Error when generating the code
      */
     public static String generateQueryOutput(QueryOutputConfig queryOutput) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(queryOutput);
 
         StringBuilder queryOutputStringBuilder = new StringBuilder();
@@ -69,7 +74,7 @@ public class QueryOutputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a InsertOutputConfig object
+     * Generates the Siddhi code representation of a InsertOutputConfig object.
      *
      * @param insertOutput The InsertOutputConfig object
      * @param target       The name of the output stream
@@ -78,6 +83,7 @@ public class QueryOutputCodeGenerator {
      */
     private static String generateInsertOutput(InsertOutputConfig insertOutput, String target)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(insertOutput);
         if (target == null || target.isEmpty()) {
             throw new CodeGenerationException("The 'target' value of a given query output element is empty");
@@ -116,7 +122,7 @@ public class QueryOutputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a DeleteOutputConfig object
+     * Generates the Siddhi code representation of a DeleteOutputConfig object.
      *
      * @param deleteOutput The DeleteOutputConfig object
      * @param target       The name of the output stream
@@ -125,6 +131,7 @@ public class QueryOutputCodeGenerator {
      */
     private static String generateDeleteOutput(DeleteOutputConfig deleteOutput, String target)
             throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(deleteOutput);
         if (target == null || target.isEmpty()) {
             throw new CodeGenerationException("The 'target' value of a given delete query output is empty");
@@ -142,7 +149,7 @@ public class QueryOutputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a UpdateInsertIntoOutputConfig object
+     * Generates the Siddhi code representation of a UpdateInsertIntoOutputConfig object.
      *
      * @param type                   The type of output (i.e Either 'update' or 'update-or-insert-into')
      * @param updateInsertIntoOutput The UpdateInsertIntoOutputConfig object
@@ -152,6 +159,7 @@ public class QueryOutputCodeGenerator {
      */
     private static String generateUpdateOutput(String type, UpdateInsertIntoOutputConfig updateInsertIntoOutput,
                                                String target) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(updateInsertIntoOutput);
         if (target == null || target.isEmpty()) {
             throw new CodeGenerationException("The 'target' value of a given update/insert" +
@@ -194,13 +202,14 @@ public class QueryOutputCodeGenerator {
     }
 
     /**
-     * Generates the Siddhi code representation of a SetAttributeConfig object
+     * Generates the Siddhi code representation of a SetAttributeConfig object.
      *
      * @param setAttribute The SetAttributeConfig object
      * @return The Siddhi code representation of the given SetAttributeConfig object
      * @throws CodeGenerationException Error when generating the code
      */
     private static String generateSetAttribute(SetAttributeConfig setAttribute) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(setAttribute);
 
         return setAttribute.getAttribute() +
@@ -208,9 +217,6 @@ public class QueryOutputCodeGenerator {
                 SiddhiCodeBuilderConstants.EQUAL +
                 SiddhiCodeBuilderConstants.SPACE +
                 setAttribute.getValue();
-    }
-
-    private QueryOutputCodeGenerator() {
     }
 
 }

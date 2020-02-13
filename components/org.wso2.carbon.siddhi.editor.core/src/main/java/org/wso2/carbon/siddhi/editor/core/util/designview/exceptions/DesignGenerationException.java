@@ -18,14 +18,17 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.exceptions;
 
 /**
- * Exceptions related to operations of generating Configs from code
+ * Exceptions related to operations of generating Configs from code.
  */
 public class DesignGenerationException extends Exception {
+
     public DesignGenerationException(String message) {
+
         super(message);
     }
 
     public DesignGenerationException(String message, Throwable cause) {
+
         super(message, cause);
     }
 }

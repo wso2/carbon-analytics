@@ -24,30 +24,36 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAp
 import java.util.Set;
 
 /**
- * Represents the visual structure of a Siddhi app, for the design view
+ * Represents the visual structure of a Siddhi app, for the design view.
  */
 public class EventFlow {
+
     private SiddhiAppConfig siddhiAppConfig;
     private Set<Edge> edgeList;
 
     public EventFlow(SiddhiAppConfig siddhiAppConfig, Set<Edge> edgeList) {
+
         this.siddhiAppConfig = siddhiAppConfig;
         this.edgeList = edgeList;
     }
 
     public SiddhiAppConfig getSiddhiAppConfig() {
+
         return siddhiAppConfig;
     }
 
     public void setSiddhiAppConfig(SiddhiAppConfig siddhiAppConfig) {
+
         this.siddhiAppConfig = siddhiAppConfig;
     }
 
     public Set<Edge> getEdgeList() {
+
         return edgeList;
     }
 
     public void setEdgeList(Set<Edge> edgeList) {
+
         this.edgeList = edgeList;
     }
 }

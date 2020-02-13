@@ -19,22 +19,26 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.siddhielements.query.output.types.setattribute;
 
 /**
- * Represents Attribute to set in Siddhi Query Output
+ * Represents Attribute to set in Siddhi Query Output.
  */
 public class SetAttributeConfig {
+
     private String attribute;
     private String value;
 
     public SetAttributeConfig(String attribute, String value) {
+
         this.attribute = attribute;
         this.value = value;
     }
 
     public String getAttribute() {
+
         return attribute;
     }
 
     public String getValue() {
+
         return value;
     }
 }

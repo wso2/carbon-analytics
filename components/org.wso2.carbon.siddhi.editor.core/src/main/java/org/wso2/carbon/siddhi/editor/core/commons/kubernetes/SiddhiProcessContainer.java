@@ -25,6 +25,7 @@ import java.util.ArrayList;
  */
 public class SiddhiProcessContainer {
     private ArrayList<Env> env;
+    private String image;
 
     public ArrayList<Env> getEnv() {
         return env;
@@ -32,5 +33,13 @@ public class SiddhiProcessContainer {
 
     public void setEnv(ArrayList<Env> env) {
         this.env = env;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

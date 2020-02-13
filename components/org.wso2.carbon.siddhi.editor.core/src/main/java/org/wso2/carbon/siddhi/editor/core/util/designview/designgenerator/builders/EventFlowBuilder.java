@@ -18,6 +18,21 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.builders;
 
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.stream.input.source.Source;
+import io.siddhi.core.stream.output.sink.Sink;
+import io.siddhi.query.api.SiddhiApp;
+import io.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.definition.AbstractDefinition;
+import io.siddhi.query.api.definition.AggregationDefinition;
+import io.siddhi.query.api.definition.FunctionDefinition;
+import io.siddhi.query.api.definition.StreamDefinition;
+import io.siddhi.query.api.definition.TableDefinition;
+import io.siddhi.query.api.definition.TriggerDefinition;
+import io.siddhi.query.api.definition.WindowDefinition;
+import io.siddhi.query.api.execution.ExecutionElement;
+import io.siddhi.query.api.execution.partition.Partition;
+import io.siddhi.query.api.execution.query.Query;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.EventFlow;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.Edge;
 import org.wso2.carbon.siddhi.editor.core.util.designview.beans.configs.SiddhiAppConfig;
@@ -38,21 +53,6 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.genera
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.commentspreserver.PartitionScopeCommentsPreserver;
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.generators.query.QueryConfigGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
-import io.siddhi.core.SiddhiAppRuntime;
-import io.siddhi.core.stream.input.source.Source;
-import io.siddhi.core.stream.output.sink.Sink;
-import io.siddhi.query.api.SiddhiApp;
-import io.siddhi.query.api.annotation.Annotation;
-import io.siddhi.query.api.definition.AbstractDefinition;
-import io.siddhi.query.api.definition.AggregationDefinition;
-import io.siddhi.query.api.definition.FunctionDefinition;
-import io.siddhi.query.api.definition.StreamDefinition;
-import io.siddhi.query.api.definition.TableDefinition;
-import io.siddhi.query.api.definition.TriggerDefinition;
-import io.siddhi.query.api.definition.WindowDefinition;
-import io.siddhi.query.api.execution.ExecutionElement;
-import io.siddhi.query.api.execution.partition.Partition;
-import io.siddhi.query.api.execution.query.Query;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -61,9 +61,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Builder to create EventFlow
+ * Builder to create EventFlow.
  */
 public class EventFlowBuilder {
+
     private String siddhiAppString;
     private SiddhiApp siddhiApp;
     private SiddhiAppRuntime siddhiAppRuntime;
@@ -72,6 +73,7 @@ public class EventFlowBuilder {
     private Set<Edge> edges;
 
     public EventFlowBuilder(String siddhiAppString, SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime) {
+
         this.siddhiAppString = siddhiAppString;
         this.siddhiApp = siddhiApp;
         this.siddhiAppRuntime = siddhiAppRuntime;
@@ -80,20 +82,22 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Creates an EventFlow object with loaded elements
+     * Creates an EventFlow object with loaded elements.
      *
      * @return EventFlow object
      */
     public EventFlow create() {
+
         return new EventFlow(siddhiAppConfig, edges);
     }
 
     /**
-     * Loads App level Annotations from the Siddhi app
+     * Loads App level Annotations from the Siddhi app.
      *
      * @return A reference to this object
      */
     public EventFlowBuilder loadAppAnnotations() {
+
         String siddhiAppName = "";
         String siddhiAppDescription = "";
         List<String> appAnnotations = new ArrayList<>();
@@ -121,12 +125,13 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Triggers from the SiddhiApp
+     * Loads Triggers from the SiddhiApp.
      *
      * @return A reference to this object
      * @throws DesignGenerationException Error while loading elements
      */
     public EventFlowBuilder loadTriggers() throws DesignGenerationException {
+
         TriggerConfigGenerator triggerConfigGenerator =
                 new TriggerConfigGenerator(siddhiAppString, siddhiAppRuntime.getStreamDefinitionMap());
         for (TriggerDefinition triggerDefinition : siddhiApp.getTriggerDefinitionMap().values()) {
@@ -137,23 +142,25 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Returns the availability of a Trigger with the given name, in the given Siddhi app
+     * Returns the availability of a Trigger with the given name, in the given Siddhi app.
      *
      * @param streamName Name of the Stream
      * @param siddhiApp  Siddhi app in which, availability of Trigger is searched
      * @return Availability of Trigger with the given name, in given Siddhi app
      */
     private boolean isTriggerDefined(String streamName, SiddhiApp siddhiApp) {
+
         return (siddhiApp.getTriggerDefinitionMap().size() != 0 &&
                 siddhiApp.getTriggerDefinitionMap().containsKey(streamName));
     }
 
     /**
-     * Loads Streams from the SiddhiAppRuntime
+     * Loads Streams from the SiddhiAppRuntime.
      *
      * @return A reference to this object
      */
     public EventFlowBuilder loadStreams() {
+
         StreamDefinitionConfigGenerator streamDefinitionConfigGenerator = new StreamDefinitionConfigGenerator();
         Map<String, StreamDefinition> streamDefinitionMap = siddhiAppRuntime.getStreamDefinitionMap();
         for (Map.Entry<String, StreamDefinition> streamDefinitionEntry : streamDefinitionMap.entrySet()) {
@@ -168,11 +175,13 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Sources from the SiddhiAppRuntime
+     * Loads Sources from the SiddhiAppRuntime.
      *
      * @return A reference to this object
+     * @throws DesignGenerationException Error when loading designer view
      */
     public EventFlowBuilder loadSources() throws DesignGenerationException {
+
         SourceSinkConfigsGenerator sourceConfigsGenerator = new SourceSinkConfigsGenerator();
         for (List<Source> sourceList : siddhiAppRuntime.getSources()) {
             for (SourceSinkConfig sourceConfig : sourceConfigsGenerator.generateSourceConfigs(sourceList)) {
@@ -184,11 +193,13 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Sinks from the SiddhiAppRuntime
+     * Loads Sinks from the SiddhiAppRuntime.
      *
      * @return A reference to this object
+     * @throws DesignGenerationException Error when loading designer view
      */
     public EventFlowBuilder loadSinks() throws DesignGenerationException {
+
         SourceSinkConfigsGenerator sinkConfigsGenerator = new SourceSinkConfigsGenerator();
         for (List<Sink> sinkList : siddhiAppRuntime.getSinks()) {
             for (SourceSinkConfig sinkConfig : sinkConfigsGenerator.generateSinkConfigs(sinkList)) {
@@ -200,12 +211,13 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Tables from the Siddhi App
+     * Loads Tables from the Siddhi App.
      *
      * @return A reference to this object
      * @throws DesignGenerationException Error while loading elements
      */
     public EventFlowBuilder loadTables() throws DesignGenerationException {
+
         TableConfigGenerator tableConfigGenerator = new TableConfigGenerator();
         for (TableDefinition tableDefinition : siddhiApp.getTableDefinitionMap().values()) {
             siddhiAppConfig.add(tableConfigGenerator.generateTableConfig(tableDefinition));
@@ -215,12 +227,13 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Defined Windows from the SiddhiAppRuntime
+     * Loads Defined Windows from the SiddhiAppRuntime.
      *
      * @return A reference to this object
      * @throws DesignGenerationException Error while loading elements
      */
     public EventFlowBuilder loadWindows() throws DesignGenerationException {
+
         WindowConfigGenerator windowConfigGenerator = new WindowConfigGenerator(siddhiAppString);
         for (WindowDefinition windowDefinition : siddhiApp.getWindowDefinitionMap().values()) {
             siddhiAppConfig.add(windowConfigGenerator.generateWindowConfig(windowDefinition));
@@ -230,12 +243,13 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Aggregations from the SiddhiApp
+     * Loads Aggregations from the SiddhiApp.
      *
      * @return A reference to this object
      * @throws DesignGenerationException Error while loading elements
      */
     public EventFlowBuilder loadAggregations() throws DesignGenerationException {
+
         AggregationConfigGenerator aggregationConfigGenerator = new AggregationConfigGenerator(siddhiAppString);
         for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
             siddhiAppConfig.add(aggregationConfigGenerator.generateAggregationConfig(aggregationDefinition));
@@ -245,11 +259,12 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Functions from the siddhi app
+     * Loads Functions from the siddhi app.
      *
      * @return A reference to this object
      */
     public EventFlowBuilder loadFunctions() {
+
         FunctionConfigGenerator functionConfigGenerator = new FunctionConfigGenerator();
         for (FunctionDefinition functionDefinition : siddhiApp.getFunctionDefinitionMap().values()) {
             siddhiAppConfig.add(functionConfigGenerator.generateFunctionConfig(functionDefinition));
@@ -259,12 +274,13 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads Execution Elements from the Siddhi App
+     * Loads Execution Elements from the Siddhi App.
      *
      * @return A reference to this object
      * @throws DesignGenerationException Error while loading elements
      */
     public EventFlowBuilder loadExecutionElements() throws DesignGenerationException {
+
         Map<String, Map<String, AbstractDefinition>> partitionedInnerStreamDefinitions =
                 siddhiAppRuntime.getPartitionedInnerStreamDefinitionMap();
         QueryConfigGenerator queryConfigGenerator = new QueryConfigGenerator(siddhiAppString, siddhiApp);
@@ -275,7 +291,8 @@ public class EventFlowBuilder {
         for (ExecutionElement executionElement : siddhiApp.getExecutionElementList()) {
             if (executionElement instanceof Query) {
                 queryCounter++;
-                QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig((Query) executionElement, queryCounter);
+                QueryConfig queryConfig = queryConfigGenerator.generateQueryConfig((Query) executionElement,
+                        queryCounter);
                 siddhiAppConfig.addQuery(QueryConfigGenerator.getQueryListType(queryConfig), queryConfig);
             } else if (executionElement instanceof Partition) {
                 String partitionId = (String) partitionedInnerStreamDefinitions.keySet().toArray()[partitionCounter];
@@ -295,24 +312,26 @@ public class EventFlowBuilder {
     }
 
     /**
-     * Loads generated Edges that represent connections between SiddhiElementConfigs, into SiddhiAppConfig object
+     * Loads generated Edges that represent connections between SiddhiElementConfigs, into SiddhiAppConfig object.
      *
      * @return A reference to this object
      * @throws DesignGenerationException Error while loading edges
      */
     public EventFlowBuilder loadEdges() throws DesignGenerationException {
+
         EdgesGenerator edgesGenerator = new EdgesGenerator(siddhiAppConfig);
         edges = edgesGenerator.generateEdges();
         return this;
     }
 
     /**
-     * Loads Comments, that were preserved by each Siddhi Element Config generator
+     * Loads Comments, that were preserved by each Siddhi Element Config generator.
      *
      * @return A reference to this object
      * @throws DesignGenerationException Error while generating Comment Code Segments
      */
     public EventFlowBuilder loadComments() throws DesignGenerationException {
+
         OuterScopeCommentsPreserver outerScopeCommentsPreserver =
                 new OuterScopeCommentsPreserver(siddhiAppString, siddhiAppConfig.getElementCodeSegments());
         siddhiAppConfig.assignCommentCodeSegments(outerScopeCommentsPreserver.generateCommentCodeSegments());

@@ -22,6 +22,7 @@ package org.wso2.carbon.siddhi.editor.core.exception;
  * Exceptions related to Siddhi store query helper.
  */
 public class SiddhiStoreQueryHelperException extends Exception {
+
     /**
      * Constructs a new exception with the specified detail message.  The
      * cause is not initialized, and may subsequently be initialized by
@@ -31,6 +32,7 @@ public class SiddhiStoreQueryHelperException extends Exception {
      *                later retrieval by the {@link #getMessage()} method.
      */
     public SiddhiStoreQueryHelperException(String message) {
+
         super(message);
     }
 
@@ -49,6 +51,7 @@ public class SiddhiStoreQueryHelperException extends Exception {
      * @since 1.4
      */
     public SiddhiStoreQueryHelperException(String message, Throwable cause) {
+
         super(message, cause);
     }
 }

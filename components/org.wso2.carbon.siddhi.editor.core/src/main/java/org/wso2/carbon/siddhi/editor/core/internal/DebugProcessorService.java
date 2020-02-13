@@ -16,24 +16,30 @@
  * under the License.
  */
 
-
 package org.wso2.carbon.siddhi.editor.core.internal;
-
 
 import org.wso2.carbon.siddhi.editor.core.exception.NoSuchSiddhiAppException;
 
 /**
- * Class which manage siddhi apps and their runtime
+ * Class which manage siddhi apps and their runtime.
  */
 public class DebugProcessorService {
 
     public DebugRuntime getSiddhiAppRuntimeHolder(String siddhiAppName) {
+
         return EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
     }
 
     public synchronized void start(String siddhiAppName) {
+
         if (EditorDataHolder.getSiddhiAppMap().containsKey(siddhiAppName)) {
             DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
+            //retrying to accommodate late bundle loadings
+            if (runtimeHolder.getMode() == DebugRuntime.Mode.FAULTY) {
+                DebugRuntime recreatedRuntimeHolder = new DebugRuntime(siddhiAppName, runtimeHolder.getSiddhiApp());
+                runtimeHolder = recreatedRuntimeHolder;
+                EditorDataHolder.getSiddhiAppMap().put(siddhiAppName, recreatedRuntimeHolder);
+            }
             runtimeHolder.start();
         } else {
             throw new NoSuchSiddhiAppException(
@@ -43,6 +49,7 @@ public class DebugProcessorService {
     }
 
     public synchronized void debug(String siddhiAppName) {
+
         if (EditorDataHolder.getSiddhiAppMap().containsKey(siddhiAppName)) {
             DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
             runtimeHolder.debug();
@@ -54,6 +61,7 @@ public class DebugProcessorService {
     }
 
     public synchronized void stop(String siddhiAppName) {
+
         if (EditorDataHolder.getSiddhiAppMap().containsKey(siddhiAppName)) {
             DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
             runtimeHolder.stop();
@@ -65,6 +73,7 @@ public class DebugProcessorService {
     }
 
     public synchronized void deploy(String siddhiAppName, String siddhiApp) {
+
         if (!EditorDataHolder.getSiddhiAppMap().containsKey(siddhiAppName)) {
             DebugRuntime runtimeHolder = new DebugRuntime(siddhiAppName, siddhiApp);
             EditorDataHolder.getSiddhiAppMap().put(siddhiAppName, runtimeHolder);
@@ -74,6 +83,7 @@ public class DebugProcessorService {
     }
 
     public synchronized void undeploy(String siddhiAppName) {
+
         if (EditorDataHolder.getSiddhiAppMap().containsKey(siddhiAppName)) {
             DebugRuntime runtimeHolder = EditorDataHolder.getSiddhiAppMap().get(siddhiAppName);
             runtimeHolder.stop();
@@ -84,6 +94,5 @@ public class DebugProcessorService {
             );
         }
     }
-
 
 }

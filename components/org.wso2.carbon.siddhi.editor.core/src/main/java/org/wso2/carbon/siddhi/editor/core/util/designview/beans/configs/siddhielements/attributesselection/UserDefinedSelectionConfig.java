@@ -23,17 +23,20 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.constants.AttributeSel
 import java.util.List;
 
 /**
- * Represents user defined selection of Siddhi Attributes
+ * Represents user defined selection of Siddhi Attributes.
  */
 public class UserDefinedSelectionConfig extends AttributesSelectionConfig {
+
     private List<SelectedAttribute> value;
 
     public UserDefinedSelectionConfig(List<SelectedAttribute> value) {
+
         super(AttributeSelection.TYPE_USER_DEFINED);
         this.value = value;
     }
 
     public List<SelectedAttribute> getValue() {
+
         return value;
     }
 }

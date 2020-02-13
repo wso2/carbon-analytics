@@ -24,19 +24,20 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 /**
- * Generates the code for a Siddhi stream element
+ * Generates the code for a Siddhi stream element.
  */
 public class StreamCodeGenerator {
 
     /**
-     * Generates the Siddhi code representation of a StreamConfig object
+     * Generates the Siddhi code representation of a StreamConfig object.
      *
-     * @param stream The StreamConfig object
+     * @param stream              The StreamConfig object
      * @param isGeneratingToolTip If it is generating a tooltip or not
      * @return The Siddhi code representation of the given StreamConfig object
      * @throws CodeGenerationException Error when generating the code
      */
     public String generateStream(StreamConfig stream, boolean isGeneratingToolTip) throws CodeGenerationException {
+
         CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
         StringBuilder streamStringBuilder = new StringBuilder();
         if (!isGeneratingToolTip) {
@@ -45,7 +46,7 @@ public class StreamCodeGenerator {
 
         streamStringBuilder.append(SubElementCodeGenerator.generateAnnotations(stream.getAnnotationList()))
                 .append(SiddhiCodeBuilderConstants.DEFINE_STREAM)
-                .append(SiddhiCodeBuilderConstants.SPACE )
+                .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(stream.getName())
                 .append(SiddhiCodeBuilderConstants.SPACE)
                 .append(SiddhiCodeBuilderConstants.OPEN_BRACKET)

@@ -19,19 +19,22 @@
 package org.wso2.carbon.siddhi.editor.core.exception;
 
 /**
- * This exception will be thrown in case a where it tries to run or debug an un deployed siddhi app
+ * This exception will be thrown in case a where it tries to run or debug an un deployed siddhi app.
  */
 public class NoSuchSiddhiAppException extends RuntimeException {
 
     public NoSuchSiddhiAppException(String msg) {
+
         super(msg);
     }
 
     public NoSuchSiddhiAppException(Exception cause) {
+
         super(cause);
     }
 
     public NoSuchSiddhiAppException(String msg, Exception cause) {
+
         super(msg, cause);
     }
 
