@@ -158,13 +158,15 @@ public class ExtensionsInstallerUtils {
                 throw new ExtensionsInstallerException(
                     String.format("Invalid value: %s for usage type.", usageType));
             } else if (usedBy == UsedByType.SAMPLES) {
-                if (usageType == UsageType.JAR) {
-                    return ExtensionsInstallerConstants.SAMPLES_JARS_LOCATION;
-                } else if (usageType == UsageType.BUNDLE) {
+                if (usageType == UsageType.BUNDLE) {
                     return ExtensionsInstallerConstants.SAMPLES_LIB_LOCATION;
+                } else if (usageType == UsageType.JAR) {
+                    throw new ExtensionsInstallerException(
+                        String.format("Usage type: %s is not applicable when used by: %s.",
+                            UsageType.JAR, UsedByType.SAMPLES));
                 }
                 throw new ExtensionsInstallerException(
-                    String.format("Invalid value: %s for dependency type.", usageType));
+                    String.format("Invalid value: %s for usage type.", usageType));
             }
         }
         throw new ExtensionsInstallerException(String.format("Invalid value: %s for 'usedBy' property.", usage));
