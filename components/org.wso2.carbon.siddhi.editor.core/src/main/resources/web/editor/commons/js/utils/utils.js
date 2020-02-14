@@ -113,6 +113,7 @@ define(['require', 'jquery', 'constants'],
                 }
             }));
         }
+
         /**
          * provide the update details about the extension
          * @param extension
