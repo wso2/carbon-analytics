@@ -26,11 +26,10 @@ define(['require', 'lodash', 'jquery', 'constants'],
                 extensionTable = $('<table class="table table-hover data-table"' +
                     ' id="extensionTableId"><tbody></tbody></table>');
 
+                // TODO generalize serviceUrl
                 var serviceUrl = window.location.protocol + "//" + window.location.host+ "/siddhi-extensions";
                 var getAllExtensionStatusesUrl = serviceUrl + "/status";
-                console.log("REQUEST", getAllExtensionStatusesUrl)
                 var extensionData = {};
-
                 $.ajax({
                     type: "GET",
                     contentType: "json",
@@ -42,7 +41,6 @@ define(['require', 'lodash', 'jquery', 'constants'],
                     error: function (e) {
                         throw "Unable to read extension statuses";
                     }
-
                 });
 
                 extensionData.forEach(function (extension, key) {
@@ -89,7 +87,7 @@ define(['require', 'lodash', 'jquery', 'constants'],
             this.callbackExtensionFileBrowser = function (updatedExtension, isUpdated) {
                 if (isUpdated) {
                     app.utils.extensionData.set(updatedExtension.extensionInfo.name,updatedExtension);
-                    // self.render(); // TODO not working. look into
+                    self.render(); // TODO not working. look into
                     console.log("INSTALLED:", updatedExtension)
                 }
             },
@@ -247,12 +245,6 @@ define(['require', 'lodash', 'jquery', 'constants'],
                 var extensionContainer = extensionModelOpen.find("div").filter("#extensionTableId");
 
                 self.renderExtensions(extensionContainer);
-                // var callbackExtensionFileBrowser = function (updatedExtension, isUpdated) { // TODO remove
-                //     if (isUpdated) {
-                //         app.utils.extensionData.set(updatedExtension.extensionInfo.name,updatedExtension);
-                //         self.renderExtensions();
-                //     }
-                // };
                 var extensionTable;
                 extensionSearch.keyup(function () {
                     self.searchExtension(extensionTable, extensionSearch.val());

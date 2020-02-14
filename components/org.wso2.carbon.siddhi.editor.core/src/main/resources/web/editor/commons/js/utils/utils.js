@@ -160,11 +160,32 @@ define(['require', 'jquery', 'constants'],
 
             self.extensionInstallUninstallAlertModal.find("button").filter("#installUninstallId").click(function () {
                 self.extensionInstallUninstallAlertModal.modal('hide');
+                var action = (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED)
+                    ? Constants.INSTALL : Constants.UNINSTALL;
                 var updateData = {
                     "name": extension.extensionInfo.name,
-                    "action": (extension.extensionStatus.trim().toUpperCase() === Constants.EXTENSION_NOT_INSTALLED)
-                        ? Constants.INSTALL : Constants.UNINSTALL
+                    "action": action
                 };
+
+                // TODO generalize serviceUrl
+                var serviceUrl = window.location.protocol + "//" + window.location.host+ "/siddhi-extensions";
+                var installUninstallUrl = serviceUrl + "/" + extension.extensionInfo.name + "/" + action.toLowerCase();
+                var installationData = {};
+                $.ajax({
+                    type: "POST",
+                    contentType: "json",
+                    url: installUninstallUrl,
+                    async: false,
+                    success: function (data) {
+                        installationData = data;
+                        console.log("Successfully " + action.toLowerCase() + "ed.")
+                    },
+                    error: function (e) {
+                        throw "Unable to read extension statuses";
+                    }
+                });
+
+
                 //this updateData goes to back end.
                 console.log(updateData.name + " " + updateData.action);
                 //this updatedExtension data should come from backend.
