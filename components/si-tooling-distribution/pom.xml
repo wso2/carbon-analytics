@@ -161,6 +161,11 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.siddhi.extensions.installer.core.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.business.rules.templates.editor.core.feature</artifactId>
             <type>zip</type>
         </dependency>
