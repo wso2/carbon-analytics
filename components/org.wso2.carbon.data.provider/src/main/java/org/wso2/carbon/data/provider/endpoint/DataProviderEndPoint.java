@@ -240,10 +240,12 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
      */
     @OnClose
     public void onClose(WebSocketConnection webSocketConnection) {
-        Map<String, DataProvider> dataProviderMap = getDataProviderHelper().getTopicDataProviderMap(
-                webSocketConnection.getChannelId());
-        for (String topic : dataProviderMap.keySet()) {
-            getDataProviderHelper().removeTopicIfExist(webSocketConnection.getChannelId(), topic);
+        Map<String, DataProvider> dataProviderMap =
+                getDataProviderHelper().getTopicDataProviderMap(webSocketConnection.getChannelId());
+        if (dataProviderMap != null) {
+            for (String topic : dataProviderMap.keySet()) {
+                getDataProviderHelper().removeTopicIfExist(webSocketConnection.getChannelId(), topic);
+            }
         }
         getDataProviderHelper().removeSessionData(webSocketConnection.getChannelId());
     }
