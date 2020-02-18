@@ -136,6 +136,22 @@
             <artifactId>docker-client</artifactId>
             <classifier>shaded</classifier>
         </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -266,7 +282,11 @@
                                     com.kenai.*,
                                     org.apache.commons.*,
                                     jni.*,
-                                    jersey.repackaged.com.*
+                                    jersey.repackaged.com.*,
+                                    com.mysql.jdbc.*,
+                                    com.microsoft.sqlserver.jdbc.*,
+                                    oracle.jdbc.driver.*,
+                                    org.postgresql.*,
                                 </Private-Package>
                                 <Export-Package>
                                     org.wso2.carbon.siddhi.editor.core.*
