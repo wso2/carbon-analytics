@@ -285,6 +285,8 @@
                                     jersey.repackaged.com.*,
                                     com.mysql.jdbc.*,
                                     com.microsoft.sqlserver.jdbc.*,
+                                    microsoft.sql.*,
+                                    mssql.googlecode.concurrentlinkedhashmap.*,
                                     oracle.jdbc.driver.*,
                                     org.postgresql.*,
                                 </Private-Package>
