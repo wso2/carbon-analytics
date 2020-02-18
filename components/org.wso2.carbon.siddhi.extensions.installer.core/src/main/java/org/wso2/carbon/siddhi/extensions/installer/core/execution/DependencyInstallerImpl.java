@@ -244,6 +244,9 @@ public class DependencyInstallerImpl implements DependencyInstaller {
             List<Path> versionedJarFiles = ExtensionsInstallerUtils.listMatchingFiles(lookupRegex, directoryPath);
             if (!versionedJarFiles.isEmpty()) {
                 allJarsDeleted = deleteJarFiles(versionedJarFiles);
+            } else {
+                // No matching jar found. Hence no need to delete.
+                allJarsDeleted = true;
             }
         } catch (IOException e) {
             LOGGER.error(String.format("Failed to list matching files for lookup regex: %s.", lookupRegex));
