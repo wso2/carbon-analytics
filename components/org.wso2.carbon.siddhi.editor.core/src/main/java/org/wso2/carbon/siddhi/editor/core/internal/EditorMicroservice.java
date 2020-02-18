@@ -1396,9 +1396,8 @@ public class EditorMicroservice implements Microservice {
         for (String key : keys) {
             dataStoreMap.put(key, jsonObj.get(key).toString().replaceAll("\"", ""));
         }
-        if (!(dataStoreMap.containsKey("driver") && dataStoreMap.containsKey("url")
-                && dataStoreMap.containsKey("username") && dataStoreMap.containsKey("password")
-                && dataStoreMap.containsKey("tableName"))) {
+        if (!(dataStoreMap.containsKey("url") && dataStoreMap.containsKey("username")
+                && dataStoreMap.containsKey("password") && dataStoreMap.containsKey("tableName"))) {
             return Response
                     .serverError()
                     .entity("Failed : cannot find the required details for the datastore.")
@@ -1411,7 +1410,15 @@ public class EditorMicroservice implements Microservice {
                             || splittedURL[1].equalsIgnoreCase("sqlserver")
                             || splittedURL[1].equalsIgnoreCase("oracle")
                             || splittedURL[1].equalsIgnoreCase("postgresql"))) {
-                Class.forName(dataStoreMap.get("driver"));
+                if (splittedURL[1].equalsIgnoreCase("mysql")) {
+                    Class.forName("com.mysql.jdbc.Driver");
+                } else if (splittedURL[1].equalsIgnoreCase("sqlserver")) {
+                    Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                } else if (splittedURL[1].equalsIgnoreCase("oracle")) {
+                    Class.forName("oracle.jdbc.driver.OracleDriver");
+                } else if (splittedURL[1].equalsIgnoreCase("postgresql")) {
+                    Class.forName("org.postgresql.Driver");
+                }
                 Connection conn = DriverManager.getConnection(dataStoreMap.get("url"),
                         dataStoreMap.get("username"),
                         dataStoreMap.get("password"));
