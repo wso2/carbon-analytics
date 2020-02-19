@@ -1385,7 +1385,77 @@ public class EditorMicroservice implements Microservice {
     }
 
     @POST
-    @Path("/datastore")
+    @Path("/datastore/connection")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDatabaseConnection(JsonElement element) {
+        JsonObject jsonResponse = new JsonObject();
+        JsonObject jsonObj = element.getAsJsonObject();
+        Map<String, String> dataStoreMap = new HashMap<>();
+        Set<String> keys = jsonObj.keySet();
+        for (String key : keys) {
+            dataStoreMap.put(key, jsonObj.get(key).toString().replaceAll("\"", ""));
+        }
+        if (!(dataStoreMap.containsKey("url") && dataStoreMap.containsKey("username")
+                && dataStoreMap.containsKey("password"))) {
+            jsonResponse.addProperty("connection","false");
+            jsonResponse.addProperty("details","Provide jdbcURL, username and password");
+            return Response
+                    .serverError()
+                    .entity(jsonResponse)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        try {
+            String[] splittedURL = dataStoreMap.get("url").split(":");
+            if (splittedURL[0].equalsIgnoreCase("jdbc") &&
+                    (splittedURL[1].equalsIgnoreCase("mysql")
+                            || splittedURL[1].equalsIgnoreCase("sqlserver")
+                            || splittedURL[1].equalsIgnoreCase("oracle")
+                            || splittedURL[1].equalsIgnoreCase("postgresql"))) {
+                if (splittedURL[1].equalsIgnoreCase("mysql")) {
+                    Class.forName("com.mysql.jdbc.Driver");
+                } else if (splittedURL[1].equalsIgnoreCase("sqlserver")) {
+                    Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                } else if (splittedURL[1].equalsIgnoreCase("oracle")) {
+                    Class.forName("oracle.jdbc.driver.OracleDriver");
+                } else if (splittedURL[1].equalsIgnoreCase("postgresql")) {
+                    Class.forName("org.postgresql.Driver");
+                }
+                Connection conn = DriverManager.getConnection(dataStoreMap.get("url"),
+                        dataStoreMap.get("username"),
+                        dataStoreMap.get("password"));
+                conn.close();
+            } else {
+                jsonResponse.addProperty("connection","false");
+                jsonResponse.addProperty("details","Unsupported schema. Expected schema: " +
+                        "mysql, sqlserver, oracle and postgresql. But found: "
+                        + splittedURL[0] + ":" + splittedURL[1]);
+                return Response
+                        .serverError()
+                        .entity(jsonResponse)
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }
+            jsonResponse.addProperty("connection","true");
+            return Response
+                    .status(Response.Status.OK)
+                    .entity(jsonResponse)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (Exception e) {
+            jsonResponse.addProperty("connection","false");
+            jsonResponse.addProperty("details",e.getMessage());
+            return Response
+                    .serverError()
+                    .entity(jsonResponse)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/datastore/tabledetails")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDatabaseDetails(JsonElement element) {
@@ -1398,9 +1468,12 @@ public class EditorMicroservice implements Microservice {
         }
         if (!(dataStoreMap.containsKey("url") && dataStoreMap.containsKey("username")
                 && dataStoreMap.containsKey("password") && dataStoreMap.containsKey("tableName"))) {
+            jsonResponse.addProperty("connection","false");
+            jsonResponse.addProperty("details","Provide jdbcURL, username and password");
             return Response
                     .serverError()
-                    .entity("Failed : cannot find the required details for the datastore.")
+                    .entity(jsonResponse)
+                    .type(MediaType.APPLICATION_JSON)
                     .build();
         }
         try {
@@ -1433,10 +1506,13 @@ public class EditorMicroservice implements Microservice {
                 st.close();
                 conn.close();
             } else {
+                jsonResponse.addProperty("connection","false");
+                jsonResponse.addProperty("details","Unsupported schema. Expected schema: " +
+                        "mysql, sqlserver, oracle and postgresql. But found: "
+                        + splittedURL[0] + ":" + splittedURL[1]);
                 return Response
-                        .status(Response.Status.OK)
-                        .entity("Unsupported schema. Expected schema: mysql, sqlserver, oracle and postgresql. " +
-                                "Found: " + splittedURL[0] + ":" + splittedURL[1])
+                        .serverError()
+                        .entity(jsonResponse)
                         .type(MediaType.APPLICATION_JSON)
                         .build();
             }
@@ -1446,9 +1522,12 @@ public class EditorMicroservice implements Microservice {
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (Exception e) {
+            jsonResponse.addProperty("connection","false");
+            jsonResponse.addProperty("details",e.getMessage());
             return Response
                     .serverError()
-                    .entity("Failed to connect with database." + e.getMessage())
+                    .entity(jsonResponse)
+                    .type(MediaType.APPLICATION_JSON)
                     .build();
         }
     }

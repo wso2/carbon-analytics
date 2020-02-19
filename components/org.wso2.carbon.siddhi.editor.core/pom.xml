@@ -287,7 +287,7 @@
                                     com.microsoft.sqlserver.jdbc.*,
                                     microsoft.sql.*,
                                     mssql.googlecode.concurrentlinkedhashmap.*,
-                                    oracle.jdbc.driver.*,
+                                    oracle.*,
                                     org.postgresql.*,
                                 </Private-Package>
                                 <Export-Package>
