@@ -106,6 +106,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -1438,6 +1439,82 @@ public class EditorMicroservice implements Microservice {
                         .build();
             }
             jsonResponse.addProperty("connection","true");
+            return Response
+                    .status(Response.Status.OK)
+                    .entity(jsonResponse)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (Exception e) {
+            jsonResponse.addProperty("connection","false");
+            jsonResponse.addProperty("details",e.getMessage());
+            return Response
+                    .serverError()
+                    .entity(jsonResponse)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/datastore/tables")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDatabaseTables(JsonElement element) {
+        JsonObject jsonResponse = new JsonObject();
+        JsonObject jsonObj = element.getAsJsonObject();
+        Map<String, String> dataStoreMap = new HashMap<>();
+        Set<String> keys = jsonObj.keySet();
+        for (String key : keys) {
+            dataStoreMap.put(key, jsonObj.get(key).toString().replaceAll("\"", ""));
+        }
+        if (!(dataStoreMap.containsKey("url") && dataStoreMap.containsKey("username")
+                && dataStoreMap.containsKey("password"))) {
+            jsonResponse.addProperty("connection","false");
+            jsonResponse.addProperty("details","Provide jdbcURL, username and password");
+            return Response
+                    .serverError()
+                    .entity(jsonResponse)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        try {
+            String[] splittedURL = dataStoreMap.get("url").split(":");
+            if (splittedURL[0].equalsIgnoreCase("jdbc") &&
+                    (splittedURL[1].equalsIgnoreCase("mysql")
+                            || splittedURL[1].equalsIgnoreCase("sqlserver")
+                            || splittedURL[1].equalsIgnoreCase("oracle")
+                            || splittedURL[1].equalsIgnoreCase("postgresql"))) {
+                if (splittedURL[1].equalsIgnoreCase("mysql")) {
+                    Class.forName("com.mysql.jdbc.Driver");
+                } else if (splittedURL[1].equalsIgnoreCase("sqlserver")) {
+                    Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                } else if (splittedURL[1].equalsIgnoreCase("oracle")) {
+                    Class.forName("oracle.jdbc.driver.OracleDriver");
+                } else if (splittedURL[1].equalsIgnoreCase("postgresql")) {
+                    Class.forName("org.postgresql.Driver");
+                }
+                Connection conn = DriverManager.getConnection(dataStoreMap.get("url"),
+                        dataStoreMap.get("username"),
+                        dataStoreMap.get("password"));
+                DatabaseMetaData dbMetadata = conn.getMetaData();
+                ResultSet rs = dbMetadata.getTables(null, null, "%", null);
+                int tableNumber = 1;
+                while (rs.next()) {
+                    jsonResponse.addProperty("tableNumber" + tableNumber, rs.getString(3));
+                    tableNumber++;
+                }
+                conn.close();
+            } else {
+                jsonResponse.addProperty("connection","false");
+                jsonResponse.addProperty("details","Unsupported schema. Expected schema: " +
+                        "mysql, sqlserver, oracle and postgresql. But found: "
+                        + splittedURL[0] + ":" + splittedURL[1]);
+                return Response
+                        .serverError()
+                        .entity(jsonResponse)
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }
             return Response
                     .status(Response.Status.OK)
                     .entity(jsonResponse)
