@@ -62,7 +62,6 @@ public class DependencyInstallerImpl implements DependencyInstaller {
     public Map<String, Object> installDependenciesFor(String extensionId) throws ExtensionsInstallerException {
         List<DependencyConfig> completedDependencies = new ArrayList<>();
         List<DependencyConfig> failedDependencies = new ArrayList<>();
-        List<DependencyConfig> manuallyInstallableDependencies = new ArrayList<>();
 
         ExtensionConfig extension = ExtensionsInstallerUtils.findExtension(extensionId, extensionConfigs);
         List<DependencyConfig> dependencies = extension.getDependencies();
@@ -77,14 +76,12 @@ public class DependencyInstallerImpl implements DependencyInstaller {
                         LOGGER.error(String.format("Failed to install dependency: %s for extension: %s.",
                             dependency.getRepresentableName(), extensionId), e);
                     }
-                } else {
-                    manuallyInstallableDependencies.add(dependency);
                 }
             }
             ExtensionInstallationStatus status = ExtensionsInstallerUtils.getInstallationStatus(
                 completedDependencies.size(), extension.getDependencies().size());
             return ResponseEntityCreator.createExtensionInstallationResponse(
-                status, completedDependencies, failedDependencies, manuallyInstallableDependencies);
+                extension, status, completedDependencies, failedDependencies);
         }
         throw new ExtensionsInstallerException(String.format(
             "No dependencies were specified in extension: %s", extensionId));
