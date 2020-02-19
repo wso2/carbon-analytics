@@ -1400,7 +1400,7 @@ public class EditorMicroservice implements Microservice {
         if (!(dataStoreMap.containsKey("url") && dataStoreMap.containsKey("username")
                 && dataStoreMap.containsKey("password"))) {
             jsonResponse.addProperty("connection","false");
-            jsonResponse.addProperty("details","Provide jdbcURL, username and password");
+            jsonResponse.addProperty("errorMessage","Provide jdbcURL, username and password");
             return Response
                     .serverError()
                     .entity(jsonResponse)
@@ -1429,7 +1429,7 @@ public class EditorMicroservice implements Microservice {
                 conn.close();
             } else {
                 jsonResponse.addProperty("connection","false");
-                jsonResponse.addProperty("details","Unsupported schema. Expected schema: " +
+                jsonResponse.addProperty("errorMessage","Unsupported schema. Expected schema: " +
                         "mysql, sqlserver, oracle and postgresql. But found: "
                         + splittedURL[0] + ":" + splittedURL[1]);
                 return Response
@@ -1446,7 +1446,7 @@ public class EditorMicroservice implements Microservice {
                     .build();
         } catch (Exception e) {
             jsonResponse.addProperty("connection","false");
-            jsonResponse.addProperty("details",e.getMessage());
+            jsonResponse.addProperty("errorMessage",e.getMessage());
             return Response
                     .serverError()
                     .entity(jsonResponse)
@@ -1460,39 +1460,16 @@ public class EditorMicroservice implements Microservice {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDatabaseTables(JsonElement element) {
-        JsonObject jsonResponse = new JsonObject();
-        JsonObject jsonObj = element.getAsJsonObject();
-        Map<String, String> dataStoreMap = new HashMap<>();
-        Set<String> keys = jsonObj.keySet();
-        for (String key : keys) {
-            dataStoreMap.put(key, jsonObj.get(key).toString().replaceAll("\"", ""));
-        }
-        if (!(dataStoreMap.containsKey("url") && dataStoreMap.containsKey("username")
-                && dataStoreMap.containsKey("password"))) {
-            jsonResponse.addProperty("connection","false");
-            jsonResponse.addProperty("details","Provide jdbcURL, username and password");
-            return Response
-                    .serverError()
-                    .entity(jsonResponse)
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-        try {
-            String[] splittedURL = dataStoreMap.get("url").split(":");
-            if (splittedURL[0].equalsIgnoreCase("jdbc") &&
-                    (splittedURL[1].equalsIgnoreCase("mysql")
-                            || splittedURL[1].equalsIgnoreCase("sqlserver")
-                            || splittedURL[1].equalsIgnoreCase("oracle")
-                            || splittedURL[1].equalsIgnoreCase("postgresql"))) {
-                if (splittedURL[1].equalsIgnoreCase("mysql")) {
-                    Class.forName("com.mysql.jdbc.Driver");
-                } else if (splittedURL[1].equalsIgnoreCase("sqlserver")) {
-                    Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-                } else if (splittedURL[1].equalsIgnoreCase("oracle")) {
-                    Class.forName("oracle.jdbc.driver.OracleDriver");
-                } else if (splittedURL[1].equalsIgnoreCase("postgresql")) {
-                    Class.forName("org.postgresql.Driver");
-                }
+        Response response = getDatabaseConnection(element);
+        if(response.getStatus()==200){
+            JsonObject jsonResponse = new JsonObject();
+            JsonObject jsonObj = element.getAsJsonObject();
+            Map<String, String> dataStoreMap = new HashMap<>();
+            Set<String> keys = jsonObj.keySet();
+            for (String key : keys) {
+                dataStoreMap.put(key, jsonObj.get(key).toString().replaceAll("\"", ""));
+            }
+            try{
                 Connection conn = DriverManager.getConnection(dataStoreMap.get("url"),
                         dataStoreMap.get("username"),
                         dataStoreMap.get("password"));
@@ -1504,30 +1481,22 @@ public class EditorMicroservice implements Microservice {
                     tableNumber++;
                 }
                 conn.close();
-            } else {
+                return Response
+                        .status(Response.Status.OK)
+                        .entity(jsonResponse)
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }catch (Exception e){
                 jsonResponse.addProperty("connection","false");
-                jsonResponse.addProperty("details","Unsupported schema. Expected schema: " +
-                        "mysql, sqlserver, oracle and postgresql. But found: "
-                        + splittedURL[0] + ":" + splittedURL[1]);
+                jsonResponse.addProperty("errorMessage",e.getMessage());
                 return Response
                         .serverError()
                         .entity(jsonResponse)
                         .type(MediaType.APPLICATION_JSON)
                         .build();
             }
-            return Response
-                    .status(Response.Status.OK)
-                    .entity(jsonResponse)
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        } catch (Exception e) {
-            jsonResponse.addProperty("connection","false");
-            jsonResponse.addProperty("details",e.getMessage());
-            return Response
-                    .serverError()
-                    .entity(jsonResponse)
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
+        } else {
+            return response;
         }
     }
 
@@ -1536,39 +1505,26 @@ public class EditorMicroservice implements Microservice {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDatabaseDetails(JsonElement element) {
-        JsonObject jsonResponse = new JsonObject();
-        JsonObject jsonObj = element.getAsJsonObject();
-        Map<String, String> dataStoreMap = new HashMap<>();
-        Set<String> keys = jsonObj.keySet();
-        for (String key : keys) {
-            dataStoreMap.put(key, jsonObj.get(key).toString().replaceAll("\"", ""));
-        }
-        if (!(dataStoreMap.containsKey("url") && dataStoreMap.containsKey("username")
-                && dataStoreMap.containsKey("password") && dataStoreMap.containsKey("tableName"))) {
-            jsonResponse.addProperty("connection","false");
-            jsonResponse.addProperty("details","Provide jdbcURL, username and password");
-            return Response
-                    .serverError()
-                    .entity(jsonResponse)
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        }
-        try {
-            String[] splittedURL = dataStoreMap.get("url").split(":");
-            if (splittedURL[0].equalsIgnoreCase("jdbc") &&
-                    (splittedURL[1].equalsIgnoreCase("mysql")
-                            || splittedURL[1].equalsIgnoreCase("sqlserver")
-                            || splittedURL[1].equalsIgnoreCase("oracle")
-                            || splittedURL[1].equalsIgnoreCase("postgresql"))) {
-                if (splittedURL[1].equalsIgnoreCase("mysql")) {
-                    Class.forName("com.mysql.jdbc.Driver");
-                } else if (splittedURL[1].equalsIgnoreCase("sqlserver")) {
-                    Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-                } else if (splittedURL[1].equalsIgnoreCase("oracle")) {
-                    Class.forName("oracle.jdbc.driver.OracleDriver");
-                } else if (splittedURL[1].equalsIgnoreCase("postgresql")) {
-                    Class.forName("org.postgresql.Driver");
-                }
+        Response response = getDatabaseConnection(element);
+        if(response.getStatus()==200){
+            JsonObject jsonResponse = new JsonObject();
+            JsonObject jsonObj = element.getAsJsonObject();
+            Map<String, String> dataStoreMap = new HashMap<>();
+            Set<String> keys = jsonObj.keySet();
+            for (String key : keys) {
+                dataStoreMap.put(key, jsonObj.get(key).toString().replaceAll("\"", ""));
+            }
+            if(!dataStoreMap.containsKey("tableName")){
+                jsonResponse.addProperty("connection","false");
+                jsonResponse.addProperty("errorMessage","Provide jdbcURL, username, password and " +
+                        "table name.");
+                return Response
+                        .serverError()
+                        .entity(jsonResponse)
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }
+            try{
                 Connection conn = DriverManager.getConnection(dataStoreMap.get("url"),
                         dataStoreMap.get("username"),
                         dataStoreMap.get("password"));
@@ -1582,30 +1538,22 @@ public class EditorMicroservice implements Microservice {
                 }
                 st.close();
                 conn.close();
-            } else {
+                return Response
+                        .status(Response.Status.OK)
+                        .entity(jsonResponse)
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }catch (Exception e){
                 jsonResponse.addProperty("connection","false");
-                jsonResponse.addProperty("details","Unsupported schema. Expected schema: " +
-                        "mysql, sqlserver, oracle and postgresql. But found: "
-                        + splittedURL[0] + ":" + splittedURL[1]);
+                jsonResponse.addProperty("errorMessage",e.getMessage());
                 return Response
                         .serverError()
                         .entity(jsonResponse)
                         .type(MediaType.APPLICATION_JSON)
                         .build();
             }
-            return Response
-                    .status(Response.Status.OK)
-                    .entity(jsonResponse)
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
-        } catch (Exception e) {
-            jsonResponse.addProperty("connection","false");
-            jsonResponse.addProperty("details",e.getMessage());
-            return Response
-                    .serverError()
-                    .entity(jsonResponse)
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
+        }else{
+            return response;
         }
     }
 
