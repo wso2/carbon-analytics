@@ -25,6 +25,7 @@ public class DownloadConfig {
 
     private boolean autoDownloadable;
     private String url;
+    private String instructions;
 
     public boolean isAutoDownloadable() {
         return autoDownloadable;
