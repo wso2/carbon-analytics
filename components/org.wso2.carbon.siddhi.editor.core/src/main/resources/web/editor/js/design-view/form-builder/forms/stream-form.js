@@ -24,6 +24,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             }
         };
 
+        StreamForm.prototype.fillStreamAtrributesWithGeneratedValues = function (streamObj,self) {
+            $('#streamName').val(streamObj.name);
+            self.formUtils.renderAttributeTemplate(streamObj.attributes, self.propertyDiv.find("#define-attribute"));
+        },
+
         /**
          * @function generate properties form for a stream
          * @param element selected element(stream)
@@ -35,13 +40,19 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             var id = $(element).parent().attr('id');
             var streamObject = self.configurationData.getSiddhiAppConfig().getStream(id);
             var previousStreamObject = _.cloneDeep(streamObject);
-            var propertyDiv = $('<div class="clearfix form-min-width"><div class = "stream-form-container"> <label> ' +
+            self.propertyDiv = $('<div class="clearfix form-min-width"><div id="streamGeneration">' +
+                '<button type="button">Generate Stream</button></div>' +
+                '<div class = "stream-form-container"> <label> ' +
                 '<span class="mandatory-symbol"> *</span> Name </label> <input type="text" id="streamName" ' +
                 'class="clearfix name"> <label class="error-message" id="streamNameErrorMessage"> </label>' +
                 '<div id="define-attribute"></div> </div> <div class= "stream-form-container"> ' +
                 '<div class ="define-annotation"> </div> </div>');
 
-            formContainer.html(propertyDiv);
+            self.propertyDiv.on('click', '#streamGeneration', function () {
+                self.application.commandManager.dispatch("generate-stream", self, self.fillStreamAtrributesWithGeneratedValues);
+            });
+
+            formContainer.html(self.propertyDiv);
             self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
@@ -66,7 +77,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
 
                 //load the saved attributes
                 var attributeList = streamObject.getAttributeList();
-                self.formUtils.renderAttributeTemplate(attributeList)
+                self.formUtils.renderAttributeTemplate(attributeList, self.propertyDiv.find("#define-attribute"));
                 self.formUtils.selectTypesOfSavedAttributes(attributeList);
 
                 //load the saved annotations
