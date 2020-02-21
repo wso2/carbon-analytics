@@ -50,7 +50,9 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
+import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.config.provider.ConfigProviderImpl;
 import org.wso2.carbon.siddhi.editor.core.EditorSiddhiAppRuntimeService;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.configs.DockerBuildConfig;
@@ -115,6 +117,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -168,6 +171,8 @@ public class EditorMicroservice implements Microservice {
     private ServiceRegistration siddhiAppRuntimeServiceRegistration;
     private StoreQueryAPIHelper storeQueryAPIHelper;
     private Map<String, DockerBuilderStatus> dockerBuilderStatusMap = new HashMap<>();
+    private ConfigProvider configProviderData;
+    private Map<String, String> dataStoreMap = new HashMap<>();
 
     public EditorMicroservice() {
 
@@ -1385,22 +1390,51 @@ public class EditorMicroservice implements Microservice {
         }
     }
 
+    @Reference(service = ConfigProvider.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigProvider")
+    protected void setConfigProvider(ConfigProvider configProvider) {
+        configProviderData = configProvider;
+    }
+
+    protected void unsetConfigProvider(ConfigProvider configProvider) {
+        configProviderData = null;
+    }
+
     @POST
-    @Path("/datastore/connection")
+    @Path("/store/connectToDatabase")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getDatabaseConnection(JsonElement element) {
+    public Response getDatabaseConnection(JsonElement element) throws ConfigurationException {
         JsonObject jsonResponse = new JsonObject();
         JsonObject jsonObj = element.getAsJsonObject();
-        Map<String, String> dataStoreMap = new HashMap<>();
         Set<String> keys = jsonObj.keySet();
         for (String key : keys) {
             dataStoreMap.put(key, jsonObj.get(key).toString().replaceAll("\"", ""));
         }
-        if (!(dataStoreMap.containsKey("url") && dataStoreMap.containsKey("username")
+        if (dataStoreMap.containsKey("dataSourceConfigurationName")) {
+            HashMap<String, ArrayList> dataSourcesMap = (LinkedHashMap<String, ArrayList>)
+                    ((ConfigProviderImpl) configProviderData).getConfigurationObject("wso2.datasources");
+            List<LinkedHashMap> dataSourcesList = new ArrayList<>();
+            for (Object map : dataSourcesMap.get("dataSources")) {
+                dataSourcesList.add((LinkedHashMap) map);
+            }
+            for (int i = 0; i < dataSourcesList.size(); i++) {
+                if (dataStoreMap.get("dataSourceConfigurationName").equals(dataSourcesList.get(i).get("name"))) {
+                    HashMap<String, LinkedHashMap> dataSourcesDefinitionMap =
+                            (HashMap<String, LinkedHashMap>) dataSourcesList.get(i).get("definition");
+                    HashMap<String, String> dataSourcesConfigurationMap =
+                            dataSourcesDefinitionMap.get("configuration");
+                    dataStoreMap.put("url", dataSourcesConfigurationMap.get("jdbcUrl"));
+                    dataStoreMap.put("username", dataSourcesConfigurationMap.get("username"));
+                    dataStoreMap.put("password", dataSourcesConfigurationMap.get("password"));
+                }
+            }
+        } else if (!(dataStoreMap.containsKey("url") && dataStoreMap.containsKey("username")
                 && dataStoreMap.containsKey("password"))) {
-            jsonResponse.addProperty("connection","false");
-            jsonResponse.addProperty("errorMessage","Provide jdbcURL, username and password");
+            jsonResponse.addProperty("connection", "false");
+            jsonResponse.addProperty("errorMessage", "Provide jdbcURL, username and password");
             return Response
                     .serverError()
                     .entity(jsonResponse)
@@ -1428,8 +1462,8 @@ public class EditorMicroservice implements Microservice {
                         dataStoreMap.get("password"));
                 conn.close();
             } else {
-                jsonResponse.addProperty("connection","false");
-                jsonResponse.addProperty("errorMessage","Unsupported schema. Expected schema: " +
+                jsonResponse.addProperty("connection", "false");
+                jsonResponse.addProperty("errorMessage", "Unsupported schema. Expected schema: " +
                         "mysql, sqlserver, oracle and postgresql. But found: "
                         + splittedURL[0] + ":" + splittedURL[1]);
                 return Response
@@ -1438,15 +1472,15 @@ public class EditorMicroservice implements Microservice {
                         .type(MediaType.APPLICATION_JSON)
                         .build();
             }
-            jsonResponse.addProperty("connection","true");
+            jsonResponse.addProperty("connection", "true");
             return Response
                     .status(Response.Status.OK)
                     .entity(jsonResponse)
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (Exception e) {
-            jsonResponse.addProperty("connection","false");
-            jsonResponse.addProperty("errorMessage",e.getMessage());
+            jsonResponse.addProperty("connection", "false");
+            jsonResponse.addProperty("errorMessage", e.getMessage());
             return Response
                     .serverError()
                     .entity(jsonResponse)
@@ -1456,20 +1490,19 @@ public class EditorMicroservice implements Microservice {
     }
 
     @POST
-    @Path("/datastore/tables")
+    @Path("/store/retrieveTableNames")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getDatabaseTables(JsonElement element) {
+    public Response getDatabaseTables(JsonElement element) throws ConfigurationException {
         Response response = getDatabaseConnection(element);
-        if(response.getStatus()==200){
+        if (response.getStatus() == 200) {
             JsonObject jsonResponse = new JsonObject();
             JsonObject jsonObj = element.getAsJsonObject();
-            Map<String, String> dataStoreMap = new HashMap<>();
             Set<String> keys = jsonObj.keySet();
             for (String key : keys) {
                 dataStoreMap.put(key, jsonObj.get(key).toString().replaceAll("\"", ""));
             }
-            try{
+            try {
                 Connection conn = DriverManager.getConnection(dataStoreMap.get("url"),
                         dataStoreMap.get("username"),
                         dataStoreMap.get("password"));
@@ -1486,9 +1519,9 @@ public class EditorMicroservice implements Microservice {
                         .entity(jsonResponse)
                         .type(MediaType.APPLICATION_JSON)
                         .build();
-            }catch (Exception e){
-                jsonResponse.addProperty("connection","false");
-                jsonResponse.addProperty("errorMessage",e.getMessage());
+            } catch (Exception e) {
+                jsonResponse.addProperty("connection", "false");
+                jsonResponse.addProperty("errorMessage", e.getMessage());
                 return Response
                         .serverError()
                         .entity(jsonResponse)
@@ -1501,22 +1534,21 @@ public class EditorMicroservice implements Microservice {
     }
 
     @POST
-    @Path("/datastore/tabledetails")
+    @Path("/store/retrieveTableColumnNames")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getDatabaseDetails(JsonElement element) {
+    public Response getDatabaseDetails(JsonElement element) throws ConfigurationException {
         Response response = getDatabaseConnection(element);
-        if(response.getStatus()==200){
+        if (response.getStatus() == 200) {
             JsonObject jsonResponse = new JsonObject();
             JsonObject jsonObj = element.getAsJsonObject();
-            Map<String, String> dataStoreMap = new HashMap<>();
             Set<String> keys = jsonObj.keySet();
             for (String key : keys) {
                 dataStoreMap.put(key, jsonObj.get(key).toString().replaceAll("\"", ""));
             }
-            if(!dataStoreMap.containsKey("tableName")){
-                jsonResponse.addProperty("connection","false");
-                jsonResponse.addProperty("errorMessage","Provide jdbcURL, username, password and " +
+            if (!dataStoreMap.containsKey("tableName")) {
+                jsonResponse.addProperty("connection", "false");
+                jsonResponse.addProperty("errorMessage", "Provide jdbcURL, username, password and " +
                         "table name.");
                 return Response
                         .serverError()
@@ -1524,7 +1556,7 @@ public class EditorMicroservice implements Microservice {
                         .type(MediaType.APPLICATION_JSON)
                         .build();
             }
-            try{
+            try {
                 Connection conn = DriverManager.getConnection(dataStoreMap.get("url"),
                         dataStoreMap.get("username"),
                         dataStoreMap.get("password"));
@@ -1543,16 +1575,16 @@ public class EditorMicroservice implements Microservice {
                         .entity(jsonResponse)
                         .type(MediaType.APPLICATION_JSON)
                         .build();
-            }catch (Exception e){
-                jsonResponse.addProperty("connection","false");
-                jsonResponse.addProperty("errorMessage",e.getMessage());
+            } catch (Exception e) {
+                jsonResponse.addProperty("connection", "false");
+                jsonResponse.addProperty("errorMessage", e.getMessage());
                 return Response
                         .serverError()
                         .entity(jsonResponse)
                         .type(MediaType.APPLICATION_JSON)
                         .build();
             }
-        }else{
+        } else {
             return response;
         }
     }
