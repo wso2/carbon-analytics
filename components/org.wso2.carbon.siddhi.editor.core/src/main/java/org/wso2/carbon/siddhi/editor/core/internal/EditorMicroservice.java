@@ -39,6 +39,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -52,7 +53,6 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.config.provider.ConfigProviderImpl;
 import org.wso2.carbon.siddhi.editor.core.EditorSiddhiAppRuntimeService;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.configs.DockerBuildConfig;
@@ -1408,22 +1408,22 @@ public class EditorMicroservice implements Microservice {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDatabaseConnection(JsonElement element) throws ConfigurationException {
         JsonObject jsonResponse = new JsonObject();
-        JsonObject jsonObj = element.getAsJsonObject();
-        Set<String> keys = jsonObj.keySet();
+        JsonObject jsonInput = element.getAsJsonObject();
+        Set<String> keys = jsonInput.keySet();
         for (String key : keys) {
-            dataStoreMap.put(key, jsonObj.get(key).toString().replaceAll("\"", ""));
+            dataStoreMap.put(key, jsonInput.get(key).toString().replaceAll("\"", ""));
         }
         if (dataStoreMap.containsKey("dataSourceConfigurationName")) {
             HashMap<String, ArrayList> dataSourcesMap = (LinkedHashMap<String, ArrayList>)
-                    ((ConfigProviderImpl) configProviderData).getConfigurationObject("wso2.datasources");
+                    configProviderData.getConfigurationObject("wso2.datasources");
             List<LinkedHashMap> dataSourcesList = new ArrayList<>();
             for (Object map : dataSourcesMap.get("dataSources")) {
                 dataSourcesList.add((LinkedHashMap) map);
             }
-            for (int i = 0; i < dataSourcesList.size(); i++) {
-                if (dataStoreMap.get("dataSourceConfigurationName").equals(dataSourcesList.get(i).get("name"))) {
+            for (LinkedHashMap linkedHashMap : dataSourcesList) {
+                if (dataStoreMap.get("dataSourceConfigurationName").equals(linkedHashMap.get("name"))) {
                     HashMap<String, LinkedHashMap> dataSourcesDefinitionMap =
-                            (HashMap<String, LinkedHashMap>) dataSourcesList.get(i).get("definition");
+                            (HashMap<String, LinkedHashMap>) linkedHashMap.get("definition");
                     HashMap<String, String> dataSourcesConfigurationMap =
                             dataSourcesDefinitionMap.get("configuration");
                     dataStoreMap.put("url", dataSourcesConfigurationMap.get("jdbcUrl"));
@@ -1497,30 +1497,27 @@ public class EditorMicroservice implements Microservice {
         Response response = getDatabaseConnection(element);
         if (response.getStatus() == 200) {
             JsonObject jsonResponse = new JsonObject();
-            JsonObject jsonObj = element.getAsJsonObject();
-            Set<String> keys = jsonObj.keySet();
-            for (String key : keys) {
-                dataStoreMap.put(key, jsonObj.get(key).toString().replaceAll("\"", ""));
-            }
             try {
                 Connection conn = DriverManager.getConnection(dataStoreMap.get("url"),
                         dataStoreMap.get("username"),
                         dataStoreMap.get("password"));
                 DatabaseMetaData dbMetadata = conn.getMetaData();
                 ResultSet rs = dbMetadata.getTables(null, null, "%", null);
-                int tableNumber = 1;
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("{ \"tables\": [ ");
                 while (rs.next()) {
-                    jsonResponse.addProperty("tableNumber" + tableNumber, rs.getString(3));
-                    tableNumber++;
+                    stringBuilder.append("\"" + rs.getString(3) + "\",");
                 }
+                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+                stringBuilder.append("]}");
+                JSONParser parser = new JSONParser();
                 conn.close();
                 return Response
                         .status(Response.Status.OK)
-                        .entity(jsonResponse)
+                        .entity(parser.parse(String.valueOf(stringBuilder)))
                         .type(MediaType.APPLICATION_JSON)
                         .build();
             } catch (Exception e) {
-                jsonResponse.addProperty("connection", "false");
                 jsonResponse.addProperty("errorMessage", e.getMessage());
                 return Response
                         .serverError()
@@ -1541,11 +1538,6 @@ public class EditorMicroservice implements Microservice {
         Response response = getDatabaseConnection(element);
         if (response.getStatus() == 200) {
             JsonObject jsonResponse = new JsonObject();
-            JsonObject jsonObj = element.getAsJsonObject();
-            Set<String> keys = jsonObj.keySet();
-            for (String key : keys) {
-                dataStoreMap.put(key, jsonObj.get(key).toString().replaceAll("\"", ""));
-            }
             if (!dataStoreMap.containsKey("tableName")) {
                 jsonResponse.addProperty("connection", "false");
                 jsonResponse.addProperty("errorMessage", "Provide jdbcURL, username, password and " +
@@ -1564,19 +1556,24 @@ public class EditorMicroservice implements Microservice {
                 ResultSet rs = st.executeQuery("SELECT * FROM " + dataStoreMap.get("tableName"));
                 ResultSetMetaData resultSetMetaData = rs.getMetaData();
                 int NumOfCol = resultSetMetaData.getColumnCount();
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("{ \"attributes\" : [ ");
                 for (int i = 1; i <= NumOfCol; i++) {
-                    jsonResponse.addProperty(resultSetMetaData.getColumnName(i),
-                            resultSetMetaData.getColumnTypeName(i));
+                    stringBuilder.append("{ \"name\": \"").append(resultSetMetaData.getColumnName(i))
+                            .append("\", \"dataType\": \"").append(resultSetMetaData.getColumnTypeName(i))
+                            .append("\"},");
                 }
+                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+                stringBuilder.append("]}");
+                JSONParser parser = new JSONParser();
                 st.close();
                 conn.close();
                 return Response
                         .status(Response.Status.OK)
-                        .entity(jsonResponse)
+                        .entity(parser.parse(String.valueOf(stringBuilder)))
                         .type(MediaType.APPLICATION_JSON)
                         .build();
             } catch (Exception e) {
-                jsonResponse.addProperty("connection", "false");
                 jsonResponse.addProperty("errorMessage", e.getMessage());
                 return Response
                         .serverError()
