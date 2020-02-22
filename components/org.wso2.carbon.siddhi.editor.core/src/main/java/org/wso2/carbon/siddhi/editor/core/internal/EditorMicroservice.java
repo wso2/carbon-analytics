@@ -39,7 +39,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -111,8 +110,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.Statement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -1414,56 +1412,42 @@ public class EditorMicroservice implements Microservice {
             dataStoreMap.put(key, jsonInput.get(key).toString().replaceAll("\"", ""));
         }
         if (dataStoreMap.containsKey("dataSourceConfigurationName")) {
-            HashMap<String, ArrayList> dataSourcesMap = (LinkedHashMap<String, ArrayList>)
-                    configProviderData.getConfigurationObject("wso2.datasources");
-            List<LinkedHashMap> dataSourcesList = new ArrayList<>();
-            for (Object map : dataSourcesMap.get("dataSources")) {
-                dataSourcesList.add((LinkedHashMap) map);
-            }
+            List<LinkedHashMap> dataSourcesList = getDataSources();
             for (LinkedHashMap linkedHashMap : dataSourcesList) {
                 if (dataStoreMap.get("dataSourceConfigurationName").equals(linkedHashMap.get("name"))) {
                     HashMap<String, LinkedHashMap> dataSourcesDefinitionMap =
                             (HashMap<String, LinkedHashMap>) linkedHashMap.get("definition");
                     HashMap<String, String> dataSourcesConfigurationMap =
                             dataSourcesDefinitionMap.get("configuration");
-                    dataStoreMap.put("url", dataSourcesConfigurationMap.get("jdbcUrl"));
-                    dataStoreMap.put("username", dataSourcesConfigurationMap.get("username"));
-                    dataStoreMap.put("password", dataSourcesConfigurationMap.get("password"));
+                    dataStoreMap.put(Constants.DB_URL, dataSourcesConfigurationMap.get(Constants.JDBC_URL));
+                    dataStoreMap.put(Constants.DB_USERNAME, dataSourcesConfigurationMap.get(Constants.DB_USERNAME));
+                    dataStoreMap.put(Constants.DB_PASSWORD, dataSourcesConfigurationMap.get(Constants.DB_PASSWORD));
                 }
             }
-        } else if (!(dataStoreMap.containsKey("url") && dataStoreMap.containsKey("username")
-                && dataStoreMap.containsKey("password"))) {
-            jsonResponse.addProperty("connection", "false");
-            jsonResponse.addProperty("errorMessage", "Provide jdbcURL, username and password");
-            return Response
-                    .serverError()
-                    .entity(jsonResponse)
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
         }
         try {
-            String[] splittedURL = dataStoreMap.get("url").split(":");
-            if (splittedURL[0].equalsIgnoreCase("jdbc") &&
-                    (splittedURL[1].equalsIgnoreCase("mysql")
-                            || splittedURL[1].equalsIgnoreCase("sqlserver")
-                            || splittedURL[1].equalsIgnoreCase("oracle")
-                            || splittedURL[1].equalsIgnoreCase("postgresql"))) {
-                if (splittedURL[1].equalsIgnoreCase("mysql")) {
-                    Class.forName("com.mysql.jdbc.Driver");
-                } else if (splittedURL[1].equalsIgnoreCase("sqlserver")) {
-                    Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-                } else if (splittedURL[1].equalsIgnoreCase("oracle")) {
-                    Class.forName("oracle.jdbc.driver.OracleDriver");
-                } else if (splittedURL[1].equalsIgnoreCase("postgresql")) {
-                    Class.forName("org.postgresql.Driver");
+            String[] splittedURL = dataStoreMap.get(Constants.DB_URL).split(Constants.COLLON);
+            if (splittedURL[0].equalsIgnoreCase(Constants.JDBC) &&
+                    (splittedURL[1].equalsIgnoreCase(Constants.MYSQL_DATABASE)
+                            || splittedURL[1].equalsIgnoreCase(Constants.MSSQL_DATABASE)
+                            || splittedURL[1].equalsIgnoreCase(Constants.ORACLE_DATABASE)
+                            || splittedURL[1].equalsIgnoreCase(Constants.POSTGRESQL))) {
+                if (splittedURL[1].equalsIgnoreCase(Constants.MYSQL_DATABASE)) {
+                    Class.forName(Constants.MYSQL_DRIVER_CLASS_NAME);
+                } else if (splittedURL[1].equalsIgnoreCase(Constants.MSSQL_DATABASE)) {
+                    Class.forName(Constants.MSSQL_DRIVER_CLASS_NAME);
+                } else if (splittedURL[1].equalsIgnoreCase(Constants.ORACLE_DATABASE)) {
+                    Class.forName(Constants.ORACLE_DRIVER_CLASS_NAME);
+                } else if (splittedURL[1].equalsIgnoreCase(Constants.POSTGRESQL)) {
+                    Class.forName(Constants.POSTGRESQL_DRIVER_CLASS_NAME);
                 }
-                Connection conn = DriverManager.getConnection(dataStoreMap.get("url"),
-                        dataStoreMap.get("username"),
-                        dataStoreMap.get("password"));
+                Connection conn = DriverManager.getConnection(dataStoreMap.get(Constants.DB_URL),
+                        dataStoreMap.get(Constants.DB_USERNAME),
+                        dataStoreMap.get(Constants.DB_PASSWORD));
                 conn.close();
             } else {
-                jsonResponse.addProperty("connection", "false");
-                jsonResponse.addProperty("errorMessage", "Unsupported schema. Expected schema: " +
+                jsonResponse.addProperty(Constants.CONNECTION, Constants.FALSE);
+                jsonResponse.addProperty(Constants.ERROR, "Unsupported schema. Expected schema: " +
                         "mysql, sqlserver, oracle and postgresql. But found: "
                         + splittedURL[0] + ":" + splittedURL[1]);
                 return Response
@@ -1472,21 +1456,40 @@ public class EditorMicroservice implements Microservice {
                         .type(MediaType.APPLICATION_JSON)
                         .build();
             }
-            jsonResponse.addProperty("connection", "true");
+            jsonResponse.addProperty(Constants.CONNECTION, Constants.TRUE);
             return Response
                     .status(Response.Status.OK)
                     .entity(jsonResponse)
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         } catch (Exception e) {
-            jsonResponse.addProperty("connection", "false");
-            jsonResponse.addProperty("errorMessage", e.getMessage());
+            jsonResponse.addProperty(Constants.CONNECTION, Constants.FALSE);
+            jsonResponse.addProperty(Constants.ERROR, e.getMessage());
             return Response
                     .serverError()
                     .entity(jsonResponse)
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
+    }
+
+    @POST
+    @Path("/store/retrieveDatasources")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDatabases(JsonElement element) throws ConfigurationException {
+        JsonObject jsonResponse = new JsonObject();
+        List<LinkedHashMap> dataSourcesList = getDataSources();
+        JsonArray datasourceNames = new JsonArray();
+        for (LinkedHashMap linkedHashMap : dataSourcesList) {
+            datasourceNames.add(linkedHashMap.get("name").toString());
+        }
+        jsonResponse.add("datasources", datasourceNames);
+        return Response
+                .serverError()
+                .entity(jsonResponse)
+                .type(MediaType.APPLICATION_JSON)
+                .build();
     }
 
     @POST
@@ -1498,27 +1501,21 @@ public class EditorMicroservice implements Microservice {
         if (response.getStatus() == 200) {
             JsonObject jsonResponse = new JsonObject();
             try {
-                Connection conn = DriverManager.getConnection(dataStoreMap.get("url"),
-                        dataStoreMap.get("username"),
-                        dataStoreMap.get("password"));
-                DatabaseMetaData dbMetadata = conn.getMetaData();
+                DatabaseMetaData dbMetadata = getDatabaseMetadata(dataStoreMap.get(Constants.DB_URL),
+                        dataStoreMap.get(Constants.DB_USERNAME), dataStoreMap.get(Constants.DB_PASSWORD));
                 ResultSet rs = dbMetadata.getTables(null, null, "%", null);
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("{ \"tables\": [ ");
+                JsonArray tableNames = new JsonArray();
                 while (rs.next()) {
-                    stringBuilder.append("\"" + rs.getString(3) + "\",");
+                    tableNames.add(new JsonPrimitive(rs.getString(3)));
                 }
-                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-                stringBuilder.append("]}");
-                JSONParser parser = new JSONParser();
-                conn.close();
+                jsonResponse.add("tables", tableNames);
                 return Response
                         .status(Response.Status.OK)
-                        .entity(parser.parse(String.valueOf(stringBuilder)))
+                        .entity(jsonResponse)
                         .type(MediaType.APPLICATION_JSON)
                         .build();
-            } catch (Exception e) {
-                jsonResponse.addProperty("errorMessage", e.getMessage());
+            } catch (SQLException e) {
+                jsonResponse.addProperty(Constants.ERROR, e.getMessage());
                 return Response
                         .serverError()
                         .entity(jsonResponse)
@@ -1539,8 +1536,8 @@ public class EditorMicroservice implements Microservice {
         if (response.getStatus() == 200) {
             JsonObject jsonResponse = new JsonObject();
             if (!dataStoreMap.containsKey("tableName")) {
-                jsonResponse.addProperty("connection", "false");
-                jsonResponse.addProperty("errorMessage", "Provide jdbcURL, username, password and " +
+                jsonResponse.addProperty(Constants.CONNECTION, Constants.FALSE);
+                jsonResponse.addProperty(Constants.ERROR, "Provide jdbcURL, username, password and " +
                         "table name.");
                 return Response
                         .serverError()
@@ -1549,32 +1546,25 @@ public class EditorMicroservice implements Microservice {
                         .build();
             }
             try {
-                Connection conn = DriverManager.getConnection(dataStoreMap.get("url"),
-                        dataStoreMap.get("username"),
-                        dataStoreMap.get("password"));
-                Statement st = conn.createStatement();
-                ResultSet rs = st.executeQuery("SELECT * FROM " + dataStoreMap.get("tableName"));
-                ResultSetMetaData resultSetMetaData = rs.getMetaData();
-                int NumOfCol = resultSetMetaData.getColumnCount();
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("{ \"attributes\" : [ ");
-                for (int i = 1; i <= NumOfCol; i++) {
-                    stringBuilder.append("{ \"name\": \"").append(resultSetMetaData.getColumnName(i))
-                            .append("\", \"dataType\": \"").append(resultSetMetaData.getColumnTypeName(i))
-                            .append("\"},");
+                DatabaseMetaData meta = getDatabaseMetadata(dataStoreMap.get(Constants.DB_URL),
+                        dataStoreMap.get(Constants.DB_USERNAME), dataStoreMap.get(Constants.DB_PASSWORD));
+                ResultSet rsColumns = meta.getColumns(null, null, dataStoreMap.get("tableName"),
+                        null);
+                JsonArray tableNamesArray = new JsonArray();
+                while (rsColumns.next()) {
+                    JsonObject object = new JsonObject();
+                    object.addProperty("name", rsColumns.getString("COLUMN_NAME"));
+                    object.addProperty("dataType", rsColumns.getString("TYPE_NAME"));
+                    tableNamesArray.add(object);
                 }
-                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-                stringBuilder.append("]}");
-                JSONParser parser = new JSONParser();
-                st.close();
-                conn.close();
+                jsonResponse.add("attributes", tableNamesArray);
                 return Response
                         .status(Response.Status.OK)
-                        .entity(parser.parse(String.valueOf(stringBuilder)))
+                        .entity(jsonResponse)
                         .type(MediaType.APPLICATION_JSON)
                         .build();
-            } catch (Exception e) {
-                jsonResponse.addProperty("errorMessage", e.getMessage());
+            } catch (SQLException e) {
+                jsonResponse.addProperty(Constants.ERROR, e.getMessage());
                 return Response
                         .serverError()
                         .entity(jsonResponse)
@@ -1584,6 +1574,25 @@ public class EditorMicroservice implements Microservice {
         } else {
             return response;
         }
+    }
+
+    private Connection getDatabaseConnection(String url, String username, String password) throws SQLException {
+        return DriverManager.getConnection(url, username, password);
+    }
+
+    private DatabaseMetaData getDatabaseMetadata(String url, String username, String password) throws SQLException {
+        Connection conn = getDatabaseConnection(url, username, password);
+        return conn.getMetaData();
+    }
+
+    private List<LinkedHashMap> getDataSources() throws ConfigurationException {
+        HashMap<String, ArrayList> dataSourcesMap = (LinkedHashMap<String, ArrayList>)
+                configProviderData.getConfigurationObject("wso2.datasources");
+        List<LinkedHashMap> dataSourcesList = new ArrayList<>();
+        for (Object map : dataSourcesMap.get("dataSources")) {
+            dataSourcesList.add((LinkedHashMap) map);
+        }
+        return dataSourcesList;
     }
 
     /**
