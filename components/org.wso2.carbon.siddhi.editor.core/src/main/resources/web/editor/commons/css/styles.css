@@ -1845,6 +1845,7 @@ div.consoleIcon {
 }
 
 .partial-extension-install-btn,
+.extension-un-install-btn,
 .extension-install-btn {
     color: whitesmoke;
 }
