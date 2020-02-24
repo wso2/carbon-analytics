@@ -43,6 +43,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 
+import static org.wso2.carbon.siddhi.extensions.installer.core.models.enums.ExtensionInstallationStatus.NOT_INSTALLED;
+import static org.wso2.carbon.siddhi.extensions.installer.core.models.enums.ExtensionUnInstallationStatus.NOT_UNINSTALLED;
+import static org.wso2.carbon.siddhi.extensions.installer.core.util.ResponseEntityCreator.ACTION_STATUS_KEY;
+import static org.wso2.carbon.siddhi.extensions.installer.core.util.ResponseEntityCreator.ACTION_TYPE_KEY;
+
 /**
  * Exposes Siddhi Extensions Installer as a micro-service.
  */
@@ -122,9 +127,12 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
     public Response installDependencies(@PathParam("extensionId") String extensionId) {
         try {
             DependencyInstaller dependencyInstaller = new DependencyInstallerImpl(extensionConfigs);
+            Map<String, Object> responseEntity = dependencyInstaller.installDependenciesFor(extensionId);
+            Response.Status responseStatus = isActionFailure(responseEntity) ? Response.Status.INTERNAL_SERVER_ERROR :
+                Response.Status.OK;
             return Response
-                .status(Response.Status.OK)
-                .entity(dependencyInstaller.installDependenciesFor(extensionId))
+                .status(responseStatus)
+                .entity(responseEntity)
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         } catch (ExtensionsInstallerException e) {
@@ -141,9 +149,12 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
     public Response uninstallDependencies(@PathParam("extensionId") String extensionId) {
         try {
             DependencyInstaller dependencyInstaller = new DependencyInstallerImpl(extensionConfigs);
+            Map<String, Object> responseEntity = dependencyInstaller.unInstallDependenciesFor(extensionId);
+            Response.Status responseStatus = isActionFailure(responseEntity) ? Response.Status.INTERNAL_SERVER_ERROR :
+                Response.Status.OK;
             return Response
-                .status(Response.Status.OK)
-                .entity(dependencyInstaller.unInstallDependenciesFor(extensionId))
+                .status(responseStatus)
+                .entity(responseEntity)
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         } catch (ExtensionsInstallerException e) {
@@ -152,6 +163,19 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 .entity(e.getMessage())
                 .build();
         }
+    }
+
+    /**
+     * Returns whether the given response entity denotes a failure in installation/un-installation.
+     * This information is used to mark such a failure as an internal server error.
+     *
+     * @param responseEntity Response entity produced by the installation/un-installation.
+     * @return Whether the response entity denotes a failure in installation/un-installation.
+     */
+    private boolean isActionFailure(Map<String, Object> responseEntity) {
+        return responseEntity.containsKey(ACTION_TYPE_KEY) && responseEntity.containsKey(ACTION_STATUS_KEY) &&
+            (NOT_INSTALLED == responseEntity.get(ACTION_STATUS_KEY) ||
+                NOT_UNINSTALLED == responseEntity.get(ACTION_STATUS_KEY));
     }
 
     /**

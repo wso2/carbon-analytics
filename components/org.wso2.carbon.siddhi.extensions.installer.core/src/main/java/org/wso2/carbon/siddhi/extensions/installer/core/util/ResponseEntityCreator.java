@@ -34,8 +34,8 @@ import java.util.Map;
  */
 public class ResponseEntityCreator {
 
-    private static final String ACTION_TYPE_KEY = "actionType";
-    private static final String ACTION_STATUS_KEY = "status";
+    public static final String ACTION_TYPE_KEY = "actionType";
+    public static final String ACTION_STATUS_KEY = "status";
     private static final String ACTION_COMPLETED_DEPENDENCIES_KEY = "completed";
     private static final String ACTION_FAILED_DEPENDENCIES_KEY = "failed";
     private static final String MANUALLY_INSTALLABLE_DEPENDENCIES_KEY = "manuallyInstall";
