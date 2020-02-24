@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
-define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils', 'constants', 'app/source-editor/completion-engine'],
-    function ($, _, log, Remarkable, Handlebars, DesignViewUtils, Constants, CompletionEngine) {
+define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils', 'constants', 'app/source-editor/completion-engine', 'alerts'],
+    function ($, _, log, Remarkable, Handlebars, DesignViewUtils, Constants, CompletionEngine, alerts) {
         /**
          * Load operators from the Completion engine.
          *
@@ -328,6 +328,8 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                     self._application.utils.extensionData = new Map(Object.entries(data));
                 },
                 error: function (e) {
+                    alerts.error("Unable to read extension statuses." +
+                        "Please see the editor console for further information.")
                     throw "Unable to read extension statuses";
                 }
             });
@@ -408,10 +410,8 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
         OperatorFinder.prototype.moveInstallationUpdatedExtension = function (extension, currentArray, targetArray) {
             var index = currentArray.indexOf(extension);
             if (index > -1) {
-                console.log("Before Lengths", currentArray.length, targetArray.length);
                 currentArray.splice(index, 1);
                 targetArray.push(extension);
-                console.log("After Lengths", currentArray.length, targetArray.length);
             }
         };
 
