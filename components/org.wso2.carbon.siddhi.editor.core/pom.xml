@@ -282,13 +282,7 @@
                                     com.kenai.*,
                                     org.apache.commons.*,
                                     jni.*,
-                                    jersey.repackaged.com.*,
-                                    com.mysql.jdbc.*,
-                                    com.microsoft.sqlserver.jdbc.*,
-                                    microsoft.sql.*,
-                                    mssql.googlecode.concurrentlinkedhashmap.*,
-                                    oracle.*,
-                                    org.postgresql.*,
+                                    jersey.repackaged.com.*
                                 </Private-Package>
                                 <Export-Package>
                                     org.wso2.carbon.siddhi.editor.core.*
