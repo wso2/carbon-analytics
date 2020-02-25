@@ -408,10 +408,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @function render the attribute form template
          * @param {Object} attributes the saved attributes
          */
-        FormUtils.prototype.renderAttributeTemplate = function (attributes) {
+        FormUtils.prototype.renderAttributeTemplate = function (attributes, attributesContainer) {
             var self = this;
             var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html())(attributes);
-            $('#define-attribute').html(attributeFormTemplate);
+            attributesContainer.html(attributeFormTemplate);
             self.changeAttributeNavigation('#attribute-div');
             self.addEventListenersForAttributeDiv();
         };
