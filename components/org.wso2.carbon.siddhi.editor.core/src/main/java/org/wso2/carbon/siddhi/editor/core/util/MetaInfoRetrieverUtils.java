@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.util.metainforetriever.utilities;
+package org.wso2.carbon.siddhi.editor.core.util;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;

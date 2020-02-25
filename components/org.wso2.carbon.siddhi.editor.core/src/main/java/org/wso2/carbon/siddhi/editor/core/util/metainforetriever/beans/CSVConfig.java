@@ -25,32 +25,26 @@ public class CSVConfig {
     private boolean isHeaderExist;
 
     public String getFilePath() {
-
         return filePath;
     }
 
     public void setFilePath(String filePath) {
-
         this.filePath = filePath;
     }
 
     public String getDelimiter() {
-
         return delimiter;
     }
 
     public void setDelimiter(String delimiter) {
-
         this.delimiter = delimiter;
     }
 
     public boolean isHeaderExist() {
-
         return isHeaderExist;
     }
 
     public void setHeaderExist(boolean headerExist) {
-
         isHeaderExist = headerExist;
     }
 }
