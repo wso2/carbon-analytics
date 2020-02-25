@@ -27,6 +27,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
+import com.zaxxer.hikari.HikariDataSource;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.debugger.SiddhiDebugger;
@@ -40,6 +41,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -50,8 +53,9 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
-import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
+import org.wso2.carbon.datasource.core.api.DataSourceService;
+import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.siddhi.editor.core.EditorSiddhiAppRuntimeService;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.configs.DockerBuildConfig;
@@ -102,6 +106,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -115,7 +120,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -165,11 +169,11 @@ public class EditorMicroservice implements Microservice {
                     .setNameFormat("Debugger-scheduler-thread-%d")
                     .build()
             );
+    private HikariDataSource dataSource;
     private ConfigProvider configProvider;
     private ServiceRegistration siddhiAppRuntimeServiceRegistration;
     private StoreQueryAPIHelper storeQueryAPIHelper;
     private Map<String, DockerBuilderStatus> dockerBuilderStatusMap = new HashMap<>();
-    private ConfigProvider configProviderData;
     private Map<String, String> dataStoreMap = new HashMap<>();
 
     public EditorMicroservice() {
@@ -1388,41 +1392,46 @@ public class EditorMicroservice implements Microservice {
         }
     }
 
-    @Reference(service = ConfigProvider.class,
-            cardinality = ReferenceCardinality.MANDATORY,
-            policy = ReferencePolicy.DYNAMIC,
-            unbind = "unsetConfigProvider")
-    protected void setConfigProvider(ConfigProvider configProvider) {
-        configProviderData = configProvider;
-    }
-
-    protected void unsetConfigProvider(ConfigProvider configProvider) {
-        configProviderData = null;
-    }
-
     @POST
     @Path("/store/connectToDatabase")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getDatabaseConnection(JsonElement element) throws ConfigurationException {
+    public Response getDatabaseConnection(JsonElement element) {
         JsonObject jsonResponse = new JsonObject();
         JsonObject jsonInput = element.getAsJsonObject();
         Set<String> keys = jsonInput.keySet();
+        dataStoreMap.clear();
         for (String key : keys) {
             dataStoreMap.put(key, jsonInput.get(key).toString().replaceAll("\"", ""));
         }
-        if (dataStoreMap.containsKey("dataSourceConfigurationName")) {
-            List<LinkedHashMap> dataSourcesList = getDataSources();
-            for (LinkedHashMap linkedHashMap : dataSourcesList) {
-                if (dataStoreMap.get("dataSourceConfigurationName").equals(linkedHashMap.get("name"))) {
-                    HashMap<String, LinkedHashMap> dataSourcesDefinitionMap =
-                            (HashMap<String, LinkedHashMap>) linkedHashMap.get("definition");
-                    HashMap<String, String> dataSourcesConfigurationMap =
-                            dataSourcesDefinitionMap.get("configuration");
-                    dataStoreMap.put(Constants.DB_URL, dataSourcesConfigurationMap.get(Constants.JDBC_URL));
-                    dataStoreMap.put(Constants.DB_USERNAME, dataSourcesConfigurationMap.get(Constants.DB_USERNAME));
-                    dataStoreMap.put(Constants.DB_PASSWORD, dataSourcesConfigurationMap.get(Constants.DB_PASSWORD));
-                }
+        if (dataStoreMap.containsKey(Constants.DATASOURCE_NAME)
+                && (dataStoreMap.containsKey(Constants.DB_URL)
+                || dataStoreMap.containsKey(Constants.DB_USERNAME)
+                || dataStoreMap.containsKey(Constants.DB_PASSWORD))) {
+            jsonResponse.addProperty(Constants.CONNECTION, Constants.FALSE);
+            jsonResponse.addProperty(Constants.ERROR, "Provide valid data source configuration or " +
+                    "jdbcURL, username and password only.");
+            return Response
+                    .serverError()
+                    .entity(jsonResponse)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } else if (dataStoreMap.containsKey(Constants.DATASOURCE_NAME)) {
+            String[] dataSourceConfiguration =
+                    getDataSourceConfiguration(dataStoreMap.get(Constants.DATASOURCE_NAME));
+            if (dataSourceConfiguration == null) {
+                jsonResponse.addProperty(Constants.CONNECTION, Constants.FALSE);
+                jsonResponse.addProperty(Constants.ERROR, "Provide valid data source configuration or " +
+                        "jdbcURL, username and password only.");
+                return Response
+                        .serverError()
+                        .entity(jsonResponse)
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            } else {
+                dataStoreMap.put(Constants.DB_URL, dataSourceConfiguration[0]);
+                dataStoreMap.put(Constants.DB_USERNAME, dataSourceConfiguration[1]);
+                dataStoreMap.put(Constants.DB_PASSWORD, dataSourceConfiguration[2]);
             }
         }
         try {
@@ -1462,7 +1471,7 @@ public class EditorMicroservice implements Microservice {
                     .entity(jsonResponse)
                     .type(MediaType.APPLICATION_JSON)
                     .build();
-        } catch (Exception e) {
+        } catch (SQLException | ClassNotFoundException e) {
             jsonResponse.addProperty(Constants.CONNECTION, Constants.FALSE);
             jsonResponse.addProperty(Constants.ERROR, e.getMessage());
             return Response
@@ -1474,29 +1483,10 @@ public class EditorMicroservice implements Microservice {
     }
 
     @POST
-    @Path("/store/retrieveDatasources")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getDatabases(JsonElement element) throws ConfigurationException {
-        JsonObject jsonResponse = new JsonObject();
-        List<LinkedHashMap> dataSourcesList = getDataSources();
-        JsonArray datasourceNames = new JsonArray();
-        for (LinkedHashMap linkedHashMap : dataSourcesList) {
-            datasourceNames.add(linkedHashMap.get("name").toString());
-        }
-        jsonResponse.add("datasources", datasourceNames);
-        return Response
-                .serverError()
-                .entity(jsonResponse)
-                .type(MediaType.APPLICATION_JSON)
-                .build();
-    }
-
-    @POST
     @Path("/store/retrieveTableNames")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getDatabaseTables(JsonElement element) throws ConfigurationException {
+    public Response getDatabaseTables(JsonElement element) {
         Response response = getDatabaseConnection(element);
         if (response.getStatus() == 200) {
             JsonObject jsonResponse = new JsonObject();
@@ -1508,7 +1498,7 @@ public class EditorMicroservice implements Microservice {
                 while (rs.next()) {
                     tableNames.add(new JsonPrimitive(rs.getString(3)));
                 }
-                jsonResponse.add("tables", tableNames);
+                jsonResponse.add(Constants.TABLES, tableNames);
                 return Response
                         .status(Response.Status.OK)
                         .entity(jsonResponse)
@@ -1531,11 +1521,11 @@ public class EditorMicroservice implements Microservice {
     @Path("/store/retrieveTableColumnNames")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getDatabaseDetails(JsonElement element) throws ConfigurationException {
+    public Response getDatabaseDetails(JsonElement element) {
         Response response = getDatabaseConnection(element);
         if (response.getStatus() == 200) {
             JsonObject jsonResponse = new JsonObject();
-            if (!dataStoreMap.containsKey("tableName")) {
+            if (!dataStoreMap.containsKey(Constants.TABLE_NAME)) {
                 jsonResponse.addProperty(Constants.CONNECTION, Constants.FALSE);
                 jsonResponse.addProperty(Constants.ERROR, "Provide jdbcURL, username, password and " +
                         "table name.");
@@ -1548,16 +1538,16 @@ public class EditorMicroservice implements Microservice {
             try {
                 DatabaseMetaData meta = getDatabaseMetadata(dataStoreMap.get(Constants.DB_URL),
                         dataStoreMap.get(Constants.DB_USERNAME), dataStoreMap.get(Constants.DB_PASSWORD));
-                ResultSet rsColumns = meta.getColumns(null, null, dataStoreMap.get("tableName"),
+                ResultSet rsColumns = meta.getColumns(null, null, dataStoreMap.get(Constants.TABLE_NAME),
                         null);
                 JsonArray tableNamesArray = new JsonArray();
                 while (rsColumns.next()) {
                     JsonObject object = new JsonObject();
-                    object.addProperty("name", rsColumns.getString("COLUMN_NAME"));
-                    object.addProperty("dataType", rsColumns.getString("TYPE_NAME"));
+                    object.addProperty(Constants.NAME, rsColumns.getString(Constants.COLUMN_NAME));
+                    object.addProperty(Constants.DATA_TYPE, rsColumns.getString(Constants.TYPE_NAME));
                     tableNamesArray.add(object);
                 }
-                jsonResponse.add("attributes", tableNamesArray);
+                jsonResponse.add(Constants.ATTRIBUTES, tableNamesArray);
                 return Response
                         .status(Response.Status.OK)
                         .entity(jsonResponse)
@@ -1585,14 +1575,16 @@ public class EditorMicroservice implements Microservice {
         return conn.getMetaData();
     }
 
-    private List<LinkedHashMap> getDataSources() throws ConfigurationException {
-        HashMap<String, ArrayList> dataSourcesMap = (LinkedHashMap<String, ArrayList>)
-                configProviderData.getConfigurationObject("wso2.datasources");
-        List<LinkedHashMap> dataSourcesList = new ArrayList<>();
-        for (Object map : dataSourcesMap.get("dataSources")) {
-            dataSourcesList.add((LinkedHashMap) map);
+    private String[] getDataSourceConfiguration(String name) {
+        BundleContext bundleContext = FrameworkUtil.getBundle(DataSourceService.class).getBundleContext();
+        ServiceReference serviceRef = bundleContext.getServiceReference(DataSourceService.class.getName());
+        DataSourceService dataSourceService = (DataSourceService) bundleContext.getService(serviceRef);
+        try {
+            dataSource = (HikariDataSource) dataSourceService.getDataSource(name);
+        } catch (DataSourceException e) {
+            return null;
         }
-        return dataSourcesList;
+        return new String[]{dataSource.getJdbcUrl(), dataSource.getUsername(), dataSource.getPassword()};
     }
 
     /**

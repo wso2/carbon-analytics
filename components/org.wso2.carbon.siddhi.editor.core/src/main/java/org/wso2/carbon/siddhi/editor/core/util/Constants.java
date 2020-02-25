@@ -88,6 +88,14 @@ public class Constants {
     public static final String TRUE = "true";
     public static final String FALSE = "false";
     public static final String ERROR = "error";
+    public static final String COLUMN_NAME = "COLUMN_NAME";
+    public static final String TYPE_NAME = "TYPE_NAME";
+    public static final String DATASOURCE_NAME = "dataSourceName";
+    public static final String ATTRIBUTES = "attributes";
+    public static final String TABLES = "tables";
+    public static final String NAME = "name";
+    public static final String DATA_TYPE = "TYPE_NAME";
+    public static final String TABLE_NAME = "tableName";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
     static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregatorExecutor";
     static final String INCREMENTAL_AGGREGATOR = "IncrementalAggregator";
