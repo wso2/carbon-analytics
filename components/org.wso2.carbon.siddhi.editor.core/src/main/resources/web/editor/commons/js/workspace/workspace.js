@@ -528,6 +528,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._handleDeploy.show();
             };
 
+            this.handleGenerateStreamDialog = function handleGenerateStreamDialog(ref, callback) {
+                if (_.isNil(this._handleGenerateStreamDialog)) {
+                    this._handleGenerateStreamDialog = new Dialogs.generate_stream_dialog(app,ref, callback);
+                }
+                this._handleGenerateStreamDialog.render();
+                this._handleGenerateStreamDialog.show();
+            };
+
             this.handleExportForDocker = function handleExportForDocker() {
                 if (!_.isNil(this._handleExport)) {
                     this._handleExport.clear();
@@ -787,6 +795,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             app.commandManager.registerHandler('tour-guide', this.runGuide, this);
 
             app.commandManager.registerHandler('deploy-to-server', this.handleDeploy, this);
+
+            app.commandManager.registerHandler('generate-stream', this.handleGenerateStreamDialog, this);
 
             //Export Menu
             app.commandManager.registerHandler('export-for-docker', this.handleExportForDocker, this);
