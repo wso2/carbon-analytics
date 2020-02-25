@@ -39,6 +39,13 @@ public class ExtensionConfig {
         return Collections.emptyList();
     }
 
+    public List<DependencyConfig> getAutoDownloadableDependencies() {
+        if (dependencies != null) {
+            return dependencies.stream().filter(DependencyConfig::isAutoDownloadable).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
     public Map<String, String> getExtensionInfo() {
         return extension;
     }

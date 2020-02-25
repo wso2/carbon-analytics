@@ -53,9 +53,10 @@ public class Constants {
     public static final String DEPLOYMENT_PASSWORD = "password";
     public static final String SIDDHI_FILE_LIST = "siddhiFileList";
     public static final String SERVER_LIST = "serverList";
-    public static final String XML_EVENT = "xml";
-    public static final String JSON_EVENT = "json";
-    public static final String TEXT_EVENT = "text";
+    public static final String TYPE_XML = "xml";
+    public static final String TYPE_JSON = "json";
+    public static final String TYPE_TEXT = "text";
+    public static final String TYPE_CSV = "csv";
     public static final String SAMPLE_EVENTS_PARENT_TAG = "events";
     public static final String SAMPLE_EVENT_PARENT_TAG = "event";
     public static final String ATTR_TYPE_FLOAT = "float";
@@ -87,7 +88,6 @@ public class Constants {
     public static final String CONNECTION = "connection";
     public static final String TRUE = "true";
     public static final String FALSE = "false";
-    public static final String ERROR = "error";
     public static final String COLUMN_NAME = "COLUMN_NAME";
     public static final String TYPE_NAME = "TYPE_NAME";
     public static final String DATASOURCE_NAME = "dataSourceName";
@@ -107,6 +107,7 @@ public class Constants {
     static final String SOURCEMAP = "SourceMap";
     static final String SINKMAP = "SinkMap";
     static final String STORE = "Store";
+    public static final String ERROR = "error";
     static final Map<String, Class<?>> SUPER_CLASS_MAP;
     static final Map<String, String> PACKAGE_NAME_MAP;
 

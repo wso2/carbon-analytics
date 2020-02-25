@@ -33,8 +33,6 @@ import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.event.Event;
 import io.siddhi.query.api.definition.Attribute;
-import io.siddhi.query.api.execution.query.StoreQuery;
-import io.siddhi.query.compiler.SiddhiCompiler;
 import io.siddhi.query.compiler.exception.SiddhiParserException;
 
 import java.util.ArrayList;
@@ -79,9 +77,8 @@ public class SiddhiProvider extends AbstractDataProvider {
         SiddhiAppRuntime siddhiAppRuntime = getSiddhiAppRuntime();
         siddhiAppRuntime.setPurgingEnabled(false);
         siddhiAppRuntime.start();
-        StoreQuery storeQuery = SiddhiCompiler.parseStoreQuery(siddhiDataProviderConfig.getQueryData()
-                .getAsJsonObject().get(QUERY).getAsString());
-        Attribute[] outputAttributeList = siddhiAppRuntime.getStoreQueryOutputAttributes(storeQuery);
+        String onDemandQuery = siddhiDataProviderConfig.getQueryData().getAsJsonObject().get(QUERY).getAsString();
+        Attribute[] outputAttributeList = siddhiAppRuntime.getOnDemandQueryOutputAttributes(onDemandQuery);
         metadata = new DataSetMetadata(outputAttributeList.length);
         Attribute outputAttribute;
         for (int i = 0; i < outputAttributeList.length; i++) {

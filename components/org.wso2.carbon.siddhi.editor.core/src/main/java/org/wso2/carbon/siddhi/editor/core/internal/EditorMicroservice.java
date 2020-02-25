@@ -1377,11 +1377,11 @@ public class EditorMicroservice implements Microservice {
                         appName + " Siddhi App.");
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse.toString()).build();
             } else {
-                if (eventType.equals(Constants.XML_EVENT)) {
+                if (eventType.equals(Constants.TYPE_XML)) {
                     return Response.ok().entity(SampleEventGenerator.generateXMLEvent(streamDefinition)).build();
-                } else if (eventType.equals(Constants.JSON_EVENT)) {
+                } else if (eventType.equals(Constants.TYPE_JSON)) {
                     return Response.ok().entity(SampleEventGenerator.generateJSONEvent(streamDefinition)).build();
-                } else if (eventType.equals(Constants.TEXT_EVENT)) {
+                } else if (eventType.equals(Constants.TYPE_TEXT)) {
                     return Response.ok().entity(SampleEventGenerator.generateTextEvent(streamDefinition)).build();
                 } else {
                     errorResponse.put("error", "Invalid type: " + eventType + " given to retrieve the sample event.");

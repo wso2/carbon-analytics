@@ -16,23 +16,26 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models;
+package org.wso2.carbon.siddhi.editor.core.util.metainforetriever.beans;
 
-/**
- * Contains a dependency's download configuration.
- */
-public class DownloadConfig {
+public class JSONConfig {
 
-    private boolean autoDownloadable;
-    private String url;
-    private String instructions;
+    private String filePath;
+    private String enclosingElement;
 
-    public boolean isAutoDownloadable() {
-        return autoDownloadable;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public String getUrl() {
-        return url;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
+    public String getEnclosingElement() {
+        return enclosingElement;
+    }
+
+    public void setEnclosingElement(String enclosingElement) {
+        this.enclosingElement = enclosingElement;
+    }
 }
