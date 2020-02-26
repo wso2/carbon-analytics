@@ -27,7 +27,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
-import com.zaxxer.hikari.HikariDataSource;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.debugger.SiddhiDebugger;
@@ -41,8 +40,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -54,8 +51,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.datasource.core.api.DataSourceService;
-import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.siddhi.editor.core.EditorSiddhiAppRuntimeService;
 import org.wso2.carbon.siddhi.editor.core.Workspace;
 import org.wso2.carbon.siddhi.editor.core.commons.configs.DockerBuildConfig;
@@ -106,7 +101,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ConnectException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -144,6 +138,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.siddhi.editor.core.util.MetaInfoRetrieverUtils.getDataSourceConfiguration;
+import static org.wso2.carbon.siddhi.editor.core.util.MetaInfoRetrieverUtils.getDatabaseMetadata;
+
 /**
  * Editor micro service implementation class.
  */
@@ -169,7 +166,6 @@ public class EditorMicroservice implements Microservice {
                     .setNameFormat("Debugger-scheduler-thread-%d")
                     .build()
             );
-    private HikariDataSource dataSource;
     private ConfigProvider configProvider;
     private ServiceRegistration siddhiAppRuntimeServiceRegistration;
     private StoreQueryAPIHelper storeQueryAPIHelper;
@@ -1564,27 +1560,6 @@ public class EditorMicroservice implements Microservice {
         } else {
             return response;
         }
-    }
-
-    private Connection getDatabaseConnection(String url, String username, String password) throws SQLException {
-        return DriverManager.getConnection(url, username, password);
-    }
-
-    private DatabaseMetaData getDatabaseMetadata(String url, String username, String password) throws SQLException {
-        Connection conn = getDatabaseConnection(url, username, password);
-        return conn.getMetaData();
-    }
-
-    private String[] getDataSourceConfiguration(String name) {
-        BundleContext bundleContext = FrameworkUtil.getBundle(DataSourceService.class).getBundleContext();
-        ServiceReference serviceRef = bundleContext.getServiceReference(DataSourceService.class.getName());
-        DataSourceService dataSourceService = (DataSourceService) bundleContext.getService(serviceRef);
-        try {
-            dataSource = (HikariDataSource) dataSourceService.getDataSource(name);
-        } catch (DataSourceException e) {
-            return null;
-        }
-        return new String[]{dataSource.getJdbcUrl(), dataSource.getUsername(), dataSource.getPassword()};
     }
 
     /**
