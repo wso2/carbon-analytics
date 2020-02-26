@@ -21,6 +21,17 @@ package org.wso2.carbon.siddhi.editor.core.util;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.zaxxer.hikari.HikariDataSource;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
+import org.wso2.carbon.datasource.core.api.DataSourceService;
+import org.wso2.carbon.datasource.core.exception.DataSourceException;
+
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class MetaInfoRetrieverUtils {
 
@@ -55,6 +66,29 @@ public class MetaInfoRetrieverUtils {
         } catch (com.google.gson.JsonSyntaxException ex) {
             return false;
         }
+    }
+
+    public static Connection getDatabaseConnection(String url, String username, String password) throws SQLException {
+        return DriverManager.getConnection(url, username, password);
+    }
+
+    public static DatabaseMetaData getDatabaseMetadata(String url, String username, String password)
+            throws SQLException {
+        Connection conn = getDatabaseConnection(url, username, password);
+        return conn.getMetaData();
+    }
+
+    public static String[] getDataSourceConfiguration(String name) {
+        BundleContext bundleContext = FrameworkUtil.getBundle(DataSourceService.class).getBundleContext();
+        ServiceReference serviceRef = bundleContext.getServiceReference(DataSourceService.class.getName());
+        DataSourceService dataSourceService = (DataSourceService) bundleContext.getService(serviceRef);
+        HikariDataSource dataSource;
+        try {
+            dataSource = (HikariDataSource) dataSourceService.getDataSource(name);
+        } catch (DataSourceException e) {
+            return null;
+        }
+        return new String[]{dataSource.getJdbcUrl(), dataSource.getUsername(), dataSource.getPassword()};
     }
 
 }
