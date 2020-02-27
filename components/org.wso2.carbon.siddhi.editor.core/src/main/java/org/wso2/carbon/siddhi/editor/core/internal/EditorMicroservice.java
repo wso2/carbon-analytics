@@ -105,12 +105,18 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -131,6 +137,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.siddhi.editor.core.util.MetaInfoRetrieverUtils.getDataSourceConfiguration;
+import static org.wso2.carbon.siddhi.editor.core.util.MetaInfoRetrieverUtils.getDatabaseMetadata;
 
 /**
  * Editor micro service implementation class.
@@ -161,6 +170,7 @@ public class EditorMicroservice implements Microservice {
     private ServiceRegistration siddhiAppRuntimeServiceRegistration;
     private StoreQueryAPIHelper storeQueryAPIHelper;
     private Map<String, DockerBuilderStatus> dockerBuilderStatusMap = new HashMap<>();
+    private Map<String, String> dataStoreMap = new HashMap<>();
 
     public EditorMicroservice() {
 
@@ -1363,11 +1373,11 @@ public class EditorMicroservice implements Microservice {
                         appName + " Siddhi App.");
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse.toString()).build();
             } else {
-                if (eventType.equals(Constants.XML_EVENT)) {
+                if (eventType.equals(Constants.TYPE_XML)) {
                     return Response.ok().entity(SampleEventGenerator.generateXMLEvent(streamDefinition)).build();
-                } else if (eventType.equals(Constants.JSON_EVENT)) {
+                } else if (eventType.equals(Constants.TYPE_JSON)) {
                     return Response.ok().entity(SampleEventGenerator.generateJSONEvent(streamDefinition)).build();
-                } else if (eventType.equals(Constants.TEXT_EVENT)) {
+                } else if (eventType.equals(Constants.TYPE_TEXT)) {
                     return Response.ok().entity(SampleEventGenerator.generateTextEvent(streamDefinition)).build();
                 } else {
                     errorResponse.put("error", "Invalid type: " + eventType + " given to retrieve the sample event.");
@@ -1375,6 +1385,180 @@ public class EditorMicroservice implements Microservice {
                             build();
                 }
             }
+        }
+    }
+
+    @POST
+    @Path("/store/connectToDatabase")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDatabaseConnection(JsonElement element) {
+        JsonObject jsonResponse = new JsonObject();
+        JsonObject jsonInput = element.getAsJsonObject();
+        Set<String> keys = jsonInput.keySet();
+        dataStoreMap.clear();
+        for (String key : keys) {
+            dataStoreMap.put(key, jsonInput.get(key).toString().replaceAll("\"", ""));
+        }
+        if (dataStoreMap.containsKey(Constants.DATASOURCE_NAME)
+                && (dataStoreMap.containsKey(Constants.DB_URL)
+                || dataStoreMap.containsKey(Constants.DB_USERNAME)
+                || dataStoreMap.containsKey(Constants.DB_PASSWORD))) {
+            jsonResponse.addProperty(Constants.CONNECTION, Constants.FALSE);
+            jsonResponse.addProperty(Constants.ERROR, "Provide valid data source configuration or " +
+                    "jdbcURL, username and password only.");
+            return Response
+                    .serverError()
+                    .entity(jsonResponse)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } else if (dataStoreMap.containsKey(Constants.DATASOURCE_NAME)) {
+            String[] dataSourceConfiguration =
+                    getDataSourceConfiguration(dataStoreMap.get(Constants.DATASOURCE_NAME));
+            if (dataSourceConfiguration == null) {
+                jsonResponse.addProperty(Constants.CONNECTION, Constants.FALSE);
+                jsonResponse.addProperty(Constants.ERROR, "Provide valid data source configuration or " +
+                        "jdbcURL, username and password only.");
+                return Response
+                        .serverError()
+                        .entity(jsonResponse)
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            } else {
+                dataStoreMap.put(Constants.DB_URL, dataSourceConfiguration[0]);
+                dataStoreMap.put(Constants.DB_USERNAME, dataSourceConfiguration[1]);
+                dataStoreMap.put(Constants.DB_PASSWORD, dataSourceConfiguration[2]);
+            }
+        }
+        try {
+            String[] splittedURL = dataStoreMap.get(Constants.DB_URL).split(Constants.COLLON);
+            if (splittedURL[0].equalsIgnoreCase(Constants.JDBC) &&
+                    (splittedURL[1].equalsIgnoreCase(Constants.MYSQL_DATABASE)
+                            || splittedURL[1].equalsIgnoreCase(Constants.MSSQL_DATABASE)
+                            || splittedURL[1].equalsIgnoreCase(Constants.ORACLE_DATABASE)
+                            || splittedURL[1].equalsIgnoreCase(Constants.POSTGRESQL))) {
+                if (splittedURL[1].equalsIgnoreCase(Constants.MYSQL_DATABASE)) {
+                    Class.forName(Constants.MYSQL_DRIVER_CLASS_NAME);
+                } else if (splittedURL[1].equalsIgnoreCase(Constants.MSSQL_DATABASE)) {
+                    Class.forName(Constants.MSSQL_DRIVER_CLASS_NAME);
+                } else if (splittedURL[1].equalsIgnoreCase(Constants.ORACLE_DATABASE)) {
+                    Class.forName(Constants.ORACLE_DRIVER_CLASS_NAME);
+                } else if (splittedURL[1].equalsIgnoreCase(Constants.POSTGRESQL)) {
+                    Class.forName(Constants.POSTGRESQL_DRIVER_CLASS_NAME);
+                }
+                Connection conn = DriverManager.getConnection(dataStoreMap.get(Constants.DB_URL),
+                        dataStoreMap.get(Constants.DB_USERNAME),
+                        dataStoreMap.get(Constants.DB_PASSWORD));
+                conn.close();
+            } else {
+                jsonResponse.addProperty(Constants.CONNECTION, Constants.FALSE);
+                jsonResponse.addProperty(Constants.ERROR, "Unsupported schema. Expected schema: " +
+                        "mysql, sqlserver, oracle and postgresql. But found: "
+                        + splittedURL[0] + ":" + splittedURL[1]);
+                return Response
+                        .serverError()
+                        .entity(jsonResponse)
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }
+            jsonResponse.addProperty(Constants.CONNECTION, Constants.TRUE);
+            return Response
+                    .status(Response.Status.OK)
+                    .entity(jsonResponse)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (SQLException | ClassNotFoundException e) {
+            jsonResponse.addProperty(Constants.CONNECTION, Constants.FALSE);
+            jsonResponse.addProperty(Constants.ERROR, e.getMessage());
+            return Response
+                    .serverError()
+                    .entity(jsonResponse)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/store/retrieveTableNames")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDatabaseTables(JsonElement element) {
+        Response response = getDatabaseConnection(element);
+        if (response.getStatus() == 200) {
+            JsonObject jsonResponse = new JsonObject();
+            try {
+                DatabaseMetaData dbMetadata = getDatabaseMetadata(dataStoreMap.get(Constants.DB_URL),
+                        dataStoreMap.get(Constants.DB_USERNAME), dataStoreMap.get(Constants.DB_PASSWORD));
+                ResultSet rs = dbMetadata.getTables(null, null, "%", null);
+                JsonArray tableNames = new JsonArray();
+                while (rs.next()) {
+                    tableNames.add(new JsonPrimitive(rs.getString(3)));
+                }
+                jsonResponse.add(Constants.TABLES, tableNames);
+                return Response
+                        .status(Response.Status.OK)
+                        .entity(jsonResponse)
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            } catch (SQLException e) {
+                jsonResponse.addProperty(Constants.ERROR, e.getMessage());
+                return Response
+                        .serverError()
+                        .entity(jsonResponse)
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }
+        } else {
+            return response;
+        }
+    }
+
+    @POST
+    @Path("/store/retrieveTableColumnNames")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDatabaseDetails(JsonElement element) {
+        Response response = getDatabaseConnection(element);
+        if (response.getStatus() == 200) {
+            JsonObject jsonResponse = new JsonObject();
+            if (!dataStoreMap.containsKey(Constants.TABLE_NAME)) {
+                jsonResponse.addProperty(Constants.CONNECTION, Constants.FALSE);
+                jsonResponse.addProperty(Constants.ERROR, "Provide jdbcURL, username, password and " +
+                        "table name.");
+                return Response
+                        .serverError()
+                        .entity(jsonResponse)
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }
+            try {
+                DatabaseMetaData meta = getDatabaseMetadata(dataStoreMap.get(Constants.DB_URL),
+                        dataStoreMap.get(Constants.DB_USERNAME), dataStoreMap.get(Constants.DB_PASSWORD));
+                ResultSet rsColumns = meta.getColumns(null, null, dataStoreMap.get(Constants.TABLE_NAME),
+                        null);
+                JsonArray tableNamesArray = new JsonArray();
+                while (rsColumns.next()) {
+                    JsonObject object = new JsonObject();
+                    object.addProperty(Constants.NAME, rsColumns.getString(Constants.COLUMN_NAME));
+                    object.addProperty(Constants.DATA_TYPE, rsColumns.getString(Constants.TYPE_NAME));
+                    tableNamesArray.add(object);
+                }
+                jsonResponse.add(Constants.ATTRIBUTES, tableNamesArray);
+                return Response
+                        .status(Response.Status.OK)
+                        .entity(jsonResponse)
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            } catch (SQLException e) {
+                jsonResponse.addProperty(Constants.ERROR, e.getMessage());
+                return Response
+                        .serverError()
+                        .entity(jsonResponse)
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }
+        } else {
+            return response;
         }
     }
 
