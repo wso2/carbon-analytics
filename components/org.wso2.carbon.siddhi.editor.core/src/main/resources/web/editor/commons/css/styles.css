@@ -1849,3 +1849,15 @@ div.consoleIcon {
 .extension-install-btn {
     color: whitesmoke;
 }
+
+.footer_btn {
+ float: right;
+}
+
+.footer_btn button {
+ margin-right: 10px;
+}
+.checkPanel{
+    padding-left: 10px;
+    padding-top: 20px !important;
+}

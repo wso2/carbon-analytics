@@ -20,6 +20,7 @@ define(['require', 'lodash', 'jquery', 'log'],
 
         var constants = {};
         var streamObj = {};
+        var requestBody = {};
 
 
         constants.HTTP_GET = "GET";
@@ -61,163 +62,7 @@ define(['require', 'lodash', 'jquery', 'log'],
             if (!_.isNil(this._generateStreamModal)) {
                 this._generateStreamModal.remove();
             }
-            var generateOptions = $(
-                "<div class='modal fade' id='generateStreamConfigModal' tabindex='-1' role='dialog' aria-tydden='true'>" +
-                "<div class='modal-dialog file-dialog' role='document'>" +
-                "<div class='modal-content'>" +
-                "<div class='modal-header'>" +
-                "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
-                "<i class='fw fw-cancel about-dialog-close'>" +
-                "</i>" +
-                "</button>" +
-                "<h4 class='modal-title file-dialog-title'>Generate Stream</h4>" +
-                "<hr class='style1'>" +
-                "</div>" +
-                "<div class='modal-body'>" +
-                "<div class='container-fluid'>" +
-
-                "<form class='form-horizontal' onsubmit='return false'>" +
-
-                "<div class='panel-group driving-license-settings' id='accordion'>" +
-                "<div class='panel panel-default'>" +
-
-                "<div class='panel-heading'>" +
-                "<h4 class='panel-title'>" +
-                "<input type='radio' id='idFromFile' name='selection' value='fromFile' style='display: block'> " +
-                "From File " +
-                "</h4>" +
-                "<h4 class='panel-title'>" +
-                "<input type='radio' id='idFromDatabase' name='selection' value='fromFile' style='display: block'> " +
-                "From Database" +
-                "</h4>" +
-                "</div>" +
-
-                "<div id='generateFromFileContent' class='panel-collapse collapse in'>" +
-                "<div class='panel-body'>" +
-                "<div class='driving-license-kind'>" +
-                "<div class='checkbox'>" +
-                "<input type='checkbox' value=''>A" +
-                "</div>" +
-                "<div class='checkbox'>" +
-                "<input type='checkbox' value=''>B" +
-                "</div>" +
-                "</div>" +
-                "</div>" +
-                "</div>" +
-
-                "<div id='generateFromDBContent' class='panel-collapse collapse in'>" +
-                "<div class='panel-body'>" +
-
-                "<div class='dbsourceConfigForm' data-type='db' style='display: block;'>" +
-                "<h4 class='panel-title'>" +
-                "<input type='radio' id='idInline' name='dbConfig' value='fromInline' style='display: block'> " +
-                "Inline Configuration " +
-                "</h4>" +
-                "<h4 class='panel-title'>" +
-                "<input type='radio' id='idDatasource' name='dbConfig' value='fromDatasource' style='display: block'> " +
-                "Provide Datasource " +
-                "</h4>" +
-
-                "</div>" +
-                "</div>" +
-
-                "<div id='inlineContent' class='panel-collapse collapse in'>" +
-                "<div class='panel-body'>" +
-                "<div class='form-group'>" +
-                "<label>" +
-                "    Database URL<span class='required_astrix'> *</span>" +
-                "</label>" +
-                "<input type='text' class='form-control required-for-db-connection' id='dataSourceLocation_1' " +
-                "value='jdbc:mysql://[machine-name/ip]:[port]/[database-name]' name='data-source-location' " +
-                "aria-required='true'></div>" +
-                "<div class='form-group'>" +
-                "<label>" +
-                "    Username<span class='required_astrix'> *</span>" +
-                "</label>" +
-                "<input type='text' class='form-control required-for-db-connection' name='username' value='root' " +
-                "aria-required='true'></div>" +
-                "<div class='form-group'>" +
-                "<label>" +
-                "Password<span class='required_astrix'> *</span>" +
-                "</label>" +
-                "<input type='password' class='form-control required-for-db-connection' name='password' value='root' " +
-                "aria-required='true'></div>" +
-                "<div class='form-group'>" +
-                "<button type='button' class='btn btn-secondary' name='loadDbConnection'>" +
-                "    Connect to database" +
-                "</button>" +
-                "<span class='helper connectionSuccessMsg'></span>" +
-                "</div>" +
-                "" +
-                "<div class='form-group'>" +
-                "<label>" +
-                "Table name<span class='required_astrix'> *</span>" +
-                "</label>" +
-                "<select name='table-name' class='form-control' aria-required='true'>" +
-                "</select>" +
-                "</div>" +
-
-                "</div>" +
-                "</div>" +
-
-                "<div id='datasourceContent' class='panel-collapse collapse in'>" +
-                "<div class='panel-body'>" +
-                "<div class='form-group'>" +
-                "<label>" +
-                "    Datasource Name<span class='required_astrix'> *</span>" +
-                "</label>" +
-                "<input type='text' class='form-control required-for-db-connection' id='dataSourceNameId' " +
-                " name='dataSourceNameId' " +
-                "aria-required='true'></div>" +
-                "<div class='form-group'>" +
-                "<button type='button' class='btn btn-secondary' name='loadDbConnection'>" +
-                "    Connect to database" +
-                "</button>" +
-                "<span class='helper connectionSuccessMsg'></span>" +
-                "</div>" +
-                "" +
-                "<div class='form-group'>" +
-                "<label>" +
-                "Table name<span class='required_astrix'> *</span>" +
-                "</label>" +
-                "<select name='table-name' class='form-control' aria-required='true'>" +
-                "</select>" +
-                "</div>" +
-                "</div>" +
-                "</div>" +
-
-
-
-                "</div>" +
-                "</div>" +
-
-                "<div class='file-dialog-form-divider'>" +
-                "</div>" +
-                "<div class='button-container' id='button-container'>" +
-                "<div class='form-group'>" +
-                "<div class='file-dialog-form-btn'>" +
-                "<button id='generateButton' type='button' class='btn btn-primary'>Generate" +
-                "</button>" +
-                "<div class='divider'/>" +
-                "<button type='button' class='btn btn-default' data-dismiss='modal'>cancel</button>" +
-                "</div>" +
-                "</div>" +
-                "</div>" +
-
-                "</form>" +
-
-                "<div id='generateStreamConfigModalError-container' class='generateStreamConfigModalError-container'>" +
-                "<div id='generateStreamConfigModalError' class='alert alert-danger'>" +
-                "<strong>Error!</strong> Something went wrong." +
-                "</div>" +
-                "</div>" +
-                "</div>" +
-                "</div>" +
-                "</div>" +
-                "</div>" +
-                "</div>"
-            );
-
+            var generateOptions = $('#generateStreamConfigModal')
 
             generateOptions.find(".collapse").collapse();
 
@@ -225,6 +70,11 @@ define(['require', 'lodash', 'jquery', 'log'],
                 e.stopPropagation();
 
                 generateOptions.find('#generateFromFileContent').collapse("show");
+                generateOptions.find('#fileSelector').change(function(e) {
+                        handleFileSelect1(e, generateOptions);
+                    }
+                );
+
                 if(!generateOptions.find('#idFromDatabase').is(":checked")){
                     generateOptions.find('#generateFromDBContent').collapse("hide");
                 }
@@ -258,6 +108,30 @@ define(['require', 'lodash', 'jquery', 'log'],
             });
 
             generateOptions.find("button").filter("#generateButton").click(function () {
+                requestBody ={};
+                if(generateOptions.find('#idFromFile').is(":checked")){
+                    if(generateOptions.find("#fromCsvFile").attr("aria-expanded")){
+                        requestBody["type"] = "csv";
+                        requestBody["streamName"] = generateOptions.find('#streamNameCsv')[0].value;
+                        requestBody["delimiter"] = generateOptions.find('#delimiterOfCSV')[0].value;
+                        requestBody["isHeaderExists"] = generateOptions.find('#isHeaderExists')[0].value;
+                    } else if(generateOptions.find("#fromJsonFile").attr("aria-expanded")){
+                         requestBody["type"] = "json";
+                         requestBody["streamName"] = generateOptions.find('#streamNameJson')[0].value;
+                         requestBody["enclosingElement"] = generateOptions.find('#jsonEnclosingElement')[0].value;
+                    } else if(generateOptions.find("#fromXmlFile").attr("aria-expanded")){
+                          requestBody["type"] = "xml";
+                          requestBody["streamName"] = generateOptions.find('#streamNameXml')[0].value;
+                          requestBody["nameSpace"] = generateOptions.find('#nameSpaceOfXml')[0].value;
+                          requestBody["enclosingElement"] = generateOptions.find('#enclosingElementXML')[0].value;
+                    }
+                } else if(generateOptions.find('#idFromDatabase').is(":checked")){
+                    if(generateOptions.find('#idInline').is(":checked")){
+
+                    }else if(generateOptions.find('#idDatasource').is(":checked")){
+
+                    }
+                }
                 self.callback(constants.streamObj,self.ref);
                 generateOptions.modal('hide');
             });
@@ -268,8 +142,35 @@ define(['require', 'lodash', 'jquery', 'log'],
             generateStreamConfigModalError.hide();
             this._generateStreamModal = generateOptions;
             generateStreamConfigModal.modal('hide');
-        };
 
+
+        };
+        function handleFileSelect1(evt, generateOptions) {
+            var files = evt.target.files; // FileList object
+                generateOptions.find("#fromJsonFile").collapse("hide");
+                generateOptions.find("#fromXmlFile").collapse("hide");
+                generateOptions.find("#fromCsvFile").collapse("hide");
+            var fileType = files[0].type;
+
+            if (fileType === "application/json"){
+                generateOptions.find("#fromJsonFile").collapse("show");
+            } else if(fileType === "text/xml"){
+                generateOptions.find("#fromXmlFile").collapse("show");
+            } else if(fileType === "text/csv"){
+                generateOptions.find("#fromCsvFile").collapse("show");
+
+            } else{
+                console.error("Huta pata support natho..")
+            }
+            var output = [];
+            for (var i = 0, f; f = files[i]; i++) {
+                output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+                f.size, ' bytes, last modified: ',
+                f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+                    '</li>');
+            }
+            document.getElementById('file_list1').innerHTML = '<ul>' + output.join('') + '</ul>';
+        }
 
         GenerateStreamDialog.prototype.show = function () {
             this._generateStreamModal.modal('show');
