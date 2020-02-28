@@ -79,15 +79,15 @@ public class ExportUtils {
     private static final String DOCKER_IMAGE_NAME_TEMPLATE = "\\{\\{DOCKER_IMAGE_NAME}}";
     private static final String PORT_BIND_TEMPLATE = "\\{\\{BIND_PORTS}}";
     private static final String CONFIG_BLOCK_VALUE =
-            "COPY --chown=siddhi_user:siddhi_io \\$\\{CONFIG_FILE}/ \\$\\{USER_HOME}";
+            "COPY \\$\\{CONFIG_FILE}/ \\$\\{USER_HOME}";
     private static final String CONFIG_PARAMETER_VALUE =
             ", \"-Dconfig=/home/siddhi_user/configurations.yaml\"";
     private static final String JARS_BLOCK_VALUE =
-            "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_JARS_DIR}/ \\$\\{JARS}";
+            "COPY \\$\\{HOST_JARS_DIR}/ \\$\\{JARS}";
     private static final String BUNDLES_BLOCK_VALUE =
-            "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_BUNDLES_DIR}/ \\$\\{BUNDLES}";
+            "COPY \\$\\{HOST_BUNDLES_DIR}/ \\$\\{BUNDLES}";
     private static final String APPS_BLOCK_VALUE =
-            "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_APPS_DIR}/ \\$\\{APPS}";
+            "COPY \\$\\{HOST_APPS_DIR}/ \\$\\{APPS}";
     private static final String SIDDHI_PROCESS_SPEC_TEMPLATE = "\\{\\{SIDDHI_PROCESS_SPEC}}";
     private static final String SIDDHI_PROCESS_NAME_TEMPLATE = "\\{\\{SIDDHI_PROCESS_NAME}}";
     private static final String SIDDHI_PROCESS_DEFAULT_NAME = "sample-siddhi-process";
@@ -455,7 +455,7 @@ public class ExportUtils {
                     );
                 } else {
                     content = content.replaceAll(
-                            DOCKER_IMAGE_NAME_TEMPLATE, Constants.DEFAULT_SIDDHI_DOCKER_IMAGE_NAME);
+                            DOCKER_IMAGE_NAME_TEMPLATE, Constants.DEFAULT_SI_DOCKER_IMAGE_NAME);
                 }
 
                 byte[] readmeContent = content.getBytes(StandardCharsets.UTF_8);
@@ -525,8 +525,9 @@ public class ExportUtils {
         }
         data = Files.readAllBytes(dockerFilePath);
         String content = new String(data, StandardCharsets.UTF_8);
-        String dockerBaseImgName = Constants.DEFAULT_SIDDHI_DOCKER_BASE_IMAGE_NAME;
-        String version = EditorDataHolder.getBundleContext().getBundle().getVersion().toString();
+        String dockerBaseImgName = Constants.DEFAULT_SI_DOCKER_BASE_IMAGE_NAME;
+        String version = Constants.DEFAULT_SI_DOCKER_IMAGE_VERSION;
+        // EditorDataHolder.getBundleContext().getBundle().getVersion().toString();
         if (version != null && !version.isEmpty()) {
             dockerBaseImgName = dockerBaseImgName.concat(":").concat(version.toLowerCase());
         }
