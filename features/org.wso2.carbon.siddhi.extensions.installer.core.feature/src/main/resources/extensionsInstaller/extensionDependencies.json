@@ -7,18 +7,18 @@
     "dependencies": [
       {
         "name": "kafka-clients",
-        "version": "2.3.0",
+        "version": "0.10.2.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/org/apache/kafka/kafka_2.11/2.1.1/kafka_2.11-2.1.1.jar"
+          "url": "https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/0.10.2.1/kafka-clients-0.10.2.1.jar"
         },
         "usages": [
           {
-            "type": "BUNDLE",
+            "type": "JAR",
             "usedBy": "RUNTIME"
           },
           {
-            "type": "JAR",
+            "type": "BUNDLE",
             "usedBy": "SAMPLES"
           }
         ],
@@ -34,10 +34,90 @@
         "usages": [
           {
             "type": "JAR",
+            "usedBy": "RUNTIME"
+          },
+          {
+            "type": "BUNDLE",
             "usedBy": "SAMPLES"
           }
         ],
         "lookupRegex": "zookeeper-(.+).jar"
+      },
+      {
+        "name": "kafka-2.11",
+        "version": "0.10.2.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/apache/kafka/kafka_2.11/0.10.2.1/kafka_2.11-0.10.2.1.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          },
+          {
+            "type": "BUNDLE",
+            "usedBy": "SAMPLES"
+          }
+        ],
+        "lookupRegex": "kafka_2.11-(.+).jar"
+      },
+      {
+        "name": "scala-library",
+        "version": "2.11.8",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          },
+          {
+            "type": "BUNDLE",
+            "usedBy": "SAMPLES"
+          }
+        ],
+        "lookupRegex": "scala-library-(.+).jar"
+      },
+      {
+        "name": "zkclient",
+        "version": "0.10",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/com/101tec/zkclient/0.10/zkclient-0.10.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          },
+          {
+            "type": "BUNDLE",
+            "usedBy": "SAMPLES"
+          }
+        ],
+        "lookupRegex": "zkclient-(.+).jar"
+      },
+      {
+        "name": "metrics-core",
+        "version": "2.2.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/com/yammer/metrics/metrics-core/2.2.0/metrics-core-2.2.0.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          },
+          {
+            "type": "BUNDLE",
+            "usedBy": "SAMPLES"
+          }
+        ],
+        "lookupRegex": "metrics-core-(.+).jar"
       }
     ]
   },
@@ -57,11 +137,96 @@
         },
         "usages": [
           {
-            "type": "JAR",
+            "type": "BUNDLE",
             "usedBy": "SAMPLES"
           }
         ],
         "lookupRegex": "jedis-(.+).jar"
+      }
+    ]
+  },
+
+  "jms": {
+    "extension": {
+      "name": "jms",
+      "version": "2.0.4"
+    },
+    "dependencies": [
+      {
+        "name": "activemq-client",
+        "version": "5.9.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/apache/activemq/activemq-client/5.9.0/activemq-client-5.9.0.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          },
+          {
+            "type": "BUNDLE",
+            "usedBy": "SAMPLES"
+          }
+        ],
+        "lookupRegex": "activemq-client_(.+).jar"
+      },
+      {
+        "name": "hawtbuf",
+        "version": "1.9",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/fusesource/hawtbuf/hawtbuf/1.9/hawtbuf-1.9.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          },
+          {
+            "type": "BUNDLE",
+            "usedBy": "SAMPLES"
+          }
+        ],
+        "lookupRegex": "hawtbuf-(.+).jar"
+      },
+      {
+        "name": "geronimo-j2ee-management_1.1_spec-",
+        "version": "1.0.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/apache/geronimo/specs/geronimo-j2ee-management_1.1_spec/1.0.1/geronimo-j2ee-management_1.1_spec-1.0.1.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          },
+          {
+            "type": "BUNDLE",
+            "usedBy": "SAMPLES"
+          }
+        ],
+        "lookupRegex": "geronimo-j2ee-management__1.1_spec-(.+).jar"
+      },
+      {
+        "name": "geronimo-jms_1.1_spec-",
+        "version": "1.1.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/apache/geronimo/specs/geronimo-jms_1.1_spec/1.1.1/geronimo-jms_1.1_spec-1.1.1.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          },
+          {
+            "type": "BUNDLE",
+            "usedBy": "SAMPLES"
+          }
+        ],
+        "lookupRegex": "geronimo-jms_1.1_spec-(.+).jar"
       }
     ]
   }
