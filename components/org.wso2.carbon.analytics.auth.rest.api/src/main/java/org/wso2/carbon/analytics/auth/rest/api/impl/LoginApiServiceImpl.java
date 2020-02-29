@@ -280,7 +280,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             String trimmedAppName = appName.split("/\\|?")[0];
             String appContext = "/" + trimmedAppName;
 
-            String requestUrl = (String) request.getProperty(ExternalIdPClientConstants.REQUEST_URL);
+            String requestUrl = request.getUri();
             String requestCode = requestUrl.substring(requestUrl.lastIndexOf("?code=") + 6);
             try {
                 ExternalIdPClient oAuth2IdPClient = (ExternalIdPClient) idPClient;
