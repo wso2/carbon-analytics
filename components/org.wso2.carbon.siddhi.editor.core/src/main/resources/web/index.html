@@ -2861,7 +2861,8 @@
 
                                 <div id='generateFromDBContent' class='panel-collapse collapse in'>
                                     <div class='panel-body'>
-                                        <div class='dbsourceConfigForm checkPanel' data-type='db' style='display: block;'>
+                                        <div class='dbsourceConfigForm checkPanel' data-type='db'
+                                             style='display: block;'>
                                             <label class='radio-inline'>
                                                 <input type='radio' id='idInline' name='dbConfig' value='fromInline'
                                                        style='display: block'>
@@ -2897,37 +2898,42 @@
                                                            id='dataSourceLocation_1'
                                                            value='jdbc:mysql://[machine-name/ip]:[port]/[database-name]'
                                                            name='data-source-location'
-                                                           aria-required='true'></div>
+                                                           aria-required='true'
+                                                           required>
+                                                </div>
                                                 <div class='form-group'>
                                                     <label>
                                                         Username<span class='required_astrix'> *</span>
                                                     </label>
                                                     <input type='text' class='form-control required-for-db-connection'
+                                                           id="inlineUsername"
                                                            name='username' value='root'
-                                                           aria-required='true'></div>
+                                                           aria-required='true' required></div>
                                                 <div class='form-group'>
                                                     <label>
                                                         Password<span class='required_astrix'> *</span>
                                                     </label>
                                                     <input type='password'
+                                                           id="inlinePass"
                                                            class='form-control required-for-db-connection'
                                                            name='password' value='root'
-                                                           aria-required='true'></div>
+                                                           aria-required='true' required></div>
                                                 <div class='form-group'>
-                                                    <button type='button' class='btn btn-secondary'
+                                                    <button id='loadInlineDbConnection' type='button'
+                                                            class='btn btn-secondary'
                                                             name='loadDbConnection'>
                                                         Connect to database
                                                     </button>
                                                     <span class='helper connectionSuccessMsg'></span>
                                                 </div>
-                                                <div class='form-group'>
-                                                    <label>
-                                                        Table name<span class='required_astrix'> *</span>
-                                                    </label>
-                                                    <select name='table-name' class='form-control' aria-required='true'>
-                                                    </select>
-                                                </div>
                                             </form>
+                                            <div class='form-group'>
+                                                <label>
+                                                    Table name<span class='required_astrix'> *</span>
+                                                </label>
+                                                <select name='table-name' class='form-control' aria-required='true'>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -2942,7 +2948,7 @@
                                                            id='streamNameDataSource'
                                                            value=","
                                                            name='streamName'
-                                                           aria-required='true'>
+                                                           aria-required='true' required>
                                                 </div>
                                                 <div class='form-group'>
                                                     <label>
@@ -2954,6 +2960,7 @@
                                                            aria-required='true'></div>
                                                 <div class='form-group'>
                                                     <button type='button' class='btn btn-secondary'
+                                                            id='loadDatasourceDbConnection'
                                                             name='loadDbConnection'>
                                                         Connect to database
                                                     </button>

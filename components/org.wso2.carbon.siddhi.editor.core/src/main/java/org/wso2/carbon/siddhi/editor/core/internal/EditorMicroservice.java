@@ -1389,7 +1389,7 @@ public class EditorMicroservice implements Microservice {
     }
 
     @POST
-    @Path("/store/connectToDatabase")
+    @Path("/connectToDatabase")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDatabaseConnection(JsonElement element) {
@@ -1479,7 +1479,7 @@ public class EditorMicroservice implements Microservice {
     }
 
     @POST
-    @Path("/store/retrieveTableNames")
+    @Path("/retrieveTableNames")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDatabaseTables(JsonElement element) {
@@ -1514,7 +1514,7 @@ public class EditorMicroservice implements Microservice {
     }
 
     @POST
-    @Path("/store/retrieveTableColumnNames")
+    @Path("/retrieveTableColumnNames")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDatabaseDetails(JsonElement element) {
