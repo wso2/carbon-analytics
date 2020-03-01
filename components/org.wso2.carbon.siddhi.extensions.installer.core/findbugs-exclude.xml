@@ -21,4 +21,10 @@
         <Package name="org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models"/>
         <Bug pattern="UWF_UNWRITTEN_FIELD"/>
     </Match>
+    <!-- The following field is only written by Gson, and only the containing class is read  -->
+    <Match>
+        <Class name="org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.DownloadConfig"/>
+        <Field name="instructions"/>
+        <Bug pattern="UUF_UNUSED_FIELD"/>
+    </Match>
 </FindBugsFilter>

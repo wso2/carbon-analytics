@@ -34,11 +34,12 @@ import java.util.Map;
  */
 public class ResponseEntityCreator {
 
-    private static final String ACTION_TYPE_KEY = "actionType";
-    private static final String ACTION_STATUS_KEY = "status";
+    public static final String ACTION_TYPE_KEY = "actionType";
+    public static final String ACTION_STATUS_KEY = "status";
     private static final String ACTION_COMPLETED_DEPENDENCIES_KEY = "completed";
     private static final String ACTION_FAILED_DEPENDENCIES_KEY = "failed";
     private static final String MANUALLY_INSTALLABLE_DEPENDENCIES_KEY = "manuallyInstall";
+    private static final String AUTO_DOWNLOADABLE_DEPENDENCIES_KEY = "autoDownloadable";
     private static final String EXTENSION_INFO_KEY = "extensionInfo";
     private static final String EXTENSION_STATUS_KEY = "extensionStatus";
     private static final String DEPENDENCY_INFO_KEY = "dependencyInfo";
@@ -53,22 +54,26 @@ public class ResponseEntityCreator {
      * {@link
      * org.wso2.carbon.siddhi.extensions.installer.core.execution.DependencyInstaller#installDependenciesFor(String)}.
      *
-     * @param status                          Status of the installation.
-     * @param installedDependencies           Dependencies that were successfully installed.
-     * @param failedDependencies              Dependencies that were failed to install.
-     * @param manuallyInstallableDependencies Dependencies that should be installed manually.
+     * @param status                Status of the installation.
+     * @param installedDependencies Dependencies that were successfully installed.
+     * @param failedDependencies    Dependencies that were failed to install.
      * @return Information for the response.
      */
     public static Map<String, Object> createExtensionInstallationResponse(
+        ExtensionConfig extension,
         ExtensionInstallationStatus status,
         List<DependencyConfig> installedDependencies,
-        List<DependencyConfig> failedDependencies,
-        List<DependencyConfig> manuallyInstallableDependencies) {
+        List<DependencyConfig> failedDependencies) {
 
         Map<String, Object> details = new HashMap<>();
         details.put(ACTION_TYPE_KEY, "INSTALL");
         details.put(ACTION_STATUS_KEY, status);
-        putDependencyDetails(installedDependencies, failedDependencies, manuallyInstallableDependencies, details);
+        putDependencyDetails(
+            installedDependencies,
+            failedDependencies,
+            extension.getManuallyInstallableDependencies(),
+            extension.getAutoDownloadableDependencies(),
+            details);
         return details;
     }
 
@@ -89,13 +94,39 @@ public class ResponseEntityCreator {
         Map<String, Object> details = new HashMap<>();
         details.put(ACTION_TYPE_KEY, "UNINSTALL");
         details.put(ACTION_STATUS_KEY, status);
-        putDependencyDetails(uninstalledDependencies, failedDependencies, null, details);
+        putDependencyDetails(uninstalledDependencies, failedDependencies, null, null, details);
+        return details;
+    }
+
+    /**
+     * Creates response after retrieving extension statuses, through:
+     * {@link DependencyRetriever#getAllExtensionStatuses()} or
+     * {@link DependencyRetriever#getExtensionStatusFor(String)}.
+     *
+     * @param extension Configuration of the extension.
+     * @param status    Installation status of the extension.
+     * @return Information for the response.
+     */
+    public static Map<String, Object> createExtensionStatusResponse(ExtensionConfig extension,
+                                                                    ExtensionInstallationStatus status) {
+        Map<String, Object> details = new HashMap<>();
+        details.put(EXTENSION_INFO_KEY, extension.getExtensionInfo());
+        details.put(EXTENSION_STATUS_KEY, status);
+        if (status != ExtensionInstallationStatus.INSTALLED) {
+            putDependencyDetails(
+                null,
+                null,
+                extension.getManuallyInstallableDependencies(),
+                extension.getAutoDownloadableDependencies(),
+                details);
+        }
         return details;
     }
 
     private static void putDependencyDetails(List<DependencyConfig> completedDependencies,
                                              List<DependencyConfig> failedDependencies,
                                              List<DependencyConfig> manuallyInstallableDependencies,
+                                             List<DependencyConfig> autoDownloadableDependencies,
                                              Map<String, Object> details) {
         if (completedDependencies != null && !completedDependencies.isEmpty()) {
             details.put(ACTION_COMPLETED_DEPENDENCIES_KEY, completedDependencies);
@@ -106,29 +137,9 @@ public class ResponseEntityCreator {
         if (manuallyInstallableDependencies != null && !manuallyInstallableDependencies.isEmpty()) {
             details.put(MANUALLY_INSTALLABLE_DEPENDENCIES_KEY, manuallyInstallableDependencies);
         }
-    }
-
-    /**
-     * Creates response after retrieving extension statuses, through:
-     * {@link DependencyRetriever#getAllExtensionStatuses()} or
-     * {@link DependencyRetriever#getExtensionStatusFor(String)}.
-     *
-     * @param extension                       Configuration of the extension.
-     * @param status                          Installation status of the extension.
-     * @param manuallyInstallableDependencies Dependencies that should be installed manually.
-     * @return Information for the response.
-     */
-    public static Map<String, Object> createExtensionStatusResponse(
-        ExtensionConfig extension,
-        ExtensionInstallationStatus status,
-        List<DependencyConfig> manuallyInstallableDependencies) {
-        Map<String, Object> details = new HashMap<>();
-        details.put(EXTENSION_INFO_KEY, extension.getExtensionInfo());
-        details.put(EXTENSION_STATUS_KEY, status);
-        if (status != ExtensionInstallationStatus.INSTALLED && !manuallyInstallableDependencies.isEmpty()) {
-            details.put(MANUALLY_INSTALLABLE_DEPENDENCIES_KEY, manuallyInstallableDependencies);
+        if (autoDownloadableDependencies != null && !autoDownloadableDependencies.isEmpty()) {
+            details.put(AUTO_DOWNLOADABLE_DEPENDENCIES_KEY, autoDownloadableDependencies);
         }
-        return details;
     }
 
     /**
