@@ -1448,7 +1448,7 @@ public class EditorMicroservice implements Microservice {
                 jsonObj = readContext.read(jsonConfig.getEnclosingElement());
                 if (jsonObj == null) {
                     String message = "Enclosing element " + jsonConfig.getEnclosingElement() + " cannot be found in " +
-                            "the " + "json string " + fileContent.toString() + ".";
+                            "the json string " + fileContent.toString() + ".";
                     log.error(message);
                     errorResponse.addProperty(Constants.ERROR,
                             message);
@@ -1493,7 +1493,6 @@ public class EditorMicroservice implements Microservice {
                                 }
                             }
                         }
-
                     } catch (JaxenException e) {
                         String message = "Could not get XPath from expression: " + xmlConfig.getEnclosingElement();
                         log.error(message, e);
@@ -1562,7 +1561,6 @@ public class EditorMicroservice implements Microservice {
                     return Response.ok().entity(
                             MetaInfoRetrieverUtils.createResponseForXML(rootOMElement)).build();
                 }
-
             } else {
                 String message = "File type provided : " + type + " is not supported.";
                 log.error(message);
@@ -1574,12 +1572,11 @@ public class EditorMicroservice implements Microservice {
                         .type(MediaType.APPLICATION_JSON)
                         .build();
             }
-
         } catch (FileNotFoundException e){
             String message = "Cannot find the provided file location." + e.getMessage();
             errorResponse.addProperty(Constants.ERROR,
                     message);
-            log.error(message + e.getMessage(), e);
+            log.error(message, e);
             return Response
                     .serverError()
                     .entity(errorResponse)
@@ -1587,7 +1584,9 @@ public class EditorMicroservice implements Microservice {
                     .build();
         } catch (IOException e) {
             String message = "Cannot retrieve file attributes." + e.getMessage();
-            log.error("Cannot retrieve file attributes." + e.getMessage(), e);
+            errorResponse.addProperty(Constants.ERROR,
+                    message);
+            log.error(message, e);
             return Response
                     .serverError()
                     .entity(errorResponse)
