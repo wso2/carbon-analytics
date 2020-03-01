@@ -20,4 +20,31 @@ package org.wso2.carbon.siddhi.editor.core.util.metainforetriever.beans;
 
 public class XMLConfig {
 
+    private String filePath;
+    private String namespaces;
+    private String enclosingElement;
+
+    public String getNamespaces() {
+        return namespaces;
+    }
+
+    public void setNamespaces(String namespaces) {
+        this.namespaces = namespaces;
+    }
+
+    public String getEnclosingElement() {
+        return enclosingElement;
+    }
+
+    public void setEnclosingElement(String enclosingElement) {
+        this.enclosingElement = enclosingElement;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
 }

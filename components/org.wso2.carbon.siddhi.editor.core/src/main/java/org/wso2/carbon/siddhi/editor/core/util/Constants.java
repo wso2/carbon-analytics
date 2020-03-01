@@ -83,6 +83,7 @@ public class Constants {
     static final String SINKMAP = "SinkMap";
     static final String STORE = "Store";
     public static final String ERROR = "error";
+    public static final String WARNING = "warning";
     static final Map<String, Class<?>> SUPER_CLASS_MAP;
     static final Map<String, String> PACKAGE_NAME_MAP;
 

@@ -136,6 +136,10 @@
             <artifactId>docker-client</artifactId>
             <classifier>shaded</classifier>
         </dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -266,7 +270,9 @@
                                     com.kenai.*,
                                     org.apache.commons.*,
                                     jni.*,
-                                    jersey.repackaged.com.*
+                                    jersey.repackaged.com.*,
+                                    com.jayway.jsonpath.*,
+                                    net.minidev.*
                                 </Private-Package>
                                 <Export-Package>
                                     org.wso2.carbon.siddhi.editor.core.*
