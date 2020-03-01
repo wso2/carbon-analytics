@@ -1578,6 +1578,11 @@
                 <classifier>shaded</classifier>
                 <version>${com.spotify.docker.client.version}</version>
             </dependency>
+            <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>${net.minidev.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1827,6 +1832,7 @@
         <io.nats.version>2.1.2</io.nats.version>
         <siddhi.io.nats.version>2.0.6</siddhi.io.nats.version>
         <org.testcontainers.version>1.8.0</org.testcontainers.version>
+        <net.minidev.version>2.2</net.minidev.version>
 
         <xerces.version>2.12.0</xerces.version>
     </properties>
