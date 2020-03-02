@@ -120,6 +120,15 @@ define(['require', 'lodash', 'jquery', 'constants'],
                 },
 
                 /**
+                 * Gets representation of the extension, that is shown within an extension row.
+                 *
+                 * @param extension Extension object.
+                 */
+                this.getExtensionRepresentation = function (extension) {
+                    return `<td><span>${extension.extensionInfo.displayName}</span></td>`;
+                };
+
+                /**
                  * Renders a single extension's visual representation.
                  *
                  * @param extension         Extension object.
@@ -134,7 +143,7 @@ define(['require', 'lodash', 'jquery', 'constants'],
                     if (extension.hasOwnProperty('manuallyInstall')) {
                         if (buttonActionText) {
                             tr = $('<tr key="' + key + '">' +
-                                '<td>' + extension.extensionInfo.name + '</td>' +
+                                selfScope.getExtensionRepresentation(extension) +
                                 '<td id="status">' + status + '&nbsp; &nbsp;<a data-toggle="modal"' +
                                 ' id="' + key + '"><i class="fw' +
                                 ' fw-info"></i></a></td>' +
@@ -144,22 +153,21 @@ define(['require', 'lodash', 'jquery', 'constants'],
                             selfScope.createManuallyInstallableExtensionModal(extension, key, tr, selfScope);
                             selfScope.bindInstallationButtonAction(tr, extension, selfScope.handleInstallationCallback);
                         } else {
-                            tr = $('<tr key="' + key + '"><td>' + extension.extensionInfo.name +
-                                '[(i)]</td><td id="status">' + status +
+                            tr = $('<tr key="' + key + '">' + selfScope.getExtensionRepresentation(extension) +
+                                '<td id="status">' + status +
                                 '&nbsp; &nbsp;<a data-toggle="modal"' +
                                 ' id="' + key + '"><i class="fw fw-info"></i></a></td><td></td></tr>');
                             selfScope.createManuallyInstallableExtensionModal(extension, key, tr, selfScope);
                         }
                     } else {
                         if (buttonActionText) {
-                            tr = $('<tr key="' + key + '"><td>' + extension.extensionInfo.name +
-                                '</td><td id="status">' + status + '</td><td><button' +
-                                ' class="btn btn-block btn' +
-                                ' btn-primary">' + buttonActionText + '</button></td></tr>');
+                            tr = $('<tr key="' + key + '">' + selfScope.getExtensionRepresentation(extension) +
+                            '<td id="status">' + status + '</td><td><button class="btn btn-block btnn btn-primary">' +
+                                buttonActionText + '</button></td></tr>');
                             selfScope.bindInstallationButtonAction(tr, extension, selfScope.handleInstallationCallback);
                         } else {
-                            tr = $('<tr key="' + key + '"><td>' + extension.extensionInfo.name +
-                                '</td><td id="status">' + status + '</td><td></td></tr>');
+                            tr = $('<tr key="' + key + '">' + selfScope.getExtensionRepresentation(extension) +
+                                '<td id="status">' + status + '</td><td></td></tr>');
                         }
                     }
                     return tr;
@@ -193,11 +201,12 @@ define(['require', 'lodash', 'jquery', 'constants'],
                  * @param extension         Extension object.
                  * @param key               Unique key of the extension.
                  * @param actionStatus      The action which is in progress.
+                 * @param selfScope         Self scope.
                  * @returns {HTMLElement}
                  */
-                this.renderExtensionLoadingRow = function (extension, key, actionStatus) {
-                    return $('<tr key="' + key + '"><td>' + extension.extensionInfo.name +
-                        '</td><td id="status">' + actionStatus + '</td>' +
+                this.renderExtensionLoadingRow = function (extension, key, actionStatus, selfScope) {
+                    return $('<tr key="' + key + '">' + selfScope.getExtensionRepresentation(extension) +
+                    '<td id="status">' + actionStatus + '</td>' +
                         '<td style="text-align:center"><a class="fw-loader5 fw-spin"></a></td></tr>');
                 },
 
@@ -211,7 +220,7 @@ define(['require', 'lodash', 'jquery', 'constants'],
                  */
                 this.handleInstallationLoading = function (extensionRow, extension, actionStatus, selfScope) {
                     var key = extensionRow.get(0).getAttribute('key');
-                    var newRow = selfScope.renderExtensionLoadingRow(extension, key, actionStatus);
+                    var newRow = selfScope.renderExtensionLoadingRow(extension, key, actionStatus, selfScope);
                     extensionRow.html(newRow.children());
                 },
 
@@ -243,8 +252,8 @@ define(['require', 'lodash', 'jquery', 'constants'],
                  * @returns {HTMLElement}
                  */
                 this.renderRestartRequiredExtensionRow = function (extension, key) {
-                    var tr = $('<tr key="' + key + '"><td>' + extension.extensionInfo.name +
-                        '</td><td id="status">Restart Required</td><td></td></tr>');
+                    var tr = $('<tr key="' + key + '">' + this.getExtensionRepresentation(extension) +
+                        '<td id="status">Restart Required</td><td></td></tr>');
                     return tr;
                 },
 
