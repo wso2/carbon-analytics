@@ -2,7 +2,7 @@
   "kafka": {
     "extension": {
       "name": "kafka",
-      "version": "5.0.8-SNAPSHOT"
+      "version": "5.0.4"
     },
     "dependencies": [
       {
@@ -125,7 +125,7 @@
   "redis": {
     "extension": {
       "name": "redis",
-      "version": "3.1.2-SNAPSHOT"
+      "version": "3.1.1"
     },
     "dependencies": [
       {
@@ -149,7 +149,7 @@
   "jms": {
     "extension": {
       "name": "jms",
-      "version": "2.0.4"
+      "version": "2.0.2"
     },
     "dependencies": [
       {
@@ -227,6 +227,231 @@
           }
         ],
         "lookupRegex": "geronimo-jms_1.1_spec-(.+).jar"
+      }
+    ]
+  },
+
+  "ibmmq": {
+    "extension": {
+      "name": "ibmmq",
+      "version": "2.0.0"
+    },
+    "dependencies": [
+      {
+        "name": "com.ibm.mq.allclient",
+        "version": "9.0.5.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/com/ibm/mq/com.ibm.mq.allclient/9.0.5.0/com.ibm.mq.allclient-9.0.5.0.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "com.ibm.mq.allclient-(.+).jar"
+      },
+      {
+        "name": "javax.jms-api",
+        "version": "2.0.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/javax/jms/javax.jms-api/2.0.1/javax.jms-api-2.0.1.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "javax.jms-api-(.+).jar"
+      }
+    ]
+  },
+
+  "cdc": {
+    "extension": {
+      "name": "cdc",
+      "version": "2.0.3"
+    },
+    "dependencies": [
+      {
+        "name": "mysql-connector-java",
+        "version": "5.1.45",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.45/mysql-connector-java-5.1.45.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "mysql-connector-java-(.+).jar"
+      }
+    ]
+  },
+
+  "prometheus": {
+    "extension": {
+      "name": "prometheus",
+      "version": "2.1.0"
+    },
+    "dependencies": [
+      {
+        "name": "simpleclient",
+        "version": "0.5.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/prometheus/simpleclient/0.5.0/simpleclient-0.5.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "simpleclient-(.+).jar"
+      },
+      {
+        "name": "simpleclient_common",
+        "version": "0.5.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/prometheus/simpleclient_common/0.5.0/simpleclient_common-0.5.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "simpleclient_common-(.+).jar"
+      },
+      {
+        "name": "simpleclient_httpserver",
+        "version": "0.5.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/prometheus/simpleclient_httpserver/0.5.0/simpleclient_httpserver-0.5.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "simpleclient_httpserver-(.+).jar"
+      },
+      {
+        "name": "simpleclient_pushgateway",
+        "version": "0.5.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/prometheus/simpleclient_pushgateway/0.5.0/simpleclient_pushgateway-0.5.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "simpleclient_pushgateway-(.+).jar"
+      },
+      {
+        "name": "com.sun.net.httpserver",
+        "version": "20070405",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/com/sun/net/httpserver/http/20070405/http-20070405.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "http-(.+).jar"
+      }
+    ]
+  },
+
+  "nats": {
+    "extension": {
+      "name": "nats",
+      "version": "2.0.6"
+    },
+    "dependencies": [
+      {
+        "name": "jnats",
+        "version": "2.6.5",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/nats/jnats/2.6.5/jnats-2.6.5.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "jnats-(.+).jar"
+      },
+      {
+        "name": "java-nats-streaming",
+        "version": "2.2.2",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/nats/java-nats-streaming/2.2.2/java-nats-streaming-2.2.2.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "java-nats-streaming-(.+).jar"
+      },
+      {
+        "name": "protobuf-java",
+        "version": "3.9.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.9.1/protobuf-java-3.9.1.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "protobuf-java-(.+).jar"
+      }
+    ]
+  },
+
+  "grpc": {
+    "extension": {
+      "name": "grpc",
+      "version": "1.0.3"
+    },
+    "dependencies": [
+      {
+        "name": "protobuf-java",
+        "version": "3.9.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.9.1/protobuf-java-3.9.1.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "protobuf-java-(.+).jar"
       }
     ]
   }
