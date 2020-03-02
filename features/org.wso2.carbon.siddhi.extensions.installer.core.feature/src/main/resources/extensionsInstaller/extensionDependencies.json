@@ -22,7 +22,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "kafka(.+).jar"
+        "lookupRegex": "kafka([_-])clients([_-])0.10.2.1(.+).jar"
       },
       {
         "name": "zookeeper",
@@ -41,7 +41,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "zookeeper(.+).jar"
+        "lookupRegex": "zookeeper([_-])3.4.9(.+).jar"
       },
       {
         "name": "kafka-2.11",
@@ -60,7 +60,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "kafka([_-])2.11(.+).jar"
+        "lookupRegex": "kafka([_-])2.11([_-])0.10.2.1(.+).jar"
       },
       {
         "name": "scala-library",
@@ -79,7 +79,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "scala([_-])library(.+).jar"
+        "lookupRegex": "scala([_-])library([_-])2.11.8(.+).jar"
       },
       {
         "name": "zkclient",
@@ -98,7 +98,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "zkclient(.+).jar"
+        "lookupRegex": "zkclient([_-])0.10(.+).jar"
       },
       {
         "name": "metrics-core",
@@ -117,7 +117,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "metrics([_-])core(.+).jar"
+        "lookupRegex": "metrics([_-])core([_-])2.2.0(.+).jar"
       }
     ]
   },
@@ -145,7 +145,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "activemq([_-])client(.+).jar"
+        "lookupRegex": "activemq([_-])client([_-])5.9.0(.+).jar"
       },
       {
         "name": "hawtbuf",
@@ -164,7 +164,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "hawtbuf(.+).jar"
+        "lookupRegex": "hawtbuf([_-])1.9(.+).jar"
       },
       {
         "name": "geronimo-j2ee-management_1.1_spec-",
@@ -183,7 +183,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "geronimo([_-])j2ee([_-])management([_-])1.1([_-])spec(.+).jar"
+        "lookupRegex": "geronimo([_-])j2ee([_-])management([_-])1.1([_-])spec([_-])1.0.1(.+).jar"
       },
       {
         "name": "geronimo-jms_1.1_spec-",
@@ -202,7 +202,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "geronimo([_-])jms([_-])1.1([_-])spec(.+).jar"
+        "lookupRegex": "geronimo([_-])jms([_-])1.1([_-])spec([_-])1.1.1(.+).jar"
       }
     ]
   },
@@ -226,7 +226,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "com.ibm.mq.allclient(.+).jar"
+        "lookupRegex": "com.ibm.mq.allclient([_-])9.0.5.0(.+).jar"
       },
       {
         "name": "javax.jms-api",
@@ -241,7 +241,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "javax.jms([_-])api(.+).jar"
+        "lookupRegex": "javax.jms([_-])api([_-])2.0.1(.+).jar"
       }
     ]
   },
@@ -265,7 +265,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mysql([_-])connector([_-])java(.+).jar"
+        "lookupRegex": "mysql([_-])connector([_-])java([_-])5.1.45(.+).jar"
       }
     ]
   },
@@ -289,7 +289,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "simpleclient(.+).jar"
+        "lookupRegex": "simpleclient([_-])0.5.0(.+).jar"
       },
       {
         "name": "simpleclient_common",
@@ -304,7 +304,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "simpleclient([_-])common(.+).jar"
+        "lookupRegex": "simpleclient([_-])common([_-])0.5.0(.+).jar"
       },
       {
         "name": "simpleclient_httpserver",
@@ -319,7 +319,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "simpleclient([_-])httpserver(.+).jar"
+        "lookupRegex": "simpleclient([_-])httpserver([_-])0.5.0(.+).jar"
       },
       {
         "name": "simpleclient_pushgateway",
@@ -334,7 +334,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "simpleclient([_-])pushgateway(.+).jar"
+        "lookupRegex": "simpleclient([_-])pushgateway([_-])0.5.0(.+).jar"
       },
       {
         "name": "com.sun.net.httpserver",
@@ -349,7 +349,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "http(.+).jar"
+        "lookupRegex": "http([_-])20070405(.+).jar"
       }
     ]
   },
@@ -373,7 +373,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "jnats(.+).jar"
+        "lookupRegex": "jnats([_-])2.6.5(.+).jar"
       },
       {
         "name": "java-nats-streaming",
@@ -388,7 +388,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "java([_-])nats([_-])streaming(.+).jar"
+        "lookupRegex": "java([_-])nats([_-])streaming([_-])2.2.2(.+).jar"
       },
       {
         "name": "protobuf-java",
@@ -403,7 +403,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "protobuf([_-])java(.+).jar"
+        "lookupRegex": "protobuf([_-])java([_-])3.9.1(.+).jar"
       }
     ]
   },
@@ -427,7 +427,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "protobuf([_-])java(.+).jar"
+        "lookupRegex": "protobuf([_-])java([_-])3.9.1(.+).jar"
       }
     ]
   },
@@ -451,7 +451,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mongo([_-])java([_-])driver(.+).jar"
+        "lookupRegex": "mongo([_-])java([_-])driver([_-])3.4.2(.+).jar"
       }
     ]
   },
@@ -475,7 +475,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mysql([_-])connector([_-])java(.+).jar"
+        "lookupRegex": "mysql([_-])connector([_-])java([_-])5.1.45(.+).jar"
       }
     ]
   },
@@ -499,7 +499,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "hbase([_-])shaded([_-])client(.+).jar"
+        "lookupRegex": "hbase([_-])shaded([_-])client([_-])1.3.1(.+).jar"
       },
       {
         "name": "htrace-core",
@@ -514,7 +514,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "htrace([_-])core(.+).jar"
+        "lookupRegex": "htrace([_-])core([_-])3.1.0([_-])incubating(.+).jar"
       }
     ]
   },
@@ -538,7 +538,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "cassandra([_-])driver([_-])core(.+).jar"
+        "lookupRegex": "cassandra([_-])driver([_-])core([_-])3.3.2(.+).jar"
       }
     ]
   },
@@ -562,7 +562,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "jedis(.+).jar"
+        "lookupRegex": "jedis([_-])2.9.0(.+).jar"
       }
     ]
   }
