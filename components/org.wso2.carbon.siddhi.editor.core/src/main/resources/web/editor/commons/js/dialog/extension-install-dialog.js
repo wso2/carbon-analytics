@@ -433,7 +433,7 @@ define(['require', 'lodash', 'jquery', 'constants'],
                         "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
                         "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
                         "</button>" +
-                        "<h4 class='modal-title file-dialog-title'>Extension Details</h4>" +
+                        "<h4 class='modal-title file-dialog-title'>Extension Installer</h4>" +
                         "<hr class='style1'>" +
                         "</div>" +
                         "<div class='modal-body'>" +
