@@ -279,6 +279,8 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
             this._notInstalledExtensionArray = getNotInstalledExtensionDetails();
             this._installedExtensionArray = getInstalledExtensionDetails();
             this._partiallyInstalledExtensionArray = getPartiallyInstalledExtensionDetails();
+            // Restart is required for extensions only after an installation/un-installation. Hence, the array is empty.
+            this._restartRequiredExtensionArray = [];
             // Register listener for changes in extension installation statuses.
             this._application.utils.extensionStatusListener = this;
         };
@@ -336,17 +338,15 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
         };
 
         /**
-         * Re-arranges extension objects, based on an extension's updated installation status.
+         * Marks the given extension's status as restart required.
          *
          * @param extension     Extension object.
-         * @param updatedStatus Updated installation status of the given extension object.
          */
-        OperatorFinder.prototype.reArrangeExtensions = function (extension, updatedStatus) {
+        OperatorFinder.prototype.markAsRestartRequired = function (extension) {
             this._application.utils.extensionData.set(extension.extensionInfo.name, extension);
             var currentArray = this.getCurrentArray(extension);
-            var targetArray = this.getExtensionArrayFromInstallationStatus(updatedStatus);
-            self.moveInstallationUpdatedExtension(extension, currentArray, targetArray);
-            extension.extensionStatus = updatedStatus;
+            self.moveInstallationUpdatedExtension(extension, currentArray, this._restartRequiredExtensionArray);
+            extension.extensionStatus = Constants.RESTART_REQUIRED;
             // Re-render only if the operator-finder is open.
             if (this._operators) {
                 self.renderSearchResults($('#operator-search-input-field').get(0).value);
@@ -378,26 +378,6 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                 return this._partiallyInstalledExtensionArray;
             }
             return this._notInstalledExtensionArray;
-        };
-
-        /**
-         * Returns the array of an extension, based on the given status.
-         *
-         * @param status    Installation status of an extension.
-         * @returns {Array} The array, which contains extensions that have the given installation status.
-         */
-        OperatorFinder.prototype.getExtensionArrayFromInstallationStatus = function (status) {
-            switch (status) {
-                case Constants.EXTENSION_INSTALLED:
-                case Constants.EXTENSION_NOT_UNINSTALLED:
-                    return this._installedExtensionArray;
-                case Constants.EXTENSION_PARTIALLY_INSTALLED:
-                case Constants.EXTENSION_PARTIALLY_UNINSTALLED:
-                    return this._partiallyInstalledExtensionArray;
-                case Constants.EXTENSION_NOT_INSTALLED:
-                case Constants.EXTENSION_UNINSTALLED:
-                    return this._notInstalledExtensionArray;
-            }
         };
 
         /**
@@ -455,6 +435,22 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
         };
 
         /**
+         * Get restart required extension details.
+         *
+         * @returns {Array}
+         */
+        var getRestartRequiredExtensionDetails = function () {
+            var restartRequiredExtensions = [];
+            self._application.utils.extensionData.forEach(function (extension) {
+                if (extension.extensionStatus.trim().toUpperCase() === Constants.RESTART_REQUIRED) {
+                    restartRequiredExtensions.push(extension);
+                }
+            });
+            return restartRequiredExtensions;
+        };
+
+
+        /**
          * get the partial intall extension object.
          * @param operatorExtension
          * @returns {Array}
@@ -483,6 +479,19 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                 if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return extension;}
             }
         };
+
+        /**
+         * Get restart required extension objects based on extension name
+         * @param operatorExtension
+         * @returns {*}
+         */
+        var getRestartRequiredExtensionObject = function (operatorExtension) {
+            for (var extension of self._restartRequiredExtensionArray) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return extension;}
+            }
+        };
+
+
         /**
          * check the whether operator extension is installed or not.
          * @param operatorExtensionName
@@ -515,6 +524,19 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                 if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return true;}
             }
         };
+
+        /**
+         * check the whether operator extension  installed or not.
+         * @param operatorExtension
+         * @returns {boolean}
+         */
+        var isRestartRequiredExtension = function (operatorExtension) {
+            var restartRequiredExtensionArray = getRestartRequiredExtensionDetails();
+            for (var extension of restartRequiredExtensionArray) {
+                if (((operatorExtension.name.trim().toLowerCase()).indexOf(extension.extensionInfo.name.trim().toLowerCase())) > -1) {return true;}
+            }
+        };
+
 
         /**
          * Searches operators using the given query.
@@ -567,7 +589,17 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                             description: result.description.text,
                             index: i
                         });
-                    }else {
+                    } else if (isRestartRequiredExtension(operatorExtension)) {
+                        keyResult.push({
+                            extension: getRestartRequiredExtensionObject(operatorExtension),
+                            restartRequired: Constants.RESTART_REQUIRED,
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    } else {
                         keyResult.push({
                             fqn: operatorExtension.fqn,
                             htmlFqn: result.fqn.text,
@@ -607,7 +639,17 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
                             description: result.description.text,
                             index: i
                         });
-                    }else {
+                    } else if (isRestartRequiredExtension(operatorExtension)) {
+                        descriptionResult.push({
+                            extension: getRestartRequiredExtensionObject(operatorExtension),
+                            restartRequired: Constants.RESTART_REQUIRED,
+                            fqn: operatorExtension.fqn,
+                            htmlFqn: result.fqn.text,
+                            type: operatorExtension.type,
+                            description: result.description.text,
+                            index: i
+                        });
+                    } else {
                         descriptionResult.push({
                             fqn: operatorExtension.fqn,
                             htmlFqn: result.fqn.text,
@@ -752,8 +794,8 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
             resultContent.on('click', 'a.extension-install-btn', function (e) {
                 var innerSelf = this;
                 e.preventDefault();
-                var handleCallback = function (extension, updatedStatus) {
-                    self.reArrangeExtensions(extension, updatedStatus);
+                var handleCallback = function (extension) {
+                    self.markAsRestartRequired(extension);
                 };
                 var extensionObject = getNotInstalledExtensionObject({name: $(this).data('extension-name')});
                 self._application.utils.installOrUnInstallExtension(
@@ -770,8 +812,8 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
             resultContent.on('click', 'a.extension-un-install-btn', function (e) {
                 var innerSelf = this;
                 e.preventDefault();
-                var handleCallback = function (extension, updatedStatus) {
-                    self.reArrangeExtensions(extension, updatedStatus);
+                var handleCallback = function (extension) {
+                    self.markAsRestartRequired(extension);
                 };
                 var extensionObject = getInstalledExtensionObject({name: $(this).data('extension-name')});
                 self._application.utils.installOrUnInstallExtension(

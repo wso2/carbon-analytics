@@ -1844,6 +1844,7 @@ div.consoleIcon {
     font-weight: bold;
 }
 
+.restart-required-btn,
 .partial-extension-install-btn,
 .extension-un-install-btn,
 .extension-install-btn {

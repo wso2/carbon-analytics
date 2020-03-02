@@ -59,4 +59,14 @@ public interface DependencyRetriever {
      */
     List<Map<String, Object>> getDependencyStatusesFor(String extensionId) throws ExtensionsInstallerException;
 
+    /**
+     * Retrieves whether the extension that has the given id shares any dependency with another extension,
+     * and if so, retrieves the information of shared dependencies and the respective extensions too.
+     *
+     * @param extensionId Id of the extension.
+     * @return Information of shared dependencies and the respective extensions.
+     * @throws ExtensionsInstallerException Failed to retrieve shared dependencies information.
+     */
+    Map<String, Object> getDependencySharingExtensionsFor(String extensionId) throws ExtensionsInstallerException;
+
 }

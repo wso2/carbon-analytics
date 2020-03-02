@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
-define(['require', 'jquery', 'constants', 'alerts'],
-    function (require, $, Constants, alerts) {
+define(['require', 'jquery', 'constants'],
+    function (require, $, Constants) {
         var self = this;
         var Utils = function () {
         };
@@ -90,9 +90,8 @@ define(['require', 'jquery', 'constants', 'alerts'],
                     async: true,
                     success: function (response) {
                         handleCallback(extension, response.status, callerObject, response, callerScope);
-                        app.utils.extensionStatusListener.reArrangeExtensions(extension, response.status);
-                        alerts.info(`Extension was successfully ${action.toLowerCase()}ed. ` +
-                            `Please restart the editor.`);
+                        app.utils.extensionStatusListener.markAsRestartRequired(extension);
+                        self.displayRestartPopup(extension, action);
                     },
                     error: function (e) {
                         var message = `Unable to ${action.toLowerCase()} the extension. ` +
@@ -102,6 +101,46 @@ define(['require', 'jquery', 'constants', 'alerts'],
                     }
                 });
             });
+        };
+
+        /**
+         * Displays a popup that instructs to restart the editor.
+         *
+         * @param extension
+         * @param action
+         */
+        this.displayRestartPopup = function (extension, action) {
+            self.extensionInstallUninstallAlertModal = $(
+                "<div class='modal fade' id='extensionAlertModal' tabindex='-1' role='dialog'" +
+                " aria-tydden='true'>" +
+                "<div class='modal-dialog file-dialog' role='document'>" +
+                "<div class='modal-content'>" +
+                "<div class='modal-header'>" +
+                "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+                "<i class='fw fw-cancel about-dialog-close'> </i> " +
+                "</button>" +
+                "<h4 class='modal-title file-dialog-title' id='newConfigModalLabel'>Restart Required</h4>" +
+                "<hr class='style1'>" +
+                "</div>" +
+                "<div class='modal-body'>" +
+                "<div class='container-fluid'>" +
+                "<form class='form-horizontal' onsubmit='return false'>" +
+                "<div class='form-group'>" +
+                "<label for='configName' class='col-sm-9 file-dialog-label'>" +
+                `Extension was successfully ${action.toLowerCase()}ed. Please restart the editor.` +
+                "</label>" +
+                "</div>" +
+                "<div class='form-group'>" +
+                "<div class='file-dialog-form-btn'>" +
+                "<button type='cancelButton' class='btn btn-primary' data-dismiss='modal'>Close</button>" +
+                "</div>" +
+                "</form>" +
+                "</div>" +
+                "</div>" +
+                "</div>" +
+                "</div>" +
+                "</div>"
+            ).modal('show');
         };
 
         Utils.prototype.retrieveSiddhiAppNames = function (successCallback, errorCallback, context) {

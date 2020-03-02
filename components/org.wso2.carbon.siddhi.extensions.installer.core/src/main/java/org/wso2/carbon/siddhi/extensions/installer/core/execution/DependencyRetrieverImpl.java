@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Reads information related to the installation of extension dependencies. Used for retrieving extension statuses.
@@ -123,6 +124,37 @@ public class DependencyRetrieverImpl implements DependencyRetriever {
         }
         throw new ExtensionsInstallerException(
             String.format("No dependencies were specified for extension: %s.", extensionId));
+    }
+
+    @Override
+    public Map<String, Object> getDependencySharingExtensionsFor(String extensionId)
+        throws ExtensionsInstallerException {
+        ExtensionConfig discardedExtension = ExtensionsInstallerUtils.findExtension(extensionId, extensionConfigs);
+        List<DependencyConfig> discardedDependencies = discardedExtension.getDependencies();
+
+        Map<String, List<DependencyConfig>> dependencySharingExtensions = new HashMap<>();
+        for (Map.Entry<String, ExtensionConfig> extensionEntry : extensionConfigs.entrySet()) {
+            if (!Objects.equals(extensionId, extensionEntry.getKey())) {
+                List<DependencyConfig> dependencies = extensionEntry.getValue().getDependencies();
+                List<DependencyConfig> commonDependencies = getCommonDependencies(dependencies, discardedDependencies);
+                if (!commonDependencies.isEmpty()) {
+                    dependencySharingExtensions.put(extensionEntry.getKey(), commonDependencies);
+                }
+            }
+        }
+        return ResponseEntityCreator.createDependencySharingExtensionsResponse(dependencySharingExtensions);
+    }
+
+    private List<DependencyConfig> getCommonDependencies(List<DependencyConfig> dependencies,
+                                                         List<DependencyConfig> discardedDependencies) {
+        List<DependencyConfig> commonDependencies = new ArrayList<>();
+        for (DependencyConfig dependency : dependencies) {
+            if (discardedDependencies.stream()
+                .anyMatch(discardedDependency -> discardedDependency.isSameFileAs(dependency))) {
+                commonDependencies.add(dependency);
+            }
+        }
+        return commonDependencies;
     }
 
 }

@@ -143,6 +143,25 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
         }
     }
 
+    @GET
+    @Path("/{extensionId}/dependency-sharing-extensions")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDependencySharingExtensions(@PathParam("extensionId") String extensionId) {
+        try {
+            DependencyRetriever dependencyRetriever = new DependencyRetrieverImpl(extensionConfigs);
+            return Response
+                .status(Response.Status.OK)
+                .entity(dependencyRetriever.getDependencySharingExtensionsFor(extensionId))
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+        } catch (ExtensionsInstallerException e) {
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+    }
+
     @POST
     @Path("/{extensionId}/uninstall")
     @Produces(MediaType.APPLICATION_JSON)

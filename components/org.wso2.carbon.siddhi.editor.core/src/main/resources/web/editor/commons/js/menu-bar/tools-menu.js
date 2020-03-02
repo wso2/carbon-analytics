@@ -25,6 +25,24 @@ define([],function (){
                 disabled: false
             },
             {
+                id: "extensionInstall",
+                label: "Extension Installer",
+                command: {
+                    id: "extension-install-dialog",
+                    shortcuts: {
+                        mac: {
+                            key: "command+alt+i",
+                            label: "\u2318\u2325I"
+                        },
+                        other: {
+                            key: "ctrl+alt+i",
+                            label: "Ctrl+Alt+I"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
                 id: "toggleEventSimulator",
                 label: "Event Simulator",
                 command: {
