@@ -22,9 +22,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.zaxxer.hikari.HikariDataSource;
+import net.minidev.json.JSONArray;
+import org.apache.axiom.om.OMElement;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 
@@ -32,31 +36,74 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class MetaInfoRetrieverUtils {
+
+    private static final Logger log = LoggerFactory.getLogger(MetaInfoRetrieverUtils.class);
 
     private MetaInfoRetrieverUtils() {
 
     }
 
-    public static JsonObject createResponse(String[] attributeNameArray, String[] values) {
+    public static JsonObject createResponseForCSV(String[] attributeNameArray, String[] values) {
         JsonObject response = new JsonObject();
-        JsonArray attributes = new JsonArray();
-        int count = 0;
+        com.google.gson.JsonArray attributes = new com.google.gson.JsonArray();
+        int count = 1;
         for (String value : values) {
             JsonObject attribute = new JsonObject();
             if (attributeNameArray != null) {
                 attribute.addProperty("name", attributeNameArray[count]);
             } else {
-                attribute.addProperty("name", "attr" + count + 1);
+                attribute.addProperty("name", "attr" + count);
             }
-            attribute.addProperty("value", value);
+            attribute.addProperty("dataType", findDataTypeFromString(value));
             attributes.add(attribute);
             count ++;
         }
         response.addProperty("attributes", attributes.toString());
         return response;
     }
+
+    public static JsonObject createResponseForJSON(Object obj) {
+        JsonObject response = new JsonObject();
+        JsonArray attributes = new JsonArray();
+        Map map = (LinkedHashMap) obj;
+        Iterator it = map.entrySet().iterator();
+        while(it.hasNext()) {
+            JsonObject attribute = new JsonObject();
+            Map.Entry entry = (Map.Entry) it.next();
+            if (entry.getValue() instanceof JSONArray) {
+                String message = "A complex object found for attribute key : \"" + entry.getKey() +
+                        "\". Hence ignoring the attribute.";
+                log.warn(message);
+                response.addProperty(Constants.WARNING, message);
+            } else {
+                attribute.addProperty("name", (String) entry.getKey());
+
+                attribute.addProperty("dataType", findDataTypeFromString(entry.getValue().toString()));
+                attributes.add(attribute);
+            }
+
+        }
+        response.addProperty("attributes", attributes.toString());
+        return response;
+    }
+
+    public static void buildNamespaceMap(Map namespaceMap, String namespace) {
+        String[] namespaces = namespace.split(",");
+        for (String ns : namespaces) {
+            String[] splits = ns.split("=");
+            if (splits.length != 2) {
+                log.warn("Malformed namespace mapping found: " + ns + ". Each namespace has to have format: "
+                        + "<prefix>=<uri>");
+            }
+            namespaceMap.put(splits[0].trim(), splits[1].trim());
+        }
+    }
+
 
     public static boolean isJsonValid(String jsonInString) {
         Gson gson = new Gson();
@@ -66,6 +113,86 @@ public class MetaInfoRetrieverUtils {
         } catch (com.google.gson.JsonSyntaxException ex) {
             return false;
         }
+    }
+
+    public static String findDataTypeFromString(String value) {
+        if (checkIfValueIsInteger(value)) {
+            return Constants.ATTR_TYPE_INTEGER;
+        } else if (checkIfValueIsLong(value)) {
+            return Constants.ATTR_TYPE_LONG;
+        } else if (checkIfValueIsDouble(value)) {
+            return Constants.ATTR_TYPE_DOUBLE;
+        } else if (checkIfValueIsFloat(value)) {
+            return Constants.ATTR_TYPE_FLOAT;
+        } else if (checkIfValueIsBool(value)) {
+            return Constants.ATTR_TYPE_BOOL;
+        } else {
+            return Constants.ATTR_TYPE_STRING;
+        }
+    }
+
+    private static boolean checkIfValueIsInteger(String value) {
+        try {
+            Integer.parseInt(value);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean checkIfValueIsLong(String value) {
+        try {
+            Long.parseLong(value);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean checkIfValueIsDouble(String value) {
+        try {
+            Double.parseDouble(value);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean checkIfValueIsFloat(String value) {
+        try {
+            Float.parseFloat(value);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean checkIfValueIsBool(String value) {
+        return Boolean.parseBoolean(value);
+    }
+
+    public static JsonObject createResponseForXML(OMElement obj) {
+        JsonObject response = new JsonObject();
+        JsonArray attributes = new JsonArray();
+
+        Iterator iterator = obj.getChildElements();
+        while (iterator.hasNext()) {
+            JsonObject attribute = new JsonObject();
+            OMElement attrOMElement = (OMElement) iterator.next();
+            if (null != attrOMElement.getFirstElement()) {
+                String message = "A nested xml structure : " + attrOMElement.toString() + " found for key : \"" +
+                        attrOMElement.getLocalName() + "\". Hence ignoring the attribute.";
+                log.warn(message);
+                response.addProperty(Constants.WARNING, message);
+            } else {
+                attribute.addProperty("name", attrOMElement.getLocalName());
+                attribute.addProperty("dataType", findDataTypeFromString(attrOMElement.getText()));
+                attributes.add(attribute);
+            }
+
+        }
+        response.addProperty("attributes", attributes.toString());
+        return response;
     }
 
     public static Connection getDatabaseConnection(String url, String username, String password) throws SQLException {

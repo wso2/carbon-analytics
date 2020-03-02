@@ -27,6 +27,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ReadContext;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.debugger.SiddhiDebugger;
@@ -34,10 +36,16 @@ import io.siddhi.core.exception.SiddhiAppCreationException;
 import io.siddhi.core.util.SiddhiComponentActivator;
 import io.siddhi.query.api.definition.StreamDefinition;
 import io.siddhi.query.api.exception.SiddhiAppContextException;
+import net.minidev.json.JSONArray;
+import org.apache.axiom.om.DeferredParsingException;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.AXIOMUtil;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jaxen.JaxenException;
 import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -75,6 +83,7 @@ import org.wso2.carbon.siddhi.editor.core.util.DebugCallbackEvent;
 import org.wso2.carbon.siddhi.editor.core.util.DebugStateHolder;
 import org.wso2.carbon.siddhi.editor.core.util.FileJsonObjectReaderUtil;
 import org.wso2.carbon.siddhi.editor.core.util.LogEncoder;
+import org.wso2.carbon.siddhi.editor.core.util.MetaInfoRetrieverUtils;
 import org.wso2.carbon.siddhi.editor.core.util.MimeMapper;
 import org.wso2.carbon.siddhi.editor.core.util.SampleEventGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.SecurityUtil;
@@ -87,6 +96,9 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.Deserial
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.metainforetriever.beans.CSVConfig;
+import org.wso2.carbon.siddhi.editor.core.util.metainforetriever.beans.JSONConfig;
+import org.wso2.carbon.siddhi.editor.core.util.metainforetriever.beans.XMLConfig;
 import org.wso2.carbon.siddhi.editor.core.util.restclients.storequery.StoreQueryAPIHelper;
 import org.wso2.carbon.siddhi.editor.core.util.siddhiappdeployer.SiddhiAppDeployerApiHelper;
 import org.wso2.carbon.streaming.integrator.common.EventStreamService;
@@ -95,10 +107,12 @@ import org.wso2.carbon.streaming.integrator.common.utils.config.FileConfigManage
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -137,6 +151,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.stream.XMLStreamException;
 
 import static org.wso2.carbon.siddhi.editor.core.util.MetaInfoRetrieverUtils.getDataSourceConfiguration;
 import static org.wso2.carbon.siddhi.editor.core.util.MetaInfoRetrieverUtils.getDatabaseMetadata;
@@ -1383,6 +1398,206 @@ public class EditorMicroservice implements Microservice {
                     errorResponse.put("error", "Invalid type: " + eventType + " given to retrieve the sample event.");
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse.toString()).
                             build();
+                }
+            }
+        }
+    }
+
+    @POST
+    @Path("/retrieveFileDataAttributes")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response retrieveFileReadAttributes(JsonElement element) {
+        JsonObject errorResponse = new JsonObject();
+        JsonObject reqObj = element.getAsJsonObject();
+        String type = reqObj.get("type").toString().replaceAll("\"", "");
+        String config = reqObj.get("config").toString();
+        BufferedReader bufferedReader = null;
+        String[] attributeNameList = null;
+        String[] attributeValueList;
+
+        try {
+            if (type.equalsIgnoreCase(Constants.TYPE_CSV)) {
+                CSVConfig csvConfig = new Gson().fromJson(config, CSVConfig.class);
+                bufferedReader = new BufferedReader(new FileReader(csvConfig.getFilePath()));
+
+                if (csvConfig.isHeaderExist()) {
+                    String metaInfoLine = bufferedReader.readLine();
+                    attributeNameList = metaInfoLine.split(csvConfig.getDelimiter());
+                }
+                attributeValueList = bufferedReader.readLine().split(csvConfig.getDelimiter());
+                return Response.ok().entity(MetaInfoRetrieverUtils.createResponseForCSV(attributeNameList,
+                        attributeValueList)).build();
+            } else if (type.equalsIgnoreCase(Constants.TYPE_JSON)) {
+                JSONConfig jsonConfig = new Gson().fromJson(config, JSONConfig.class);
+                bufferedReader = new BufferedReader(new FileReader(jsonConfig.getFilePath()));
+                JsonParser jsonParser = new JsonParser();
+                Object fileContent = jsonParser.parse(bufferedReader);
+                if (!MetaInfoRetrieverUtils.isJsonValid(fileContent.toString())) {
+                    String message = "Invalid Json String :" + fileContent.toString();
+                    log.error(message);
+                    errorResponse.addProperty(Constants.ERROR, message);
+                    return Response
+                            .serverError()
+                            .entity(errorResponse)
+                            .type(MediaType.APPLICATION_JSON)
+                            .build();
+                }
+                Object jsonObj;
+                ReadContext readContext = JsonPath.parse(fileContent.toString());
+                jsonObj = readContext.read(jsonConfig.getEnclosingElement());
+                if (jsonObj == null) {
+                    String message = "Enclosing element " + jsonConfig.getEnclosingElement() + " cannot be found in " +
+                            "the json string " + fileContent.toString() + ".";
+                    log.error(message);
+                    errorResponse.addProperty(Constants.ERROR,
+                            message);
+                    return Response
+                            .serverError()
+                            .entity(errorResponse)
+                            .type(MediaType.APPLICATION_JSON)
+                            .build();
+                }
+                if (jsonObj instanceof JSONArray) {
+                    JSONArray jsonArray = (JSONArray) jsonObj;
+                    return Response.ok().entity(MetaInfoRetrieverUtils.createResponseForJSON(jsonArray.get(0))).build();
+                } else {
+                    return Response.ok().entity(MetaInfoRetrieverUtils.createResponseForJSON(jsonObj)).build();
+                }
+            } else if (type.equalsIgnoreCase(Constants.TYPE_XML)) {
+                XMLConfig xmlConfig = new Gson().fromJson(config, XMLConfig.class);
+                bufferedReader = new BufferedReader(new FileReader(xmlConfig.getFilePath()));
+                Map<String, String> namespaceMap = null;
+                AXIOMXPath enclosingElementSelectorPath = null;
+                if (xmlConfig.getNamespaces() != null) {
+                    namespaceMap = new HashMap<>();
+                    MetaInfoRetrieverUtils.buildNamespaceMap(namespaceMap, xmlConfig.getNamespaces());
+                }
+                if (xmlConfig.getEnclosingElement() != null) {
+                    try {
+                        enclosingElementSelectorPath = new AXIOMXPath(xmlConfig.getEnclosingElement());
+                        if (namespaceMap != null) {
+                            for (Map.Entry<String, String> entry : namespaceMap.entrySet()) {
+                                try {
+                                    enclosingElementSelectorPath.addNamespace(entry.getKey(), entry.getValue());
+                                } catch (JaxenException e) {
+                                    String message = "Error occurred when adding namespace: " + entry.getKey() + ":" +
+                                            entry.getValue()  + " to XPath element: " + xmlConfig.getEnclosingElement();
+                                    log.error(message, e);
+                                    errorResponse.addProperty(Constants.ERROR, message);
+                                    return Response
+                                            .serverError()
+                                            .entity(errorResponse)
+                                            .type(MediaType.APPLICATION_JSON)
+                                            .build();
+                                }
+                            }
+                        }
+                    } catch (JaxenException e) {
+                        String message = "Could not get XPath from expression: " + xmlConfig.getEnclosingElement();
+                        log.error(message, e);
+                        errorResponse.addProperty(Constants.ERROR,
+                                message);
+                        return Response
+                                .serverError()
+                                .entity(errorResponse)
+                                .type(MediaType.APPLICATION_JSON)
+                                .build();
+                    }
+
+                }
+                String line = bufferedReader.readLine();
+                StringBuilder xmlFile = new StringBuilder();
+                while ( line != null) {
+                    xmlFile.append(line).append("\n");
+                    line = bufferedReader.readLine();
+                }
+                OMElement rootOMElement;
+                try {
+                    rootOMElement = AXIOMUtil.stringToOM(xmlFile.toString());
+                } catch (XMLStreamException | DeferredParsingException e) {
+                    String message = "Error parsing read XML content : " + xmlFile + ". Reason: " + e.getMessage();
+                    log.error(message, e);
+                    errorResponse.addProperty(Constants.ERROR,
+                            message);
+                    return Response
+                            .serverError()
+                            .entity(errorResponse)
+                            .type(MediaType.APPLICATION_JSON)
+                            .build();
+                }
+                if (enclosingElementSelectorPath != null) {
+                    List enclosingNodeList;
+                    try {
+                        enclosingNodeList = enclosingElementSelectorPath.selectNodes(rootOMElement);
+                        if (enclosingNodeList.size() == 0) {
+                            String message = "Provided enclosing element " + xmlConfig.getEnclosingElement() +
+                                    " did not match any xml node.";
+                            log.error(message);
+                            errorResponse.addProperty(Constants.ERROR,
+                                    message);
+                            return Response
+                                    .serverError()
+                                    .entity(errorResponse)
+                                    .type(MediaType.APPLICATION_JSON)
+                                    .build();
+                        }
+                    } catch (JaxenException e) {
+                        String message = "Error occurred when selecting nodes from XPath: " +
+                                xmlConfig.getEnclosingElement();
+                        log.error(message, e);
+                        errorResponse.addProperty(Constants.ERROR,
+                                message);
+                        return Response
+                                .serverError()
+                                .entity(errorResponse)
+                                .type(MediaType.APPLICATION_JSON)
+                                .build();
+                    }
+                    return Response.ok().entity(
+                            MetaInfoRetrieverUtils.createResponseForXML((OMElement) enclosingNodeList.get(0))).build();
+
+                } else {
+                    return Response.ok().entity(
+                            MetaInfoRetrieverUtils.createResponseForXML(rootOMElement)).build();
+                }
+            } else {
+                String message = "File type provided : " + type + " is not supported.";
+                log.error(message);
+                errorResponse.addProperty(Constants.ERROR,
+                        message);
+                return Response
+                        .serverError()
+                        .entity(errorResponse)
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }
+        } catch (FileNotFoundException e){
+            String message = "Cannot find the provided file location." + e.getMessage();
+            errorResponse.addProperty(Constants.ERROR,
+                    message);
+            log.error(message, e);
+            return Response
+                    .serverError()
+                    .entity(errorResponse)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (IOException e) {
+            String message = "Cannot retrieve file attributes." + e.getMessage();
+            errorResponse.addProperty(Constants.ERROR,
+                    message);
+            log.error(message, e);
+            return Response
+                    .serverError()
+                    .entity(errorResponse)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    log.error("Cannot close the buffer reader. " + e.getMessage(), e);
                 }
             }
         }
