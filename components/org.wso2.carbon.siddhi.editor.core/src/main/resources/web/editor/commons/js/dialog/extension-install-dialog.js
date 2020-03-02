@@ -102,68 +102,6 @@ define(['require', 'lodash', 'jquery', 'constants'],
                 },
 
                 /**
-                 * Returns an object with texts for installed status and the action button,
-                 * after an installation or un-installation.
-                 *
-                 * @param updatedStatus         Updated installation status of an extension.
-                 * @param failedDependencies    Dependencies that were failed to be installed/un-installed.
-                 * @param autoDownloadable      Auto downloadable dependencies of an extension.
-                 * @returns {{buttonActionText: string, status: string}}
-                 */
-                this.getUpdateStatusTexts = function (updatedStatus, failedDependencies, autoDownloadable) {
-                    var status;
-                    switch (updatedStatus.trim().toUpperCase()) {
-                        case (Constants.EXTENSION_INSTALLED):
-                        case (Constants.EXTENSION_NOT_UNINSTALLED):
-                            status = Constants.EXTENSION_INSTALLED_TEXT;
-                            break;
-                        case (Constants.EXTENSION_NOT_INSTALLED):
-                        case (Constants.EXTENSION_UNINSTALLED):
-                            status = Constants.EXTENSION_NOT_INSTALLED_TEXT;
-                            break;
-                        case (Constants.EXTENSION_PARTIALLY_INSTALLED):
-                        case (Constants.EXTENSION_PARTIALLY_UNINSTALLED):
-                            status = Constants.EXTENSION_PARTIALLY_INSTALLED_TEXT;
-                            break;
-                        default:
-                            status = Constants.EXTENSION_NOT_INSTALLED_TEXT;
-                            break;
-                    }
-                    var buttonActionText;
-                    switch (updatedStatus.trim().toUpperCase()) {
-                        case (Constants.EXTENSION_INSTALLED):
-                        case (Constants.EXTENSION_NOT_UNINSTALLED):
-                        case (Constants.EXTENSION_PARTIALLY_UNINSTALLED):
-                            buttonActionText = Constants.UNINSTALL;
-                            break;
-                        case (Constants.EXTENSION_PARTIALLY_INSTALLED):
-                            if (this.isNonEmptyArray(failedDependencies)) {
-                                // Partial due to a failure.
-                                buttonActionText = Constants.INSTALL;
-                            } else {
-                                // Partial because manually installable dependencies are there.
-                                buttonActionText = Constants.UNINSTALL;
-                            }
-                            break;
-                        case (Constants.EXTENSION_NOT_INSTALLED):
-                            if (this.isNonEmptyArray(autoDownloadable)) {
-                                buttonActionText = Constants.INSTALL;
-                            } else {
-                                // Nothing to auto download and install.
-                                buttonActionText = Constants.UNINSTALL;
-                            }
-                            break;
-                        case (Constants.EXTENSION_UNINSTALLED):
-                            buttonActionText = Constants.INSTALL;
-                            break;
-                        default:
-                            buttonActionText = Constants.INSTALL;
-                            break;
-                    }
-                    return {status: status, buttonActionText: buttonActionText};
-                },
-
-                /**
                  * Organizes elements and renders a single extension's visual representation.
                  *
                  * @param extension Extension object.
@@ -293,7 +231,21 @@ define(['require', 'lodash', 'jquery', 'constants'],
                                                             selfScope) {
                     var extensionName = extension.extensionInfo.name;
                     app.utils.extensionData.get(extensionName).extensionStatus = updatedStatus;
-                    selfScope.updateExtensionStatus(extension, extensionRow, updatedStatus, response);
+                    selfScope.updateExtensionStatus(extension, extensionRow);
+                },
+
+                /**
+                 * Renders an extension's visual representation after an installation/un-installation,
+                 * which informs the user to perform a restart.
+                 *
+                 * @param extension         Extension object.
+                 * @param key               Unique key of the extension.
+                 * @returns {HTMLElement}
+                 */
+                this.renderRestartRequiredExtensionRow = function (extension, key) {
+                    var tr = $('<tr key="' + key + '"><td>' + extension.extensionInfo.name +
+                        '</td><td id="status">Restart Required</td><td></td></tr>');
+                    return tr;
                 },
 
                 /**
@@ -301,14 +253,10 @@ define(['require', 'lodash', 'jquery', 'constants'],
                  *
                  * @param extension     Extension object.
                  * @param extensionRow  Table row, which represents the extension.
-                 * @param updatedStatus Updated installation status of the extension.
-                 * @param response      Received response.
                  */
-                this.updateExtensionStatus = function (extension, extensionRow, updatedStatus, response) {
+                this.updateExtensionStatus = function (extension, extensionRow) {
                     var key = extensionRow.get(0).getAttribute('key');
-                    var statuses = this.getUpdateStatusTexts(updatedStatus, response.failed, response.autoDownloadable);
-                    var newRow =
-                        this.renderExtensionRow(extension, key, statuses.status, statuses.buttonActionText, this);
+                    var newRow = this.renderRestartRequiredExtensionRow(extension, key);
                     extensionRow.html(newRow.children());
                 },
 
