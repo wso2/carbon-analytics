@@ -23,7 +23,7 @@ wso2.carbon:
     # ports used by this server
   ports:
       # port offset
-    offset: 3
+    offset: 0
 
 wso2.transport.http:
   transportProperties:
