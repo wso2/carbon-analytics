@@ -30,19 +30,19 @@ define(['require', 'lodash', 'jquery', 'log'],
         constants.HTTP_DELETE = "DELETE";
         constants.editorUrl = window.location.protocol + "//" + window.location.host + '/editor';
         constants.streamObj = {
-            "name" : "testStream",
-            "attributes":[
+            "name": "testStream",
+            "attributes": [
                 {
-                    "name":"price",
-                    "dataType":"int"
+                    "name": "price",
+                    "dataType": "int"
                 },
                 {
-                    "name":"name",
-                    "dataType":"string"
+                    "name": "name",
+                    "dataType": "string"
                 },
                 {
-                    "name":"volume",
-                    "dataType":"double"
+                    "name": "volume",
+                    "dataType": "double"
                 }
             ]
         };
@@ -67,92 +67,95 @@ define(['require', 'lodash', 'jquery', 'log'],
 
             generateOptions.find(".collapse").collapse();
 
-            generateOptions.find('#idFromFile').on('click', function(e) {
+            generateOptions.find('#idFromFile').on('click', function (e) {
                 e.stopPropagation();
 
                 generateOptions.find('#generateFromFileContent').collapse("show");
-                generateOptions.find('#fileSelector').change(function(e) {
+                generateOptions.find('#fileSelector').change(function (e) {
                         handleFileSelect1(e, generateOptions);
                     }
                 );
 
-                if(!generateOptions.find('#idFromDatabase').is(":checked")){
+                if (!generateOptions.find('#idFromDatabase').is(":checked")) {
                     generateOptions.find('#generateFromDBContent').collapse("hide");
                 }
             });
 
-            generateOptions.find('#idFromDatabase').on('click', function(e) {
+            generateOptions.find('#idFromDatabase').on('click', function (e) {
                 e.stopPropagation();
 
                 generateOptions.find('#generateFromDBContent').collapse("show");
-                if(!generateOptions.find('#idFromFile').is(":checked")){
+                if (!generateOptions.find('#idFromFile').is(":checked")) {
                     generateOptions.find('#generateFromFileContent').collapse("hide");
                 }
             });
 
-            generateOptions.find('#idInline').on('click', function(e) {
+            generateOptions.find('#idInline').on('click', function (e) {
                 e.stopPropagation();
 
                 generateOptions.find('#inlineContent').collapse("show");
-                if(!generateOptions.find('#idDatasource').is(":checked")){
+                if (!generateOptions.find('#idDatasource').is(":checked")) {
                     generateOptions.find('#datasourceContent').collapse("hide");
                 }
             });
 
-            generateOptions.find('#idDatasource').on('click', function(e) {
+            generateOptions.find('#idDatasource').on('click', function (e) {
                 e.stopPropagation();
 
                 generateOptions.find('#datasourceContent').collapse("show");
-                if(!generateOptions.find('#idInline').is(":checked")){
+                if (!generateOptions.find('#idInline').is(":checked")) {
                     generateOptions.find('#inlineContent').collapse("hide");
                 }
             });
 
-            generateOptions.find('button').filter('#loadInlineDbConnection').click(function(e){
+            generateOptions.find('button').filter('#loadInlineDbConnection').click(function (e) {
                     handleLoadDbConnection(e, generateOptions);
                 }
             );
-            generateOptions.find('button').filter('#loadDatasourceDbConnection').click(function(e){
-                    handleLoadDbConnection(e, generateOptions);
+            generateOptions.find('button').filter('#loadDatasourceDbConnection').click(function (e) {
+                handleLoadDbConnection(e, generateOptions);
             });
 
             generateOptions.find("button").filter("#generateButton").click(function () {
-                requestBody ={};
+                requestBody = {};
                 var fileReader = new FileReader();
-                config={};
-                formData.append('file',files[0]);
-                if(generateOptions.find('#idFromFile').is(":checked")){
-                    if(generateOptions.find("#fromCsvFile").attr("aria-expanded")=="true"){
-                        requestBody["type"] = "csv";
-                        config["streamName"] = generateOptions.find('#streamNameCsv')[0].value;
-                        config["delimiter"] = generateOptions.find('#delimiterOfCSV')[0].value;
-                        config["isHeaderExists"] = generateOptions.find('#isHeaderExists')[0].value;
-                        config["fileBody"] = formData;
-                        requestBody["config"] = config;
-                    } else if(generateOptions.find("#fromJsonFile").attr("aria-expanded")=="true"){
-                         requestBody["type"] = "json";
-                         config["streamName"] = generateOptions.find('#streamNameJson')[0].value;
-                         config["enclosingElement"] = generateOptions.find('#jsonEnclosingElement')[0].value;
-                        requestBody["config"] = config;
-                    } else if(generateOptions.find("#fromXmlFile").attr("aria-expanded")=="true"){
-                          requestBody["type"] = "xml";
-                          config["streamName"] = generateOptions.find('#streamNameXml')[0].value;
-                          config["nameSpace"] = generateOptions.find('#nameSpaceOfXml')[0].value;
-                          config["enclosingElement"] = generateOptions.find('#enclosingElementXML')[0].value;
-                          requestBody["config"] = config;
-                    }
-                } else if(generateOptions.find('#idFromDatabase').is(":checked")){
-                    if(generateOptions.find('#idInline').is(":checked")){
+                config = {};
+                fileReader.readAsArrayBuffer(files[0]);
+                fileReader.onloadend = function (ev) {
+                    if (generateOptions.find('#idFromFile').is(":checked")) {
+                        if (generateOptions.find("#fromCsvFile").attr("aria-expanded") === "true") {
+                            requestBody["type"] = "csv";
+                            config["streamName"] = generateOptions.find('#streamNameCsv')[0].value;
+                            config["delimiter"] = generateOptions.find('#delimiterOfCSV')[0].value;
+                            config["isHeaderExists"] = generateOptions.find('#isHeaderExists')[0].value;
+                            config["fileBody"] = fileReader.result;
+                            requestBody["config"] = config;
+                        } else if (generateOptions.find("#fromJsonFile").attr("aria-expanded") === "true") {
+                            requestBody["type"] = "json";
+                            config["streamName"] = generateOptions.find('#streamNameJson')[0].value;
+                            config["enclosingElement"] = generateOptions.find('#jsonEnclosingElement')[0].value;
+                            requestBody["config"] = config;
+                        } else if (generateOptions.find("#fromXmlFile").attr("aria-expanded") === "true") {
+                            requestBody["type"] = "xml";
+                            config["streamName"] = generateOptions.find('#streamNameXml')[0].value;
+                            config["nameSpace"] = generateOptions.find('#nameSpaceOfXml')[0].value;
+                            config["enclosingElement"] = generateOptions.find('#enclosingElementXML')[0].value;
+                            requestBody["config"] = config;
+                        }
+                    } else if (generateOptions.find('#idFromDatabase').is(":checked")) {
+                        if (generateOptions.find('#idInline').is(":checked")) {
 
-                    }else if(generateOptions.find('#idDatasource').is(":checked")){
+                        } else if (generateOptions.find('#idDatasource').is(":checked")) {
 
+                        }
                     }
-                }
-                self.retrieveTableNames(requestBody,function(e){
-                    console.log(e)
-                },function(err){
-                    console.log(err)
-                });
+                    self.retrieveTableNames(requestBody, function (e) {
+                        console.log(e)
+                    }, function (err) {
+                        console.log(err)
+                    });
+                };
+
 //                self.callback(constants.streamObj,self.ref);
 //                generateOptions.modal('hide');
             });
@@ -166,48 +169,49 @@ define(['require', 'lodash', 'jquery', 'log'],
 
 
         };
+
         function handleFileSelect1(evt, generateOptions) {
             files = evt.target.files; // FileList object
-                generateOptions.find("#fromJsonFile").collapse("hide");
-                generateOptions.find("#fromXmlFile").collapse("hide");
-                generateOptions.find("#fromCsvFile").collapse("hide");
+            generateOptions.find("#fromJsonFile").collapse("hide");
+            generateOptions.find("#fromXmlFile").collapse("hide");
+            generateOptions.find("#fromCsvFile").collapse("hide");
             var fileType = files[0].type;
 
-            if (fileType === "application/json"){
+            if (fileType === "application/json") {
                 generateOptions.find("#fromJsonFile").collapse("show");
-            } else if(fileType === "text/xml"){
+            } else if (fileType === "text/xml") {
                 generateOptions.find("#fromXmlFile").collapse("show");
-            } else if(fileType === "text/csv"){
+            } else if (fileType === "text/csv") {
                 generateOptions.find("#fromCsvFile").collapse("show");
 
-            } else{
+            } else {
                 console.error("Huta pata support natho..")
             }
             var output = [];
             for (var i = 0, f; f = files[i]; i++) {
                 output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-                f.size, ' bytes, last modified: ',
-                f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+                    f.size, ' bytes, last modified: ',
+                    f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
                     '</li>');
             }
             document.getElementById('file_list1').innerHTML = '<ul>' + output.join('') + '</ul>';
         }
 
-        function handleLoadDbConnection(evt, generateOptions){
-            requestBody={};
-            if(generateOptions.find("#inlineContent").attr("aria-expanded")=="true"){
-               requestBody['url'] = generateOptions.find('#dataSourceLocation_1')[0].value;
-               requestBody['username'] = generateOptions.find('#inlineUsername')[0].value;
+        function handleLoadDbConnection(evt, generateOptions) {
+            requestBody = {};
+            if (generateOptions.find("#inlineContent").attr("aria-expanded") == "true") {
+                requestBody['url'] = generateOptions.find('#dataSourceLocation_1')[0].value;
+                requestBody['username'] = generateOptions.find('#inlineUsername')[0].value;
                 requestBody['password'] = generateOptions.find('#inlinePass')[0].value;
-             } else if (generateOptions.find("#datasourceContent").attr("aria-expanded")=="true"){
+            } else if (generateOptions.find("#datasourceContent").attr("aria-expanded") == "true") {
                 requestBody['dataSourceName'] = generateOptions.find('#dataSourceNameId')[0].value;
-             }
-             console.log(requestBody);
-             var response = connectToDatabase(requestBody, function(evt){
+            }
+            console.log(requestBody);
+            var response = connectToDatabase(requestBody, function (evt) {
                 console.log(evt);
-             }, function(err){
+            }, function (err) {
                 console.log(err);
-             });
+            });
         }
 
         GenerateStreamDialog.prototype.show = function () {
@@ -223,7 +227,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                     contentType: "application/json; charset=utf-8",
                     data: connectionDetails,
                     success: function (data) {
-                      return data
+                        return data
                     },
                     error: function (msg) {
                         if (typeof errorCallback === 'function')
@@ -242,12 +246,12 @@ define(['require', 'lodash', 'jquery', 'log'],
                     contentType: "application/json; charset=utf-8",
                     data: connectionDetails,
                     success: function (data) {
-                    alert('Success')
+                        alert('Success')
                         if (typeof successCallback === 'function')
                             successCallback(data)
                     },
                     error: function (msg) {
-                                        alert('error')
+                        alert('error')
                         if (typeof errorCallback === 'function')
                             errorCallback(msg)
                     }
