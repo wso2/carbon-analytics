@@ -79,6 +79,13 @@ public class ResponseEntityCreator {
         return details;
     }
 
+    /**
+     * Creates response with information about dependency sharing extensions, through:
+     * {@link DependencyRetriever#getDependencySharingExtensionsFor(String)}.
+     *
+     * @param dependencySharingExtensions Extensions that share same dependencies.
+     * @return Information for the response.
+     */
     public static Map<String, Object> createDependencySharingExtensionsResponse(
         Map<String, List<DependencyConfig>> dependencySharingExtensions) {
         Map<String, Object> details = new HashMap<>();
