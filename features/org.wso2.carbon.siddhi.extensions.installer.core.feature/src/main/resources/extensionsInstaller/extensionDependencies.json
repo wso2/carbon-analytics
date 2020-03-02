@@ -18,11 +18,11 @@
             "usedBy": "RUNTIME"
           },
           {
-            "type": "BUNDLE",
+            "type": "JAR",
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "kafka_(.+).jar"
+        "lookupRegex": "kafka(.+).jar"
       },
       {
         "name": "zookeeper",
@@ -37,11 +37,11 @@
             "usedBy": "RUNTIME"
           },
           {
-            "type": "BUNDLE",
+            "type": "JAR",
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "zookeeper-(.+).jar"
+        "lookupRegex": "zookeeper(.+).jar"
       },
       {
         "name": "kafka-2.11",
@@ -56,11 +56,11 @@
             "usedBy": "RUNTIME"
           },
           {
-            "type": "BUNDLE",
+            "type": "JAR",
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "kafka_2.11-(.+).jar"
+        "lookupRegex": "kafka([_-])2.11(.+).jar"
       },
       {
         "name": "scala-library",
@@ -75,11 +75,11 @@
             "usedBy": "RUNTIME"
           },
           {
-            "type": "BUNDLE",
+            "type": "JAR",
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "scala-library-(.+).jar"
+        "lookupRegex": "scala([_-])library(.+).jar"
       },
       {
         "name": "zkclient",
@@ -94,11 +94,11 @@
             "usedBy": "RUNTIME"
           },
           {
-            "type": "BUNDLE",
+            "type": "JAR",
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "zkclient-(.+).jar"
+        "lookupRegex": "zkclient(.+).jar"
       },
       {
         "name": "metrics-core",
@@ -113,35 +113,11 @@
             "usedBy": "RUNTIME"
           },
           {
-            "type": "BUNDLE",
+            "type": "JAR",
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "metrics-core-(.+).jar"
-      }
-    ]
-  },
-
-  "redis": {
-    "extension": {
-      "name": "redis",
-      "version": "3.1.1"
-    },
-    "dependencies": [
-      {
-        "name": "jedis",
-        "version": "2.9.3",
-        "download": {
-          "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/redis/clients/jedis/2.9.3/jedis-2.9.3.jar"
-        },
-        "usages": [
-          {
-            "type": "BUNDLE",
-            "usedBy": "SAMPLES"
-          }
-        ],
-        "lookupRegex": "jedis-(.+).jar"
+        "lookupRegex": "metrics([_-])core(.+).jar"
       }
     ]
   },
@@ -165,11 +141,11 @@
             "usedBy": "RUNTIME"
           },
           {
-            "type": "BUNDLE",
+            "type": "JAR",
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "activemq-client_(.+).jar"
+        "lookupRegex": "activemq([_-])client(.+).jar"
       },
       {
         "name": "hawtbuf",
@@ -184,11 +160,11 @@
             "usedBy": "RUNTIME"
           },
           {
-            "type": "BUNDLE",
+            "type": "JAR",
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "hawtbuf-(.+).jar"
+        "lookupRegex": "hawtbuf(.+).jar"
       },
       {
         "name": "geronimo-j2ee-management_1.1_spec-",
@@ -203,11 +179,11 @@
             "usedBy": "RUNTIME"
           },
           {
-            "type": "BUNDLE",
+            "type": "JAR",
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "geronimo-j2ee-management__1.1_spec-(.+).jar"
+        "lookupRegex": "geronimo([_-])j2ee([_-])management([_-])1.1([_-])spec(.+).jar"
       },
       {
         "name": "geronimo-jms_1.1_spec-",
@@ -222,11 +198,11 @@
             "usedBy": "RUNTIME"
           },
           {
-            "type": "BUNDLE",
+            "type": "JAR",
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "geronimo-jms_1.1_spec-(.+).jar"
+        "lookupRegex": "geronimo([_-])jms([_-])1.1([_-])spec(.+).jar"
       }
     ]
   },
@@ -250,7 +226,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "com.ibm.mq.allclient-(.+).jar"
+        "lookupRegex": "com.ibm.mq.allclient(.+).jar"
       },
       {
         "name": "javax.jms-api",
@@ -265,7 +241,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "javax.jms-api-(.+).jar"
+        "lookupRegex": "javax.jms([_-])api(.+).jar"
       }
     ]
   },
@@ -289,7 +265,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mysql-connector-java-(.+).jar"
+        "lookupRegex": "mysql([_-])connector([_-])java(.+).jar"
       }
     ]
   },
@@ -313,7 +289,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "simpleclient-(.+).jar"
+        "lookupRegex": "simpleclient(.+).jar"
       },
       {
         "name": "simpleclient_common",
@@ -328,7 +304,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "simpleclient_common-(.+).jar"
+        "lookupRegex": "simpleclient([_-])common(.+).jar"
       },
       {
         "name": "simpleclient_httpserver",
@@ -343,7 +319,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "simpleclient_httpserver-(.+).jar"
+        "lookupRegex": "simpleclient([_-])httpserver(.+).jar"
       },
       {
         "name": "simpleclient_pushgateway",
@@ -358,7 +334,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "simpleclient_pushgateway-(.+).jar"
+        "lookupRegex": "simpleclient([_-])pushgateway(.+).jar"
       },
       {
         "name": "com.sun.net.httpserver",
@@ -373,7 +349,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "http-(.+).jar"
+        "lookupRegex": "http(.+).jar"
       }
     ]
   },
@@ -397,7 +373,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "jnats-(.+).jar"
+        "lookupRegex": "jnats(.+).jar"
       },
       {
         "name": "java-nats-streaming",
@@ -412,7 +388,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "java-nats-streaming-(.+).jar"
+        "lookupRegex": "java([_-])nats([_-])streaming(.+).jar"
       },
       {
         "name": "protobuf-java",
@@ -427,7 +403,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "protobuf-java-(.+).jar"
+        "lookupRegex": "protobuf([_-])java(.+).jar"
       }
     ]
   },
@@ -451,7 +427,142 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "protobuf-java-(.+).jar"
+        "lookupRegex": "protobuf([_-])java(.+).jar"
+      }
+    ]
+  },
+
+  "mongodb": {
+    "extension": {
+      "name": "mongodb",
+      "version": "2.0.2"
+    },
+    "dependencies": [
+      {
+        "name": "mongo-java-driver",
+        "version": "3.4.2",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.2/mongo-java-driver-3.4.2.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "mongo([_-])java([_-])driver(.+).jar"
+      }
+    ]
+  },
+
+  "rdbms": {
+    "extension": {
+      "name": "rdbms",
+      "version": "6.0.4"
+    },
+    "dependencies": [
+      {
+        "name": "mysql-connector-java",
+        "version": "5.1.45",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.45/mysql-connector-java-5.1.45.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "mysql([_-])connector([_-])java(.+).jar"
+      }
+    ]
+  },
+
+  "hbase": {
+    "extension": {
+      "name": "hbase",
+      "version": "5.0.0"
+    },
+    "dependencies": [
+      {
+        "name": "hbase-shaded-client",
+        "version": "1.3.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/apache/hbase/hbase-shaded-client/1.3.1/hbase-shaded-client-1.3.1.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "hbase([_-])shaded([_-])client(.+).jar"
+      },
+      {
+        "name": "htrace-core",
+        "version": "3.1.0-incubating",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/apache/htrace/htrace-core/3.1.0-incubating/htrace-core-3.1.0-incubating.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "htrace([_-])core(.+).jar"
+      }
+    ]
+  },
+
+  "cassandra": {
+    "extension": {
+      "name": "cassandra",
+      "version": "2.0.0"
+    },
+    "dependencies": [
+      {
+        "name": "cassandra-driver-core",
+        "version": "3.3.2",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/com/datastax/cassandra/cassandra-driver-core/3.3.2/cassandra-driver-core-3.3.2.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "cassandra([_-])driver([_-])core(.+).jar"
+      }
+    ]
+  },
+
+  "redis": {
+    "extension": {
+      "name": "redis",
+      "version": "3.1.1"
+    },
+    "dependencies": [
+      {
+        "name": "jedis",
+        "version": "2.9.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/redis/clients/jedis/2.9.0/jedis-2.9.0.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "jedis(.+).jar"
       }
     ]
   }
