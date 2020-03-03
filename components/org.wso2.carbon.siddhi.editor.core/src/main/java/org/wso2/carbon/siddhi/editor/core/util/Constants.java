@@ -108,6 +108,8 @@ public class Constants {
     static final String SOURCEMAP = "SourceMap";
     static final String SINKMAP = "SinkMap";
     static final String STORE = "Store";
+    public static final String OPERATOR_YAML_NAME = "siddhi-operator.yaml";
+    public static final String OPERATOR_PREREQ_YAML_NAME = "k8-prerequisites.yaml";
     public static final String ERROR = "error";
     public static final String WARNING = "warning";
     static final Map<String, Class<?>> SUPER_CLASS_MAP;

@@ -24,7 +24,7 @@ define(['require', 'jquery', 'constants'],
          * @param handleLoading         Function which handles the 'loading' state of the installation.
          * @param handleCallback        Callback function after a successful installation.
          * @param callerObject          The object which calls this method.
-         * @param requestedActionText   The requested action, i.e: either install or un-install
+         * @param requestedActionText   The requested action, i.e: either install or un-install.
          * @param callerScope           Scope of the caller.
          */
         Utils.prototype.installOrUnInstallExtension = function (extension,
@@ -74,32 +74,159 @@ define(['require', 'jquery', 'constants'],
                 self.extensionInstallUninstallAlertModal.modal('hide');
                 var action = requestedActionText;
 
-                // Wait until installation completes.
-                if (handleLoading) {
-                    var actionStatus = action + 'ing';
-                    actionStatus = actionStatus.charAt(0).toUpperCase() + actionStatus.substr(1).toLowerCase();
-                    handleLoading(callerObject, extension, actionStatus, callerScope);
+                if (action === Constants.INSTALL) {
+                    self.performInstallOrUnInstall(
+                        extension, app, handleLoading, handleCallback, callerObject, action, callerScope);
+                } else if (action === Constants.UNINSTALL) {
+                    var serviceUrl = app.config.services.extensionsInstallation.endpoint;
+                    var getDependencySharingExtensionsUrl =
+                        serviceUrl + "/" + extension.extensionInfo.name + "/dependency-sharing-extensions";
+                    $.ajax({
+                        type: "GET",
+                        contentType: "json",
+                        url: getDependencySharingExtensionsUrl,
+                        async: false,
+                        success: function (response) {
+                            if (response.doesShareDependencies) {
+                                // Some dependencies are shared. Proceed or not based on user's selection.
+                                self.performDependencySharingUnInstallation(
+                                    response.sharesWith,
+                                    extension,
+                                    app,
+                                    handleLoading,
+                                    handleCallback,
+                                    callerObject,
+                                    action,
+                                    callerScope);
+                            } else {
+                                // No dependencies are shared. Proceed with un-installation.
+                                self.performInstallOrUnInstall(
+                                    extension, app, handleLoading, handleCallback, callerObject, action, callerScope);
+                            }
+                        },
+                        error: function (e) {
+                            var message = 'Unable to get dependency sharing information for the extension. ' +
+                                'Please check editor console for further information.';
+                            alerts.error(message);
+                            throw message;
+                        }
+                    });
                 }
+            });
+        };
 
-                var serviceUrl = app.config.services.extensionsInstallation.endpoint;
-                var installUninstallUrl = serviceUrl + "/" + extension.extensionInfo.name + "/" + action.toLowerCase();
-                $.ajax({
-                    type: "POST",
-                    contentType: "json",
-                    url: installUninstallUrl,
-                    async: true,
-                    success: function (response) {
-                        handleCallback(extension, response.status, callerObject, response, callerScope);
-                        app.utils.extensionStatusListener.markAsRestartRequired(extension);
-                        self.displayRestartPopup(extension, action);
-                    },
-                    error: function (e) {
-                        var message = `Unable to ${action.toLowerCase()} the extension. ` +
-                            `Please check editor console for further information.`;
-                        alerts.error(message);
-                        throw message;
-                    }
-                });
+        /**
+         * Displays a popup with the information about extensions - that share dependencies with the given
+         * extension (if any), during un-installation.
+         * Un-installation will be continued or not, respectively when the user confirms or cancels the popup.
+         *
+         * @param sharesWith        Information about dependency sharing extensions, obtained from the response.
+         * @param extension         Configuration of an extension.
+         * @param app               Reference of the app.
+         * @param handleLoading     Function which handles the 'loading' state of the installation.
+         * @param handleCallback    Callback function after a successful installation.
+         * @param callerObject      The object which calls this method.
+         * @param action            The requested action, i.e: either install or un-install.
+         * @param callerScope       Scope of the caller.
+         */
+        this.performDependencySharingUnInstallation = function (sharesWith,
+                                                                extension,
+                                                                app,
+                                                                handleLoading,
+                                                                handleCallback,
+                                                                callerObject,
+                                                                action,
+                                                                callerScope) {
+            var extensionListElements = "";
+            for (var extensionName in sharesWith) {
+                var dependencies = "";
+                if (sharesWith.hasOwnProperty(extensionName)) {
+                    var sharedDependencies = sharesWith[extensionName];
+                    sharedDependencies.forEach(function(dependency) {
+                        dependencies += `<li>&nbsp;${dependency.name} ${dependency.version}</li>`;
+                    });
+                }
+                extensionListElements += `<li><b>${extensionName}</b><ul>${dependencies}</ul></li><br/>`;
+            }
+
+            self.extensionInstallUninstallAlertModal = $(
+                "<div class='modal fade' id='extensionAlertModal' tabindex='-1' role='dialog'" +
+                " aria-tydden='true'>" +
+                "<div class='modal-dialog file-dialog' role='document'>" +
+                "<div class='modal-content'>" +
+                "<div class='modal-header'>" +
+                "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+                "<i class='fw fw-cancel about-dialog-close'> </i> " +
+                "</button>" +
+                "<h4 class='modal-title file-dialog-title' id='newConfigModalLabel'>Shared Dependencies Exist</h4>" +
+                "<hr class='style1'>" +
+                "</div>" +
+                "<div class='modal-body'>" +
+                "<div class='container-fluid'>" +
+                "<form class='form-horizontal' onsubmit='return false'>" +
+                "<div class='form-group'>" +
+                "<label for='configName' class='col-sm-9 file-dialog-label'>" +
+                "The extension shares some of its dependencies with the following extensions. " +
+                "Are you sure you want to un-install?" +
+                "</label>" +
+                "<label for='configName' class='col-sm-9 file-dialog-label'>" +
+                `<ul>${extensionListElements}</ul>` +
+                "</label>" +
+                "</div>" +
+                "<div class='form-group'>" +
+                "<div class='file-dialog-form-btn'>" +
+                "<button id='confirmUnInstall' type='button' class='btn btn-primary'>Confirm</button>" +
+                "<div class='divider'/>" +
+                "<button type='cancel' class='btn btn-default' data-dismiss='modal'>Cancel</button>" +
+                "</div>" +
+                "</form>" +
+                "</div>" +
+                "</div>" +
+                "</div>" +
+                "</div>" +
+                "</div>"
+            ).modal('show');
+
+            // Confirm un-installation.
+            self.extensionInstallUninstallAlertModal.find("button").filter("#confirmUnInstall").click(function () {
+                self.extensionInstallUninstallAlertModal.modal('hide');
+                self.performInstallOrUnInstall(
+                    extension, app, handleLoading, handleCallback, callerObject, action, callerScope);
+            });
+        };
+
+        this.performInstallOrUnInstall = function (extension,
+                                                   app,
+                                                   handleLoading,
+                                                   handleCallback,
+                                                   callerObject,
+                                                   action,
+                                                   callerScope) {
+            // Wait until installation completes.
+            if (handleLoading) {
+                var actionStatus = action + 'ing';
+                actionStatus = actionStatus.charAt(0).toUpperCase() + actionStatus.substr(1).toLowerCase();
+                handleLoading(callerObject, extension, actionStatus, callerScope);
+            }
+
+            var serviceUrl = app.config.services.extensionsInstallation.endpoint;
+            var installUninstallUrl = serviceUrl + "/" + extension.extensionInfo.name + "/" + action.toLowerCase();
+            $.ajax({
+                type: "POST",
+                contentType: "json",
+                url: installUninstallUrl,
+                async: true,
+                success: function (response) {
+                    handleCallback(extension, response.status, callerObject, response, callerScope);
+                    app.utils.extensionStatusListener.markAsRestartRequired(extension);
+                    self.displayRestartPopup(extension, action);
+                },
+                error: function (e) {
+                    var message = `Unable to ${action.toLowerCase()} the extension. ` +
+                        `Please check editor console for further information.`;
+                    alerts.error(message);
+                    throw message;
+                }
             });
         };
 
