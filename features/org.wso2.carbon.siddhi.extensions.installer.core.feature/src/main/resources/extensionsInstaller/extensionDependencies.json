@@ -747,15 +747,15 @@
     "extension": {
       "name": "http",
       "displayName": "HTTP",
-      "version": "2.1.0"
+      "version": "2.2.0"
     },
     "dependencies": [
       {
         "name": "siddhi-io-http",
-        "version": "2.1.0",
+        "version": "2.2.0",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/http/siddhi-io-http/2.1.0/siddhi-io-http-2.1.0.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/http/siddhi-io-http/2.2.0/siddhi-io-http-2.2.0.jar"
         },
         "usages": [
           {
@@ -763,7 +763,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])http([_-])2.1.0.jar"
+        "lookupRegex": "siddhi([_-])io([_-])http([_-])2.2.0.jar"
       }
     ]
   },
