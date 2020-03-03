@@ -2,9 +2,25 @@
   "kafka": {
     "extension": {
       "name": "kafka",
+      "displayName": "Kafka",
       "version": "5.0.4"
     },
     "dependencies": [
+      {
+        "name": "siddhi-io-kafka",
+        "version": "5.0.4",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.4/siddhi-io-kafka-5.0.4.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])kafka([_-])5.0.4.jar"
+      },
       {
         "name": "kafka-clients",
         "version": "0.10.2.1",
@@ -125,9 +141,25 @@
   "jms": {
     "extension": {
       "name": "jms",
+      "displayName": "JMS",
       "version": "2.0.2"
     },
     "dependencies": [
+      {
+        "name": "siddhi-io-jms",
+        "version": "2.0.2",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/jms/siddhi-io-jms/2.0.2/siddhi-io-jms-2.0.2.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])jms([_-])2.0.2.jar"
+      },
       {
         "name": "activemq-client",
         "version": "5.9.0",
@@ -210,9 +242,25 @@
   "ibmmq": {
     "extension": {
       "name": "ibmmq",
-      "version": "2.0.0"
+      "displayName": "IBMMQ",
+      "version": "3.0.0"
     },
     "dependencies": [
+      {
+        "name": "siddhi-io-ibmmq",
+        "version": "3.0.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/ibmmq/siddhi-io-ibmmq/3.0.0/siddhi-io-ibmmq-3.0.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])ibmmq([_-])3.0.0.jar"
+      },
       {
         "name": "com.ibm.mq.allclient",
         "version": "9.0.5.0",
@@ -227,21 +275,6 @@
           }
         ],
         "lookupRegex": "com.ibm.mq.allclient([_-])9.0.5.0(.+).jar"
-      },
-      {
-        "name": "javax.jms-api",
-        "version": "2.0.1",
-        "download": {
-          "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/javax/jms/javax.jms-api/2.0.1/javax.jms-api-2.0.1.jar"
-        },
-        "usages": [
-          {
-            "type": "JAR",
-            "usedBy": "RUNTIME"
-          }
-        ],
-        "lookupRegex": "javax.jms([_-])api([_-])2.0.1(.+).jar"
       }
     ]
   },
@@ -249,9 +282,25 @@
   "cdc": {
     "extension": {
       "name": "cdc",
+      "displayName": "CDC",
       "version": "2.0.3"
     },
     "dependencies": [
+      {
+        "name": "siddhi-io-cdc",
+        "version": "2.0.3",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.3/siddhi-io-cdc-2.0.3.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])2.0.3.jar"
+      },
       {
         "name": "mysql-connector-java",
         "version": "5.1.45",
@@ -273,9 +322,25 @@
   "prometheus": {
     "extension": {
       "name": "prometheus",
+      "displayName": "Prometheus",
       "version": "2.1.0"
     },
     "dependencies": [
+      {
+        "name": "siddhi-io-prometheus",
+        "version": "2.1.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/prometheus/siddhi-io-prometheus/2.1.0/siddhi-io-prometheus-2.1.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])prometheus([_-])2.1.0.jar"
+      },
       {
         "name": "simpleclient",
         "version": "0.5.0",
@@ -357,9 +422,25 @@
   "nats": {
     "extension": {
       "name": "nats",
+      "displayName": "Nats",
       "version": "2.0.6"
     },
     "dependencies": [
+      {
+        "name": "siddhi-io-nats",
+        "version": "2.0.6",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/nats/siddhi-io-nats/2.0.6/siddhi-io-nats-2.0.6.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])nats([_-])2.0.6.jar"
+      },
       {
         "name": "jnats",
         "version": "2.6.5",
@@ -411,9 +492,25 @@
   "grpc": {
     "extension": {
       "name": "grpc",
+      "displayName": "gRPC",
       "version": "1.0.3"
     },
     "dependencies": [
+      {
+        "name": "siddhi-io-grpc",
+        "version": "1.0.3",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/grpc/siddhi-io-grpc/1.0.3/siddhi-io-grpc-1.0.3.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])grpc([_-])1.0.3.jar"
+      },
       {
         "name": "protobuf-java",
         "version": "3.9.1",
@@ -435,9 +532,25 @@
   "mongodb": {
     "extension": {
       "name": "mongodb",
+      "displayName": "MongoDB",
       "version": "2.0.2"
     },
     "dependencies": [
+      {
+        "name": "siddhi-store-mongodb",
+        "version": "2.0.2",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/mongodb/siddhi-store-mongodb/2.0.2/siddhi-store-mongodb-2.0.2.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])store([_-])mongodb([_-])2.0.2.jar"
+      },
       {
         "name": "mongo-java-driver",
         "version": "3.4.2",
@@ -459,9 +572,25 @@
   "rdbms": {
     "extension": {
       "name": "rdbms",
+      "displayName": "RDBMS",
       "version": "6.0.4"
     },
     "dependencies": [
+      {
+        "name": "siddhi-store-rdbms",
+        "version": "6.0.4",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/6.0.4/siddhi-store-rdbms-6.0.4.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])store([_-])rdbms([_-])6.0.4.jar"
+      },
       {
         "name": "mysql-connector-java",
         "version": "5.1.45",
@@ -483,9 +612,25 @@
   "hbase": {
     "extension": {
       "name": "hbase",
+      "displayName": "HBase",
       "version": "5.0.0"
     },
     "dependencies": [
+      {
+        "name": "siddhi-store-hbase",
+        "version": "5.0.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/store/hbase/siddhi-store-hbase/5.0.0/siddhi-store-hbase-5.0.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])store([_-])hbase([_-])5.0.0.jar"
+      },
       {
         "name": "hbase-shaded-client",
         "version": "1.3.1",
@@ -522,9 +667,25 @@
   "cassandra": {
     "extension": {
       "name": "cassandra",
+      "displayName": "Cassandra",
       "version": "2.0.0"
     },
     "dependencies": [
+      {
+        "name": "siddhi-store-cassandra",
+        "version": "2.0.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/store/cassandra/siddhi-store-cassandra/2.0.0/siddhi-store-cassandra-2.0.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])store([_-])cassandra([_-])2.0.0.jar"
+      },
       {
         "name": "cassandra-driver-core",
         "version": "3.3.2",
@@ -546,9 +707,25 @@
   "redis": {
     "extension": {
       "name": "redis",
+      "displayName": "Redis",
       "version": "3.1.1"
     },
     "dependencies": [
+      {
+        "name": "siddhi-store-redis",
+        "version": "3.1.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/redis/siddhi-store-redis/3.1.1/siddhi-store-redis-3.1.1.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])store([_-])redis([_-])3.1.1.jar"
+      },
       {
         "name": "jedis",
         "version": "2.9.0",
@@ -563,6 +740,431 @@
           }
         ],
         "lookupRegex": "jedis([_-])2.9.0(.+).jar"
+      }
+    ]
+  },
+
+  "http": {
+    "extension": {
+      "name": "http",
+      "displayName": "HTTP",
+      "version": "2.2.0"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-http",
+        "version": "2.2.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/http/siddhi-io-http/2.2.0/siddhi-io-http-2.2.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])http([_-])2.2.0.jar"
+      }
+    ]
+  },
+
+  "file": {
+    "extension": {
+      "name": "file",
+      "displayName": "File",
+      "version": "2.0.3"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-file",
+        "version": "2.0.3",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/file/siddhi-io-file/2.0.3/siddhi-io-file-2.0.3.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])file([_-])2.0.3.jar"
+      }
+    ]
+  },
+
+  "tcp": {
+    "extension": {
+      "name": "tcp",
+      "displayName": "TCP",
+      "version": "3.0.4"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-tcp",
+        "version": "3.0.4",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/tcp/siddhi-io-tcp/3.0.4/siddhi-io-tcp-3.0.4.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])tcp([_-])3.0.4.jar"
+      }
+    ]
+  },
+
+  "email": {
+    "extension": {
+      "name": "email",
+      "displayName": "E-mail",
+      "version": "2.0.3"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-email",
+        "version": "2.0.3",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/email/siddhi-io-email/2.0.3/siddhi-io-email-2.0.3.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])email([_-])2.0.3.jar"
+      }
+    ]
+  },
+
+  "rabbitmq": {
+    "extension": {
+      "name": "rabbitmq",
+      "displayName": "RabbitMQ",
+      "version": "3.0.2"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-rabbitmq",
+        "version": "3.0.2",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/rabbitmq/siddhi-io-rabbitmq/3.0.2/siddhi-io-rabbitmq-3.0.2.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])rabbitmq([_-])3.0.2.jar"
+      }
+    ]
+  },
+
+  "mqtt": {
+    "extension": {
+      "name": "mqtt",
+      "displayName": "MQTT",
+      "version": "3.0.0"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-mqtt",
+        "version": "3.0.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/mqtt/siddhi-io-mqtt/3.0.0/siddhi-io-mqtt-3.0.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])mqtt([_-])3.0.0.jar"
+      }
+    ]
+  },
+
+  "twitter": {
+    "extension": {
+      "name": "twitter",
+      "displayName": "Twitter",
+      "version": "2.0.0"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-twitter",
+        "version": "2.0.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/io/twitter/siddhi-io-twitter/2.0.0/siddhi-io-twitter-2.0.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])twitter([_-])2.0.0.jar"
+      }
+    ]
+  },
+
+  "sqs": {
+    "extension": {
+      "name": "sqs",
+      "displayName": "SQS",
+      "version": "3.0.0"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-sqs",
+        "version": "3.0.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/sqs/siddhi-io-sqs/3.0.0/siddhi-io-sqs-3.0.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])sqs([_-])3.0.0.jar"
+      }
+    ]
+  },
+
+  "websocket": {
+    "extension": {
+      "name": "websocket",
+      "displayName": "WebSocket",
+      "version": "3.0.0"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-websocket",
+        "version": "3.0.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/websocket/siddhi-io-websocket/3.0.0/siddhi-io-websocket-3.0.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])websocket([_-])3.0.0.jar"
+      }
+    ]
+  },
+
+  "googlepubsub": {
+    "extension": {
+      "name": "googlepubsub",
+      "displayName": "GooglePubsub",
+      "version": "2.0.2"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-googlepubsub",
+        "version": "2.0.2",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/googlepubsub/siddhi-io-googlepubsub/2.0.2/siddhi-io-googlepubsub-2.0.2.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])googlepubsub([_-])2.0.2.jar"
+      }
+    ]
+  },
+
+  "hl7": {
+    "extension": {
+      "name": "hl7",
+      "displayName": "HL7",
+      "version": "3.0.0"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-hl7",
+        "version": "3.0.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/hl7/siddhi-io-hl7/3.0.0/siddhi-io-hl7-3.0.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])hl7([_-])3.0.0.jar"
+      }
+    ]
+  },
+
+  "snmp": {
+    "extension": {
+      "name": "snmp",
+      "displayName": "SNMP",
+      "version": "2.0.0"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-snmp",
+        "version": "2.0.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/io/snmp/siddhi-io-snmp/2.0.0/siddhi-io-snmp-2.0.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])snmp([_-])2.0.0.jar"
+      }
+    ]
+  },
+
+  "gcs": {
+    "extension": {
+      "name": "gcs",
+      "displayName": "GCS",
+      "version": "1.0.0"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-gcs",
+        "version": "1.0.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/gcs/siddhi-io-gcs/1.0.0/siddhi-io-gcs-1.0.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])gcs([_-])1.0.0.jar"
+      }
+    ]
+  },
+
+  "s3": {
+    "extension": {
+      "name": "s3",
+      "displayName": "S3",
+      "version": "1.0.0"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-s3",
+        "version": "1.0.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/s3/siddhi-io-s3/1.0.0/siddhi-io-s3-1.0.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])s3([_-])1.0.0.jar"
+      }
+    ]
+  },
+
+  "solr": {
+    "extension": {
+      "name": "solr",
+      "displayName": "Solr",
+      "version": "2.0.0"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-solr",
+        "version": "2.0.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/store/solr/siddhi-store-solr/2.0.0/siddhi-store-solr-2.0.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])store([_-])solr([_-])2.0.0.jar"
+      }
+    ]
+  },
+
+  "elasticsearch": {
+    "extension": {
+      "name": "elasticsearch",
+      "displayName": "Elasticsearch",
+      "version": "3.1.1"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-elasticsearch",
+        "version": "3.1.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/elasticsearch/siddhi-store-elasticsearch/3.1.1/siddhi-store-elasticsearch-3.1.1.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])store([_-])elasticsearch([_-])3.1.1.jar"
+      }
+    ]
+  },
+
+  "influxdb": {
+    "extension": {
+      "name": "influxdb",
+      "displayName": "InfluxDB",
+      "version": "2.0.0"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-influxdb",
+        "version": "2.0.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/store/influxdb/siddhi-store-influxdb/2.0.0/siddhi-store-influxdb-2.0.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])store([_-])influxdb([_-])2.0.0.jar"
       }
     ]
   }
