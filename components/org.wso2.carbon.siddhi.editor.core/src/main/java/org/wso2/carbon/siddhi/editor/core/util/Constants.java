@@ -59,12 +59,12 @@ public class Constants {
     public static final String TYPE_CSV = "csv";
     public static final String SAMPLE_EVENTS_PARENT_TAG = "events";
     public static final String SAMPLE_EVENT_PARENT_TAG = "event";
-    public static final String ATTR_TYPE_FLOAT = "float";
-    public static final String ATTR_TYPE_DOUBLE = "double";
-    public static final String ATTR_TYPE_INTEGER = "int";
-    public static final String ATTR_TYPE_LONG = "long";
-    public static final String ATTR_TYPE_STRING = "string";
-    public static final String ATTR_TYPE_BOOL = "bool";
+    public static final String ATTR_TYPE_FLOAT = "FLOAT";
+    public static final String ATTR_TYPE_DOUBLE = "DOUBLE";
+    public static final String ATTR_TYPE_INTEGER = "INT";
+    public static final String ATTR_TYPE_LONG = "LONG";
+    public static final String ATTR_TYPE_STRING = "STRING";
+    public static final String ATTR_TYPE_BOOL = "BOOL";
     public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
     public static final String FAULT_STREAM_PREFIX = "!";
     public static final String EXPORT_PROPERTIES_NAMESPACE = "exportConfigs";
@@ -95,7 +95,7 @@ public class Constants {
     public static final String ATTRIBUTES = "attributes";
     public static final String TABLES = "tables";
     public static final String NAME = "name";
-    public static final String DATA_TYPE = "TYPE_NAME";
+    public static final String DATA_TYPE = "type";
     public static final String TABLE_NAME = "tableName";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
     static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregatorExecutor";
@@ -111,6 +111,7 @@ public class Constants {
     public static final String OPERATOR_YAML_NAME = "siddhi-operator.yaml";
     public static final String OPERATOR_PREREQ_YAML_NAME = "k8-prerequisites.yaml";
     public static final String ERROR = "error";
+    public static final String WARNING = "warning";
     static final Map<String, Class<?>> SUPER_CLASS_MAP;
     static final Map<String, String> PACKAGE_NAME_MAP;
 

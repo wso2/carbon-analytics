@@ -180,10 +180,10 @@
                         <div class="output-console-content-wrapper">
                             <div class="consoleToolbar">
                                 <div class="consoleIcon">
-                                <a href="#" class="clear-console-btn" data-placement="right" data-toggle="tooltip"
-                                   title="Clear">
-                                    <i class="fw fw-clear"></i>
-                                </a>
+                                    <a href="#" class="clear-console-btn" data-placement="right" data-toggle="tooltip"
+                                       title="Clear">
+                                        <i class="fw fw-clear"></i>
+                                    </a>
                                 </div>
                                 <div class="consoleIcon">
                                     <a href="#" class="reload-console-btn console-sync-btn-disable" aria-disabled="true"
@@ -1048,7 +1048,8 @@
                 <div class="siddhi-app-list"></div>
             </div>
             <div class="modal-footer" style="clear:both;">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" name="confirm">Start Simulation</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" name="confirm">Start Simulation
+                </button>
                 <button type="button" class="btn btn-default" data-dismiss="modal" name="cancel">Cancel</button>
             </div>
         </div>
@@ -2283,7 +2284,7 @@
             <form role="form" class="single-event-form" data-form-type="single" data-toggle="loading"
                   data-loading-style="overlay" data-loading-text="Sending event">
                 <div class="form-group">
-                    <button type="button" class="btn btn-primary template-refresh-btn"  id="refreshAttributes">
+                    <button type="button" class="btn btn-primary template-refresh-btn" id="refreshAttributes">
                         <i class="fw fw-refresh fw-lg"></i>
                     </button>
 
@@ -2379,8 +2380,8 @@
                 <span class="extension-not-install"> {{notInstall}}</span>
                 &nbsp;&nbsp;
                 <a href="#" data-extension-name="{{extension.extensionInfo.name}}"
-                  title="Click here to install"
-                  class="extension-install-btn">
+                   title="Click here to install"
+                   class="extension-install-btn">
                     <i class="fw fw-download"></i>
                 </a>
             </span>
@@ -2390,7 +2391,7 @@
             <span id="partialBtnId">
              <span class="extension-not-install"> {{partialInstall}}</span>
             &nbsp;&nbsp;
-            <a href="#" data-extension-names ="{{extension.extensionInfo.name}}"
+            <a href="#" data-extension-names="{{extension.extensionInfo.name}}"
                title="Click here for installation instructions"
                class="partial-extension-install-btn">
                 <i class="fw fw-warning"></i>
@@ -2520,19 +2521,24 @@
                 <hr class='export-dialog-hr'>
             </div>
             <div class='modal-body'>
-                <div id='export-form' class="clearfix" >
+                <div id='export-form' class="clearfix">
                     <ul id="form-steps" class="docker_export_header">
-                        <li><a href="#step-1" class="link-disabled">Step 1<br/><small>Select Siddhi Apps</small></a></li>
-                        <li><a href="#step-2" class="link-disabled">Step 2<br/><small>Template Siddhi Apps</small></a></li>
-                        <li><a href="#step-3" class="link-disabled">Step 3<br/><small>Update Siddhi Runner<br/>Configurations</small></a></li>
-                        <li><a href="#step-4" class="link-disabled">Step 4<br/><small>Populate Template <br/>Arguments</small></a></li>
+                        <li><a href="#step-1" class="link-disabled">Step 1<br/><small>Select Siddhi Apps</small></a>
+                        </li>
+                        <li><a href="#step-2" class="link-disabled">Step 2<br/><small>Template Siddhi Apps</small></a>
+                        </li>
+                        <li><a href="#step-3" class="link-disabled">Step 3<br/><small>Update Siddhi Runner<br/>Configurations</small></a>
+                        </li>
+                        <li><a href="#step-4" class="link-disabled">Step 4<br/><small>Populate Template
+                            <br/>Arguments</small></a></li>
                     </ul>
                     <div id="form-containers">
                         <div id="step-1" class="export-selector">
                             <div class='export-siddhi-app-list' id='siddhi-app-list' style='display: block'>
                                 <div class="kube-config-row" id="sp-name-input-row">
                                     <div class="clearfix">Siddhi Process Name</div>
-                                    <input type="text" class="export-file-dialog-form-control siddhi-process-name-input" id="sp-name-input-field" placeholder="sample-siddhi-process">
+                                    <input type="text" class="export-file-dialog-form-control siddhi-process-name-input"
+                                           id="sp-name-input-field" placeholder="sample-siddhi-process">
                                 </div>
                                 <div id='select-siddhi-app' class='step-description openDockerWizardError-container'>
                                     Select Siddhi Apps to export
@@ -2553,18 +2559,21 @@
                         <div id="step-3">
                             <div class="step-description-text"></div>
                             <div class="dropdown" id="siddhi-config-main-dropdown-id" align="right">
-                                <button class="btn btn-default btn-circle" id="deployment-config-add-button" type="button" data-toggle="dropdown">
+                                <button class="btn btn-default btn-circle" id="deployment-config-add-button"
+                                        type="button" data-toggle="dropdown">
                                     <i class="fw fw-add"></i>
                                 </button>
-                                <ul class="dropdown-menu kube-persistence-right-dropdown" role="menu" id="siddhi-config-dropdown-id">
-                                    <li><a href="#" id="data-sources" class="dropdown-list-element">Data Sources</a></li>
+                                <ul class="dropdown-menu kube-persistence-right-dropdown" role="menu"
+                                    id="siddhi-config-dropdown-id">
+                                    <li><a href="#" id="data-sources" class="dropdown-list-element">Data Sources</a>
+                                    </li>
                                     <li><a href="#" id="metrics" class="dropdown-list-element">Metrics</a></li>
                                     <li><a href="#" id="extensions" class="dropdown-list-element">Extensions</a></li>
                                     <li><a href="#" id="references" class="dropdown-list-element">References</a></li>
                                     <li><a href="#" id="transports" class="dropdown-list-element">Transports</a></li>
                                 </ul>
                             </div>
-                            <br />
+                            <br/>
                             <div class='config-template-container' id='config-template-container-id'
                                  style='display: block'>
                             </div>
@@ -2594,20 +2603,27 @@
             <div id='docker-name-upper-error' class='alert alert-danger' hidden>
                 Docker image tag cannot contain uppercase letters.
             </div>
-            <input class="docker-checkbox" type="checkbox" name="download-docker-artifacts" id="download-docker-artifacts" value="download"><label class="label-description" id="download-docker-artifacts-label">Download artifacts</label><br>
+            <input class="docker-checkbox" type="checkbox" name="download-docker-artifacts"
+                   id="download-docker-artifacts" value="download"><label class="label-description"
+                                                                          id="download-docker-artifacts-label">Download
+            artifacts</label><br>
             <div class="docker-details-form" id="file-name-for-docker-parent" hidden>
                 <div class="docker-details-row">
                     <label class="clearfix">Export file name:</label>
-                    <input class="export-file-dialog-form-control" type="text" name="username" id="file-name-for-docker">
+                    <input class="export-file-dialog-form-control" type="text" name="username"
+                           id="file-name-for-docker">
                 </div>
             </div>
-            <input class="docker-checkbox" type="checkbox" name="push-docker-image" id="docker-push-checkbox" value="push"><label class="label-description">Push to docker registry</label><br>
+            <input class="docker-checkbox" type="checkbox" name="push-docker-image" id="docker-push-checkbox"
+                   value="push"><label class="label-description">Push to docker registry</label><br>
             <div class="docker-details-form" id="docker-details" hidden>
                 <div class="docker-details-row">
                     <label class="clearfix">* Docker image:</label>
-                    <input class="file-dialog-form-control-mini-input" type="text" id="docker-img-name-input-field-registry" placeholder="<DOCKER_REGISTRY_NAME>">
+                    <input class="file-dialog-form-control-mini-input" type="text"
+                           id="docker-img-name-input-field-registry" placeholder="<DOCKER_REGISTRY_NAME>">
                     &nbsp; / &nbsp;
-                    <input class="file-dialog-form-control-mini-input" type="text" id="docker-img-name-input-field-image" placeholder="<IMAGE_NAME>">
+                    <input class="file-dialog-form-control-mini-input" type="text"
+                           id="docker-img-name-input-field-image" placeholder="<IMAGE_NAME>">
                 </div>
                 <div class="docker-details-row">
                     <label class="clearfix">* Docker username:</label>
@@ -2638,16 +2654,19 @@
             <div id='k8s-path-missing-docker-build-type-upper-error' class='alert alert-danger' hidden>
                 Docker Image Tag cannot contain uppercase letters.
             </div>
-            <input class="docker-checkbox" type="radio" name="docker-image-type-name" id="docker-image-type-tobuild" value="tobuild" checked="checked">
+            <input class="docker-checkbox" type="radio" name="docker-image-type-name" id="docker-image-type-tobuild"
+                   value="tobuild" checked="checked">
             <label class="label-description">Build custom docker image with extensions and artifacts</label>
             <br>
-            <input class="docker-checkbox" type="radio" name="docker-image-type-name" id="docker-image-type-existing" value="existing" >
+            <input class="docker-checkbox" type="radio" name="docker-image-type-name" id="docker-image-type-existing"
+                   value="existing">
             <label class="label-description">Use an existing Docker image</label>
             <br>
             <div class="docker-details-form" id="k8s-path-docker-image-name-form" hidden>
                 <div class="docker-details-row">
                     <label class="clearfix">* Docker Image:</label>
-                    <input class="export-file-dialog-form-control" type="text" id="built-docker-image-name-input-field" placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">
+                    <input class="export-file-dialog-form-control" type="text" id="built-docker-image-name-input-field"
+                           placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">
                 </div>
             </div>
         </div>
@@ -2671,9 +2690,12 @@
                 <div class="kube-config-sub-row">
                     <div class="clearfix">Deployment Mode</div>
                     <div class="kube-input-group" id="distribution-selection">
-                        <input type="radio" name="distribution" id="non-distributed" value="non-distributed"> Non distributed deployment<br>
-                        <input type="radio" name="distribution" id="distributed-with-nats" value="distributed-with-nats"> Distributed deployment with NATS<br>
-                        <input type="radio" name="distribution" id="distributed-with-ext-nats" value="distributed-with-ext-nats"> Distributed deployment with External NATS<br>
+                        <input type="radio" name="distribution" id="non-distributed" value="non-distributed"> Non
+                        distributed deployment<br>
+                        <input type="radio" name="distribution" id="distributed-with-nats"
+                               value="distributed-with-nats"> Distributed deployment with NATS<br>
+                        <input type="radio" name="distribution" id="distributed-with-ext-nats"
+                               value="distributed-with-ext-nats"> Distributed deployment with External NATS<br>
                     </div>
                 </div>
                 <div class="kube-config-sub-row">
@@ -2688,9 +2710,9 @@
                     </div>
                 </div>
             </div>
-            </div>
         </div>
     </div>
+</div>
 </div>
 
 <!-- Docker export unique steps -->
@@ -2704,13 +2726,300 @@
         </div>
     </div>
 </div>
+
+<!--<script id="test-template" type="text/x-handlebar-template">-->
+<!--<h1>Hello world</h1>-->
+<!--</script>-->
+
+<!--  -->
+<div class='modal fade' id='generateStreamConfigModal' tabindex='-1' role='dialog' aria-tydden='true'>
+    <div class='modal-dialog file-dialog' role='document'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                    <i class='fw fw-cancel about-dialog-close'>
+                    </i>
+                </button>
+                <h4 class='modal-title file-dialog-title'>Generate Stream</h4>
+                <hr class='style1'>
+            </div>
+            <div class='modal-body'>
+                <div class='container-fluid'>
+
+                    <form class='form-horizontal' onsubmit='return false'>
+
+                        <div class='panel-group driving-license-settings' id='accordion'>
+                            <div class='panel panel-default'>
+                                <div>
+                                    <label class="radio-inline">
+                                        <input type='radio' id='idFromFile' name='selection' value='fromFile'
+                                               style='display: block'>
+                                        From File
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type='radio' id='idFromDatabase' name='selection' value='fromFile'
+                                               style='display: block'>
+                                        From Database
+                                    </label>
+                                </div>
+
+                                <div id='generateFromFileContent' class='panel-collapse collapse in'>
+                                    <div class='panel-body'>
+                                        <div class='driving-license-kind'>
+                                            <div class='checkbox checkPanel'>
+                                                <input type="file" id="fileSelector" name="fileSelector" multiple/>
+                                                <output id="file_list1"></output>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id='fromJsonFile' class='panel-collapse collapse in from-file-section' data-file-type="application/json">
+                                        <div class='panel-body'>
+                                            <form id="jsonForm">
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Stream Name <span class='required_astrix'> *</span>
+                                                    </label>
+                                                    <input type='text' class='form-control streamName'
+                                                           id='streamNameJson'
+                                                           value="tempStream"
+                                                           name='streamName'
+                                                           aria-required='true'>
+                                                </div>
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Enclosing Element<span class='required_astrix'> *</span>
+                                                    </label>
+                                                    <input type='text' class='form-control'
+                                                           id='jsonEnclosingElement'
+                                                           value='$'
+                                                           name='enclosing-element'
+                                                           aria-required='true'>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <div id='fromXmlFile' class='panel-collapse collapse in from-file-section' data-file-type='text/xml'>
+                                        <div class='panel-body'>
+                                            <form id="xmlForm">
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Stream Name <span class='required_astrix'> *</span>
+                                                    </label>
+                                                    <input type='text' class='form-control streamName'
+                                                           id='streamNameXml'
+                                                           value="tempStream"
+                                                           name='streamName'
+                                                           aria-required='true'>
+                                                </div>
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Name Space<span class='required_astrix'> *</span>
+                                                    </label>
+                                                    <input type='text' class='form-control'
+                                                           id='nameSpaceOfXml'
+                                                           name='nameSpaceOfXml'
+                                                           aria-required='true'></div>
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Enclosing Element<span class='required_astrix'> *</span>
+                                                    </label>
+                                                    <input type='text' class='form-control'
+                                                           id='enclosingElementXML'
+                                                           name='enclosingElementXML'
+                                                           aria-required='true'>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <div id='fromCsvFile' class='panel-collapse collapse in from-file-section' data-file-type='text/csv'>
+                                        <div class='panel-body'>
+                                            <form id="csvForm">
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Stream Name <span class='required_astrix'> *</span>
+                                                    </label>
+                                                    <input type='text' class='form-control streamName'
+                                                           id='streamNameCsv'
+                                                           value="tempStream"
+                                                           name='streamName'
+                                                           aria-required='true'>
+                                                </div>
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Delimiter <span class='required_astrix'> *</span>
+                                                    </label>
+                                                    <input type='text' class='form-control'
+                                                           id='delimiterOfCSV'
+                                                           value=","
+                                                           name='delimiterOfCSV'
+                                                           aria-required='true'>
+                                                </div>
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Is Header Exists<span class='required_astrix'>*</span>
+                                                    </label>
+                                                    <input type='text' class='form-control'
+                                                           id='isHeaderExists'
+                                                           value="true"
+                                                           name='isHeaderExists'
+                                                           aria-required='true'>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div id='generateFromDBContent' class='panel-collapse collapse in'>
+                                    <div class='panel-body'>
+                                        <div class='dbsourceConfigForm checkPanel' data-type='db'
+                                             style='display: block;'>
+                                            <label class='radio-inline'>
+                                                <input type='radio' id='idInline' name='dbConfig' value='fromInline'
+                                                       style='display: block'>
+                                                Inline Configuration
+                                            </label>
+                                            <label class='radio-inline'>
+                                                <input type='radio' id='idDatasource' name='dbConfig'
+                                                       value='fromDatasource' style='display: block'>
+                                                Provide Datasource
+                                            </label>
+
+                                        </div>
+                                    </div>
+
+                                    <div id='inlineContent' class='panel-collapse collapse in'>
+                                        <div class='panel-body'>
+                                            <form id="inlineForm">
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Stream Name <span class='required_astrix'> *</span>
+                                                    </label>
+                                                    <input type='text' class='form-control streamName'
+                                                           id='streamNameInlineDB'
+                                                           value="tempStream"
+                                                           name='streamName'
+                                                           aria-required='true'>
+                                                </div>
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Database URL<span class='required_astrix'> *</span>
+                                                    </label>
+                                                    <input type='text' class='form-control required-for-db-connection'
+                                                           id='dataSourceLocation_1'
+                                                           value='jdbc:mysql://[machine-name/ip]:[port]/[database-name]'
+                                                           name='data-source-location'
+                                                           aria-required='true'
+                                                           required>
+                                                </div>
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Username<span class='required_astrix'> *</span>
+                                                    </label>
+                                                    <input type='text' class='form-control required-for-db-connection'
+                                                           id="inlineUsername"
+                                                           name='username' value='root'
+                                                           aria-required='true' required></div>
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Password<span class='required_astrix'> *</span>
+                                                    </label>
+                                                    <input type='password'
+                                                           id="inlinePass"
+                                                           class='form-control required-for-db-connection'
+                                                           name='password' value='root'
+                                                           aria-required='true' required></div>
+                                                <div class='form-group'>
+                                                    <button id='loadInlineDbConnection' type='button'
+                                                            class='btn btn-secondary'
+                                                            name='loadDbConnection'>
+                                                        Retrieve Tables
+                                                    </button>
+                                                    <span class='helper connectionSuccessMsg'></span>
+                                                </div>
+                                            </form>
+                                            <div class='form-group'>
+                                                <label>
+                                                    Table name<span class='required_astrix'> *</span>
+                                                </label>
+                                                <select id="inlineTableSelector" name='table-name'
+                                                        class='tableSelector form-control' aria-required='true'>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id='datasourceContent' class='panel-collapse collapse in'>
+                                        <div class='panel-body'>
+                                            <form id="datasourceForm">
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Stream Name <span class='required_astrix'> *</span>
+                                                    </label>
+                                                    <input type='text' class='form-control streamName'
+                                                           id='streamNameDataSource'
+                                                           value="tempStream"
+                                                           name='streamName'
+                                                           aria-required='true' required>
+                                                </div>
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Datasource Name<span class='required_astrix'> *</span>
+                                                    </label>
+                                                    <input type='text' class='form-control required-for-db-connection'
+                                                           id='dataSourceNameId'
+                                                           name='dataSourceNameId'
+                                                           aria-required='true'></div>
+                                                <div class='form-group'>
+                                                    <button type='button' class='btn btn-secondary'
+                                                            id='loadDatasourceDbConnection'
+                                                            name='loadDbConnection'>
+                                                        Retrieve Tables
+                                                    </button>
+                                                    <span class='helper connectionSuccessMsg'></span>
+                                                </div>
+                                                <div class='form-group'>
+                                                    <label>
+                                                        Table name<span class='required_astrix'> *</span>
+                                                    </label>
+                                                    <select id="datasourceTableSelector" name='table-name'
+                                                            class='tableSelector form-control' aria-required='true'>
+                                                    </select>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="modal-error" class='panel-collapse collapse in'>
+                <div id='generateStreamConfigModalError-container' class='generateStreamConfigModalError-container'>
+                    <label id="generateStreamConfigModalError-label" class="alert alert-danger alert_gen"><strong>Error</strong> Something went wrong. </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class='button-container footer_btn' id='button-container'>
+                    <button id='generateButton' type='button' class='btn btn-primary' disabled>Generate
+                    </button>
+                    <button type='button' class='btn btn-default' data-dismiss='modal'>cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="editor/commons/lib/requirejs-2.3.6/require.min.js"></script>
 <script>
     //Load common code that includes config, then load the app
     //logic for this page. Do the requirejs calls here instead of
     //a separate file so after a build there are only 2 HTTP
     //requests instead of three.
-    requirejs.config({ waitSeconds: 0 });
+    requirejs.config({waitSeconds: 0});
     requirejs(['./editor/app'], function (common) {
         //js/common sets the baseUrl to be js/ so
         //can just ask for 'app/main1' here instead

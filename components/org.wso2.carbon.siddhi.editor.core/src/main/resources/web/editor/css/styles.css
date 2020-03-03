@@ -532,6 +532,10 @@ body.sticky-footer {
     margin-right: 20px;
 }
 
+.alert_gen {
+    width: 98%;
+}
+
 /* Query form styles */
 .query-form-actions > .btn {
     margin-right: 5px;
