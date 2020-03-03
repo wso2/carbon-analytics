@@ -279,7 +279,7 @@
     ]
   },
 
-  "cdcoracle": {
+  "cdc-mysql": {
     "extension": {
       "name": "cdc-mysql",
       "displayName": "Change Data Capture - MySQL",
