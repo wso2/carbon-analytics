@@ -1456,7 +1456,6 @@ public class EditorMicroservice implements Microservice {
                 }
             } else if (type.equalsIgnoreCase(Constants.TYPE_JSON)) {
                 JSONConfig jsonConfig = new Gson().fromJson(config, JSONConfig.class);
-//                bufferedReader = new BufferedReader(new FileReader(jsonConfig.getFilePath()));
                 JsonParser jsonParser = new JsonParser();
                 Object fileContent = jsonParser.parse(bufferedReader);
                 if (!MetaInfoRetrieverUtils.isJsonValid(fileContent.toString())) {
