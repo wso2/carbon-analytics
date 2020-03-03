@@ -107,16 +107,16 @@ define(['require', 'lodash', 'jquery', 'log'],
                 }
             });
 
-            // todo
             generateStreamModal.find('#loadInlineDbConnection').click(function (e) {
                 self.handleLoadDbConnection(e, generateStreamModal, self);
             });
-            // todo
+
             generateStreamModal.find('#loadDatasourceDbConnection').click(function (e) {
                 self.handleLoadDbConnection(e, generateStreamModal, self);
             });
 
             generateStreamModal.find("#generateButton").click(function () {
+                self.errorHide(generateStreamModal);
                 config = {};
                 var formData = new FormData();
                 if (generateStreamModal.find('#idFromFile').is(":checked")) {
@@ -125,7 +125,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                         constants.streamObj.name = generateStreamModal.find('#streamNameCsv')[0].value;
                         config = {
                             streamName: generateStreamModal.find('#streamNameCsv')[0].value,
-                            delemiter: generateStreamModal.find('#delimiterOfCSV')[0].value,
+                            delimiter: generateStreamModal.find('#delimiterOfCSV')[0].value,
                             isHeaderExist: generateStreamModal.find('#isHeaderExists')[0].value
                         };
                         requestBody.type = 'csv';
@@ -134,7 +134,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                         constants.streamObj.name = generateStreamModal.find('#streamNameJson')[0].value;
                         config = {
                             streamName: generateStreamModal.find('#streamNameJson')[0].value,
-                            enclosingElement:generateStreamModal.find('#jsonEnclosingElement')[0].value
+                            enclosingElement: generateStreamModal.find('#jsonEnclosingElement')[0].value
                         };
                         requestBody.type = 'json';
                         requestBody.config = config;
@@ -147,7 +147,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                             enclosingElement: generateStreamModal.find('#enclosingElementXML')[0].value
                         };
 
-                        requestBody.type = 'xml'
+                        requestBody.type = 'xml';
                         requestBody.config = config;
                     }
                     formData.append("config", JSON.stringify(requestBody));
@@ -180,7 +180,6 @@ define(['require', 'lodash', 'jquery', 'log'],
                 }
             });
 
-            // todo
             var generateStreamConfigModal = generateStreamModal.filter("#generateStreamConfigModal");
             var generateStreamConfigModalError = generateStreamModal.find("#generateStreamConfigModalError");
             generateStreamConfigModalError.hide();
@@ -188,12 +187,13 @@ define(['require', 'lodash', 'jquery', 'log'],
             generateStreamConfigModal.modal('hide');
         };
 
-        GenerateStreamDialog.prototype.handleFileSelect = function (evt, generateOptions) {
+        GenerateStreamDialog.prototype.handleFileSelect = function (evt, generateStreamModal) {
+            this.errorHide(generateStreamModal);
             files = evt.target.files; // FileList object
-            generateOptions.find('.from-file-section').collapse('hide');
+            generateStreamModal.find('.from-file-section').collapse('hide');
             var fileType = files[0].type;
 
-            var section = generateOptions.find('.from-file-section[data-file-type=' + fileType + ']');
+            var section = generateStreamModal.find('.from-file-section[data-file-type="' + fileType + '"]');
             if (section) {
                 section.collapse('show');
             } else {
@@ -210,21 +210,21 @@ define(['require', 'lodash', 'jquery', 'log'],
             document.getElementById('file_list1').innerHTML = '<ul>' + output.join('') + '</ul>';
         };
 
-        GenerateStreamDialog.prototype.handleLoadDbConnection = function (evt, generateOptions, self) {
+        GenerateStreamDialog.prototype.handleLoadDbConnection = function (evt, generateStreamModal, self) {
             requestBody = {};
-            if (generateOptions.find("#inlineContent").attr("aria-expanded") === "true") {
+            if (generateStreamModal.find("#inlineContent").attr("aria-expanded") === "true") {
                 requestBody = {
-                    url: generateOptions.find('#dataSourceLocation_1')[0].value,
-                    username: generateOptions.find('#inlineUsername')[0].value,
-                    password: generateOptions.find('#inlinePass')[0].value
+                    url: generateStreamModal.find('#dataSourceLocation_1')[0].value,
+                    username: generateStreamModal.find('#inlineUsername')[0].value,
+                    password: generateStreamModal.find('#inlinePass')[0].value
                 };
-            } else if (generateOptions.find("#datasourceContent").attr("aria-expanded") === "true") {
-                requestBody.dataSourceName = generateOptions.find('#dataSourceNameId')[0].value;
+            } else if (generateStreamModal.find("#datasourceContent").attr("aria-expanded") === "true") {
+                requestBody.dataSourceName = generateStreamModal.find('#dataSourceNameId')[0].value;
             }
             console.log(requestBody);
             self.connectToDatabase(requestBody, function (evt) {
                 self.retrieveTableNames(requestBody, function (evt) {
-                    self.populateInlineTableList(evt.tables, generateOptions);
+                    self.populateInlineTableList(evt.tables, generateStreamModal);
                 }, function (err) {
                     alertError(err.error);
                 });
@@ -236,10 +236,10 @@ define(['require', 'lodash', 'jquery', 'log'],
         GenerateStreamDialog.prototype.show = function () {
             this._generateStreamModal.modal('show');
         };
-        GenerateStreamDialog.prototype.populateInlineTableList = function (data, generateOptions) {
+        GenerateStreamDialog.prototype.populateInlineTableList = function (data, generateStreamModal) {
             if (data != null && data instanceof Array) {
                 data.forEach(function (value, index) {
-                    generateOptions.find('.tableSelector').append('<option value=' + index + '>'
+                    generateStreamModal.find('.tableSelector').append('<option value=' + index + '>'
                         + value + '</option>');
                 });
             }
@@ -313,7 +313,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                     type: constants.HTTP_POST,
                     contentType: false,
                     processData: false,
-                    data: JSON.stringify(connectionDetails),
+                    data: connectionDetails,
                     success: function (data) {
                         if (typeof successCallback === 'function')
                             successCallback(data)
@@ -326,10 +326,15 @@ define(['require', 'lodash', 'jquery', 'log'],
             }
         };
 
-        GenerateStreamDialog.prototype.errorDisplay = function (errorMessage, generateOptions) {
-            generateOptions.find("#modal-error").collapse("show");
-            var generateStreamConfigModalError = generateOptions.find("#generateStreamConfigModalError");
+        GenerateStreamDialog.prototype.errorDisplay = function (errorMessage, generateStreamModal) {
+            generateStreamModal.find("#modal-error").collapse("show");
+            var generateStreamConfigModalError = generateStreamModal.find("#generateStreamConfigModalError");
             generateStreamConfigModalError.show();
+        };
+
+        GenerateStreamDialog.prototype.errorHide = function (generateStreamModal) {
+            generateStreamModal.find("#modal-error").collapse("hide");
+            generateStreamModal.find("#generateStreamConfigModalError").hide();
         };
         return GenerateStreamDialog;
     });

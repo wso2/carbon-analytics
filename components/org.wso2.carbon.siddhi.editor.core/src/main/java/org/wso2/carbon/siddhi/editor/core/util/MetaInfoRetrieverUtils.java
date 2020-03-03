@@ -51,15 +51,15 @@ public class MetaInfoRetrieverUtils {
     public static JsonObject createResponseForCSV(String[] attributeNameArray, String[] values) {
         JsonObject response = new JsonObject();
         com.google.gson.JsonArray attributes = new com.google.gson.JsonArray();
-        int count = 1;
+        int count = 0;
         for (String value : values) {
             JsonObject attribute = new JsonObject();
             if (attributeNameArray != null) {
                 attribute.addProperty("name", attributeNameArray[count]);
             } else {
-                attribute.addProperty("name", "attr" + count);
+                attribute.addProperty("name", "attr" + (count + 1));
             }
-            attribute.addProperty("dataType", findDataTypeFromString(value));
+            attribute.addProperty("type", findDataTypeFromString(value));
             attributes.add(attribute);
             count ++;
         }

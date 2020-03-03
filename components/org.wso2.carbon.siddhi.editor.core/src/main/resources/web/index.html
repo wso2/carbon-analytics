@@ -2380,8 +2380,8 @@
                 <span class="extension-not-install"> {{notInstall}}</span>
                 &nbsp;&nbsp;
                 <a href="#" data-extension-name="{{extension.extensionInfo.name}}"
-                  title="Click here to install"
-                  class="extension-install-btn">
+                   title="Click here to install"
+                   class="extension-install-btn">
                     <i class="fw fw-download"></i>
                 </a>
             </span>
@@ -2391,7 +2391,7 @@
             <span id="partialBtnId">
              <span class="extension-not-install"> {{partialInstall}}</span>
             &nbsp;&nbsp;
-            <a href="#" data-extension-names ="{{extension.extensionInfo.name}}"
+            <a href="#" data-extension-names="{{extension.extensionInfo.name}}"
                title="Click here for installation instructions"
                class="partial-extension-install-btn">
                 <i class="fw fw-warning"></i>
@@ -2997,11 +2997,11 @@
                     </form>
                 </div>
             </div>
-        <div id="modal-error" class='panel-collapse collapse in'>
-            <div id='generateStreamConfigModalError-container' class='generateStreamConfigModalError-container'>
-                <label class="alert alert-danger alert_gen"><strong>Error</strong> Something went wrong. </label>
+            <div id="modal-error" class='panel-collapse collapse in'>
+                <div id='generateStreamConfigModalError-container' class='generateStreamConfigModalError-container'>
+                    <label class="alert alert-danger alert_gen"><strong>Error</strong> Something went wrong. </label>
+                </div>
             </div>
-        </div>
             <div class="modal-footer">
                 <div class='button-container footer_btn' id='button-container'>
                     <button id='generateButton' type='button' class='btn btn-primary'>Generate
@@ -3019,7 +3019,7 @@
     //logic for this page. Do the requirejs calls here instead of
     //a separate file so after a build there are only 2 HTTP
     //requests instead of three.
-    requirejs.config({ waitSeconds: 0 });
+    requirejs.config({waitSeconds: 0});
     requirejs(['./editor/app'], function (common) {
         //js/common sets the baseUrl to be js/ so
         //can just ask for 'app/main1' here instead
