@@ -439,6 +439,8 @@ public class ExportUtils {
                 writeFileToZip(Paths.get(kubernetesFilePath.toString(), Constants.OPERATOR_PREREQ_YAML_NAME),
                         zipOutputStream);
             } else {
+                ZipEntry readmeEntry = new ZipEntry(Paths.get(zipFileRoot, GENERIC_README_FILE_NAME).toString());
+                zipOutputStream.putNextEntry(readmeEntry);
                 // Add Docker README.md
                 StringBuilder portBindingStr = new StringBuilder();
                 for (int port : exposePorts) {
