@@ -195,13 +195,13 @@ public class MetaInfoRetrieverUtils {
         return response;
     }
 
-    public static Connection getDatabaseConnection(String url, String username, String password) throws SQLException {
+    public static Connection getDbConnection(String url, String username, String password) throws SQLException {
         return DriverManager.getConnection(url, username, password);
     }
 
     public static DatabaseMetaData getDatabaseMetadata(String url, String username, String password)
             throws SQLException {
-        Connection conn = getDatabaseConnection(url, username, password);
+        Connection conn = getDbConnection(url, username, password);
         return conn.getMetaData();
     }
 

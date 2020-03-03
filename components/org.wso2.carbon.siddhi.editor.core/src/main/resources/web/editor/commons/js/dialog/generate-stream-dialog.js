@@ -72,7 +72,7 @@ define(['require', 'lodash', 'jquery', 'log'],
 
                 generateOptions.find('#generateFromFileContent').collapse("show");
                 generateOptions.find('#fileSelector').change(function (e) {
-                        handleFileSelect1(e, generateOptions);
+                        self.handleFileSelect(e, generateOptions);
                     }
                 );
 
@@ -109,55 +109,68 @@ define(['require', 'lodash', 'jquery', 'log'],
             });
 
             generateOptions.find('button').filter('#loadInlineDbConnection').click(function (e) {
-                    handleLoadDbConnection(e, generateOptions);
+                    self.handleLoadDbConnection(e, generateOptions, self);
                 }
             );
             generateOptions.find('button').filter('#loadDatasourceDbConnection').click(function (e) {
-                handleLoadDbConnection(e, generateOptions);
+                self.handleLoadDbConnection(e, generateOptions, self);
             });
 
             generateOptions.find("button").filter("#generateButton").click(function () {
-                requestBody = {};
-                var fileReader = new FileReader();
                 config = {};
-                fileReader.readAsArrayBuffer(files[0]);
-                fileReader.onloadend = function (ev) {
-                    if (generateOptions.find('#idFromFile').is(":checked")) {
-                        if (generateOptions.find("#fromCsvFile").attr("aria-expanded") === "true") {
-                            requestBody["type"] = "csv";
-                            config["streamName"] = generateOptions.find('#streamNameCsv')[0].value;
-                            config["delimiter"] = generateOptions.find('#delimiterOfCSV')[0].value;
-                            config["isHeaderExists"] = generateOptions.find('#isHeaderExists')[0].value;
-                            config["fileBody"] = fileReader.result;
-                            requestBody["config"] = config;
-                        } else if (generateOptions.find("#fromJsonFile").attr("aria-expanded") === "true") {
-                            requestBody["type"] = "json";
-                            config["streamName"] = generateOptions.find('#streamNameJson')[0].value;
-                            config["enclosingElement"] = generateOptions.find('#jsonEnclosingElement')[0].value;
-                            requestBody["config"] = config;
-                        } else if (generateOptions.find("#fromXmlFile").attr("aria-expanded") === "true") {
-                            requestBody["type"] = "xml";
-                            config["streamName"] = generateOptions.find('#streamNameXml')[0].value;
-                            config["nameSpace"] = generateOptions.find('#nameSpaceOfXml')[0].value;
-                            config["enclosingElement"] = generateOptions.find('#enclosingElementXML')[0].value;
-                            requestBody["config"] = config;
-                        }
-                    } else if (generateOptions.find('#idFromDatabase').is(":checked")) {
-                        if (generateOptions.find('#idInline').is(":checked")) {
-
-                        } else if (generateOptions.find('#idDatasource').is(":checked")) {
-
-                        }
+                var formData = new FormData();
+                if (generateOptions.find('#idFromFile').is(":checked")) {
+                    requestBody = {};
+                    if (generateOptions.find("#fromCsvFile").attr("aria-expanded") === "true") {
+                        requestBody["type"] = "csv";
+                        constants.streamObj.name = generateOptions.find('#streamNameCsv')[0].value;
+                        config["streamName"] = generateOptions.find('#streamNameCsv')[0].value;
+                        config["delimiter"] = generateOptions.find('#delimiterOfCSV')[0].value;
+                        config["isHeaderExist"] = generateOptions.find('#isHeaderExists')[0].value;
+                        requestBody["config"] = config;
+                    } else if (generateOptions.find("#fromJsonFile").attr("aria-expanded") === "true") {
+                        requestBody["type"] = "json";
+                        constants.streamObj.name = generateOptions.find('#streamNameJson')[0].value;
+                        config["streamName"] = generateOptions.find('#streamNameJson')[0].value;
+                        config["enclosingElement"] = generateOptions.find('#jsonEnclosingElement')[0].value;
+                        requestBody["config"] = config;
+                        formData.append("config", JSON.stringify(requestBody));
+                    } else if (generateOptions.find("#fromXmlFile").attr("aria-expanded") === "true") {
+                        requestBody["type"] = "xml";
+                        constants.streamObj.name = generateOptions.find('#streamNameXml')[0].value;
+                        config["streamName"] = generateOptions.find('#streamNameXml')[0].value;
+                        config["nameSpace"] = generateOptions.find('#nameSpaceOfXml')[0].value;
+                        config["enclosingElement"] = generateOptions.find('#enclosingElementXML')[0].value;
+                        requestBody["config"] = config;
                     }
-                    self.retrieveTableNames(requestBody, function (e) {
-                        console.log(e)
-                    }, function (err) {
-                        console.log(err)
-                    });
-                };
+                    formData.append("config", JSON.stringify(requestBody));
+                    formData.append("file", files[0]);
+                    self.retrieveFileDataAttributes(formData, function (data) {
+                        constants.streamObj.attributes = JSON.parse(data.attributes);
+                        self.callback(constants.streamObj, self.ref);
+                        generateOptions.modal('hide');
+                    }, function (msg) {
+                        self.errorDisplay(msg, generateOptions)
 
-//                self.callback(constants.streamObj,self.ref);
-//                generateOptions.modal('hide');
+                    });
+                } else if (generateOptions.find('#idFromDatabase').is(":checked")) {
+                    if (generateOptions.find('#idInline').is(":checked")) {
+                        var inlineTableList = generateOptions.find('#inlineTableSelector');
+                        requestBody['tableName'] = inlineTableList[0].selectedOptions[0].label;
+                        constants.streamObj.name = generateOptions.find('#streamNameInlineDB')[0].value;
+                    } else if (generateOptions.find('#idDatasource').is(":checked")) {
+                        constants.streamObj.name = generateOptions.find('#streamNameInlineDB')[0].value;
+                        var datasourceTableSelector = generateOptions.find('#datasourceTableSelector');
+                        requestBody['tableName'] = datasourceTableSelector[0].selectedOptions[0].label;
+                    }
+                    self.retrieveTableColumnNames(requestBody, function (data) {
+                        constants.streamObj.attributes = data.attributes;
+                        self.callback(constants.streamObj, self.ref);
+                        generateOptions.modal('hide');
+                    }, function (err) {
+                        self.errorDisplay(err, generateOptions)
+                    });
+                }
             });
 
 
@@ -166,11 +179,9 @@ define(['require', 'lodash', 'jquery', 'log'],
             generateStreamConfigModalError.hide();
             this._generateStreamModal = generateOptions;
             generateStreamConfigModal.modal('hide');
-
-
         };
 
-        function handleFileSelect1(evt, generateOptions) {
+        GenerateStreamDialog.prototype.handleFileSelect = function (evt, generateOptions) {
             files = evt.target.files; // FileList object
             generateOptions.find("#fromJsonFile").collapse("hide");
             generateOptions.find("#fromXmlFile").collapse("hide");
@@ -183,9 +194,8 @@ define(['require', 'lodash', 'jquery', 'log'],
                 generateOptions.find("#fromXmlFile").collapse("show");
             } else if (fileType === "text/csv") {
                 generateOptions.find("#fromCsvFile").collapse("show");
-
             } else {
-                console.error("Huta pata support natho..")
+                self.alertError("Error Occurred while processing the file. File type does not supported")
             }
             var output = [];
             for (var i = 0, f; f = files[i]; i++) {
@@ -195,39 +205,52 @@ define(['require', 'lodash', 'jquery', 'log'],
                     '</li>');
             }
             document.getElementById('file_list1').innerHTML = '<ul>' + output.join('') + '</ul>';
-        }
+        };
 
-        function handleLoadDbConnection(evt, generateOptions) {
+        GenerateStreamDialog.prototype.handleLoadDbConnection = function (evt, generateOptions, self) {
             requestBody = {};
-            if (generateOptions.find("#inlineContent").attr("aria-expanded") == "true") {
+            if (generateOptions.find("#inlineContent").attr("aria-expanded") === "true") {
                 requestBody['url'] = generateOptions.find('#dataSourceLocation_1')[0].value;
                 requestBody['username'] = generateOptions.find('#inlineUsername')[0].value;
                 requestBody['password'] = generateOptions.find('#inlinePass')[0].value;
-            } else if (generateOptions.find("#datasourceContent").attr("aria-expanded") == "true") {
+            } else if (generateOptions.find("#datasourceContent").attr("aria-expanded") === "true") {
                 requestBody['dataSourceName'] = generateOptions.find('#dataSourceNameId')[0].value;
             }
             console.log(requestBody);
-            var response = connectToDatabase(requestBody, function (evt) {
-                console.log(evt);
+            self.connectToDatabase(requestBody, function (evt) {
+                self.retrieveTableNames(requestBody, function (evt) {
+                    self.populateInlineTableList(evt.tables, generateOptions);
+                }, function (err) {
+                    self.alertError(err.error);
+                });
             }, function (err) {
-                console.log(err);
+                self.alertError(err.error);
             });
-        }
+        };
 
         GenerateStreamDialog.prototype.show = function () {
             this._generateStreamModal.modal('show');
         };
+        GenerateStreamDialog.prototype.populateInlineTableList = function (data, generateOptions) {
+            if (data != null && data instanceof Array) {
+                  data.forEach( function (value, index) {
+                      generateOptions.find('.tableSelector').append('<option value=' + index + '>'
+                          + value + '</option>');
+                  });
+            }
+        };
 
-        GenerateStreamDialog.prototype.connectToDatabase = function (connectionDetails) {
-            if (connectionDetails !== null && connectionDetails.length > 0) {
+        GenerateStreamDialog.prototype.connectToDatabase = function (connectionDetails, successCallback, errorCallback) {
+            if (connectionDetails !== null) {
                 $.ajax({
                     async: false,
                     url: constants.editorUrl + "/connectToDatabase",
                     type: constants.HTTP_POST,
                     contentType: "application/json; charset=utf-8",
-                    data: connectionDetails,
+                    data: JSON.stringify(connectionDetails),
                     success: function (data) {
-                        return data
+                        if (typeof errorCallback === 'function')
+                            successCallback(data)
                     },
                     error: function (msg) {
                         if (typeof errorCallback === 'function')
@@ -244,14 +267,12 @@ define(['require', 'lodash', 'jquery', 'log'],
                     url: constants.editorUrl + "/retrieveTableNames",
                     type: constants.HTTP_POST,
                     contentType: "application/json; charset=utf-8",
-                    data: connectionDetails,
+                    data: JSON.stringify(connectionDetails),
                     success: function (data) {
-                        alert('Success')
                         if (typeof successCallback === 'function')
                             successCallback(data)
                     },
                     error: function (msg) {
-                        alert('error')
                         if (typeof errorCallback === 'function')
                             errorCallback(msg)
                     }
@@ -259,5 +280,51 @@ define(['require', 'lodash', 'jquery', 'log'],
             }
         };
 
+        GenerateStreamDialog.prototype.retrieveTableColumnNames = function (connectionDetails, successCallback, errorCallback) {
+            if (connectionDetails !== null) {
+                $.ajax({
+                    async: false,
+                    url: constants.editorUrl + "/retrieveTableColumnNames",
+                    type: constants.HTTP_POST,
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(connectionDetails),
+                    success: function (data) {
+                        if (typeof successCallback === 'function')
+                            successCallback(data)
+                    },
+                    error: function (msg) {
+                        if (typeof errorCallback === 'function')
+                            errorCallback(msg)
+                    }
+                })
+            }
+        };
+
+        GenerateStreamDialog.prototype.retrieveFileDataAttributes = function (connectionDetails, successCallback, errorCallback) {
+            if (connectionDetails !== null) {
+                $.ajax({
+                    async: false,
+                    url: constants.editorUrl + "/retrieveFileDataAttributes",
+                    type: constants.HTTP_POST,
+                    contentType: false,
+                    processData: false,
+                    data: JSON.stringify(connectionDetails),
+                    success: function (data) {
+                        if (typeof successCallback === 'function')
+                            successCallback(data)
+                    },
+                    error: function (msg) {
+                        if (typeof errorCallback === 'function')
+                            errorCallback(msg)
+                    }
+                })
+            }
+        };
+
+        GenerateStreamDialog.prototype.errorDisplay = function (errorMessage, generateOptions) {
+            generateOptions.find("#modal-error").collapse("show");
+            var generateStreamConfigModalError = generateOptions.find("#generateStreamConfigModalError");
+            generateStreamConfigModalError.show();
+        };
         return GenerateStreamDialog;
     });

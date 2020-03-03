@@ -424,6 +424,9 @@ hr.file-dialog-hr {
 .openFileWizardError-container {
     margin-right: -15px;
 }
+.generateStreamConfigModalError-container{
+    margin-right: -15px;
+}
 
 .file-dialog-form-scrollable-block-list {
     padding: 20px 20px 20px 20px;

@@ -106,15 +106,16 @@ import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.streaming.integrator.common.utils.config.FileConfigManager;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
+import org.wso2.msf4j.formparam.FormDataParam;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -155,6 +156,7 @@ import javax.xml.stream.XMLStreamException;
 
 import static org.wso2.carbon.siddhi.editor.core.util.MetaInfoRetrieverUtils.getDataSourceConfiguration;
 import static org.wso2.carbon.siddhi.editor.core.util.MetaInfoRetrieverUtils.getDatabaseMetadata;
+import static org.wso2.carbon.siddhi.editor.core.util.MetaInfoRetrieverUtils.getDbConnection;
 
 /**
  * Editor micro service implementation class.
@@ -356,7 +358,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/listDirectoriesInPath")
     @Produces(MediaType.APPLICATION_JSON)
     public Response filterDirectories(@QueryParam("path") String path,
-                                                            @QueryParam("directoryList") String directoryList) {
+                                      @QueryParam("directoryList") String directoryList) {
         try {
             List<String> directories = Arrays.stream(
                     new String(Base64.getDecoder().decode(directoryList), Charset.defaultCharset())
@@ -371,7 +373,7 @@ public class EditorMicroservice implements Microservice {
                     Paths.get(new String(Base64.getDecoder().decode(path), Charset.defaultCharset())));
 
             JsonArray filteredDirectoryFiles = FileJsonObjectReaderUtil.listDirectoryInPath(
-                                                                                pathLocation.toString(), directories);
+                    pathLocation.toString(), directories);
 
             JsonObject rootElement = FileJsonObjectReaderUtil.getJsonRootObject(filteredDirectoryFiles);
 
@@ -1405,11 +1407,14 @@ public class EditorMicroservice implements Microservice {
 
     @POST
     @Path("/retrieveFileDataAttributes")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response retrieveFileReadAttributes(JsonElement element) {
+    public Response retrieveFileReadAttributes(@Context Request request,
+                                               @FormDataParam("config") String fileConfig,
+                                               @FormDataParam("file") InputStream fileInputStream) {
         JsonObject errorResponse = new JsonObject();
-        JsonObject reqObj = element.getAsJsonObject();
+        JsonParser parser = new JsonParser();
+        JsonObject reqObj = (JsonObject) parser.parse(fileConfig);
         String type = reqObj.get("type").toString().replaceAll("\"", "");
         String config = reqObj.get("config").toString();
         BufferedReader bufferedReader = null;
@@ -1417,9 +1422,10 @@ public class EditorMicroservice implements Microservice {
         String[] attributeValueList;
 
         try {
+            bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
             if (type.equalsIgnoreCase(Constants.TYPE_CSV)) {
                 CSVConfig csvConfig = new Gson().fromJson(config, CSVConfig.class);
-                bufferedReader = new BufferedReader(new FileReader(csvConfig.getFilePath()));
+//                bufferedReader = new BufferedReader(new FileReader(csvConfig.getFilePath()));
 
                 if (csvConfig.isHeaderExist()) {
                     String metaInfoLine = bufferedReader.readLine();
@@ -1430,7 +1436,7 @@ public class EditorMicroservice implements Microservice {
                         attributeValueList)).build();
             } else if (type.equalsIgnoreCase(Constants.TYPE_JSON)) {
                 JSONConfig jsonConfig = new Gson().fromJson(config, JSONConfig.class);
-                bufferedReader = new BufferedReader(new FileReader(jsonConfig.getFilePath()));
+//                bufferedReader = new BufferedReader(new FileReader(jsonConfig.getFilePath()));
                 JsonParser jsonParser = new JsonParser();
                 Object fileContent = jsonParser.parse(bufferedReader);
                 if (!MetaInfoRetrieverUtils.isJsonValid(fileContent.toString())) {
@@ -1466,7 +1472,7 @@ public class EditorMicroservice implements Microservice {
                 }
             } else if (type.equalsIgnoreCase(Constants.TYPE_XML)) {
                 XMLConfig xmlConfig = new Gson().fromJson(config, XMLConfig.class);
-                bufferedReader = new BufferedReader(new FileReader(xmlConfig.getFilePath()));
+//                bufferedReader = new BufferedReader(new FileReader(xmlConfig.getFilePath()));
                 Map<String, String> namespaceMap = null;
                 AXIOMXPath enclosingElementSelectorPath = null;
                 if (xmlConfig.getNamespaces() != null) {
@@ -1482,7 +1488,7 @@ public class EditorMicroservice implements Microservice {
                                     enclosingElementSelectorPath.addNamespace(entry.getKey(), entry.getValue());
                                 } catch (JaxenException e) {
                                     String message = "Error occurred when adding namespace: " + entry.getKey() + ":" +
-                                            entry.getValue()  + " to XPath element: " + xmlConfig.getEnclosingElement();
+                                            entry.getValue() + " to XPath element: " + xmlConfig.getEnclosingElement();
                                     log.error(message, e);
                                     errorResponse.addProperty(Constants.ERROR, message);
                                     return Response
@@ -1508,7 +1514,7 @@ public class EditorMicroservice implements Microservice {
                 }
                 String line = bufferedReader.readLine();
                 StringBuilder xmlFile = new StringBuilder();
-                while ( line != null) {
+                while (line != null) {
                     xmlFile.append(line).append("\n");
                     line = bufferedReader.readLine();
                 }
@@ -1572,16 +1578,6 @@ public class EditorMicroservice implements Microservice {
                         .type(MediaType.APPLICATION_JSON)
                         .build();
             }
-        } catch (FileNotFoundException e){
-            String message = "Cannot find the provided file location." + e.getMessage();
-            errorResponse.addProperty(Constants.ERROR,
-                    message);
-            log.error(message, e);
-            return Response
-                    .serverError()
-                    .entity(errorResponse)
-                    .type(MediaType.APPLICATION_JSON)
-                    .build();
         } catch (IOException e) {
             String message = "Cannot retrieve file attributes." + e.getMessage();
             errorResponse.addProperty(Constants.ERROR,
@@ -1702,9 +1698,10 @@ public class EditorMicroservice implements Microservice {
         if (response.getStatus() == 200) {
             JsonObject jsonResponse = new JsonObject();
             try {
-                DatabaseMetaData dbMetadata = getDatabaseMetadata(dataStoreMap.get(Constants.DB_URL),
+                Connection conn = getDbConnection(dataStoreMap.get(Constants.DB_URL),
                         dataStoreMap.get(Constants.DB_USERNAME), dataStoreMap.get(Constants.DB_PASSWORD));
-                ResultSet rs = dbMetadata.getTables(null, null, "%", null);
+                DatabaseMetaData dbMetadata = conn.getMetaData();
+                ResultSet rs = dbMetadata.getTables(conn.getCatalog(), null, "%", null);
                 JsonArray tableNames = new JsonArray();
                 while (rs.next()) {
                     tableNames.add(new JsonPrimitive(rs.getString(3)));
@@ -1747,9 +1744,10 @@ public class EditorMicroservice implements Microservice {
                         .build();
             }
             try {
-                DatabaseMetaData meta = getDatabaseMetadata(dataStoreMap.get(Constants.DB_URL),
+                Connection conn = getDbConnection(dataStoreMap.get(Constants.DB_URL),
                         dataStoreMap.get(Constants.DB_USERNAME), dataStoreMap.get(Constants.DB_PASSWORD));
-                ResultSet rsColumns = meta.getColumns(null, null, dataStoreMap.get(Constants.TABLE_NAME),
+                DatabaseMetaData meta = conn.getMetaData();
+                ResultSet rsColumns = meta.getColumns(conn.getCatalog(), null, dataStoreMap.get(Constants.TABLE_NAME),
                         null);
                 JsonArray tableNamesArray = new JsonArray();
                 while (rsColumns.next()) {
