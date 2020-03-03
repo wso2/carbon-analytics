@@ -187,7 +187,7 @@ public class ExportUtils {
         }
         Path dockerFilePath = Paths.get(Constants.RUNTIME_PATH, RESOURCES_DIR, DOCKER_FILE_NAME);
         Path dockerReadmeFilePath = Paths.get(Constants.RUNTIME_PATH, RESOURCES_DIR, DOCKER_README_FILE_NAME);
-        Path kubernetesReadmeFilePath = Paths.get(Constants.RUNTIME_PATH, RESOURCES_DIR, KUBERNETES_README_FILE_NAME);
+        Path kubernetesFilePath = Paths.get(Constants.RUNTIME_PATH, RESOURCES_DIR);
         File zipFile = new File(zipFileName);
         ZipOutputStream zipOutputStream = null;
         ZipEntry dockerFileEntry = new ZipEntry(Paths.get(zipFileRoot, DOCKER_FILE_NAME).toString());
@@ -432,29 +432,11 @@ public class ExportUtils {
             }
 
             // Write the kubernetes file to the zip file and add README.md
-            ZipEntry readmeEntry = new ZipEntry(Paths.get(zipFileRoot, GENERIC_README_FILE_NAME).toString());
-            zipOutputStream.putNextEntry(readmeEntry);
             if (EXPORT_TYPE_KUBERNETES.equals(exportType)) {
-                // Add K8s README.md
-                if (!Files.isReadable(kubernetesReadmeFilePath)) {
-                    throw new KubernetesGenerationException(
-                            "Readme file " + kubernetesReadmeFilePath.toString() + " is not readable."
-                    );
-                }
-                byte[] readmeContent = Files.readAllBytes(kubernetesReadmeFilePath);
-                zipOutputStream.write(readmeContent, 0, readmeContent.length);
-                zipOutputStream.closeEntry();
-
-                // Add K8s YAML
-                ZipEntry kubernetesFileEntry = new ZipEntry(
-                        Paths.get(zipFileRoot, KUBERNETES_FILE_NAME).toString()
-                );
-                zipOutputStream.putNextEntry(kubernetesFileEntry);
-                byte[] kubernetesFileData = this.getKubernetesFile(
-                        Paths.get(Constants.RUNTIME_PATH, RESOURCES_DIR, KUBERNETES_FILE_NAME)
-                );
-                zipOutputStream.write(kubernetesFileData, 0, kubernetesFileData.length);
-                zipOutputStream.closeEntry();
+                writeFileToZip(Paths.get(kubernetesFilePath.toString(), KUBERNETES_README_FILE_NAME), zipOutputStream);
+                writeFileToZip(Paths.get(kubernetesFilePath.toString(), Constants.OPERATOR_YAML_NAME), zipOutputStream);
+                writeFileToZip(Paths.get(kubernetesFilePath.toString(), Constants.OPERATOR_PREREQ_YAML_NAME),
+                        zipOutputStream);
             } else {
                 // Add Docker README.md
                 StringBuilder portBindingStr = new StringBuilder();
@@ -506,6 +488,33 @@ public class ExportUtils {
             }
         }
         return zipFile;
+    }
+
+    private void writeFileToZip(Path filePath, ZipOutputStream zipOutputStream) throws
+            IOException, KubernetesGenerationException {
+        ZipEntry readmeEntry = new ZipEntry(Paths.get(zipFileRoot, filePath.getFileName().toString()).toString());
+
+        zipOutputStream.putNextEntry(readmeEntry);
+        // Add K8s README.md
+        if (!Files.isReadable(filePath)) {
+            throw new KubernetesGenerationException(
+                    "Readme file " + filePath.toString() + " is not readable."
+            );
+        }
+        byte[] readmeContent = Files.readAllBytes(filePath);
+        zipOutputStream.write(readmeContent, 0, readmeContent.length);
+        zipOutputStream.closeEntry();
+
+        // Add K8s YAML
+        ZipEntry kubernetesFileEntry = new ZipEntry(
+                Paths.get(zipFileRoot, KUBERNETES_FILE_NAME).toString()
+        );
+        zipOutputStream.putNextEntry(kubernetesFileEntry);
+        byte[] kubernetesFileData = this.getKubernetesFile(
+                Paths.get(Constants.RUNTIME_PATH, RESOURCES_DIR, KUBERNETES_FILE_NAME)
+        );
+        zipOutputStream.write(kubernetesFileData, 0, kubernetesFileData.length);
+        zipOutputStream.closeEntry();
     }
 
     /**

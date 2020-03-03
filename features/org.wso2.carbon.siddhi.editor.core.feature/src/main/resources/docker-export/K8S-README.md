@@ -38,8 +38,8 @@ Purpose of each file in the above archive is as follows.
 ### Install Siddhi Operator
 
 ```sh
-kubectl apply -f https://github.com/siddhi-io/siddhi-operator/releases/download/<SIDDHI-OPERATOR-VERSION>/prerequisites.yaml
-kubectl apply -f https://github.com/siddhi-io/siddhi-operator/releases/download/<SIDDHI-OPERATOR-VERSION>/siddhi-operator.yaml
+kubectl apply -f ./k8-prerequisites.yaml
+kubectl apply -f ./siddhi-operator.yaml
 ```
 
 Note: Replace <SIDDHI-OPERATOR-VERSION> with the version of the Siddhi operator that you want to use. Refer [Siddhi Operator releases](https://github.com/siddhi-io/siddhi-operator/releases) for more details about Siddhi operator releases.
