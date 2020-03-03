@@ -28,6 +28,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             $('#streamName').val(responseJsonObj.name);
             self.formUtils.renderAttributeTemplate(responseJsonObj.attributes,
                 self.propertyDiv.find("#define-attribute"));
+            streamObj.clearAttributeList();
             _.forEach(responseJsonObj.attributes, function (attribute) {
                 var attributeObject = new Attribute({name: attribute.name, type: attribute.type});
                 streamObj.addAttribute(attributeObject);

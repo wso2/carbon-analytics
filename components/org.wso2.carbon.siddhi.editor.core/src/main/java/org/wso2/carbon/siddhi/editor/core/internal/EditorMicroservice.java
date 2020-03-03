@@ -156,7 +156,6 @@ import javax.ws.rs.core.Response;
 import javax.xml.stream.XMLStreamException;
 
 import static org.wso2.carbon.siddhi.editor.core.util.MetaInfoRetrieverUtils.getDataSourceConfiguration;
-import static org.wso2.carbon.siddhi.editor.core.util.MetaInfoRetrieverUtils.getDatabaseMetadata;
 import static org.wso2.carbon.siddhi.editor.core.util.MetaInfoRetrieverUtils.getDbConnection;
 
 /**
@@ -1423,18 +1422,38 @@ public class EditorMicroservice implements Microservice {
         String[] attributeValueList;
 
         try {
-            bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
+            bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream, StandardCharsets.UTF_8));
             if (type.equalsIgnoreCase(Constants.TYPE_CSV)) {
                 CSVConfig csvConfig = new Gson().fromJson(config, CSVConfig.class);
-//                bufferedReader = new BufferedReader(new FileReader(csvConfig.getFilePath()));
-
+                String firstLine;
                 if (csvConfig.isHeaderExist()) {
-                    String metaInfoLine = bufferedReader.readLine();
-                    attributeNameList = metaInfoLine.split(csvConfig.getDelimiter());
+                    if (null != (firstLine = bufferedReader.readLine())) {
+                        attributeNameList = firstLine.split(csvConfig.getDelimiter());
+                    } else {
+                        String message = "Error while reading the csv file, CSV file is empty ";
+                        log.error(message);
+                        errorResponse.addProperty(Constants.ERROR, message);
+                        return Response
+                                .serverError()
+                                .entity(errorResponse)
+                                .type(MediaType.APPLICATION_JSON)
+                                .build();
+                    }
                 }
-                attributeValueList = bufferedReader.readLine().split(csvConfig.getDelimiter());
-                return Response.ok().entity(MetaInfoRetrieverUtils.createResponseForCSV(attributeNameList,
-                        attributeValueList)).build();
+                if (null != (firstLine = bufferedReader.readLine())) {
+                    attributeValueList = firstLine.split(csvConfig.getDelimiter());
+                    return Response.ok().entity(MetaInfoRetrieverUtils.createResponseForCSV(attributeNameList,
+                            attributeValueList)).build();
+                } else {
+                    String message = "Error while reading the csv file, CSV file is empty ";
+                    log.error(message);
+                    errorResponse.addProperty(Constants.ERROR, message);
+                    return Response
+                            .serverError()
+                            .entity(errorResponse)
+                            .type(MediaType.APPLICATION_JSON)
+                            .build();
+                }
             } else if (type.equalsIgnoreCase(Constants.TYPE_JSON)) {
                 JSONConfig jsonConfig = new Gson().fromJson(config, JSONConfig.class);
 //                bufferedReader = new BufferedReader(new FileReader(jsonConfig.getFilePath()));
@@ -1596,6 +1615,16 @@ public class EditorMicroservice implements Microservice {
             }
         } catch (IOException e) {
             String message = "Cannot retrieve file attributes." + e.getMessage();
+            errorResponse.addProperty(Constants.ERROR,
+                    message);
+            log.error(message, e);
+            return Response
+                    .serverError()
+                    .entity(errorResponse)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (Exception e) {
+            String message = "Error occurred while processing the file " + e.getMessage();
             errorResponse.addProperty(Constants.ERROR,
                     message);
             log.error(message, e);

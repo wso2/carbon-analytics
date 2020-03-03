@@ -95,7 +95,7 @@ public class Constants {
     public static final String ATTRIBUTES = "attributes";
     public static final String TABLES = "tables";
     public static final String NAME = "name";
-    public static final String DATA_TYPE = "TYPE_NAME";
+    public static final String DATA_TYPE = "type";
     public static final String TABLE_NAME = "tableName";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
     static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregatorExecutor";

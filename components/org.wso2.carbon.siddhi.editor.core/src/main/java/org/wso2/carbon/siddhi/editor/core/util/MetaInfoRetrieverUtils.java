@@ -83,7 +83,7 @@ public class MetaInfoRetrieverUtils {
             } else {
                 attribute.addProperty("name", (String) entry.getKey());
 
-                attribute.addProperty("dataType", findDataTypeFromString(entry.getValue().toString()));
+                attribute.addProperty("type", findDataTypeFromString(entry.getValue().toString()));
                 attributes.add(attribute);
             }
 
@@ -186,7 +186,7 @@ public class MetaInfoRetrieverUtils {
                 response.addProperty(Constants.WARNING, message);
             } else {
                 attribute.addProperty("name", attrOMElement.getLocalName());
-                attribute.addProperty("dataType", findDataTypeFromString(attrOMElement.getText()));
+                attribute.addProperty("type", findDataTypeFromString(attrOMElement.getText()));
                 attributes.add(attribute);
             }
 
@@ -197,12 +197,6 @@ public class MetaInfoRetrieverUtils {
 
     public static Connection getDbConnection(String url, String username, String password) throws SQLException {
         return DriverManager.getConnection(url, username, password);
-    }
-
-    public static DatabaseMetaData getDatabaseMetadata(String url, String username, String password)
-            throws SQLException {
-        Connection conn = getDbConnection(url, username, password);
-        return conn.getMetaData();
     }
 
     public static String[] getDataSourceConfiguration(String name) {

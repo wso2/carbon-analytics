@@ -102,7 +102,6 @@ define(['require', 'lodash', 'jquery', 'log'],
             });
 
             generateStreamModal.find("#generateButton").click(function () {
-                self.errorHide(generateStreamModal);
                 config = {};
                 var formData = new FormData();
                 if (generateStreamModal.find('#idFromFile').is(":checked")) {
@@ -143,7 +142,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                         self.callback(constants.streamJsonObj, self.ref, self.streamObj);
                         generateStreamModal.modal('hide');
                     }, function (msg) {
-                        self.errorDisplay(msg, generateStreamModal)
+                        self.alertError(JSON.parse(err.responseText).error)
 
                     });
                 } else if (generateStreamModal.find('#idFromDatabase').is(":checked")) {
@@ -161,7 +160,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                         self.callback(constants.streamJsonObj, self.ref, self.streamObj);
                         generateStreamModal.modal('hide');
                     }, function (err) {
-                        self.errorDisplay(err, generateStreamModal)
+                        self.alertError(JSON.parse(err.responseText).error);
                     });
                 }
             });
@@ -174,7 +173,6 @@ define(['require', 'lodash', 'jquery', 'log'],
         };
 
         GenerateStreamDialog.prototype.handleFileSelect = function (evt, generateStreamModal) {
-            this.errorHide(generateStreamModal);
             files = evt.target.files; // FileList object
             generateStreamModal.find('.from-file-section').collapse('hide');
             var fileType = files[0].type;
@@ -311,17 +309,6 @@ define(['require', 'lodash', 'jquery', 'log'],
                     }
                 })
             }
-        };
-
-        GenerateStreamDialog.prototype.errorDisplay = function (errorMessage, generateStreamModal) {
-            generateStreamModal.find("#modal-error").collapse("show");
-            var generateStreamConfigModalError = generateStreamModal.find("#generateStreamConfigModalError");
-            generateStreamConfigModalError.show();
-        };
-
-        GenerateStreamDialog.prototype.errorHide = function (generateStreamModal) {
-            generateStreamModal.find("#modal-error").collapse("hide");
-            generateStreamModal.find("#generateStreamConfigModalError").hide();
         };
         return GenerateStreamDialog;
     });
