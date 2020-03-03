@@ -434,6 +434,7 @@ public class ExportUtils {
             // Write the kubernetes file to the zip file and add README.md
             if (EXPORT_TYPE_KUBERNETES.equals(exportType)) {
                 writeFileToZip(Paths.get(kubernetesFilePath.toString(), KUBERNETES_README_FILE_NAME), zipOutputStream);
+                writeFileToZip(Paths.get(kubernetesFilePath.toString(), KUBERNETES_FILE_NAME), zipOutputStream);
                 writeFileToZip(Paths.get(kubernetesFilePath.toString(), Constants.OPERATOR_YAML_NAME), zipOutputStream);
                 writeFileToZip(Paths.get(kubernetesFilePath.toString(), Constants.OPERATOR_PREREQ_YAML_NAME),
                         zipOutputStream);
@@ -492,9 +493,9 @@ public class ExportUtils {
 
     private void writeFileToZip(Path filePath, ZipOutputStream zipOutputStream) throws
             IOException, KubernetesGenerationException {
-        ZipEntry readmeEntry = new ZipEntry(Paths.get(zipFileRoot, filePath.getFileName().toString()).toString());
+        ZipEntry fileEntry = new ZipEntry(Paths.get(zipFileRoot, filePath.getFileName().toString()).toString());
 
-        zipOutputStream.putNextEntry(readmeEntry);
+        zipOutputStream.putNextEntry(fileEntry);
         // Add K8s README.md
         if (!Files.isReadable(filePath)) {
             throw new KubernetesGenerationException(
@@ -503,17 +504,6 @@ public class ExportUtils {
         }
         byte[] readmeContent = Files.readAllBytes(filePath);
         zipOutputStream.write(readmeContent, 0, readmeContent.length);
-        zipOutputStream.closeEntry();
-
-        // Add K8s YAML
-        ZipEntry kubernetesFileEntry = new ZipEntry(
-                Paths.get(zipFileRoot, KUBERNETES_FILE_NAME).toString()
-        );
-        zipOutputStream.putNextEntry(kubernetesFileEntry);
-        byte[] kubernetesFileData = this.getKubernetesFile(
-                Paths.get(Constants.RUNTIME_PATH, RESOURCES_DIR, KUBERNETES_FILE_NAME)
-        );
-        zipOutputStream.write(kubernetesFileData, 0, kubernetesFileData.length);
         zipOutputStream.closeEntry();
     }
 
