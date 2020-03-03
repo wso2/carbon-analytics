@@ -20,4 +20,9 @@
         <Class name="org.wso2.carbon.siddhi.editor.core.internal.EditorMicroservice"/>
         <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
     </Match>
+    <Match>
+        <Class name="org.wso2.carbon.siddhi.editor.core.internal.ExportUtils" />
+        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE" />
+    </Match>
+
 </FindBugsFilter>

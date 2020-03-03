@@ -72,6 +72,10 @@
         <Package name="org.wso2.carbon.streaming.integrator.core.ha" />
         <Bug pattern="SIC_INNER_SHOULD_BE_STATIC" />
     </Match>
+    <Match>
+        <Class name="org.wso2.carbon.siddhi.editor.core.internal.ExportUtils" />
+        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE" />
+    </Match>
     <!--<Match>-->
         <!--<Package name="~org\.wso2\.siddhi\.query\.api.*"/>-->
         <!--<Bug pattern="EI_EXPOSE_REP, EI_EXPOSE_REP2"/>-->
