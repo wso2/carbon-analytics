@@ -242,7 +242,7 @@
   "ibmmq": {
     "extension": {
       "name": "ibmmq",
-      "displayName": "IBMMQ",
+      "displayName": "IBM MQ",
       "version": "3.0.0"
     },
     "dependencies": [
@@ -279,10 +279,10 @@
     ]
   },
 
-  "cdc": {
+  "cdc-mysql": {
     "extension": {
-      "name": "cdc",
-      "displayName": "CDC",
+      "name": "cdc-mysql",
+      "displayName": "Change Data Capture - MySQL",
       "version": "2.0.3"
     },
     "dependencies": [
@@ -422,7 +422,7 @@
   "nats": {
     "extension": {
       "name": "nats",
-      "displayName": "Nats",
+      "displayName": "NATS",
       "version": "2.0.6"
     },
     "dependencies": [
@@ -572,7 +572,7 @@
   "rdbms": {
     "extension": {
       "name": "rdbms",
-      "displayName": "RDBMS",
+      "displayName": "RDBMS - MySQL",
       "version": "6.0.4"
     },
     "dependencies": [
@@ -747,7 +747,7 @@
   "http": {
     "extension": {
       "name": "http",
-      "displayName": "HTTP",
+      "displayName": "HTTP Transport",
       "version": "2.2.0"
     },
     "dependencies": [
@@ -797,7 +797,7 @@
   "tcp": {
     "extension": {
       "name": "tcp",
-      "displayName": "TCP",
+      "displayName": "TCP Transport",
       "version": "3.0.4"
     },
     "dependencies": [
@@ -922,7 +922,7 @@
   "sqs": {
     "extension": {
       "name": "sqs",
-      "displayName": "SQS",
+      "displayName": "Amazon SQS",
       "version": "3.0.0"
     },
     "dependencies": [
@@ -947,7 +947,7 @@
   "websocket": {
     "extension": {
       "name": "websocket",
-      "displayName": "WebSocket",
+      "displayName": "WebSockets",
       "version": "3.0.0"
     },
     "dependencies": [
@@ -972,7 +972,7 @@
   "googlepubsub": {
     "extension": {
       "name": "googlepubsub",
-      "displayName": "GooglePubsub",
+      "displayName": "GooglePubsub Service",
       "version": "2.0.2"
     },
     "dependencies": [
@@ -1047,7 +1047,7 @@
   "gcs": {
     "extension": {
       "name": "gcs",
-      "displayName": "GCS",
+      "displayName": "Google Cloud Storage",
       "version": "1.0.0"
     },
     "dependencies": [
@@ -1072,7 +1072,7 @@
   "s3": {
     "extension": {
       "name": "s3",
-      "displayName": "S3",
+      "displayName": "Amazon S3",
       "version": "1.0.0"
     },
     "dependencies": [
@@ -1122,7 +1122,7 @@
   "elasticsearch": {
     "extension": {
       "name": "elasticsearch",
-      "displayName": "Elasticsearch",
+      "displayName": "ElasticSearch",
       "version": "3.1.1"
     },
     "dependencies": [
@@ -1147,7 +1147,7 @@
   "influxdb": {
     "extension": {
       "name": "influxdb",
-      "displayName": "InfluxDB",
+      "displayName": "Influx DB",
       "version": "2.0.0"
     },
     "dependencies": [
