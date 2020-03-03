@@ -2,6 +2,7 @@
   "kafka": {
     "extension": {
       "name": "kafka",
+      "displayName": "Kafka",
       "version": "5.0.4"
     },
     "dependencies": [
@@ -125,6 +126,7 @@
   "jms": {
     "extension": {
       "name": "jms",
+      "displayName": "JMS",
       "version": "2.0.2"
     },
     "dependencies": [
@@ -210,6 +212,7 @@
   "ibmmq": {
     "extension": {
       "name": "ibmmq",
+      "displayName": "IBMMQ",
       "version": "2.0.0"
     },
     "dependencies": [
@@ -249,6 +252,7 @@
   "cdc": {
     "extension": {
       "name": "cdc",
+      "displayName": "CDC",
       "version": "2.0.3"
     },
     "dependencies": [
@@ -357,6 +361,7 @@
   "nats": {
     "extension": {
       "name": "nats",
+      "displayName": "Nats",
       "version": "2.0.6"
     },
     "dependencies": [
@@ -411,6 +416,7 @@
   "grpc": {
     "extension": {
       "name": "grpc",
+      "displayName": "gRPC",
       "version": "1.0.3"
     },
     "dependencies": [
@@ -435,6 +441,7 @@
   "mongodb": {
     "extension": {
       "name": "mongodb",
+      "displayName": "MongoDB",
       "version": "2.0.2"
     },
     "dependencies": [
@@ -459,6 +466,7 @@
   "rdbms": {
     "extension": {
       "name": "rdbms",
+      "displayName": "RDBMS",
       "version": "6.0.4"
     },
     "dependencies": [
@@ -483,6 +491,7 @@
   "hbase": {
     "extension": {
       "name": "hbase",
+      "displayName": "HBase",
       "version": "5.0.0"
     },
     "dependencies": [
@@ -522,6 +531,7 @@
   "cassandra": {
     "extension": {
       "name": "cassandra",
+      "displayName": "Cassandra",
       "version": "2.0.0"
     },
     "dependencies": [
@@ -546,6 +556,7 @@
   "redis": {
     "extension": {
       "name": "redis",
+      "displayName": "Redis",
       "version": "3.1.1"
     },
     "dependencies": [
