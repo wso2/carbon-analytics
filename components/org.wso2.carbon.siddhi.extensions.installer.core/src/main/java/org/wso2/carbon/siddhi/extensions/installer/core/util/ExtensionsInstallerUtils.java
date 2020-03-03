@@ -138,8 +138,6 @@ public class ExtensionsInstallerUtils {
 
     /**
      * Returns the directory path, where the jar for the given usage is initially put during an installation.
-     * Only for bundles, this location will be same as the location retrieved through
-     * {@link #getBundleLocation(UsageConfig)}.
      *
      * @param usage Configuration of a dependency's usage.
      * @return Directory path for installation.
@@ -153,7 +151,7 @@ public class ExtensionsInstallerUtils {
                 if (usageType == UsageType.JAR) {
                     return ExtensionsInstallerConstants.RUNTIME_JARS_LOCATION;
                 } else if (usageType == UsageType.BUNDLE) {
-                    return ExtensionsInstallerConstants.RUNTIME_LIB_LOCATION;
+                    return ExtensionsInstallerConstants.RUNTIME_BUNDLES_LOCATION;
                 }
                 throw new ExtensionsInstallerException(
                     String.format("Invalid value: %s for usage type.", usageType));

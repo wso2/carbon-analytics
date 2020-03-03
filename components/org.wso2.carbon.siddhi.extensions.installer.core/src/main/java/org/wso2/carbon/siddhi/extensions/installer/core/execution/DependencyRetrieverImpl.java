@@ -85,8 +85,14 @@ public class DependencyRetrieverImpl implements DependencyRetriever {
         String lookupRegex = dependency.getLookupRegex();
         if (lookupRegex != null) {
             for (UsageConfig usage : dependency.getUsages()) {
-                String usageDirectoryPath = ExtensionsInstallerUtils.getBundleLocation(usage);
-                if (!doesUsageFileExist(lookupRegex, usageDirectoryPath)) {
+                // Whether jar(s) for the usage exist in the directory where they are finally put to after conversion.
+                boolean existsInFinalDirectory =
+                    doesUsageFileExist(lookupRegex, ExtensionsInstallerUtils.getBundleLocation(usage));
+                // Whether jar(s) for the usage exist in the initial download directory (before conversion).
+                boolean existsInInitialDirectory =
+                    doesUsageFileExist(lookupRegex, ExtensionsInstallerUtils.getInstallationLocation(usage));
+
+                if (!existsInFinalDirectory || !existsInInitialDirectory) {
                     return false;
                 }
             }
