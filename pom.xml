@@ -1789,7 +1789,7 @@
         <siddhi.io.tcp.version>3.0.4</siddhi.io.tcp.version>
         <siddhi.io.email.version>2.0.3</siddhi.io.email.version>
         <siddhi.io.kafka.version>5.0.4</siddhi.io.kafka.version>
-        <siddhi.io.http.version>2.1.0</siddhi.io.http.version>
+        <siddhi.io.http.version>2.2.0</siddhi.io.http.version>
 
         <siddhi.map.json.version>5.0.4</siddhi.map.json.version>
         <siddhi.map.binary.version>2.0.4</siddhi.map.binary.version>
