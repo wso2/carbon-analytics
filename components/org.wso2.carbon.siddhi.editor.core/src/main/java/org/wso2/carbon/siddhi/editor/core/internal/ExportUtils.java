@@ -19,6 +19,9 @@
 package org.wso2.carbon.siddhi.editor.core.internal;
 
 import io.siddhi.core.stream.input.source.Source;
+import java.nio.file.InvalidPathException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
@@ -79,15 +82,15 @@ public class ExportUtils {
     private static final String DOCKER_IMAGE_NAME_TEMPLATE = "\\{\\{DOCKER_IMAGE_NAME}}";
     private static final String PORT_BIND_TEMPLATE = "\\{\\{BIND_PORTS}}";
     private static final String CONFIG_BLOCK_VALUE =
-            "COPY --chown=siddhi_user:siddhi_io \\$\\{CONFIG_FILE}/ \\$\\{USER_HOME}";
+            "COPY \\$\\{CONFIG_FILE}/ \\$\\{USER_HOME}";
     private static final String CONFIG_PARAMETER_VALUE =
             ", \"-Dconfig=/home/siddhi_user/configurations.yaml\"";
     private static final String JARS_BLOCK_VALUE =
-            "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_JARS_DIR}/ \\$\\{JARS}";
+            "COPY \\$\\{HOST_JARS_DIR}/ \\$\\{JARS}";
     private static final String BUNDLES_BLOCK_VALUE =
-            "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_BUNDLES_DIR}/ \\$\\{BUNDLES}";
+            "COPY \\$\\{HOST_BUNDLES_DIR}/ \\$\\{BUNDLES}";
     private static final String APPS_BLOCK_VALUE =
-            "COPY --chown=siddhi_user:siddhi_io \\$\\{HOST_APPS_DIR}/ \\$\\{APPS}";
+            "COPY \\$\\{HOST_APPS_DIR}/ \\$\\{APPS}";
     private static final String SIDDHI_PROCESS_SPEC_TEMPLATE = "\\{\\{SIDDHI_PROCESS_SPEC}}";
     private static final String SIDDHI_PROCESS_NAME_TEMPLATE = "\\{\\{SIDDHI_PROCESS_NAME}}";
     private static final String SIDDHI_PROCESS_DEFAULT_NAME = "sample-siddhi-process";
@@ -168,7 +171,7 @@ public class ExportUtils {
         }
         if (EXPORT_TYPE_KUBERNETES.equals(exportType)) {
             zipFileName = "siddhi-kubernetes.zip";
-            zipFileRoot = "siddhi-kubernetes" +  File.separator;
+            zipFileRoot = "siddhi-kubernetes" + File.separator;
             if (exportAppsRequest.getKubernetesConfiguration() != null) {
                 KubernetesConfig kubernetesConfig = getKubernetesConfigs(
                         exportAppsRequest.getKubernetesConfiguration()
@@ -210,8 +213,11 @@ public class ExportUtils {
 
             // Write JARs to the zip file
             if (exportAppsRequest.getJars() != null && exportAppsRequest.getJars().size() > 0) {
+                // TODO: 3/2/20 Once the new Streaming integrator is released with carbon kernel bump revert these
+                //  changes
+
                 jarsAdded = true;
-                String jarRootDir = Paths.get(Constants.CARBON_HOME, JARS_DIR).toString();
+                String jarRootDir = Paths.get(Constants.CARBON_HOME, "lib/").toString();
                 String jarEntryRootDir = Paths.get(zipFileRoot, JARS_DIR).toString();
                 Path tempDockerJarDirPath = Paths.get(tempDockerDirectoryPath.toString(), JARS_DIR);
                 if (buildDocker && !Files.exists(tempDockerJarDirPath)) {
@@ -224,18 +230,38 @@ public class ExportUtils {
                 }
 
                 for (String jar : exportAppsRequest.getJars()) {
-                    Path jarPath = Paths.get(jarRootDir, jar);
-                    ZipEntry jarEntry = new ZipEntry(Paths.get(jarEntryRootDir, jar).toString());
-                    if (Files.isReadable(jarPath)) {
-                        zipOutputStream.putNextEntry(jarEntry);
-                        byte[] jarData = Files.readAllBytes(jarPath);
-                        zipOutputStream.write(jarData, 0, jarData.length);
-                        zipOutputStream.closeEntry();
-                        if (buildDocker) {
-                            Files.write(Paths.get(tempDockerJarDirPath.toString(), jar), jarData);
-                        }
+
+                    Pattern originalJarPattern = Pattern.compile("(.*).jar$");
+                    Matcher matcher = originalJarPattern.matcher(jar);
+
+                    String convertedJarName = "";
+                    if (matcher.find()) {
+                        convertedJarName = matcher.group(1).replace("-", "_").concat("_1.0.0.jar");
                     } else {
-                        log.error("JAR file" + jarPath.toString() + " is not readable.");
+                        log.error("JAR file is not valid.");
+                    }
+
+
+                    try {
+                        Path jarPath = Paths.get(jarRootDir, convertedJarName);
+                        ZipEntry jarEntry = new ZipEntry(Paths.get(jarEntryRootDir, jar).toString());
+                        if (Files.isReadable(jarPath)) {
+                            zipOutputStream.putNextEntry(jarEntry);
+                            byte[] jarData = Files.readAllBytes(jarPath);
+                            zipOutputStream.write(jarData, 0, jarData.length);
+                            zipOutputStream.closeEntry();
+                            if (buildDocker) {
+                                Files.write(Paths.get(tempDockerJarDirPath.toString(), jar), jarData);
+                            }
+                        } else {
+                            log.error("JAR file" + jarPath.toString() + " is not readable.");
+                            throw new DockerGenerationException("Jar file provided has not been converted to an OSGi " +
+                                    "bundle. Please do a restart of the server to proceed");
+                        }
+                    } catch (InvalidPathException e) {
+                        throw new DockerGenerationException("Jar file provided has not been converted to an OSGi " +
+                                "bundle. Please do a restart of the server to proceed", e);
+
                     }
                 }
             }
@@ -432,7 +458,7 @@ public class ExportUtils {
             } else {
                 // Add Docker README.md
                 StringBuilder portBindingStr = new StringBuilder();
-                for (int port: exposePorts) {
+                for (int port : exposePorts) {
                     portBindingStr.append("-p ");
                     portBindingStr.append(port);
                     portBindingStr.append(":");
@@ -455,7 +481,7 @@ public class ExportUtils {
                     );
                 } else {
                     content = content.replaceAll(
-                            DOCKER_IMAGE_NAME_TEMPLATE, Constants.DEFAULT_SIDDHI_DOCKER_IMAGE_NAME);
+                            DOCKER_IMAGE_NAME_TEMPLATE, Constants.DEFAULT_SI_DOCKER_IMAGE_NAME);
                 }
 
                 byte[] readmeContent = content.getBytes(StandardCharsets.UTF_8);
@@ -487,7 +513,7 @@ public class ExportUtils {
      *
      * @return Path
      */
-    public Path getTempDockerPath()  {
+    public Path getTempDockerPath() {
         if (tempDockerDirectoryPath != null) {
             return tempDockerDirectoryPath;
         } else {
@@ -525,8 +551,9 @@ public class ExportUtils {
         }
         data = Files.readAllBytes(dockerFilePath);
         String content = new String(data, StandardCharsets.UTF_8);
-        String dockerBaseImgName = Constants.DEFAULT_SIDDHI_DOCKER_BASE_IMAGE_NAME;
-        String version = EditorDataHolder.getBundleContext().getBundle().getVersion().toString();
+        String dockerBaseImgName = Constants.DEFAULT_SI_DOCKER_BASE_IMAGE_NAME;
+        String version = Constants.DEFAULT_SI_DOCKER_IMAGE_VERSION;
+        // EditorDataHolder.getBundleContext().getBundle().getVersion().toString();
         if (version != null && !version.isEmpty()) {
             dockerBaseImgName = dockerBaseImgName.concat(":").concat(version.toLowerCase());
         }

@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -36,6 +37,10 @@ public class DependencyConfig {
             return download.isAutoDownloadable();
         }
         return false;
+    }
+
+    public boolean isSameFileAs(DependencyConfig dependency) {
+        return Objects.equals(lookupRegex, dependency.lookupRegex);
     }
 
     public DownloadConfig getDownload() {

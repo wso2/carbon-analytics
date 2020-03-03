@@ -61,7 +61,7 @@ public class TestUtil {
         try {
             URL url = baseURI.resolve(path).toURL();
             boundary = "---------------------------" + currentTimeMillis();
-            logger.error(url.toString());
+            logger.info(url.toString());
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Accept-Charset", CHARSET);
             connection.setRequestMethod(methodType);

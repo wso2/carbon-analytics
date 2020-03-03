@@ -36,6 +36,8 @@ public class ResponseEntityCreator {
 
     public static final String ACTION_TYPE_KEY = "actionType";
     public static final String ACTION_STATUS_KEY = "status";
+    private static final String DOES_SHARE_DEPENDENCIES_KEY = "doesShareDependencies";
+    private static final String SHARES_WITH_KEY = "sharesWith";
     private static final String ACTION_COMPLETED_DEPENDENCIES_KEY = "completed";
     private static final String ACTION_FAILED_DEPENDENCIES_KEY = "failed";
     private static final String MANUALLY_INSTALLABLE_DEPENDENCIES_KEY = "manuallyInstall";
@@ -74,6 +76,21 @@ public class ResponseEntityCreator {
             extension.getManuallyInstallableDependencies(),
             extension.getAutoDownloadableDependencies(),
             details);
+        return details;
+    }
+
+    /**
+     * Creates response with information about dependency sharing extensions, through:
+     * {@link DependencyRetriever#getDependencySharingExtensionsFor(String)}.
+     *
+     * @param dependencySharingExtensions Extensions that share same dependencies.
+     * @return Information for the response.
+     */
+    public static Map<String, Object> createDependencySharingExtensionsResponse(
+        Map<String, List<DependencyConfig>> dependencySharingExtensions) {
+        Map<String, Object> details = new HashMap<>();
+        details.put(DOES_SHARE_DEPENDENCIES_KEY, !dependencySharingExtensions.isEmpty());
+        details.put(SHARES_WITH_KEY, dependencySharingExtensions);
         return details;
     }
 

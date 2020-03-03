@@ -17,15 +17,16 @@
 # ------------------------------------------------------------------------
 
 # use streaming-integrator-base-image
-FROM {{INTEGRATOR_BASE_IMAGE_NAME}}
+FROM {{SIDDHI_RUNNER_BASE_IMAGE}}
 MAINTAINER WSO2 Docker Maintainers "dev@wso2.org"
 
+ARG STREAMING_INTEGRATOR_HOME=/home/wso2carbon/wso2si
 ARG HOST_BUNDLES_DIR=./bundles
 ARG HOST_JARS_DIR=./jars
 ARG HOST_APPS_DIR=./siddhi-files
-ARG JARS=${RUNTIME_SERVER_HOME}/jars
-ARG BUNDLES=${RUNTIME_SERVER_HOME}/bundles
-ARG APPS=${RUNTIME_SERVER_HOME}/deployment/siddhi-files
+ARG JARS=${STREAMING_INTEGRATOR_HOME}/lib
+ARG BUNDLES=${STREAMING_INTEGRATOR_HOME}/lib
+ARG APPS=${STREAMING_INTEGRATOR_HOME}/wso2/server/deployment/siddhi-files
 ARG CONFIG_FILE=./configurations.yaml
 ARG CONFIG_FILE_PATH=${HOME}/configurations.yaml
 
