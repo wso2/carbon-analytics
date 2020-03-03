@@ -1507,7 +1507,6 @@ public class EditorMicroservice implements Microservice {
                 }
             } else if (type.equalsIgnoreCase(Constants.TYPE_XML)) {
                 XMLConfig xmlConfig = new Gson().fromJson(config, XMLConfig.class);
-//                bufferedReader = new BufferedReader(new FileReader(xmlConfig.getFilePath()));
                 Map<String, String> namespaceMap = null;
                 AXIOMXPath enclosingElementSelectorPath = null;
                 if (xmlConfig.getNamespaces() != null) {
