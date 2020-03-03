@@ -33,6 +33,7 @@ public class ExtensionsInstallerConstants {
         Utils.getRuntimePath().normalize().toString() + "/resources/extensionsInstaller/extensionDependencies.json";
     private static final String CARBON_HOME = Utils.getCarbonHome().normalize().toString();
     public static final String RUNTIME_JARS_LOCATION = CARBON_HOME + "/jars";
+    public static final String RUNTIME_BUNDLES_LOCATION = CARBON_HOME + "/bundles";
     public static final String RUNTIME_LIB_LOCATION = CARBON_HOME + "/lib";
     public static final String SAMPLES_LIB_LOCATION = CARBON_HOME + "/samples/sample-clients/lib";
 

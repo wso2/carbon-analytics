@@ -213,17 +213,14 @@ public class DependencyInstallerImpl implements DependencyInstaller {
         if (lookupRegex != null) {
             boolean hasFailures = false;
             for (UsageConfig usage : dependency.getUsages()) {
-                // Delete jar(s) for the usage from the final directory.
+                // Delete jar(s) for the usage, from the directory where they are finally put to after conversion.
                 boolean deletedInFinalDirectory =
                     deleteMatchingJars(lookupRegex, ExtensionsInstallerUtils.getBundleLocation(usage));
-                hasFailures = !deletedInFinalDirectory;
+                // Delete jar(s) for the usage, from the initial download directory (before conversion).
+                boolean deletedInInitialDirectory =
+                    deleteMatchingJars(lookupRegex, ExtensionsInstallerUtils.getInstallationLocation(usage));
 
-                // Only for non-bundle usages, delete jar(s) from the initial directory as well.
-                if (usage.getType() == UsageType.JAR) {
-                    boolean deletedInInitialDirectory =
-                        deleteMatchingJars(lookupRegex, ExtensionsInstallerUtils.getInstallationLocation(usage));
-                    hasFailures = hasFailures || !deletedInInitialDirectory;
-                }
+                hasFailures = !deletedInFinalDirectory || !deletedInInitialDirectory;
             }
             return !hasFailures;
         } else {
