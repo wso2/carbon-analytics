@@ -28,30 +28,15 @@ define(['require', 'lodash', 'jquery', 'log'],
             HTTP_PUT: 'PUT',
             HTTP_DELETE: 'DELETE',
             editorUrl: window.location.protocol + '//' + window.location.host + '/editor',
-            streamObj: {
-                "name": "testStream",
-                "attributes": [
-                    {
-                        "name": "price",
-                        "dataType": "int"
-                    },
-                    {
-                        "name": "name",
-                        "dataType": "string"
-                    },
-                    {
-                        "name": "volume",
-                        "dataType": "double"
-                    }
-                ]
-            }
+            streamJsonObj: {}
         };
 
-        var GenerateStreamDialog = function (options, ref, callback) {
+        var GenerateStreamDialog = function (options, ref, callback, streamObj) {
             this.app = options;
             this.pathSeparator = this.app.getPathSeperator();
             this.ref = ref;
             this.callback = callback;
+            this.streamObj = streamObj;
         };
 
         GenerateStreamDialog.prototype.constructor = GenerateStreamDialog;
@@ -63,9 +48,10 @@ define(['require', 'lodash', 'jquery', 'log'],
             }
 
             // rename the variable
-            var generateStreamModal = $('#generateStreamConfigModal');
+            var generateStreamModal = $('#generateStreamConfigModal').clone();
 
             generateStreamModal.find(".collapse").collapse();
+            generateStreamModal.find(".streamName").attr('value', self.streamObj.name)
 
             generateStreamModal.find('#idFromFile').on('click', function (e) {
                 e.stopPropagation();
@@ -122,7 +108,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                 if (generateStreamModal.find('#idFromFile').is(":checked")) {
                     requestBody = {};
                     if (generateStreamModal.find("#fromCsvFile").attr("aria-expanded") === "true") {
-                        constants.streamObj.name = generateStreamModal.find('#streamNameCsv')[0].value;
+                        constants.streamJsonObj.name = generateStreamModal.find('#streamNameCsv')[0].value;
                         config = {
                             streamName: generateStreamModal.find('#streamNameCsv')[0].value,
                             delimiter: generateStreamModal.find('#delimiterOfCSV')[0].value,
@@ -131,7 +117,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                         requestBody.type = 'csv';
                         requestBody["config"] = config;
                     } else if (generateStreamModal.find("#fromJsonFile").attr("aria-expanded") === "true") {
-                        constants.streamObj.name = generateStreamModal.find('#streamNameJson')[0].value;
+                        constants.streamJsonObj.name = generateStreamModal.find('#streamNameJson')[0].value;
                         config = {
                             streamName: generateStreamModal.find('#streamNameJson')[0].value,
                             enclosingElement: generateStreamModal.find('#jsonEnclosingElement')[0].value
@@ -140,7 +126,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                         requestBody.config = config;
                     } else if (generateStreamModal.find("#fromXmlFile").attr("aria-expanded") === "true") {
                         requestBody["type"] = "xml";
-                        constants.streamObj.name = generateStreamModal.find('#streamNameXml')[0].value;
+                        constants.streamJsonObj.name = generateStreamModal.find('#streamNameXml')[0].value;
                         config = {
                             streamName: generateStreamModal.find('#streamNameXml')[0].value,
                             nameSpace: generateStreamModal.find('#nameSpaceOfXml')[0].value,
@@ -153,8 +139,8 @@ define(['require', 'lodash', 'jquery', 'log'],
                     formData.append("config", JSON.stringify(requestBody));
                     formData.append("file", files[0]);
                     self.retrieveFileDataAttributes(formData, function (data) {
-                        constants.streamObj.attributes = JSON.parse(data.attributes);
-                        self.callback(constants.streamObj, self.ref);
+                        constants.streamJsonObj.attributes = JSON.parse(data.attributes);
+                        self.callback(constants.streamJsonObj, self.ref, self.streamObj);
                         generateStreamModal.modal('hide');
                     }, function (msg) {
                         self.errorDisplay(msg, generateStreamModal)
@@ -164,15 +150,15 @@ define(['require', 'lodash', 'jquery', 'log'],
                     if (generateStreamModal.find('#idInline').is(":checked")) {
                         var inlineTableList = generateStreamModal.find('#inlineTableSelector');
                         requestBody.tableName = inlineTableList[0].selectedOptions[0].label;
-                        constants.streamObj.name = generateStreamModal.find('#streamNameInlineDB')[0].value;
+                        constants.streamJsonObj.name = generateStreamModal.find('#streamNameInlineDB')[0].value;
                     } else if (generateStreamModal.find('#idDatasource').is(":checked")) {
-                        constants.streamObj.name = generateStreamModal.find('#streamNameInlineDB')[0].value;
+                        constants.streamJsonObj.name = generateStreamModal.find('#streamNameInlineDB')[0].value;
                         var datasourceTableSelector = generateStreamModal.find('#datasourceTableSelector');
                         requestBody.tableName = datasourceTableSelector[0].selectedOptions[0].label;
                     }
                     self.retrieveTableColumnNames(requestBody, function (data) {
-                        constants.streamObj.attributes = data.attributes;
-                        self.callback(constants.streamObj, self.ref);
+                        constants.streamJsonObj.attributes = data.attributes;
+                        self.callback(constants.streamJsonObj, self.ref, self.streamObj);
                         generateStreamModal.modal('hide');
                     }, function (err) {
                         self.errorDisplay(err, generateStreamModal)
@@ -194,8 +180,9 @@ define(['require', 'lodash', 'jquery', 'log'],
             var fileType = files[0].type;
 
             var section = generateStreamModal.find('.from-file-section[data-file-type="' + fileType + '"]');
-            if (section) {
+            if (section.length > 0) {
                 section.collapse('show');
+                generateStreamModal.find('#generateButton').removeAttr('disabled');
             } else {
                 self.alertError("Error Occurred while processing the file. File type does not supported")
             }
@@ -221,15 +208,15 @@ define(['require', 'lodash', 'jquery', 'log'],
             } else if (generateStreamModal.find("#datasourceContent").attr("aria-expanded") === "true") {
                 requestBody.dataSourceName = generateStreamModal.find('#dataSourceNameId')[0].value;
             }
-            console.log(requestBody);
             self.connectToDatabase(requestBody, function (evt) {
                 self.retrieveTableNames(requestBody, function (evt) {
                     self.populateInlineTableList(evt.tables, generateStreamModal);
+                    generateStreamModal.find('#generateButton').removeAttr('disabled');
                 }, function (err) {
-                    alertError(err.error);
+                    alertError(JSON.parse(err.responseText).error);
                 });
             }, function (err) {
-                alertError(err.error);
+                alertError(JSON.parse(err.responseText).error);
             });
         };
 

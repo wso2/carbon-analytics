@@ -528,9 +528,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._handleDeploy.show();
             };
 
-            this.handleGenerateStreamDialog = function handleGenerateStreamDialog(ref, callback) {
+            this.handleGenerateStreamDialog = function handleGenerateStreamDialog(ref, callback, streamObj) {
                 if (_.isNil(this._handleGenerateStreamDialog)) {
-                    this._handleGenerateStreamDialog = new Dialogs.generate_stream_dialog(app,ref, callback);
+                    this._handleGenerateStreamDialog = new Dialogs.generate_stream_dialog(app,ref, callback, streamObj);
                 }
                 this._handleGenerateStreamDialog.render();
                 this._handleGenerateStreamDialog.show();

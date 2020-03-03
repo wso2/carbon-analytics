@@ -28,6 +28,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.ReadContext;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
@@ -1449,9 +1450,24 @@ public class EditorMicroservice implements Microservice {
                             .type(MediaType.APPLICATION_JSON)
                             .build();
                 }
-                Object jsonObj;
+                Object jsonObj = null;
                 ReadContext readContext = JsonPath.parse(fileContent.toString());
-                jsonObj = readContext.read(jsonConfig.getEnclosingElement());
+                try {
+                    jsonObj = readContext.read(jsonConfig.getEnclosingElement());
+                } catch (PathNotFoundException e) {
+                    String message = "Could not find an element using enclosing element " +
+                            jsonConfig.getEnclosingElement() + " .Make sure enclosing element provided correctly." +
+                            e.getMessage() + ".";
+                    log.error(message);
+                    errorResponse.addProperty(Constants.ERROR,
+                            message);
+                    return Response
+                            .serverError()
+                            .entity(errorResponse)
+                            .type(MediaType.APPLICATION_JSON)
+                            .build();
+                }
+
                 if (jsonObj == null) {
                     String message = "Enclosing element " + jsonConfig.getEnclosingElement() + " cannot be found in " +
                             "the json string " + fileContent.toString() + ".";

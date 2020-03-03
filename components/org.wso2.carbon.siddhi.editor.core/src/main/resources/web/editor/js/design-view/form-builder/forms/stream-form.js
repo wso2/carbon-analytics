@@ -24,9 +24,15 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             }
         };
 
-        StreamForm.prototype.fillStreamAtrributesWithGeneratedValues = function (streamObj,self) {
-            $('#streamName').val(streamObj.name);
-            self.formUtils.renderAttributeTemplate(streamObj.attributes, self.propertyDiv.find("#define-attribute"));
+        StreamForm.prototype.fillStreamAtrributesWithGeneratedValues = function (responseJsonObj, self, streamObj) {
+            $('#streamName').val(responseJsonObj.name);
+            self.formUtils.renderAttributeTemplate(responseJsonObj.attributes,
+                self.propertyDiv.find("#define-attribute"));
+            _.forEach(responseJsonObj.attributes, function (attribute) {
+                var attributeObject = new Attribute({name: attribute.name, type: attribute.type});
+                streamObj.addAttribute(attributeObject);
+            });
+            self.formUtils.selectTypesOfSavedAttributes(streamObj.getAttributeList());
         },
 
         /**
@@ -49,7 +55,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 '<div class ="define-annotation"> </div> </div>');
 
             self.propertyDiv.on('click', '#streamGeneration', function () {
-                self.application.commandManager.dispatch("generate-stream", self, self.fillStreamAtrributesWithGeneratedValues);
+                self.application.commandManager.dispatch("generate-stream", self,
+                    self.fillStreamAtrributesWithGeneratedValues, streamObject);
             });
 
             formContainer.html(self.propertyDiv);
@@ -70,7 +77,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 //if stream form is freshly opened [new object]
                 annotations = predefinedAnnotationList;
                 var attributes = [{name: ""}];
-                self.formUtils.renderAttributeTemplate(attributes)
+                self.formUtils.renderAttributeTemplate(attributes, self.propertyDiv.find("#define-attribute"));
             } else {
                 //if the stream object is already edited
                 $('#streamName').val(name);
