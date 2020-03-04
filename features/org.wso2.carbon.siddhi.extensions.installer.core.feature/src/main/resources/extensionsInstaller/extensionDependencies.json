@@ -38,7 +38,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "kafka([_-])clients([_-])0.10.2.1(.+).jar"
+        "lookupRegex": "kafka([_-])clients([_-])0.10.2.1(.*).jar"
       },
       {
         "name": "zookeeper",
@@ -57,7 +57,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "zookeeper([_-])3.4.9(.+).jar"
+        "lookupRegex": "zookeeper([_-])3.4.9(.*).jar"
       },
       {
         "name": "kafka-2.11",
@@ -76,7 +76,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "kafka([_-])2.11([_-])0.10.2.1(.+).jar"
+        "lookupRegex": "kafka([_-])2.11([_-])0.10.2.1(.*).jar"
       },
       {
         "name": "scala-library",
@@ -95,7 +95,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "scala([_-])library([_-])2.11.8(.+).jar"
+        "lookupRegex": "scala([_-])library([_-])2.11.8(.*).jar"
       },
       {
         "name": "zkclient",
@@ -114,7 +114,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "zkclient([_-])0.10(.+).jar"
+        "lookupRegex": "zkclient([_-])0.10(.*).jar"
       },
       {
         "name": "metrics-core",
@@ -133,7 +133,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "metrics([_-])core([_-])2.2.0(.+).jar"
+        "lookupRegex": "metrics([_-])core([_-])2.2.0(.*).jar"
       }
     ]
   },
@@ -177,7 +177,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "activemq([_-])client([_-])5.9.0(.+).jar"
+        "lookupRegex": "activemq([_-])client([_-])5.9.0(.*).jar"
       },
       {
         "name": "hawtbuf",
@@ -196,10 +196,10 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "hawtbuf([_-])1.9(.+).jar"
+        "lookupRegex": "hawtbuf([_-])1.9.jar"
       },
       {
-        "name": "geronimo-j2ee-management_1.1_spec-",
+        "name": "geronimo-j2ee-management_1.1_spec",
         "version": "1.0.1",
         "download": {
           "autoDownloadable": true,
@@ -215,10 +215,10 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "geronimo([_-])j2ee([_-])management([_-])1.1([_-])spec([_-])1.0.1(.+).jar"
+        "lookupRegex": "geronimo([_-])j2ee([_-])management([_-])1.1([_-])spec([_-])1.0.1(.*).jar"
       },
       {
-        "name": "geronimo-jms_1.1_spec-",
+        "name": "geronimo-jms_1.1_spec",
         "version": "1.1.1",
         "download": {
           "autoDownloadable": true,
@@ -234,7 +234,7 @@
             "usedBy": "SAMPLES"
           }
         ],
-        "lookupRegex": "geronimo([_-])jms([_-])1.1([_-])spec([_-])1.1.1(.+).jar"
+        "lookupRegex": "geronimo([_-])jms([_-])1.1([_-])spec([_-])1.1.1(.*).jar"
       }
     ]
   },
@@ -314,7 +314,182 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mysql([_-])connector([_-])java([_-])5.1.45(.+).jar"
+        "lookupRegex": "mysql([_-])connector([_-])java([_-])5.1.45(.*).jar"
+      }
+    ]
+  },
+
+  "cdc-oracle": {
+    "extension": {
+      "name": "cdc-oracle",
+      "displayName": "Change Data Capture - Oracle",
+      "version": "2.0.3"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-cdc",
+        "version": "2.0.3",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.3/siddhi-io-cdc-2.0.3.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])2.0.3.jar"
+      },
+      {
+        "name": "ojdbc8",
+        "version": "12.2.0.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://maven.xwiki.org/externals/com/oracle/jdbc/ojdbc8/12.2.0.1/ojdbc8-12.2.0.1.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "ojdbc8([_-])12.2.0.1(.*).jar"
+      },
+      {
+        "name": "xstreams",
+        "version": "12.2.0.1",
+        "download": {
+          "autoDownloadable": false,
+          "instructions": "https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html download relevant instant client zip from above link and unzip to locate xstreams.jar. Convert it to bundle using jartobundle.sh and add it in <SI_HOME>/lib"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "ojdbc8([_-])12.2.0.1(.*).jar"
+      }
+    ]
+  },
+
+  "cdc-postgresql": {
+    "extension": {
+      "name": "cdc-postgresql",
+      "displayName": "Change Data Capture - PostgreSQL",
+      "version": "2.0.3"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-cdc",
+        "version": "2.0.3",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.3/siddhi-io-cdc-2.0.3.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])2.0.3.jar"
+      },
+      {
+        "name": "postgresql",
+        "version": "42.2.10",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.10/postgresql-42.2.10.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "postgresql([_-])42.2.10(.*).jar"
+      }
+    ]
+  },
+
+  "cdc-mssql": {
+    "extension": {
+      "name": "cdc-mssql",
+      "displayName": "Change Data Capture - MS SQL",
+      "version": "2.0.3"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-cdc",
+        "version": "2.0.3",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.3/siddhi-io-cdc-2.0.3.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])2.0.3.jar"
+      },
+      {
+        "name": "mssql-jdbc",
+        "version": "8.2.1.jre8",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/8.2.1.jre8/mssql-jdbc-8.2.1.jre8.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "mssql([_-])jdbc([_-])8.2.1.jre8(.*).jar"
+      }
+    ]
+  },
+
+  "cdc-mongodb": {
+    "extension": {
+      "name": "cdc-mongodb",
+      "displayName": "Change Data Capture - Mongo DB",
+      "version": "2.0.3"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-cdc",
+        "version": "2.0.3",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.3/siddhi-io-cdc-2.0.3.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])2.0.3.jar"
+      },
+      {
+        "name": "mongo-java-driver",
+        "version": "3.4.2",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.2/mongo-java-driver-3.4.2.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "mongo([_-])java([_-])driver([_-])3.4.2(.*).jar"
       }
     ]
   },
@@ -354,7 +529,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "simpleclient([_-])0.5.0(.+).jar"
+        "lookupRegex": "simpleclient([_-])0.5.0.jar"
       },
       {
         "name": "simpleclient_common",
@@ -369,7 +544,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "simpleclient([_-])common([_-])0.5.0(.+).jar"
+        "lookupRegex": "simpleclient([_-])common([_-])0.5.0.jar"
       },
       {
         "name": "simpleclient_httpserver",
@@ -384,7 +559,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "simpleclient([_-])httpserver([_-])0.5.0(.+).jar"
+        "lookupRegex": "simpleclient([_-])httpserver([_-])0.5.0.jar"
       },
       {
         "name": "simpleclient_pushgateway",
@@ -399,7 +574,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "simpleclient([_-])pushgateway([_-])0.5.0(.+).jar"
+        "lookupRegex": "simpleclient([_-])pushgateway([_-])0.5.0.jar"
       },
       {
         "name": "com.sun.net.httpserver",
@@ -414,7 +589,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "http([_-])20070405(.+).jar"
+        "lookupRegex": "http([_-])20070405(.*).jar"
       }
     ]
   },
@@ -454,7 +629,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "jnats([_-])2.6.5(.+).jar"
+        "lookupRegex": "jnats([_-])2.6.5(.*).jar"
       },
       {
         "name": "java-nats-streaming",
@@ -469,7 +644,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "java([_-])nats([_-])streaming([_-])2.2.2(.+).jar"
+        "lookupRegex": "java([_-])nats([_-])streaming([_-])2.2.2(.*).jar"
       },
       {
         "name": "protobuf-java",
@@ -484,7 +659,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "protobuf([_-])java([_-])3.9.1(.+).jar"
+        "lookupRegex": "protobuf([_-])java([_-])3.9.1.jar"
       }
     ]
   },
@@ -524,7 +699,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "protobuf([_-])java([_-])3.9.1(.+).jar"
+        "lookupRegex": "protobuf([_-])java([_-])3.9.1.jar"
       }
     ]
   },
@@ -564,14 +739,14 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mongo([_-])java([_-])driver([_-])3.4.2(.+).jar"
+        "lookupRegex": "mongo([_-])java([_-])driver([_-])3.4.2(.*).jar"
       }
     ]
   },
 
-  "rdbms": {
+  "rdbms-mysql": {
     "extension": {
-      "name": "rdbms",
+      "name": "rdbms-mysql",
       "displayName": "RDBMS - MySQL",
       "version": "6.0.4"
     },
@@ -604,7 +779,127 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mysql([_-])connector([_-])java([_-])5.1.45(.+).jar"
+        "lookupRegex": "mysql([_-])connector([_-])java([_-])5.1.45(.*).jar"
+      }
+    ]
+  },
+
+  "rdbms-mssql": {
+    "extension": {
+      "name": "rdbms-mssql",
+      "displayName": "RDBMS - MS SQL",
+      "version": "6.0.4"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-store-rdbms",
+        "version": "6.0.4",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/6.0.4/siddhi-store-rdbms-6.0.4.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])store([_-])rdbms([_-])6.0.4.jar"
+      },
+      {
+        "name": "mssql-jdbc",
+        "version": "8.2.1.jre8",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/8.2.1.jre8/mssql-jdbc-8.2.1.jre8.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "mssql([_-])jdbc([_-])8.2.1.jre8(.*).jar"
+      }
+    ]
+  },
+
+  "rdbms-postgresql": {
+    "extension": {
+      "name": "rdbms-postgresql",
+      "displayName": "RDBMS - Postgre SQL",
+      "version": "6.0.4"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-store-rdbms",
+        "version": "6.0.4",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/6.0.4/siddhi-store-rdbms-6.0.4.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])store([_-])rdbms([_-])6.0.4.jar"
+      },
+      {
+        "name": "postgresql",
+        "version": "42.2.10",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.10/postgresql-42.2.10.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "postgresql([_-])42.2.10(.*).jar"
+      }
+    ]
+  },
+
+  "rdbms-oracle": {
+    "extension": {
+      "name": "rdbms-oracle",
+      "displayName": "RDBMS - Oracle",
+      "version": "6.0.4"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-store-rdbms",
+        "version": "6.0.4",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/6.0.4/siddhi-store-rdbms-6.0.4.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])store([_-])rdbms([_-])6.0.4.jar"
+      },
+      {
+        "name": "ojdbc8",
+        "version": "12.2.0.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://maven.xwiki.org/externals/com/oracle/jdbc/ojdbc8/12.2.0.1/ojdbc8-12.2.0.1.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "ojdbc8([_-])12.2.0.1(.*).jar"
       }
     ]
   },
@@ -644,7 +939,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "hbase([_-])shaded([_-])client([_-])1.3.1(.+).jar"
+        "lookupRegex": "hbase([_-])shaded([_-])client([_-])1.3.1(.*).jar"
       },
       {
         "name": "htrace-core",
@@ -659,7 +954,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "htrace([_-])core([_-])3.1.0([_-])incubating(.+).jar"
+        "lookupRegex": "htrace([_-])core([_-])3.1.0([_-])incubating(.*).jar"
       }
     ]
   },
@@ -699,7 +994,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "cassandra([_-])driver([_-])core([_-])3.3.2(.+).jar"
+        "lookupRegex": "cassandra([_-])driver([_-])core([_-])3.3.2(.*).jar"
       }
     ]
   },
@@ -739,7 +1034,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "jedis([_-])2.9.0(.+).jar"
+        "lookupRegex": "jedis([_-])2.9.0(.*).jar"
       }
     ]
   },
