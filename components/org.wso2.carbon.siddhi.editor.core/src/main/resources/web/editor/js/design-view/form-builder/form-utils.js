@@ -422,7 +422,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          * @param {templateId} the id of the template div to render
          */
         FormUtils.prototype.renderUserDefinedAttributeSelection = function (attributes, templateId) {
-            var userAttributeSelectionTemplate = Handlebars.compile($('#' + templateId + '-template').html())(attributes);
+            var userAttributeSelectionTemplate = Handlebars.compile($('#' + templateId + '-template').html())
+            (attributes);
             $('.define-select').html(userAttributeSelectionTemplate);
         };
 
@@ -458,7 +459,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 ({id: "map", types: predefinedMaps});
                 $('#define-map').html(mapFormTemplate);
                 $('#define-map #map-type').val('passThrough');
-                $('#define-map #map-type option:contains("' + Constants.DEFAULT_MAPPER_TYPE + '")').text('passThrough (default)');
+                $('#define-map #map-type option:contains("' + Constants.DEFAULT_MAPPER_TYPE + '")')
+                    .text('passThrough (default)');
             }
         };
 
@@ -843,7 +845,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.createEmptyAttributesForQueryProjection = function (outputElementName) {
             var self = this;
             var attributes = [];
-            var connectedElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
+            var connectedElement = self.configurationData.getSiddhiAppConfig()
+                .getDefinitionElementByName(outputElementName);
             _.forEach(connectedElement.element.getAttributeList(), function (attribute) {
                 attributes.push({
                     expression: "",
@@ -861,7 +864,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var self = this;
             var attributes = [];
             var i = 0;
-            var connectedElement = self.configurationData.getSiddhiAppConfig().getDefinitionElementByName(outputElementName);
+            var connectedElement = self.configurationData.getSiddhiAppConfig()
+                .getDefinitionElementByName(outputElementName);
             _.forEach(connectedElement.element.getAttributeList(), function (attribute) {
                 var expression = "";
                 if (projectionValues[i]) {
@@ -943,11 +947,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                             multiValue = true;
                         }
                         if (overload === parameter.name) {
-                            parameterOverloads.push({
-                                name: parameter.name,
-                                description: parameter.description,
-                                optional: parameter.optional,
-                                defaultValue: parameter.defaultValue,
+                            parameterOverloads.push({name: parameter.name, description: parameter.description,
+                                optional: parameter.optional, defaultValue: parameter.defaultValue,
                                 isMultiValue: multiValue
                             });
                             return false;
@@ -999,9 +1000,11 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var functions = [];
             var functionNames = [];
             if (functionType === Constants.STREAM_FUNCTION) {
-                functions = self.getParameterOverloadNames(self.configurationData.rawExtensions["streamFunctions"]);
+                functions = self.getParameterOverloadNames(self.configurationData
+                    .rawExtensions["streamFunctions"]);
             } else if (functionType === Constants.AGGREGATE_FUNCTION) {
-                functions = self.getParameterOverloadNames(self.configurationData.rawExtensions["incrementalAggregators"]);
+                functions = self.getParameterOverloadNames(self.configurationData
+                    .rawExtensions["incrementalAggregators"]);
             } else if (functionType === Constants.FUNCTION) {
                 functions = self.getParameterOverloadNames(self.configurationData.rawExtensions["functions"]);
             }
@@ -1109,12 +1112,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     var savedOption = (_.filter(savedOptions, function (rdbmsOption) {
                         return rdbmsOption.name == datasourceOption.name
                     }))[0];
-                    rdbmsOptions.push({
-                        name: datasourceOption.name,
-                        value: savedOption.value,
-                        description: datasourceOption
-                            .description,
-                        optional: datasourceOption.optional,
+                    rdbmsOptions.push({name: datasourceOption.name, value: savedOption.value,
+                        description: datasourceOption.description, optional: datasourceOption.optional,
                         defaultValue: datasourceOption.defaultValue
                     });
                 });
@@ -1141,11 +1140,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                         return rdbmsOption.name == jndiResourceOption.name
                     }))[0];
                     rdbmsOptions.push({
-                        name: jndiResourceOption.name,
-                        value: savedOption.value,
-                        description: jndiResourceOption
-                            .description,
-                        optional: jndiResourceOption.optional,
+                        name: jndiResourceOption.name, value: savedOption.value,
+                        description: jndiResourceOption.description, optional: jndiResourceOption.optional,
                         defaultValue: jndiResourceOption.defaultValue
                     });
                 });
@@ -2304,7 +2300,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             })
 
             if (elements.length != 0) {
-                predefinedAnnotationString = predefinedAnnotationString.substring(0, predefinedAnnotationString.length - 1);
+                predefinedAnnotationString = predefinedAnnotationString.substring(0,
+                    predefinedAnnotationString.length - 1);
             }
         };
 
@@ -3536,7 +3533,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.addAutoCompleteForLogicStatements = function () {
             var self = this;
-            var conditionNames = self.addLabelsForAutocompleteDropDowns(self.getPatternSequenceInputs(), Constants.INPUT);
+            var conditionNames = self.addLabelsForAutocompleteDropDowns(self.getPatternSequenceInputs(),
+                Constants.INPUT);
             var keywords = self.addLabelsForAutocompleteDropDowns
             (self.configurationData.application.config.logic_statement_keywords, Constants.KEYWORD);
             var queryOperators = self.addLabelsForAutocompleteDropDowns
@@ -3812,7 +3810,8 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                             parameters: savedParameterValues
                         }
                     };
-                    var parameterDiv = $(this).closest('.defineFunctionName').parents('.define-stream-handler-type-content');
+                    var parameterDiv = $(this).closest('.defineFunctionName')
+                        .parents('.define-stream-handler-type-content');
                     self.mapParameterValues(streamHandler, parameterDiv, true);
                     self.addAutoCompleteForStreamWindowFunctionAttributes(attributes);
                 });
@@ -3845,16 +3844,19 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var previousContent;
             $('.define-stream-handler').on('focus', '.stream-handler-selection', function () {
                 previousValue = this.value;
-                previousContent = $(this).closest('.define-stream-handler-type').parents('.define-stream-handler-content').find('.define-stream-handler-type-content').contents();
+                previousContent = $(this).closest('.define-stream-handler-type')
+                    .parents('.define-stream-handler-content').find('.define-stream-handler-type-content').contents();
 
             }).on('change', '.stream-handler-selection', function () {
                 var currentValue = this.value; // New Value
-                var currentContentDiv = $(this).closest('.define-stream-handler-type').parents('.define-stream-handler-content').find('.define-stream-handler-type-content');
+                var currentContentDiv = $(this).closest('.define-stream-handler-type')
+                    .parents('.define-stream-handler-content').find('.define-stream-handler-type-content');
                 if (currentValue == previousValue) {
                     currentContentDiv.html(previousContent)
                 } else {
                     var sourceDiv = self.getSourceDiv($(this));
-                    var streamHandlerContent = $(this).closest('.define-stream-handler-type').parents('.define-stream-handler-content').find('.define-stream-handler-type-content');
+                    var streamHandlerContent = $(this).closest('.define-stream-handler-type')
+                        .parents('.define-stream-handler-content').find('.define-stream-handler-type-content');
                     streamHandlerContent.removeClass();
                     streamHandlerContent.addClass('define-stream-handler-type-content');
                     streamHandlerContent.addClass('define-' + currentValue + '-stream-handler');

@@ -108,9 +108,9 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 }
             };
             self.formUtils.mapParameterValues(windowParameters, windowFormContainer, false);
-            self.formUtils.renderAnnotationTemplate("define-annotation", annotations);
+            self.formUtils.renderAnnotationTemplate('define-annotation', annotations);
 
-            $(windowFormContainer).on("autocompleteselect", '.custom-combobox-input', function (event, ui) {
+            $(windowFormContainer).on('autocompleteselect', '.custom-combobox-input', function (event, ui) {
                 var savedParameterValues = [];
                 var selectedType = ui.item.value.toLowerCase();
                 if (name && self.formUtils.getFunctionNameWithoutParameterOverload(selectedType) === windowType) {
@@ -127,7 +127,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 self.formUtils.addAutoCompleteForStreamWindowFunctionAttributes(getAttributes());
             });
 
-            $(windowFormContainer).on("blur", ".attr-name", function () {
+            $(windowFormContainer).on('blur', '.attr-name', function () {
                 self.formUtils.addAutoCompleteForStreamWindowFunctionAttributes(getAttributes());
             });
 
@@ -142,25 +142,25 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
 
                 var windowName = $('#windowName').val().trim();
                 //check if window name is empty
-                if (windowName == "") {
-                    self.formUtils.addErrorClass("#windowName");
-                    $('#windowNameErrorMessage').text("Window name is required.")
+                if (windowName == '') {
+                    self.formUtils.addErrorClass('#windowName');
+                    $('#windowNameErrorMessage').text('Window name is required.')
                     isErrorOccurred = true;
                     return;
                 }
                 var previouslySavedName = windowObject.getName();
                 if (previouslySavedName === undefined) {
-                    previouslySavedName = "";
+                    previouslySavedName = '';
                 }
                 if (previouslySavedName !== windowName) {
                     var isWindowNameUsed = self.formUtils.isDefinitionElementNameUsed(windowName, id);
                     if (isWindowNameUsed) {
-                        self.formUtils.addErrorClass("#windowName");
-                        $('#windowNameErrorMessage').text("Window name is already used.")
+                        self.formUtils.addErrorClass('#windowName');
+                        $('#windowNameErrorMessage').text('Window name is already used.')
                         isErrorOccurred = true;
                         return;
                     }
-                    if (self.formUtils.validateAttributeOrElementName("#windowName", Constants.WINDOW, windowName)) {
+                    if (self.formUtils.validateAttributeOrElementName('#windowName', Constants.WINDOW, windowName)) {
                         isErrorOccurred = true;
                         return;
                     }
@@ -173,7 +173,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
 
                 if (attributeNameList.length == 0) {
                     self.formUtils.addErrorClass($('.attribute:eq(0)').find('.attr-name'))
-                    $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.");
+                    $('.attribute:eq(0)').find('.error-message').text('Minimum one attribute is required.');
                     isErrorOccurred = true;
                     return;
                 }
@@ -207,7 +207,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                     $('.attribute .attr-content').each(function () {
                         var nameValue = $(this).find('.attr-name').val().trim();
                         var typeValue = $(this).find('.attr-type').val();
-                        if (nameValue != "") {
+                        if (nameValue != '') {
                             var attributeObject = new Attribute({name: nameValue, type: typeValue});
                             windowObject.addAttribute(attributeObject)
                         }

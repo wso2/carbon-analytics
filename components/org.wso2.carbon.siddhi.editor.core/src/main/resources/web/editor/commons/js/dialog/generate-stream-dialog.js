@@ -49,48 +49,47 @@ define(['require', 'lodash', 'jquery', 'log'],
 
             // rename the variable
             var generateStreamModal = $('#generateStreamConfigModal').clone();
-            generateStreamModal.find('output').html("");
+            generateStreamModal.find('output').html('');
 
-
-            generateStreamModal.find(".collapse").collapse();
-            generateStreamModal.find(".streamName").attr('value', self.streamObj.name)
+            generateStreamModal.find('.collapse').collapse();
+            generateStreamModal.find('.streamName').attr('value', self.streamObj.name)
 
             generateStreamModal.find('#idFromFile').on('click', function (e) {
                 e.stopPropagation();
-                generateStreamModal.find('#generateFromFileContent').collapse("show");
+                generateStreamModal.find('#generateFromFileContent').collapse('show');
                 generateStreamModal.find('#fileSelector').change(function (e) {
                     self.handleFileSelect(e, generateStreamModal);
                 });
 
-                if (!generateStreamModal.find('#idFromDatabase').is(":checked")) {
-                    generateStreamModal.find('#generateFromDBContent').collapse("hide");
+                if (!generateStreamModal.find('#idFromDatabase').is(':checked')) {
+                    generateStreamModal.find('#generateFromDBContent').collapse('hide');
                 }
             });
 
             generateStreamModal.find('#idFromDatabase').on('click', function (e) {
                 e.stopPropagation();
 
-                generateStreamModal.find('#generateFromDBContent').collapse("show");
-                if (!generateStreamModal.find('#idFromFile').is(":checked")) {
-                    generateStreamModal.find('#generateFromFileContent').collapse("hide");
+                generateStreamModal.find('#generateFromDBContent').collapse('show');
+                if (!generateStreamModal.find('#idFromFile').is(':checked')) {
+                    generateStreamModal.find('#generateFromFileContent').collapse('hide');
                 }
             });
 
             generateStreamModal.find('#idInline').on('click', function (e) {
                 e.stopPropagation();
 
-                generateStreamModal.find('#inlineContent').collapse("show");
-                if (!generateStreamModal.find('#idDatasource').is(":checked")) {
-                    generateStreamModal.find('#datasourceContent').collapse("hide");
+                generateStreamModal.find('#inlineContent').collapse('show');
+                if (!generateStreamModal.find('#idDatasource').is(':checked')) {
+                    generateStreamModal.find('#datasourceContent').collapse('hide');
                 }
             });
 
             generateStreamModal.find('#idDatasource').on('click', function (e) {
                 e.stopPropagation();
 
-                generateStreamModal.find('#datasourceContent').collapse("show");
-                if (!generateStreamModal.find('#idInline').is(":checked")) {
-                    generateStreamModal.find('#inlineContent').collapse("hide");
+                generateStreamModal.find('#datasourceContent').collapse('show');
+                if (!generateStreamModal.find('#idInline').is(':checked')) {
+                    generateStreamModal.find('#inlineContent').collapse('hide');
                 }
             });
 
@@ -102,12 +101,12 @@ define(['require', 'lodash', 'jquery', 'log'],
                 self.handleLoadDbConnection(e, generateStreamModal, self);
             });
 
-            generateStreamModal.find("#generateButton").click(function () {
+            generateStreamModal.find('#generateButton').click(function () {
                 config = {};
                 var formData = new FormData();
-                if (generateStreamModal.find('#idFromFile').is(":checked")) {
+                if (generateStreamModal.find('#idFromFile').is(':checked')) {
                     requestBody = {};
-                    if (generateStreamModal.find("#fromCsvFile").attr("aria-expanded") === "true") {
+                    if (generateStreamModal.find('#fromCsvFile').attr('aria-expanded') === 'true') {
                         constants.streamJsonObj.name = generateStreamModal.find('#streamNameCsv')[0].value;
                         config = {
                             streamName: generateStreamModal.find('#streamNameCsv')[0].value,
@@ -115,8 +114,8 @@ define(['require', 'lodash', 'jquery', 'log'],
                             isHeaderExist: generateStreamModal.find('#isHeaderExists')[0].value
                         };
                         requestBody.type = 'csv';
-                        requestBody["config"] = config;
-                    } else if (generateStreamModal.find("#fromJsonFile").attr("aria-expanded") === "true") {
+                        requestBody['config'] = config;
+                    } else if (generateStreamModal.find('#fromJsonFile').attr('aria-expanded') === 'true') {
                         constants.streamJsonObj.name = generateStreamModal.find('#streamNameJson')[0].value;
                         config = {
                             streamName: generateStreamModal.find('#streamNameJson')[0].value,
@@ -124,8 +123,8 @@ define(['require', 'lodash', 'jquery', 'log'],
                         };
                         requestBody.type = 'json';
                         requestBody.config = config;
-                    } else if (generateStreamModal.find("#fromXmlFile").attr("aria-expanded") === "true") {
-                        requestBody["type"] = "xml";
+                    } else if (generateStreamModal.find('#fromXmlFile').attr('aria-expanded') === 'true') {
+                        requestBody['type'] = 'xml';
                         constants.streamJsonObj.name = generateStreamModal.find('#streamNameXml')[0].value;
                         config = {
                             streamName: generateStreamModal.find('#streamNameXml')[0].value,
@@ -136,8 +135,8 @@ define(['require', 'lodash', 'jquery', 'log'],
                         requestBody.type = 'xml';
                         requestBody.config = config;
                     }
-                    formData.append("config", JSON.stringify(requestBody));
-                    formData.append("file", files[0]);
+                    formData.append('config', JSON.stringify(requestBody));
+                    formData.append('file', files[0]);
                     self.retrieveFileDataAttributes(formData, function (data) {
                         constants.streamJsonObj.attributes = JSON.parse(data.attributes);
                         self.callback(constants.streamJsonObj, self.ref, self.streamObj);
@@ -146,12 +145,12 @@ define(['require', 'lodash', 'jquery', 'log'],
                         self.alertError(JSON.parse(err.responseText).error)
 
                     });
-                } else if (generateStreamModal.find('#idFromDatabase').is(":checked")) {
-                    if (generateStreamModal.find('#idInline').is(":checked")) {
+                } else if (generateStreamModal.find('#idFromDatabase').is(':checked')) {
+                    if (generateStreamModal.find('#idInline').is(':checked')) {
                         var inlineTableList = generateStreamModal.find('#inlineTableSelector');
                         requestBody.tableName = inlineTableList[0].selectedOptions[0].label;
                         constants.streamJsonObj.name = generateStreamModal.find('#streamNameInlineDB')[0].value;
-                    } else if (generateStreamModal.find('#idDatasource').is(":checked")) {
+                    } else if (generateStreamModal.find('#idDatasource').is(':checked')) {
                         constants.streamJsonObj.name = generateStreamModal.find('#streamNameInlineDB')[0].value;
                         var datasourceTableSelector = generateStreamModal.find('#datasourceTableSelector');
                         requestBody.tableName = datasourceTableSelector[0].selectedOptions[0].label;
@@ -166,8 +165,8 @@ define(['require', 'lodash', 'jquery', 'log'],
                 }
             });
 
-            var generateStreamConfigModal = generateStreamModal.filter("#generateStreamConfigModal");
-            var generateStreamConfigModalError = generateStreamModal.find("#generateStreamConfigModalError");
+            var generateStreamConfigModal = generateStreamModal.filter('#generateStreamConfigModal');
+            var generateStreamConfigModalError = generateStreamModal.find('#generateStreamConfigModalError');
             generateStreamConfigModalError.hide();
             this._generateStreamModal = generateStreamModal;
             generateStreamConfigModal.modal('hide');
@@ -183,7 +182,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                 section.collapse('show');
                 generateStreamModal.find('#generateButton').removeAttr('disabled');
             } else {
-                self.alertError("Error Occurred while processing the file. File type does not supported")
+                self.alertError('Error Occurred while processing the file. File type does not supported')
             }
 
             var output = [];
@@ -231,7 +230,8 @@ define(['require', 'lodash', 'jquery', 'log'],
             }
         };
 
-        GenerateStreamDialog.prototype.connectToDatabase = function (connectionDetails, successCallback, errorCallback) {
+        GenerateStreamDialog.prototype.connectToDatabase = function (connectionDetails, successCallback,
+                                                                     errorCallback) {
             if (connectionDetails !== null) {
                 $.ajax({
                     async: false,
@@ -251,7 +251,8 @@ define(['require', 'lodash', 'jquery', 'log'],
             }
         };
 
-        GenerateStreamDialog.prototype.retrieveTableNames = function (connectionDetails, successCallback, errorCallback) {
+        GenerateStreamDialog.prototype.retrieveTableNames = function (connectionDetails, successCallback,
+                                                                      errorCallback) {
             if (connectionDetails !== null) {
                 $.ajax({
                     async: false,
@@ -271,7 +272,8 @@ define(['require', 'lodash', 'jquery', 'log'],
             }
         };
 
-        GenerateStreamDialog.prototype.retrieveTableColumnNames = function (connectionDetails, successCallback, errorCallback) {
+        GenerateStreamDialog.prototype.retrieveTableColumnNames = function (connectionDetails, successCallback,
+                                                                            errorCallback) {
             if (connectionDetails !== null) {
                 $.ajax({
                     async: false,
@@ -291,7 +293,8 @@ define(['require', 'lodash', 'jquery', 'log'],
             }
         };
 
-        GenerateStreamDialog.prototype.retrieveFileDataAttributes = function (connectionDetails, successCallback, errorCallback) {
+        GenerateStreamDialog.prototype.retrieveFileDataAttributes = function (connectionDetails, successCallback,
+                                                                              errorCallback) {
             if (connectionDetails !== null) {
                 $.ajax({
                     async: false,
@@ -301,7 +304,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                     processData: false,
                     data: connectionDetails,
                     success: function (data) {
-                        if(data.warning != null && data.warning !== ""){
+                        if (data.warning != null && data.warning !== '') {
                             alertWarning(data.warning)
                         }
                         if (typeof successCallback === 'function')
