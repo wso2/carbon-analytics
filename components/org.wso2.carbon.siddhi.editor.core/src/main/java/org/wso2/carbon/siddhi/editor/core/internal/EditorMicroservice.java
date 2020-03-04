@@ -1441,7 +1441,19 @@ public class EditorMicroservice implements Microservice {
                     }
                 }
                 if (null != (firstLine = bufferedReader.readLine())) {
-                    attributeValueList = firstLine.split(csvConfig.getDelimiter());
+                    String splitRegex = csvConfig.getDelimiter() + Constants.REGEX_TO_KEEP_QUOTES;
+                    attributeValueList = firstLine.split(splitRegex, -1);
+                    if (csvConfig.isHeaderExist() && attributeNameList.length != attributeValueList.length) {
+                        String message = "Header attribute length : " + attributeNameList.length +
+                                " and corresponding value length : " + attributeValueList.length + " does not match ";
+                        log.error(message);
+                        errorResponse.addProperty(Constants.ERROR, message);
+                        return Response
+                                .serverError()
+                                .entity(errorResponse)
+                                .type(MediaType.APPLICATION_JSON)
+                                .build();
+                    }
                     return Response.ok().entity(MetaInfoRetrieverUtils.createResponseForCSV(attributeNameList,
                             attributeValueList)).build();
                 } else {
