@@ -546,8 +546,8 @@
         "name": "simpleclient_httpserver",
         "version": "0.5.0",
         "download": {
-          "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/prometheus/simpleclient_httpserver/0.5.0/simpleclient_httpserver-0.5.0.jar"
+          "autoDownloadable": false,
+          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/io/prometheus/simpleclient_httpserver/0.5.0/simpleclient_httpserver-0.5.0.jar'.<br/>2. Copy the jar to '{WSO2SIHome}/bin' directory"
         },
         "usages": [
           {
@@ -561,8 +561,8 @@
         "name": "simpleclient_pushgateway",
         "version": "0.5.0",
         "download": {
-          "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/prometheus/simpleclient_pushgateway/0.5.0/simpleclient_pushgateway-0.5.0.jar"
+          "autoDownloadable": false,
+          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/io/prometheus/simpleclient_pushgateway/0.5.0/simpleclient_pushgateway-0.5.0.jar'. Copy the jar to '{WSO2SIHome}/bin' directory"
         },
         "usages": [
           {
