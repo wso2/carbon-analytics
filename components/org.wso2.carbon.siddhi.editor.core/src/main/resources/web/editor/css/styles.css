@@ -33,7 +33,7 @@ header .brand h1 {
 }
 
 header .brand {
-    line-height: 40px;
+    /*line-height: 40px;*/
     padding: 10px 10px 0 10px;
     vertical-align: middle;
     margin-right: 25px;
