@@ -354,7 +354,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "ojdbc8[_-])12.2.0.1(.+).jar"
+        "lookupRegex": "ojdbc8([_-])12.2.0.1(.+).jar"
       },
       {
         "name": "xstreams",
@@ -369,7 +369,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "ojdbc8[_-])12.2.0.1(.+).jar"
+        "lookupRegex": "ojdbc8([_-])12.2.0.1(.+).jar"
       }
     ]
   },
@@ -409,7 +409,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "postgresql[_-])42.2.10(.+).jar"
+        "lookupRegex": "postgresql([_-])42.2.10(.+).jar"
       }
     ]
   },
@@ -859,7 +859,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "postgresql[_-])42.2.10(.+).jar"
+        "lookupRegex": "postgresql([_-])42.2.10(.+).jar"
       }
     ]
   },
@@ -899,7 +899,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "ojdbc8[_-])12.2.0.1(.+).jar"
+        "lookupRegex": "ojdbc8([_-])12.2.0.1(.+).jar"
       }
     ]
   },
