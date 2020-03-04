@@ -78,7 +78,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
             if (!name) {
                 //if window form is freshly opened[unedited window object]
                 var attributes = [{name: ""}];
-                self.formUtils.renderAttributeTemplate(attributes)
+                self.formUtils.renderAttributeTemplate(attributes, propertyDiv.find("#define-attribute"))
                 selectedType = Constants.BATCH_WINDOW_PROCESSOR;
             } else {
                 //if window object is already edited
@@ -89,7 +89,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'constants'],
                 selectedType = windowType;
 
                 var attributeList = windowObject.getAttributeList();
-                self.formUtils.renderAttributeTemplate(attributeList)
+                self.formUtils.renderAttributeTemplate(attributeList, propertyDiv.find("#define-attribute"))
                 self.formUtils.selectTypesOfSavedAttributes(attributeList);
 
                 var outputEventType = windowObject.getOutputEventType().toLowerCase();

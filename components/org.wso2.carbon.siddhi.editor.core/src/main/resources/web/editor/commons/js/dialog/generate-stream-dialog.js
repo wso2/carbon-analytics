@@ -49,13 +49,14 @@ define(['require', 'lodash', 'jquery', 'log'],
 
             // rename the variable
             var generateStreamModal = $('#generateStreamConfigModal').clone();
+            generateStreamModal.find('output').html("");
+
 
             generateStreamModal.find(".collapse").collapse();
             generateStreamModal.find(".streamName").attr('value', self.streamObj.name)
 
             generateStreamModal.find('#idFromFile').on('click', function (e) {
                 e.stopPropagation();
-
                 generateStreamModal.find('#generateFromFileContent').collapse("show");
                 generateStreamModal.find('#fileSelector').change(function (e) {
                     self.handleFileSelect(e, generateStreamModal);
@@ -192,7 +193,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                     f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
                     '</li>');
             }
-            document.getElementById('file_list1').innerHTML = '<ul>' + output.join('') + '</ul>';
+            generateStreamModal.find('output').html('<ul>' + output.join('') + '</ul>');
         };
 
         GenerateStreamDialog.prototype.handleLoadDbConnection = function (evt, generateStreamModal, self) {

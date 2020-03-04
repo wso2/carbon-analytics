@@ -68,7 +68,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             var name = tableObject.getName();
             if (!name) {
                 var attributes = [{ name: "" }];
-                self.formUtils.renderAttributeTemplate(attributes)
+                self.formUtils.renderAttributeTemplate(attributes, propertyDiv.find("#define-attribute"))
 
             } else {
                 $('#tableName').val(name);
