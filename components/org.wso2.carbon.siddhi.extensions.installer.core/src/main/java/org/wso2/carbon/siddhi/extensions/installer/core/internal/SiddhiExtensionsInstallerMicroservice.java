@@ -58,6 +58,8 @@ import static org.wso2.carbon.siddhi.extensions.installer.core.util.ResponseEnti
 @Path("/siddhi-extensions")
 public class SiddhiExtensionsInstallerMicroservice implements Microservice {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SiddhiExtensionsInstallerMicroservice.class);
+
     private Map<String, ExtensionConfig> extensionConfigs;
 
     public SiddhiExtensionsInstallerMicroservice() {
@@ -76,6 +78,7 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         } catch (ExtensionsInstallerException e) {
+            LOGGER.error("Failed to get installation statuses of all the extensions.", e);
             return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(e.getMessage())
@@ -95,6 +98,7 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         } catch (ExtensionsInstallerException e) {
+            LOGGER.error(String.format("Failed to get installation status of extension: %s.", extensionId), e);
             return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(e.getMessage())
@@ -114,6 +118,8 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         } catch (ExtensionsInstallerException e) {
+            LOGGER.error(String.format(
+                "Failed to get installation statuses of dependencies, of extension: %s.", extensionId), e);
             return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(e.getMessage())
@@ -136,6 +142,7 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         } catch (ExtensionsInstallerException e) {
+            LOGGER.error(String.format("Failed to install dependencies for extension: %s.", extensionId), e);
             return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(e.getMessage())
@@ -155,6 +162,8 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         } catch (ExtensionsInstallerException e) {
+            LOGGER.error(
+                String.format("Failed to get dependency sharing extensions for extension: %s.", extensionId), e);
             return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(e.getMessage())
@@ -177,6 +186,7 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         } catch (ExtensionsInstallerException e) {
+            LOGGER.error(String.format("Failed to un-install dependencies for extension: %s.", extensionId), e);
             return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(e.getMessage())

@@ -40,6 +40,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Contains utility methods that are used in Siddhi Extensions Installer.
@@ -110,9 +111,11 @@ public class ExtensionsInstallerUtils {
      * @param regexPattern  Regex pattern for file name.
      * @param directoryPath Path of the directory.
      * @return List of matching files.
-     * @throws IOException Failure occurred while walking the file tree.
+     * @throws IOException            Failure occurred while walking the file tree.
+     * @throws PatternSyntaxException The provided regex pattern is invalid.
      */
-    public static List<Path> listMatchingFiles(String regexPattern, String directoryPath) throws IOException {
+    public static List<Path> listMatchingFiles(String regexPattern, String directoryPath)
+        throws IOException, PatternSyntaxException {
         final String PATH_MATCHER_SYNTAX = "regex:";
         Path path = Paths.get(directoryPath);
         final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(PATH_MATCHER_SYNTAX + regexPattern);
