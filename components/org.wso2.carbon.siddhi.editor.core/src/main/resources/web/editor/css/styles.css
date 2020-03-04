@@ -33,7 +33,7 @@ header .brand h1 {
 }
 
 header .brand {
-    line-height: 40px;
+    /*line-height: 40px;*/
     padding: 10px 10px 0 10px;
     vertical-align: middle;
     margin-right: 25px;
@@ -303,9 +303,8 @@ a.ui-button:active, .ui-button:active,
 }
 
 .btn-primary:hover {
-    background-color: #027f82;
-    border-color: #027f82;
     color: #fff;
+    transition: 0.15s;
 }
 
 #clear_confirmation_modal_for_create .modal-dialog {
@@ -634,8 +633,8 @@ h3.popover-title {
 }
 
 .btn.btn_no:hover {
-    background-color: #027f82;
-    color: #000000;
+    color: #fff;
+    transition: 0.15s;
 }
 
 .btn.btn_yes:hover {
