@@ -301,6 +301,9 @@ define(['require', 'lodash', 'jquery', 'log'],
                     processData: false,
                     data: connectionDetails,
                     success: function (data) {
+                        if(data.warning != null && data.warning !== ""){
+                            alertWarning(data.warning)
+                        }
                         if (typeof successCallback === 'function')
                             successCallback(data)
                     },
