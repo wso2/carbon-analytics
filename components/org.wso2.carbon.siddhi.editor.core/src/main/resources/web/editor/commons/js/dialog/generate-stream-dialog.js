@@ -141,8 +141,8 @@ define(['require', 'lodash', 'jquery', 'log'],
                         constants.streamJsonObj.attributes = JSON.parse(data.attributes);
                         self.callback(constants.streamJsonObj, self.ref, self.streamObj);
                         generateStreamModal.modal('hide');
-                    }, function (msg) {
-                        self.alertError(JSON.parse(err.responseText).error)
+                    }, function (err) {
+                        alertError(JSON.parse(err.responseText).error)
 
                     });
                 } else if (generateStreamModal.find('#idFromDatabase').is(':checked')) {
@@ -160,7 +160,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                         self.callback(constants.streamJsonObj, self.ref, self.streamObj);
                         generateStreamModal.modal('hide');
                     }, function (err) {
-                        self.alertError(JSON.parse(err.responseText).error);
+                        alertError(JSON.parse(err.responseText).error);
                     });
                 }
             });
