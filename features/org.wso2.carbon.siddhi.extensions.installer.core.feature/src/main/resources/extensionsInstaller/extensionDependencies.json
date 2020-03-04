@@ -562,7 +562,7 @@
         "version": "0.5.0",
         "download": {
           "autoDownloadable": false,
-          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/io/prometheus/simpleclient_pushgateway/0.5.0/simpleclient_pushgateway-0.5.0.jar'. Copy the jar to '{WSO2SIHome}/bin' directory"
+          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/io/prometheus/simpleclient_pushgateway/0.5.0/simpleclient_pushgateway-0.5.0.jar'.<br/>2. Copy the jar to '{WSO2SIHome}/bin' directory"
         },
         "usages": [
           {
