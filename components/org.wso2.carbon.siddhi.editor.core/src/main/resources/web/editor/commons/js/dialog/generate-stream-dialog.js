@@ -49,8 +49,7 @@ define(['require', 'lodash', 'jquery', 'log'],
 
             // rename the variable
             var generateStreamModal = $('#generateStreamConfigModal').clone();
-            generateStreamModal.find('output').html("");
-
+            generateStreamModal.find('output').html('');
 
             generateStreamModal.find(".collapse").collapse();
             generateStreamModal.find(".streamName").attr('value', self.streamObj.name)
@@ -301,7 +300,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                     processData: false,
                     data: connectionDetails,
                     success: function (data) {
-                        if(data.warning != null && data.warning !== ""){
+                        if(data.warning != null && data.warning !== ''){
                             alertWarning(data.warning)
                         }
                         if (typeof successCallback === 'function')
