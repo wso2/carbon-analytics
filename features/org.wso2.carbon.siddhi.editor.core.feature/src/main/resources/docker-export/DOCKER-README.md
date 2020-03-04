@@ -9,7 +9,7 @@ In WSO2 Streaming Integrator Studio, Docker artifacts can be created for either 
 ```
 .
 ├── README.md
-├── docker-compose.yml
+├── Dockerfile
 └── workspace
     ├── <SIDDHI_FILE_1>.siddhi
     └── <SIDDHI_FILE_2>.siddhi
@@ -19,7 +19,7 @@ In WSO2 Streaming Integrator Studio, Docker artifacts can be created for either 
 Purpose of each file in the above archive is as follows.
 
 - **README.md**: This readme file.
-- **docker-compose.yml**: Docker Compose file which contains Docker configurations to build and run the Docker container.
+- **Dockerfile**: File which contains Docker configurations to build the docker image.
 - **siddhi-files**: Directory which contains Siddhi files.
 
 ## How to Run?
@@ -27,7 +27,6 @@ Purpose of each file in the above archive is as follows.
 To run this archive, following applications are required.
 
 - Docker
-- Docker Compose
 
 Once the above prerequisites are installed in your environment, follow the steps mentioned below to create and run the docker image.
 
@@ -35,10 +34,10 @@ Once the above prerequisites are installed in your environment, follow the steps
 
 2. Go to `<DOCKER_HOME>` directory.
 
-3. Run the following command to start the Docker container.
+3. Run the following command to build the Docker image.
 
 ```
-docker-compose up
+docker build -t <repository>/<image-name> .
 ```
 
 
