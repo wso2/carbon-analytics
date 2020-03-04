@@ -2755,11 +2755,7 @@
     </div>
 </div>
 
-<!--<script id="test-template" type="text/x-handlebar-template">-->
-<!--<h1>Hello world</h1>-->
-<!--</script>-->
-
-<!--  -->
+<!-- Generate Stream UI -->
 <div class='modal fade' id='generateStreamConfigModal' tabindex='-1' role='dialog' aria-tydden='true'>
     <div class='modal-dialog file-dialog' role='document'>
         <div class='modal-content'>
@@ -2842,7 +2838,7 @@
                                                 </div>
                                                 <div class='form-group'>
                                                     <label>
-                                                        Name Space<span class='required_astrix'> *</span>
+                                                        Namespace
                                                     </label>
                                                     <input type='text' class='form-control'
                                                            id='nameSpaceOfXml'
@@ -2854,6 +2850,7 @@
                                                     </label>
                                                     <input type='text' class='form-control'
                                                            id='enclosingElementXML'
+                                                           value="//"
                                                            name='enclosingElementXML'
                                                            aria-required='true'>
                                                 </div>
@@ -2888,11 +2885,11 @@
                                                     <label>
                                                         Is Header Exists<span class='required_astrix'>*</span>
                                                     </label>
-                                                    <input type='text' class='form-control'
-                                                           id='isHeaderExists'
-                                                           value="true"
-                                                           name='isHeaderExists'
-                                                           aria-required='true'>
+                                                    <select id="isHeaderExists" name='isHeaderExists'
+                                                            class='form-control' aria-required='true'>
+                                                        <option value="true">True</option>
+                                                        <option value="false">False</option>
+                                                    </select>
                                                 </div>
                                             </form>
                                         </div>

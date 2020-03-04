@@ -123,6 +123,14 @@ define(['require', 'jquery', 'log', 'backbone', '../../../js/event-simulator/sim
             });
         };
 
+        self.alertWarning = function (warningMessage) {
+            var warningNotification = getWarningNotification(warningMessage);
+            $("#notification-container").append(warningNotification);
+            warningNotification.fadeTo(4000, 200).slideUp(1000, function () {
+                warningNotification.slideUp(1000);
+            });
+        };
+
         function getErrorNotification(errorMessage) {
             return $(
                 "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-danger' id='error-alert'>" +
@@ -130,7 +138,16 @@ define(['require', 'jquery', 'log', 'backbone', '../../../js/event-simulator/sim
                 errorMessage +
                 "</span>" +
                 "</div>");
-        };
+        }
+
+        function getWarningNotification(warningMessage) {
+            return $(
+                "<div style='z-index: 9999;' style='line-height: 20%;' class='alert alert-warning' id='error-alert'>" +
+                "<span class='notification'>" +
+                warningMessage +
+                "</span>" +
+                "</div>");
+        }
 
         return SampleEventsDialog;
     });

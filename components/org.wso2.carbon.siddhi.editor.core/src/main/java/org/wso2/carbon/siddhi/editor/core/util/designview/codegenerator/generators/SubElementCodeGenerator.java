@@ -172,7 +172,8 @@ public class SubElementCodeGenerator {
             String[] parameterArray = parameter.split(Character.toString(SiddhiCodeBuilderConstants.EQUAL));
             if (parameterArray.length > 1) {
                 parametersStringBuilder.append(parameterArray[0]).append(SiddhiCodeBuilderConstants.EQUAL);
-                parameter = parameterArray[1];
+                parameter = parameter.substring(parameter.indexOf(
+                        Character.toString(SiddhiCodeBuilderConstants.EQUAL)) + 1);
             }
             if (parameter.matches(SiddhiCodeBuilderConstants.MULTI_DOUBLE_QUOTE_REGEX)) {
                 parametersStringBuilder.append(SiddhiCodeBuilderConstants.MULTI_DOUBLE_QUOTE).append(parameter

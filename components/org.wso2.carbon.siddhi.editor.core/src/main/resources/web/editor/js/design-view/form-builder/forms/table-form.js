@@ -54,7 +54,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             self.formUtils.addEventListenerToShowAndHideInfo();
             self.formUtils.addEventListenerToShowInputContentOnHover();
 
-            var predefinedStores = _.orderBy(_.cloneDeep(this.configurationData.rawExtensions["store"]),
+            var predefinedStores = _.orderBy(_.cloneDeep(this.configurationData.rawExtensions['store']),
                 ['name'], ['asc']);
             self.formUtils.addCustomizedType(predefinedStores, Constants.DEFAULT_STORE_TYPE);
             var predefinedTableAnnotations = _.cloneDeep(self.configurationData.application.config.
@@ -67,8 +67,8 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
 
             var name = tableObject.getName();
             if (!name) {
-                var attributes = [{ name: "" }];
-                self.formUtils.renderAttributeTemplate(attributes)
+                var attributes = [{ name: '' }];
+                self.formUtils.renderAttributeTemplate(attributes, propertyDiv.find('#define-attribute'))
 
             } else {
                 $('#tableName').val(name);
@@ -88,7 +88,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             //render the predefined table annotation form template
             self.formUtils.renderPrimaryIndexAnnotations(tableAnnotations, 'define-predefined-annotations');
 
-            self.formUtils.renderAnnotationTemplate("define-user-defined-annotations", userAnnotations);
+            self.formUtils.renderAnnotationTemplate('define-user-defined-annotations', userAnnotations);
             $('.define-user-defined-annotations').find('label:first-child').html('Customized Annotations');
 
             //render the template to  generate the store types
@@ -146,25 +146,25 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
 
                 var tableName = $('#tableName').val().trim();
                 // to check if table name is empty
-                if (tableName == "") {
-                    self.formUtils.addErrorClass("#tableName");
-                    $('#tableNameErrorMessage').text("Table name is required.");
+                if (tableName == '') {
+                    self.formUtils.addErrorClass('#tableName');
+                    $('#tableNameErrorMessage').text('Table name is required.');
                     isErrorOccurred = true;
                     return;
                 }
                 var previouslySavedName = tableObject.getName();
                 if (!previouslySavedName) {
-                    previouslySavedName = "";
+                    previouslySavedName = '';
                 }
                 if (previouslySavedName !== tableName) {
                     var isTableNameUsed = self.formUtils.isDefinitionElementNameUsed(tableName);
                     if (isTableNameUsed) {
-                        self.formUtils.addErrorClass("#tableName");
-                        $('#tableNameErrorMessage').text("Table name is already used.");
+                        self.formUtils.addErrorClass('#tableName');
+                        $('#tableNameErrorMessage').text('Table name is already used.');
                         isErrorOccurred = true;
                         return;
                     }
-                    if (self.formUtils.validateAttributeOrElementName("#tableName", Constants.TABLE, tableName)) {
+                    if (self.formUtils.validateAttributeOrElementName('#tableName', Constants.TABLE, tableName)) {
                         isErrorOccurred = true;
                         return;
                     }
@@ -194,7 +194,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                 }
                 if (attributeNameList.length == 0) {
                     self.formUtils.addErrorClass($('.attribute:eq(0)').find('.attr-name'));
-                    $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.");
+                    $('.attribute:eq(0)').find('.error-message').text('Minimum one attribute is required.');
                     isErrorOccurred = true;
                     return;
                 }
@@ -241,7 +241,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
                     $('.attribute .attr-content').each(function () {
                         var nameValue = $(this).find('.attr-name').val().trim();
                         var typeValue = $(this).find('.attr-type').val();
-                        if (nameValue != "") {
+                        if (nameValue != '') {
                             var attributeObject = new Attribute({ name: nameValue, type: typeValue });
                             tableObject.addAttribute(attributeObject);
                         }
