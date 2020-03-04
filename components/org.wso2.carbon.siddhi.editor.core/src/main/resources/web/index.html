@@ -2364,6 +2364,8 @@
         <div class="icon-bar">
             <a href="#" class="expand-description">More...</a>
             &nbsp;&nbsp;
+
+            <!-- Installed -->
             {{#if install}}
             <span id="InstallBtnId">
                 <span class="extension-not-install"> {{install}}</span>
@@ -2375,30 +2377,56 @@
                 </a>
             </span>
             {{/if}}
+
+            <!-- Not Installed -->
             {{#if notInstall}}
             <span id="notInstallBtnId">
                 <span class="extension-not-install"> {{notInstall}}</span>
+                <!-- Manually installable dependencies are available -->
+                {{#if extension.manuallyInstall}}
+                <a href="#" data-extension-names ="{{extension.extensionInfo.name}}"
+                   title="Click here for installation instructions"
+                   class="partial-extension-install-btn">
+                    <i class="fw fw-warning"></i>
+                </a>
+                {{/if}}
+                <!-- Auto downloadable dependencies are available -->
+                {{#if extension.autoDownloadable}}
                 &nbsp;&nbsp;
                 <a href="#" data-extension-name="{{extension.extensionInfo.name}}"
                    title="Click here to install"
                    class="extension-install-btn">
                     <i class="fw fw-download"></i>
                 </a>
+                {{/if}}
             </span>
             {{/if}}
 
+            <!-- Partially Installed -->
             {{#if partialInstall}}
             <span id="partialBtnId">
-             <span class="extension-not-install"> {{partialInstall}}</span>
-            &nbsp;&nbsp;
-            <a href="#" data-extension-names="{{extension.extensionInfo.name}}"
-               title="Click here for installation instructions"
-               class="partial-extension-install-btn">
-                <i class="fw fw-warning"></i>
-            </a>
-                 <span>
+                <span class="extension-not-install"> {{partialInstall}}</span>
+                <!-- Manually installable dependencies are available -->
+                {{#if extension.manuallyInstall}}
+                <a href="#" data-extension-names ="{{extension.extensionInfo.name}}"
+                   title="Click here for installation instructions"
+                   class="partial-extension-install-btn">
+                    <i class="fw fw-warning"></i>
+                </a>
+                {{/if}}
+                <!-- Auto downloadable dependencies are available -->
+                {{#if extension.autoDownloadable}}
+                &nbsp;&nbsp;
+                <a href="#" data-extension-name="{{extension.extensionInfo.name}}"
+                   title="Click here to install"
+                   class="extension-install-btn">
+                    <i class="fw fw-download"></i>
+                </a>
+                {{/if}}
+            </span>
             {{/if}}
 
+            <!-- Restart Required -->
             {{#if restartRequired}}
             <span id="restartRequiredBtn">
                 <span class="extension-not-install"> {{restartRequired}}</span>
