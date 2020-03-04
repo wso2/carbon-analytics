@@ -197,13 +197,13 @@ define(['require', 'lodash', 'jquery', 'log'],
 
         GenerateStreamDialog.prototype.handleLoadDbConnection = function (evt, generateStreamModal, self) {
             requestBody = {};
-            if (generateStreamModal.find("#inlineContent").attr("aria-expanded") === "true") {
+            if (generateStreamModal.find('#inlineContent').attr('aria-expanded') === 'true') {
                 requestBody = {
                     url: generateStreamModal.find('#dataSourceLocation_1')[0].value,
                     username: generateStreamModal.find('#inlineUsername')[0].value,
                     password: generateStreamModal.find('#inlinePass')[0].value
                 };
-            } else if (generateStreamModal.find("#datasourceContent").attr("aria-expanded") === "true") {
+            } else if (generateStreamModal.find('#datasourceContent').attr('aria-expanded') === 'true') {
                 requestBody.dataSourceName = generateStreamModal.find('#dataSourceNameId')[0].value;
             }
             self.connectToDatabase(requestBody, function (evt) {
@@ -234,9 +234,9 @@ define(['require', 'lodash', 'jquery', 'log'],
             if (connectionDetails !== null) {
                 $.ajax({
                     async: false,
-                    url: constants.editorUrl + "/connectToDatabase",
+                    url: constants.editorUrl + '/connectToDatabase',
                     type: constants.HTTP_POST,
-                    contentType: "application/json; charset=utf-8",
+                    contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify(connectionDetails),
                     success: function (data) {
                         if (typeof errorCallback === 'function')
@@ -254,9 +254,9 @@ define(['require', 'lodash', 'jquery', 'log'],
             if (connectionDetails !== null) {
                 $.ajax({
                     async: false,
-                    url: constants.editorUrl + "/retrieveTableNames",
+                    url: constants.editorUrl + '/retrieveTableNames',
                     type: constants.HTTP_POST,
-                    contentType: "application/json; charset=utf-8",
+                    contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify(connectionDetails),
                     success: function (data) {
                         if (typeof successCallback === 'function')
@@ -274,9 +274,9 @@ define(['require', 'lodash', 'jquery', 'log'],
             if (connectionDetails !== null) {
                 $.ajax({
                     async: false,
-                    url: constants.editorUrl + "/retrieveTableColumnNames",
+                    url: constants.editorUrl + '/retrieveTableColumnNames',
                     type: constants.HTTP_POST,
-                    contentType: "application/json; charset=utf-8", // todo constant
+                    contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify(connectionDetails),
                     success: function (data) {
                         if (typeof successCallback === 'function')
@@ -294,7 +294,7 @@ define(['require', 'lodash', 'jquery', 'log'],
             if (connectionDetails !== null) {
                 $.ajax({
                     async: false,
-                    url: constants.editorUrl + "/retrieveFileDataAttributes",
+                    url: constants.editorUrl + '/retrieveFileDataAttributes',
                     type: constants.HTTP_POST,
                     contentType: false,
                     processData: false,
