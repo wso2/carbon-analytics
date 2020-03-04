@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 /**
@@ -244,6 +245,8 @@ public class DependencyInstallerImpl implements DependencyInstaller {
             }
         } catch (IOException e) {
             LOGGER.error(String.format("Failed to list matching files for lookup regex: %s.", lookupRegex));
+        } catch (PatternSyntaxException e) {
+            LOGGER.error(String.format("Lookup regex: %s is invalid.", lookupRegex));
         }
         return allJarsDeleted;
     }

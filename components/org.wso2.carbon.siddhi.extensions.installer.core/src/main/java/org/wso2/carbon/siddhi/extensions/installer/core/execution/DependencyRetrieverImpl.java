@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Reads information related to the installation of extension dependencies. Used for retrieving extension statuses.
@@ -108,6 +109,8 @@ public class DependencyRetrieverImpl implements DependencyRetriever {
             throw new ExtensionsInstallerException(
                 String.format("Failed when matching files for regex pattern: %s in directory: %s.",
                     regexPattern, directoryPath), e);
+        } catch (PatternSyntaxException e) {
+            throw new ExtensionsInstallerException(String.format("Regex pattern: %s is invalid.", regexPattern), e);
         }
     }
 
