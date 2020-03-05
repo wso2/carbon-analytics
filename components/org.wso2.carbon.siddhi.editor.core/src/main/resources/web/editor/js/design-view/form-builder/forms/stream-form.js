@@ -26,14 +26,17 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
 
         StreamForm.prototype.fillStreamAtrributesWithGeneratedValues = function (responseJsonObj, self, streamObj) {
             $('#streamName').val(responseJsonObj.name);
-            self.formUtils.renderAttributeTemplate(responseJsonObj.attributes,
-                self.propertyDiv.find("#define-attribute"));
+            self.formUtils.renderAttributeTemplate(responseJsonObj.attributes, self.getPropertyDiv());
             streamObj.clearAttributeList();
             _.forEach(responseJsonObj.attributes, function (attribute) {
                 var attributeObject = new Attribute({name: attribute.name, type: attribute.type});
                 streamObj.addAttribute(attributeObject);
             });
             self.formUtils.selectTypesOfSavedAttributes(streamObj.getAttributeList());
+        },
+
+        StreamForm.prototype.getPropertyDiv = function () {
+            return this.formContainer.find("#define-attribute");
         },
 
         /**
@@ -44,10 +47,11 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
          */
         StreamForm.prototype.generatePropertiesForm = function (element, formConsole, formContainer) {
             var self = this;
+            this.formContainer = formContainer;
             var id = $(element).parent().attr('id');
             var streamObject = self.configurationData.getSiddhiAppConfig().getStream(id);
             var previousStreamObject = _.cloneDeep(streamObject);
-            self.propertyDiv = $('<div class="clearfix form-min-width"><div id="streamGeneration">' +
+            this.propertyDiv = $('<div class="clearfix form-min-width"><div id="streamGeneration">' +
                 '<button type="button" class="btn btn-primary">Generate Stream</button></div>' +
                 '<div class = "stream-form-container"> <label> ' +
                 '<span class="mandatory-symbol"> *</span> Name </label> <input type="text" id="streamName" ' +
@@ -55,12 +59,13 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 '<div id="define-attribute"></div> </div> <div class= "stream-form-container"> ' +
                 '<div class ="define-annotation"> </div> </div>');
 
-            self.propertyDiv.on('click', '#streamGeneration', function () {
+            formContainer.html(self.propertyDiv);
+
+            self.formContainer.on('click', '#streamGeneration', function () {
                 self.application.commandManager.dispatch("generate-stream", self,
                     self.fillStreamAtrributesWithGeneratedValues, streamObject);
             });
 
-            formContainer.html(self.propertyDiv);
             self.formUtils.buildFormButtons(formConsole.cid);
             self.formUtils.popUpSelectedElement(id);
             self.designViewContainer.addClass('disableContainer');
