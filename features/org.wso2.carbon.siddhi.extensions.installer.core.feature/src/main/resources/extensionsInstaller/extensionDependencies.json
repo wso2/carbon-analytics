@@ -164,17 +164,13 @@
         "name": "activemq-client",
         "version": "5.9.0",
         "download": {
-          "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/org/apache/activemq/activemq-client/5.9.0/activemq-client-5.9.0.jar"
+          "autoDownloadable": false,
+          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/org/apache/activemq/activemq-client/5.9.0/activemq-client-5.9.0.jar'.<br/>2. Navigate to '{WSO2SIHome}/bin' and run the following command:<br/>&nbsp;For Linux: './icf-provider.sh org.apache.activemq.jndi.ActiveMQInitialContextFactory downloaded/jar/path/activemq-client-5.x.x.jar carbon_home/lib'.<br/>&nbsp;For Windows: './icf-provider.bat org.apache.activemq.jndi.ActiveMQInitialContextFactory downloaded\\jar\\path\\activemq-client-5.x.x.jar carbon_home\\lib'."
         },
         "usages": [
           {
-            "type": "JAR",
+            "type": "BUNDLE",
             "usedBy": "RUNTIME"
-          },
-          {
-            "type": "JAR",
-            "usedBy": "SAMPLES"
           }
         ],
         "lookupRegex": "activemq([_-])client([_-])5.9.0(.*).jar"
@@ -345,12 +341,12 @@
         "name": "ojdbc8",
         "version": "12.2.0.1",
         "download": {
-          "autoDownloadable": true,
-          "url": "https://maven.xwiki.org/externals/com/oracle/jdbc/ojdbc8/12.2.0.1/ojdbc8-12.2.0.1.jar"
+          "autoDownloadable": false,
+          "instructions": "1. Download the jar from: 'https://maven.xwiki.org/externals/com/oracle/jdbc/ojdbc8/12.2.0.1/ojdbc8-12.2.0.1.jar'<br/>2. Navigate to 'carbon_home/bin' and use the command './spi-provider.sh oracle.jdbc.OracleDriver java.sql.Driver downloaded/path/to/jar/ojdbc8.jar'.<br/>3. Place the bundle to carbon_home/lib"
         },
         "usages": [
           {
-            "type": "JAR",
+            "type": "BUNDLE",
             "usedBy": "RUNTIME"
           }
         ],
@@ -361,11 +357,11 @@
         "version": "12.2.0.1",
         "download": {
           "autoDownloadable": false,
-          "instructions": "https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html download relevant instant client zip from above link and unzip to locate xstreams.jar. Convert it to bundle using jartobundle.sh and add it in <SI_HOME>/lib"
+          "instructions": "1. Download relevant instant client zip from 'https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html'.<br/>2. Unzip it and locate 'xstreams.jar'.<br/>3. Navigate to 'carbon_home/bin' and convert it to bundle using the command './jartobundle.sh source/dir/xstreams.jar carbon_home/lib'.<br/>&nbsp;Only for Linux, use './jni-provider.sh source/dir/xstreams.jar carbon_home/lib clntsh'."
         },
         "usages": [
           {
-            "type": "JAR",
+            "type": "BUNDLE",
             "usedBy": "RUNTIME"
           }
         ],
@@ -550,8 +546,8 @@
         "name": "simpleclient_httpserver",
         "version": "0.5.0",
         "download": {
-          "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/prometheus/simpleclient_httpserver/0.5.0/simpleclient_httpserver-0.5.0.jar"
+          "autoDownloadable": false,
+          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/io/prometheus/simpleclient_httpserver/0.5.0/simpleclient_httpserver-0.5.0.jar'.<br/>2. Copy the jar to '{WSO2SIHome}/bin' directory"
         },
         "usages": [
           {
@@ -565,8 +561,8 @@
         "name": "simpleclient_pushgateway",
         "version": "0.5.0",
         "download": {
-          "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/prometheus/simpleclient_pushgateway/0.5.0/simpleclient_pushgateway-0.5.0.jar"
+          "autoDownloadable": false,
+          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/io/prometheus/simpleclient_pushgateway/0.5.0/simpleclient_pushgateway-0.5.0.jar'. Copy the jar to '{WSO2SIHome}/bin' directory"
         },
         "usages": [
           {
@@ -1030,7 +1026,7 @@
         },
         "usages": [
           {
-            "type": "JAR",
+            "type": "BUNDLE",
             "usedBy": "RUNTIME"
           }
         ],
