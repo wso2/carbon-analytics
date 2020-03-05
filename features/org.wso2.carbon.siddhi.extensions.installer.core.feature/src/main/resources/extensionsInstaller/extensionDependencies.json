@@ -271,6 +271,21 @@
           }
         ],
         "lookupRegex": "com.ibm.mq.allclient([_-])9.0.5.0(.+).jar"
+      },
+      {
+        "name": "javax.jms-api",
+        "version": "2.0.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/javax/jms/javax.jms-api/2.0.1/javax.jms-api-2.0.1.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "javax.jms([_-])api([_-])2.0.1(.+).jar"
       }
     ]
   },
@@ -547,7 +562,7 @@
         "version": "0.5.0",
         "download": {
           "autoDownloadable": false,
-          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/io/prometheus/simpleclient_httpserver/0.5.0/simpleclient_httpserver-0.5.0.jar'.<br/>2. Copy the jar to '{WSO2SIHome}/bin' directory"
+          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/io/prometheus/simpleclient_httpserver/0.5.0/simpleclient_httpserver-0.5.0.jar'.<br/>2. Copy the jar to '{WSO2SIHome}/lib' directory"
         },
         "usages": [
           {
@@ -562,7 +577,7 @@
         "version": "0.5.0",
         "download": {
           "autoDownloadable": false,
-          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/io/prometheus/simpleclient_pushgateway/0.5.0/simpleclient_pushgateway-0.5.0.jar'.<br/>2. Copy the jar to '{WSO2SIHome}/bin' directory"
+          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/io/prometheus/simpleclient_pushgateway/0.5.0/simpleclient_pushgateway-0.5.0.jar'.<br/>2. Copy the jar to '{WSO2SIHome}/lib' directory"
         },
         "usages": [
           {
@@ -986,7 +1001,7 @@
         },
         "usages": [
           {
-            "type": "JAR",
+            "type": "BUNDLE",
             "usedBy": "RUNTIME"
           }
         ],
