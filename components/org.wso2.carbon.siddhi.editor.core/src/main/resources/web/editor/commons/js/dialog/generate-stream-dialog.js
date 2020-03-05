@@ -317,5 +317,12 @@ define(['require', 'lodash', 'jquery', 'log'],
                 })
             }
         };
+
+        GenerateStreamDialog.prototype.clear = function () {
+            if (!_.isNil(this._generateStreamModal)) {
+                this._generateStreamModal.remove();
+            }
+        };
+
         return GenerateStreamDialog;
     });
