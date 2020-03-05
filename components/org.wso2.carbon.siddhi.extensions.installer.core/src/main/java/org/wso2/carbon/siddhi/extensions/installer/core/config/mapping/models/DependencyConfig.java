@@ -43,6 +43,10 @@ public class DependencyConfig {
         return Objects.equals(lookupRegex, dependency.lookupRegex);
     }
 
+    public String getName() {
+        return name;
+    }
+
     public DownloadConfig getDownload() {
         return download;
     }

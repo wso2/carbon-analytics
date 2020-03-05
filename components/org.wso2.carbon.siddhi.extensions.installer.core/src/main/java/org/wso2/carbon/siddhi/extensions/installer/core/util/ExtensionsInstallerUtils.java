@@ -70,7 +70,29 @@ public class ExtensionsInstallerUtils {
     }
 
     /**
-     * Returns the installation status of an extension, based on the given counts of its installed dependencies.
+     * Returns the existing installation status of an extension,
+     * based on the given counts of its installed dependencies, and whether the self jar of the extension is available.
+     *
+     * @param isSelfDependencyInstalled  Whether the self jar of the extension is available.
+     * @param installedDependenciesCount Actual count of successfully installed dependencies.
+     * @param expectedDependenciesCount  Expected count of successfully installed dependencies.
+     * @return Installation status of the extension.
+     */
+    public static ExtensionInstallationStatus getExistingInstallationStatus(boolean isSelfDependencyInstalled,
+                                                                            int installedDependenciesCount,
+                                                                            int expectedDependenciesCount) {
+        if (installedDependenciesCount == 0 || !isSelfDependencyInstalled) {
+            return ExtensionInstallationStatus.NOT_INSTALLED;
+        }
+        if (installedDependenciesCount < expectedDependenciesCount) {
+            return ExtensionInstallationStatus.PARTIALLY_INSTALLED;
+        }
+        return ExtensionInstallationStatus.INSTALLED;
+    }
+
+    /**
+     * Returns the installation status of an extension after an installation,
+     * based on the given counts of its installed dependencies.
      *
      * @param installedDependenciesCount Actual count of successfully installed dependencies.
      * @param expectedDependenciesCount  Expected count of successfully installed dependencies.
@@ -88,7 +110,8 @@ public class ExtensionsInstallerUtils {
     }
 
     /**
-     * Returns the un-installation status of an extension, based on the given counts of its un-installed dependencies.
+     * Returns the un-installation status of an extension (after an un-installation),
+     * based on the given counts of its un-installed dependencies.
      *
      * @param uninstalledDependenciesCount Actual count of successfully un-installed dependencies.
      * @param expectedDependenciesCount    Expected count of successfully un-installed dependencies.
