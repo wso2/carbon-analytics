@@ -72,15 +72,27 @@ public class DependencyRetrieverImpl implements DependencyRetriever {
         List<DependencyConfig> dependencies = extension.getDependencies();
         if (dependencies != null) {
             int installedDependenciesCount = 0;
+            boolean isSelfDependencyInstalled = false;
             for (DependencyConfig dependency : dependencies) {
                 if (isDependencyInstalled(dependency)) {
                     installedDependenciesCount++;
+                    // Whether the Siddhi jar of the extension itself has been installed or not.
+                    if (isSelfDependency(dependency)) {
+                        isSelfDependencyInstalled = true;
+                    }
                 }
             }
-            return ExtensionsInstallerUtils
-                .getInstallationStatus(installedDependenciesCount, dependencies.size());
+            return ExtensionsInstallerUtils.getExistingInstallationStatus(
+                isSelfDependencyInstalled, installedDependenciesCount, dependencies.size());
         }
         throw new ExtensionsInstallerException("No dependencies were specified.");
+    }
+
+    private boolean isSelfDependency(DependencyConfig dependency) {
+        if (dependency.getName() != null) {
+            return dependency.getName().toLowerCase().startsWith("siddhi-");
+        }
+        return false;
     }
 
     private boolean isDependencyInstalled(DependencyConfig dependency) throws ExtensionsInstallerException {
