@@ -33,7 +33,6 @@ import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -55,7 +54,8 @@ public class MetaInfoRetrieverUtils {
         for (String value : values) {
             JsonObject attribute = new JsonObject();
             if (attributeNameArray != null) {
-                attribute.addProperty("name", attributeNameArray[count]);
+                attribute.addProperty("name", attributeNameArray[count].
+                        replaceAll("\\s",""));
             } else {
                 attribute.addProperty("name", "attr" + (count + 1));
             }
@@ -81,7 +81,8 @@ public class MetaInfoRetrieverUtils {
                 log.warn(message);
                 response.addProperty(Constants.WARNING, message);
             } else {
-                attribute.addProperty("name", (String) entry.getKey());
+                attribute.addProperty("name", ((String) entry.getKey()).
+                        replaceAll("\\s",""));
 
                 attribute.addProperty("type", findDataTypeFromString(entry.getValue().toString()));
                 attributes.add(attribute);
