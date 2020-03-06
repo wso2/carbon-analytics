@@ -222,6 +222,7 @@ define(['require', 'lodash', 'jquery', 'log'],
             this._generateStreamModal.modal('show');
         };
         GenerateStreamDialog.prototype.populateInlineTableList = function (data, generateStreamModal) {
+            generateStreamModal.find('.tableSelector').find('option').remove();
             if (data != null && data instanceof Array) {
                 data.forEach(function (value, index) {
                     generateStreamModal.find('.tableSelector').append('<option value=' + index + '>'
