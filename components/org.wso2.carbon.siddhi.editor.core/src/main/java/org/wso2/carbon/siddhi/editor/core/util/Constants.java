@@ -112,7 +112,7 @@ public class Constants {
     public static final String OPERATOR_PREREQ_YAML_NAME = "k8-prerequisites.yaml";
     public static final String ERROR = "error";
     public static final String WARNING = "warning";
-    public static final String REGEX_TO_KEEP_QUOTES = "(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)";
+    public static final String REGEX_TO_KEEP_QUOTES = "(?=(?:[^(\"|')]*(\"|')[^(\"|')]*(\"|'))*[^(\"|')]*$)";
     static final Map<String, Class<?>> SUPER_CLASS_MAP;
     static final Map<String, String> PACKAGE_NAME_MAP;
 
