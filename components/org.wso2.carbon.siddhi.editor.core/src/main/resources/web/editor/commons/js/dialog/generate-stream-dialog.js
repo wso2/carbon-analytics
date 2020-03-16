@@ -21,6 +21,9 @@ define(['require', 'lodash', 'jquery', 'log'],
         var requestBody = {};
         var files;
         var config = {};
+        const CONTENT_TYPE_CSV = 'text/csv';
+        const CONTENT_TYPE_JSON = 'type/json';
+        const CONTENT_TYPE_XML = 'type/xml';
 
         var constants = {
             HTTP_GET: 'GET',
@@ -175,8 +178,14 @@ define(['require', 'lodash', 'jquery', 'log'],
         GenerateStreamDialog.prototype.handleFileSelect = function (evt, generateStreamModal) {
             files = evt.target.files; // FileList object
             generateStreamModal.find('.from-file-section').collapse('hide');
-            var fileType = files[0].type;
-
+            var fileType = '';
+            if(files[0].type === CONTENT_TYPE_CSV || files[0].name.includes('.csv') || files[0].type.includes('excel')){
+                fileType = CONTENT_TYPE_CSV;
+            } else if (files[0].type === CONTENT_TYPE_JSON || files[0].name.includes('.json')){
+                fileType = CONTENT_TYPE_JSON;
+            } else if(files[0].type === CONTENT_TYPE_XML || files[0].name.includes('xml') ) {
+                fileType = CONTENT_TYPE_XML;
+            }
             var section = generateStreamModal.find('.from-file-section[data-file-type="' + fileType + '"]');
             if (section.length > 0) {
                 section.collapse('show');
