@@ -23,7 +23,7 @@ define(['require', 'lodash', 'jquery', 'log'],
         var config = {};
         const CONTENT_TYPE_CSV = 'text/csv';
         const CONTENT_TYPE_JSON = 'application/json';
-        const CONTENT_TYPE_XML = 'type/xml';
+        const CONTENT_TYPE_XML = 'text/xml';
 
         var constants = {
             HTTP_GET: 'GET',
@@ -52,7 +52,6 @@ define(['require', 'lodash', 'jquery', 'log'],
 
             // rename the variable
             var generateStreamModal = $('#generateStreamConfigModal').clone();
-            generateStreamModal.find('output').html('');
 
             generateStreamModal.find('.collapse').collapse();
             generateStreamModal.find('.streamName').attr('value', self.streamObj.name)
@@ -193,15 +192,6 @@ define(['require', 'lodash', 'jquery', 'log'],
             } else {
                 self.alertError('Error Occurred while processing the file. File type does not supported')
             }
-
-            var output = [];
-            for (var i = 0, f; f = files[i]; i++) {
-                output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-                    f.size, ' bytes, last modified: ',
-                    f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-                    '</li>');
-            }
-            generateStreamModal.find('output').html('<ul>' + output.join('') + '</ul>');
         };
 
         GenerateStreamDialog.prototype.handleLoadDbConnection = function (evt, generateStreamModal, self) {

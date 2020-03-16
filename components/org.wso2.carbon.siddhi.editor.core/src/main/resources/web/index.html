@@ -2790,9 +2790,16 @@
                                 <div id='generateFromFileContent' class='panel-collapse collapse in'>
                                     <div class='panel-body'>
                                         <div class='driving-license-kind'>
-                                            <div class='checkbox checkPanel'>
-                                                <input type="file" id="fileSelector" name="fileSelector" multiple/>
-                                                <output id="file_list1"></output>
+                                            <div class='form-group'>
+                                                <input type="text" name="fileName" id="fileName" disabled="true"
+                                                       class="form-control" style="float: left; width: 75%;  "/>
+                                                <select id="fileType" name='fileType'
+                                                        class='form-control' aria-required='true' style="width: 25%">
+                                                    <option value="0">CSV</option>
+                                                    <option value="1">JSON</option>
+                                                    <option value="2">XML</option>
+                                                </select>
+                                                <input type="file" id="fileSelector" name="fileSelector" style="padding-top: 10px;color: transparent"/>
                                             </div>
                                         </div>
                                     </div>
