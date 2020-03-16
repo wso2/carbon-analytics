@@ -27,11 +27,11 @@ The directory structure of the exported kubernetes artifacts zip file is as foll
 Purpose of each file in the above archive is as follows.
 
 - **README.md**: This readme file.
-- **Dockerfile**: Docker image build script which contains all commands to assemble Siddhi Runner image. 
+- **Dockerfile**: Docker image build script which contains all commands to assemble Streaming Integrator image. 
 - **siddhi-files**: Directory which contains Siddhi files. (Note: These Siddhi files are already added in `siddhi-process.yaml`)
 - **siddhi-process.yaml**: `SiddhiProcess` YAML that used to deploy Siddhi apps directly in a Kubernetes cluster using Kubernetes custom resource definition.
-- **bundles**: Directory maintained for OSGI bundles which needs to be copied to Siddhi Runner image during the build phase.
-- **jars**: Directory maintained for Jar files which may not have their corresponding OSGi bundle implementation. These Jars will be converted as OSGI bundles and copied to Siddhi Runner image during the build phase.
+- **bundles**: Directory maintained for OSGI bundles which needs to be copied to Streaming Integrator image during the build phase.
+- **jars**: Directory maintained for Jar files which may not have their corresponding OSGi bundle implementation. These Jars will be converted as OSGI bundles and copied to Streaming Integrator image during the build phase.
 
 ## Steps to Run
 
