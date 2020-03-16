@@ -79,7 +79,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 $('#step-2 > div.step-description-text').append('Use ${...} format to template siddhi apps');
                 $('#step-3 > div.step-description-text').append('Use ${...} format to template the configurations');
 
-                var productNameWrapHeader = $('<h2><img src="/editor/commons/images/wso2-logo.svg">' +
+                var productNameWrapHeader = $('<h2 style="min-width: 253px;text-align: center;display: table-cell;">' +
+                    '<img src="/editor/commons/images/wso2-logo.svg">' +
                     '<h1>Streaming Integrator Tooling</h1></h2>');
                 productNameWrap.append(productNameWrapHeader);
 
