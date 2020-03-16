@@ -71,15 +71,15 @@ public class MetaInfoRetrieverUtils {
         JsonObject response = new JsonObject();
         JsonArray attributes = new JsonArray();
         Map map = (LinkedHashMap) obj;
+        StringBuilder warningMessage = new StringBuilder("");
         Iterator it = map.entrySet().iterator();
         while(it.hasNext()) {
             JsonObject attribute = new JsonObject();
             Map.Entry entry = (Map.Entry) it.next();
-            if (entry.getValue() instanceof JSONArray) {
-                String message = "A complex object found for attribute key : \"" + entry.getKey() +
-                        "\". Hence ignoring the attribute.";
-                log.warn(message);
-                response.addProperty(Constants.WARNING, message);
+            if (entry.getValue() instanceof JSONArray || entry.getValue() instanceof LinkedHashMap) {
+                warningMessage.append("A complex object found for attribute key : \"" + entry.getKey() +
+                        "\".");
+                log.warn(warningMessage.toString());
             } else {
                 attribute.addProperty("name", ((String) entry.getKey()).
                         replaceAll("\\s",""));
@@ -88,6 +88,9 @@ public class MetaInfoRetrieverUtils {
                 attributes.add(attribute);
             }
 
+        }
+        if (!"".equals(warningMessage.toString())) {
+            response.addProperty(Constants.WARNING, warningMessage.append("Hence ignoring them.").toString());
         }
         response.addProperty("attributes", attributes.toString());
         return response;
@@ -175,22 +178,24 @@ public class MetaInfoRetrieverUtils {
     public static JsonObject createResponseForXML(OMElement obj) {
         JsonObject response = new JsonObject();
         JsonArray attributes = new JsonArray();
-
+        StringBuilder warningMessage = new StringBuilder("");
         Iterator iterator = obj.getChildElements();
         while (iterator.hasNext()) {
             JsonObject attribute = new JsonObject();
             OMElement attrOMElement = (OMElement) iterator.next();
             if (null != attrOMElement.getFirstElement()) {
-                String message = "A nested xml structure : " + attrOMElement.toString() + " found for key : \"" +
-                        attrOMElement.getLocalName() + "\". Hence ignoring the attribute.";
-                log.warn(message);
-                response.addProperty(Constants.WARNING, message);
+                warningMessage.append("A nested xml structure : " + attrOMElement.toString() + " found for key : \"" +
+                        attrOMElement.getLocalName() + "\".");
+                log.warn(warningMessage.toString());
             } else {
                 attribute.addProperty("name", attrOMElement.getLocalName());
                 attribute.addProperty("type", findDataTypeFromString(attrOMElement.getText()));
                 attributes.add(attribute);
             }
 
+        }
+        if (!"".equals(warningMessage.toString())) {
+            response.addProperty(Constants.WARNING, warningMessage.append("Hence ignoring them.").toString());
         }
         response.addProperty("attributes", attributes.toString());
         return response;
