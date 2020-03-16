@@ -22,7 +22,7 @@ define(['require', 'lodash', 'jquery', 'log'],
         var files;
         var config = {};
         const CONTENT_TYPE_CSV = 'text/csv';
-        const CONTENT_TYPE_JSON = 'type/json';
+        const CONTENT_TYPE_JSON = 'application/json';
         const CONTENT_TYPE_XML = 'type/xml';
 
         var constants = {
