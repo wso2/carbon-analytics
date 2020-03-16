@@ -79,7 +79,6 @@ public class MetaInfoRetrieverUtils {
             if (entry.getValue() instanceof JSONArray || entry.getValue() instanceof LinkedHashMap) {
                 warningMessage.append("A complex object found for attribute key : \"" + entry.getKey() +
                         "\".");
-                log.warn(warningMessage.toString());
             } else {
                 attribute.addProperty("name", ((String) entry.getKey()).
                         replaceAll("\\s",""));
@@ -91,6 +90,7 @@ public class MetaInfoRetrieverUtils {
         }
         if (!"".equals(warningMessage.toString())) {
             response.addProperty(Constants.WARNING, warningMessage.append("Hence ignoring them.").toString());
+            log.warn(warningMessage.toString());
         }
         response.addProperty("attributes", attributes.toString());
         return response;
@@ -186,7 +186,6 @@ public class MetaInfoRetrieverUtils {
             if (null != attrOMElement.getFirstElement()) {
                 warningMessage.append("A nested xml structure : " + attrOMElement.toString() + " found for key : \"" +
                         attrOMElement.getLocalName() + "\".");
-                log.warn(warningMessage.toString());
             } else {
                 attribute.addProperty("name", attrOMElement.getLocalName());
                 attribute.addProperty("type", findDataTypeFromString(attrOMElement.getText()));
@@ -196,6 +195,7 @@ public class MetaInfoRetrieverUtils {
         }
         if (!"".equals(warningMessage.toString())) {
             response.addProperty(Constants.WARNING, warningMessage.append("Hence ignoring them.").toString());
+            log.warn(warningMessage.toString());
         }
         response.addProperty("attributes", attributes.toString());
         return response;
