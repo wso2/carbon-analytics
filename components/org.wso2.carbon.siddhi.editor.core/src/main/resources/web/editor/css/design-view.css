@@ -1676,3 +1676,11 @@ label.option-name {
 .init-loading-screen p {
     font-size: 20px;
 }
+
+.form-control.fileName[disabled]{
+    opacity: 1;
+}
+
+.streamGen {
+    padding:0 15px;
+}

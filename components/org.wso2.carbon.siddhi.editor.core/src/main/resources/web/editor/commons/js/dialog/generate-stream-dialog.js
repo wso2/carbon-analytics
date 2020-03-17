@@ -24,6 +24,9 @@ define(['require', 'lodash', 'jquery', 'log'],
         const CONTENT_TYPE_CSV = 'text/csv';
         const CONTENT_TYPE_JSON = 'application/json';
         const CONTENT_TYPE_XML = 'text/xml';
+        var fileType = '';
+        var stateChangedByFileSelector = false;
+
 
         var constants = {
             HTTP_GET: 'GET',
@@ -103,6 +106,10 @@ define(['require', 'lodash', 'jquery', 'log'],
                 self.handleLoadDbConnection(e, generateStreamModal, self);
             });
 
+            generateStreamModal.find('#fileType').on('change', function (e) {
+                self.handleFileTypeSelect(e, generateStreamModal, self);
+            });
+
             generateStreamModal.find('#generateButton').click(function () {
                 config = {};
                 var formData = new FormData();
@@ -176,21 +183,47 @@ define(['require', 'lodash', 'jquery', 'log'],
 
         GenerateStreamDialog.prototype.handleFileSelect = function (evt, generateStreamModal) {
             files = evt.target.files; // FileList object
+            generateStreamModal.find('#fileTypeSelect').collapse('show');
+            generateStreamModal.find('#fileType')[0].value = '-1';
             generateStreamModal.find('.from-file-section').collapse('hide');
-            var fileType = '';
-            if(files[0].type === CONTENT_TYPE_CSV || files[0].name.includes('.csv') || files[0].type.includes('excel')){
+            generateStreamModal.find('#fileType')[0].disabled = false;
+            generateStreamModal.find('#fileName')[0].value = files[0].name;
+            stateChangedByFileSelector = false;
+            if (files[0].type === CONTENT_TYPE_CSV || files[0].name.includes('.csv') || files[0].type.includes('excel')) {
                 fileType = CONTENT_TYPE_CSV;
-            } else if (files[0].type === CONTENT_TYPE_JSON || files[0].name.includes('.json')){
+                generateStreamModal.find('#fileType')[0].value = CONTENT_TYPE_CSV;
+            } else if (files[0].type === CONTENT_TYPE_JSON || files[0].name.includes('.json')) {
                 fileType = CONTENT_TYPE_JSON;
-            } else if(files[0].type === CONTENT_TYPE_XML || files[0].name.includes('xml') ) {
+                generateStreamModal.find('#fileType')[0].value = CONTENT_TYPE_JSON;
+            } else if (files[0].type === CONTENT_TYPE_XML || files[0].name.includes('xml')) {
                 fileType = CONTENT_TYPE_XML;
+                generateStreamModal.find('#fileType')[0].value = CONTENT_TYPE_XML;
             }
-            var section = generateStreamModal.find('.from-file-section[data-file-type="' + fileType + '"]');
-            if (section.length > 0) {
-                section.collapse('show');
-                generateStreamModal.find('#generateButton').removeAttr('disabled');
-            } else {
-                self.alertError('Error Occurred while processing the file. File type does not supported')
+            if (generateStreamModal.find('#fileType')[0].value !== '-1') {
+                generateStreamModal.find('#fileType')[0].disabled = true;
+                stateChangedByFileSelector = true;
+                generateStreamModal.find('#fileType').trigger('change');
+            }  else {
+                self.alertWarning('Provided file type is not supported or cannot identify. ' +
+                    'please select the file type from the drop down')
+            }
+        };
+
+        GenerateStreamDialog.prototype.handleFileTypeSelect = function(evt , generateStreamModal, self){
+            if (generateStreamModal.find('#fileType')[0].value !== '-1') {
+                generateStreamModal.find('.from-file-section').collapse('hide');
+                self.sleep(500).then(() => {
+                    if (generateStreamModal.find('#fileName')[0].value !== '' && evt.target.value !== '-1') {
+                        fileType = evt.target.value;
+                        var section = generateStreamModal.find('.from-file-section[data-file-type="' + fileType + '"]');
+                        if (section.length > 0) {
+                            section.collapse('show');
+                            generateStreamModal.find('#generateButton').removeAttr('disabled');
+                        } else {
+                            self.alertError('Error Occurred while processing the file. File type does not supported')
+                        }
+                    }
+                })
             }
         };
 
@@ -324,5 +357,12 @@ define(['require', 'lodash', 'jquery', 'log'],
             }
         };
 
+        GenerateStreamDialog.prototype.sleep = function (time) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve();
+                }, time);
+            });
+        };
         return GenerateStreamDialog;
     });
