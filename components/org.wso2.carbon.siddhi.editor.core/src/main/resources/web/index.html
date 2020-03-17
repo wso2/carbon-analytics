@@ -2384,7 +2384,7 @@
                 <span class="extension-not-install"> {{notInstall}}</span>
                 <!-- Manually installable dependencies are available -->
                 {{#if extension.manuallyInstall}}
-                <a href="#" data-extension-names ="{{extension.extensionInfo.name}}"
+                <a href="#" data-extension-names="{{extension.extensionInfo.name}}"
                    title="Click here for installation instructions"
                    class="partial-extension-install-btn">
                     <i class="fw fw-warning"></i>
@@ -2408,7 +2408,7 @@
                 <span class="extension-not-install"> {{partialInstall}}</span>
                 <!-- Manually installable dependencies are available -->
                 {{#if extension.manuallyInstall}}
-                <a href="#" data-extension-names ="{{extension.extensionInfo.name}}"
+                <a href="#" data-extension-names="{{extension.extensionInfo.name}}"
                    title="Click here for installation instructions"
                    class="partial-extension-install-btn">
                     <i class="fw fw-warning"></i>
@@ -2770,12 +2770,12 @@
             <div class='modal-body'>
                 <div class='container-fluid'>
 
-                    <form class='form-horizontal' onsubmit='return false'>
+                    <form class='form-horizontal streamGen' onsubmit='return false'>
 
-                        <div class='panel-group driving-license-settings' id='accordion'>
+                        <div class='panel-group' id='accordion'>
                             <div class='panel panel-default'>
-                                <div>
-                                    <label class="radio-inline">
+                                <div class='form-group'>
+                                    <label class='radio-inline'>
                                         <input type='radio' id='idFromFile' name='selection' value='fromFile'
                                                style='display: block;margin-left: -20px;margin-top: 1;'>
                                         From File
@@ -2790,115 +2790,136 @@
                                 <div id='generateFromFileContent' class='panel-collapse collapse in'>
                                     <div class='panel-body'>
                                         <div class='driving-license-kind'>
-                                            <div class='checkbox checkPanel'>
-                                                <input type="file" id="fileSelector" name="fileSelector" multiple/>
-                                                <output id="file_list1"></output>
+                                            <div class='form-group'>
+                                                <input type='file' id='fileSelector' class='fileSelector'
+                                                       name='fileSelector'
+                                                       style='padding-top: 10px;color: transparent'/>
                                             </div>
                                         </div>
                                     </div>
-                                    <div id='fromJsonFile' class='panel-collapse collapse in from-file-section' data-file-type="application/json">
+                                    <div id='fileTypeSelect' class='panel-collapse collapse in'>
                                         <div class='panel-body'>
-                                            <form id="jsonForm">
-                                                <div class='form-group'>
-                                                    <label>
-                                                        Stream Name <span class='required_astrix'> *</span>
-                                                    </label>
-                                                    <input type='text' class='form-control streamName'
-                                                           id='streamNameJson'
-                                                           value="tempStream"
-                                                           name='streamName'
-                                                           aria-required='true'>
-                                                </div>
-                                                <div class='form-group'>
-                                                    <label>
-                                                        Enclosing Element<span class='required_astrix'> *</span>
-                                                    </label>
-                                                    <input type='text' class='form-control'
-                                                           id='jsonEnclosingElement'
-                                                           value='$'
-                                                           name='enclosing-element'
-                                                           aria-required='true'>
-                                                </div>
-                                            </form>
+                                            <div class='form-group'>
+                                                <input type='text' name='fileName' id='fileName' disabled='true'
+                                                       class='form-control fileName'
+                                                       style="float: left; width: 70%; margin-right:15px "/>
+                                                <select id="fileType" name='fileType'
+                                                        class='form-control fileType' aria-required='true'
+                                                        style="width: calc(30% - 15px)">
+                                                    <option value='-1' selected="selected">Select File Type</option>
+                                                    <option value="text/csv">CSV</option>
+                                                    <option value="application/json">JSON</option>
+                                                    <option value="text/xml">XML</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-
-                                    <div id='fromXmlFile' class='panel-collapse collapse in from-file-section' data-file-type='text/xml'>
-                                        <div class='panel-body'>
-                                            <form id="xmlForm">
-                                                <div class='form-group'>
-                                                    <label>
-                                                        Stream Name <span class='required_astrix'> *</span>
-                                                    </label>
-                                                    <input type='text' class='form-control streamName'
-                                                           id='streamNameXml'
-                                                           value="tempStream"
-                                                           name='streamName'
-                                                           aria-required='true'>
-                                                </div>
-                                                <div class='form-group'>
-                                                    <label>
-                                                        Namespace
-                                                    </label>
-                                                    <input type='text' class='form-control'
-                                                           id='nameSpaceOfXml'
-                                                           name='nameSpaceOfXml'
-                                                           aria-required='true'></div>
-                                                <div class='form-group'>
-                                                    <label>
-                                                        Enclosing Element<span class='required_astrix'> *</span>
-                                                    </label>
-                                                    <input type='text' class='form-control'
-                                                           id='enclosingElementXML'
-                                                           value="//"
-                                                           name='enclosingElementXML'
-                                                           aria-required='true'>
-                                                </div>
-                                            </form>
+                                        <div id='fromJsonFile' class='panel-collapse collapse in from-file-section'
+                                             data-file-type='application/json'>
+                                            <div class='panel-body'>
+                                                <form id="jsonForm">
+                                                    <div class='form-group'>
+                                                        <label>
+                                                            Stream Name <span class='required_astrix'> *</span>
+                                                        </label>
+                                                        <input type='text' class='form-control streamName'
+                                                               id='streamNameJson'
+                                                               value="tempStream"
+                                                               name='streamName'
+                                                               aria-required='true'>
+                                                    </div>
+                                                    <div class='form-group'>
+                                                        <label>
+                                                            Enclosing Element<span class='required_astrix'> *</span>
+                                                        </label>
+                                                        <input type='text' class='form-control'
+                                                               id='jsonEnclosingElement'
+                                                               value='$'
+                                                               name='enclosing-element'
+                                                               aria-required='true'>
+                                                    </div>
+                                                </form>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div id='fromCsvFile' class='panel-collapse collapse in from-file-section' data-file-type='text/csv'>
-                                        <div class='panel-body'>
-                                            <form id="csvForm">
-                                                <div class='form-group'>
-                                                    <label>
-                                                        Stream Name <span class='required_astrix'> *</span>
-                                                    </label>
-                                                    <input type='text' class='form-control streamName'
-                                                           id='streamNameCsv'
-                                                           value="tempStream"
-                                                           name='streamName'
-                                                           aria-required='true'>
-                                                </div>
-                                                <div class='form-group'>
-                                                    <label>
-                                                        Delimiter <span class='required_astrix'> *</span>
-                                                    </label>
-                                                    <input type='text' class='form-control'
-                                                           id='delimiterOfCSV'
-                                                           value=","
-                                                           name='delimiterOfCSV'
-                                                           aria-required='true'>
-                                                </div>
-                                                <div class='form-group'>
-                                                    <label>
-                                                        Is Header Exists<span class='required_astrix'>*</span>
-                                                    </label>
-                                                    <select id="isHeaderExists" name='isHeaderExists'
-                                                            class='form-control' aria-required='true'>
-                                                        <option value="true">True</option>
-                                                        <option value="false">False</option>
-                                                    </select>
-                                                </div>
-                                            </form>
+                                        <div id='fromXmlFile' class='panel-collapse collapse in from-file-section'
+                                             data-file-type='text/xml'>
+                                            <div class='panel-body'>
+                                                <form id="xmlForm">
+                                                    <div class='form-group'>
+                                                        <label>
+                                                            Stream Name <span class='required_astrix'> *</span>
+                                                        </label>
+                                                        <input type='text' class='form-control streamName'
+                                                               id='streamNameXml'
+                                                               value="tempStream"
+                                                               name='streamName'
+                                                               aria-required='true'>
+                                                    </div>
+                                                    <div class='form-group'>
+                                                        <label>
+                                                            Namespace
+                                                        </label>
+                                                        <input type='text' class='form-control'
+                                                               id='nameSpaceOfXml'
+                                                               name='nameSpaceOfXml'
+                                                               aria-required='true'></div>
+                                                    <div class='form-group'>
+                                                        <label>
+                                                            Enclosing Element<span class='required_astrix'> *</span>
+                                                        </label>
+                                                        <input type='text' class='form-control'
+                                                               id='enclosingElementXML'
+                                                               value="//"
+                                                               name='enclosingElementXML'
+                                                               aria-required='true'>
+                                                    </div>
+                                                </form>
+                                            </div>
                                         </div>
-                                    </div>
 
+                                        <div id='fromCsvFile' class='panel-collapse collapse in from-file-section'
+                                             data-file-type='text/csv'>
+                                            <div class='panel-body'>
+                                                <form id="csvForm">
+                                                    <div class='form-group'>
+                                                        <label>
+                                                            Stream Name <span class='required_astrix'> *</span>
+                                                        </label>
+                                                        <input type='text' class='form-control streamName'
+                                                               id='streamNameCsv'
+                                                               value="tempStream"
+                                                               name='streamName'
+                                                               aria-required='true'>
+                                                    </div>
+                                                    <div class='form-group'>
+                                                        <label>
+                                                            Delimiter <span class='required_astrix'> *</span>
+                                                        </label>
+                                                        <input type='text' class='form-control'
+                                                               id='delimiterOfCSV'
+                                                               value=","
+                                                               name='delimiterOfCSV'
+                                                               aria-required='true'>
+                                                    </div>
+                                                    <div class='form-group'>
+                                                        <label>
+                                                            Is Header Exists<span class='required_astrix'>*</span>
+                                                        </label>
+                                                        <select id="isHeaderExists" name='isHeaderExists'
+                                                                class='form-control' aria-required='true'>
+                                                            <option value="true">True</option>
+                                                            <option value="false">False</option>
+                                                        </select>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                    </div>
                                 </div>
 
                                 <div id='generateFromDBContent' class='panel-collapse collapse in'>
-                                    <div class='panel-body'>
+                                    <div style='padding-bottom: 10px'>
                                         <div class='dbsourceConfigForm checkPanel' data-type='db'
                                              style='display: block;'>
                                             <label class='radio-inline'>
@@ -2932,7 +2953,8 @@
                                                     <label>
                                                         Database URL<span class='required_astrix'> *</span>
                                                     </label>
-                                                    <input type='text' class='form-control required-for-db-connection'
+                                                    <input type='text'
+                                                           class='form-control required-for-db-connection'
                                                            id='dataSourceLocation_1'
                                                            value='jdbc:mysql://[machine-name/ip]:[port]/[database-name]'
                                                            name='data-source-location'
@@ -2943,7 +2965,8 @@
                                                     <label>
                                                         Username<span class='required_astrix'> *</span>
                                                     </label>
-                                                    <input type='text' class='form-control required-for-db-connection'
+                                                    <input type='text'
+                                                           class='form-control required-for-db-connection'
                                                            id="inlineUsername"
                                                            name='username' value='root'
                                                            aria-required='true' required></div>
@@ -2993,7 +3016,8 @@
                                                     <label>
                                                         Datasource Name<span class='required_astrix'> *</span>
                                                     </label>
-                                                    <input type='text' class='form-control required-for-db-connection'
+                                                    <input type='text'
+                                                           class='form-control required-for-db-connection'
                                                            id='dataSourceNameId'
                                                            name='dataSourceNameId'
                                                            aria-required='true'></div>
@@ -3024,11 +3048,12 @@
             </div>
             <div id="modal-error" class='panel-collapse collapse in'>
                 <div id='generateStreamConfigModalError-container' class='generateStreamConfigModalError-container'>
-                    <label id="generateStreamConfigModalError-label" class="alert alert-danger alert_gen"><strong>Error</strong> Something went wrong. </label>
+                    <label id="generateStreamConfigModalError-label"
+                           class="alert alert-danger alert_gen"><strong>Error</strong> Something went wrong. </label>
                 </div>
             </div>
             <div class="modal-footer">
-                <div class='button-container footer_btn' id='button-container'>
+                <div class='footer_btn' id='button-container'>
                     <button id='generateButton' type='button' class='btn btn-primary' disabled>Generate
                     </button>
                     <button type='button' class='btn btn-default' data-dismiss='modal'>cancel
