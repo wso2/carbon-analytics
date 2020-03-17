@@ -1362,7 +1362,7 @@
         "version": "1.0.0",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/gcs/siddhi-io-gcs/1.0.0/siddhi-io-gcs-1.0.0.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/gcs/siddhi-io-gcs/1.0.1/siddhi-io-gcs-1.0.1.jar"
         },
         "usages": [
           {
@@ -1387,7 +1387,7 @@
         "version": "1.0.0",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/s3/siddhi-io-s3/1.0.2/siddhi-io-s3-1.0.2.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/s3/siddhi-io-s3/1.0.3/siddhi-io-s3-1.0.3.jar"
         },
         "usages": [
           {
