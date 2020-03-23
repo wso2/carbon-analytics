@@ -115,8 +115,7 @@ public class SiddhiAppExtensionUsageDetectorImpl implements SiddhiAppExtensionUs
                             Objects.equals(usage.getProperties().get(uniqueAttribute), uniqueAttributeValue));
                     }
                     return false;
-                })
-                .findFirst();
+                }).findFirst();
         return matchedExtensionEntry.map(Map.Entry::getValue);
     }
 
@@ -148,8 +147,7 @@ public class SiddhiAppExtensionUsageDetectorImpl implements SiddhiAppExtensionUs
                                 usage.getProperties().get(uniqueAttribute).matches(uniqueAttributeValueRegex));
                     }
                     return false;
-                })
-                .findFirst();
+                }).findFirst();
         return matchedExtensionEntry.map(Map.Entry::getValue);
     }
 
@@ -177,8 +175,7 @@ public class SiddhiAppExtensionUsageDetectorImpl implements SiddhiAppExtensionUs
                         return extensionIdentifier.getAlternativeTypes().contains(usage.getProperties().get(TYPE_KEY));
                     }
                     return false;
-                })
-                .findFirst();
+                }).findFirst();
         return matchedExtensionEntry.map(Map.Entry::getValue);
     }
 
