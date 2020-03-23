@@ -27,4 +27,10 @@
         <Field name="instructions"/>
         <Bug pattern="UUF_UNUSED_FIELD"/>
     </Match>
+    <!-- The following field is only read from the ultimate response -->
+    <Match>
+        <Class name="org.wso2.carbon.siddhi.extensions.installer.core.models.SiddhiAppExtensionUsage"/>
+        <Field name="usingSiddhiElement"/>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+    </Match>
 </FindBugsFilter>

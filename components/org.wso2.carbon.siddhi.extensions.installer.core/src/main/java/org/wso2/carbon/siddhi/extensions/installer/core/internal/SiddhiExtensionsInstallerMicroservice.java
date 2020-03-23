@@ -32,8 +32,11 @@ import org.wso2.carbon.siddhi.extensions.installer.core.execution.DependencyInst
 import org.wso2.carbon.siddhi.extensions.installer.core.execution.DependencyInstallerImpl;
 import org.wso2.carbon.siddhi.extensions.installer.core.execution.DependencyRetriever;
 import org.wso2.carbon.siddhi.extensions.installer.core.execution.DependencyRetrieverImpl;
+import org.wso2.carbon.siddhi.extensions.installer.core.execution.SiddhiAppExtensionUsageDetector;
+import org.wso2.carbon.siddhi.extensions.installer.core.execution.SiddhiAppExtensionUsageDetectorImpl;
 import org.wso2.msf4j.Microservice;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -41,6 +44,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 
 import static org.wso2.carbon.siddhi.extensions.installer.core.models.enums.ExtensionInstallationStatus.NOT_INSTALLED;
@@ -205,6 +210,29 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
         return responseEntity.containsKey(ACTION_TYPE_KEY) && responseEntity.containsKey(ACTION_STATUS_KEY) &&
             (NOT_INSTALLED == responseEntity.get(ACTION_STATUS_KEY) ||
                 NOT_UNINSTALLED == responseEntity.get(ACTION_STATUS_KEY));
+    }
+
+    @POST
+    @Path("/siddhi-app-usages")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsedExtensionStatuses(String siddhiAppStringBase64) {
+        try {
+            String siddhiAppString =
+                new String(Base64.getDecoder().decode(siddhiAppStringBase64), StandardCharsets.UTF_8);
+            SiddhiAppExtensionUsageDetector siddhiAppExtensionUsageDetector =
+                new SiddhiAppExtensionUsageDetectorImpl(extensionConfigs);
+            return Response
+                .status(Response.Status.OK)
+                .entity(siddhiAppExtensionUsageDetector.getUsedExtensionStatuses(siddhiAppString))
+                .build();
+        } catch (ExtensionsInstallerException e) {
+            LOGGER.error("Failed to get installation statuses of extensions used in the Siddhi app.", e);
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
     }
 
     /**

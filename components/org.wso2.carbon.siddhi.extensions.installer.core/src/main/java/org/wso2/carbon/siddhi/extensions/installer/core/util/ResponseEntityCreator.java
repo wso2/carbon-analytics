@@ -21,9 +21,11 @@ package org.wso2.carbon.siddhi.extensions.installer.core.util;
 import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.DependencyConfig;
 import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.ExtensionConfig;
 import org.wso2.carbon.siddhi.extensions.installer.core.execution.DependencyRetriever;
+import org.wso2.carbon.siddhi.extensions.installer.core.models.SiddhiAppExtensionUsage;
 import org.wso2.carbon.siddhi.extensions.installer.core.models.enums.ExtensionInstallationStatus;
 import org.wso2.carbon.siddhi.extensions.installer.core.models.enums.ExtensionUnInstallationStatus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +48,7 @@ public class ResponseEntityCreator {
     private static final String EXTENSION_STATUS_KEY = "extensionStatus";
     private static final String DEPENDENCY_INFO_KEY = "dependencyInfo";
     private static final String DEPENDENCY_IS_INSTALLED_KEY = "isInstalled";
+    private static final String USAGES_KEY = "usages";
 
     private ResponseEntityCreator() {
         // Prevents instantiation.
@@ -172,6 +175,37 @@ public class ResponseEntityCreator {
         details.put(DEPENDENCY_INFO_KEY, dependency);
         details.put(DEPENDENCY_IS_INSTALLED_KEY, isInstalled);
         return details;
+    }
+
+    /**
+     * Adds the given siddhi app usage and the corresponding extension status,
+     * to the given map - which contains all the used extensions and their statuses.
+     *
+     * @param siddhiAppExtensionUsage Element of the Siddhi app, which uses the extension.
+     * @param extensionId             Unique id of the extension.
+     * @param extensionStatusResponse Installation status response of the extension.
+     * @param usedExtensionStatuses   The map, which maintains all used extensions and their statuses.
+     */
+    public static void addUsedExtensionStatusResponse(SiddhiAppExtensionUsage siddhiAppExtensionUsage,
+                                                      String extensionId,
+                                                      Map<String, Object> extensionStatusResponse,
+                                                      Map<String, Map<String, Object>> usedExtensionStatuses) {
+        if (!usedExtensionStatuses.containsKey(extensionId)) {
+            // This is the first usage of the extension.
+            Map<String, Object> extensionAndUsages = new HashMap<>();
+            List<SiddhiAppExtensionUsage> usages = new ArrayList<>();
+            usages.add(siddhiAppExtensionUsage);
+            extensionAndUsages.put(EXTENSION_STATUS_KEY, extensionStatusResponse);
+            extensionAndUsages.put(USAGES_KEY, usages);
+            usedExtensionStatuses.put(extensionId, extensionAndUsages);
+        } else {
+            // This extension has been already used. Add this as the next usage.
+            List<SiddhiAppExtensionUsage> usages =
+                (List<SiddhiAppExtensionUsage>) (usedExtensionStatuses.get(extensionId).get(USAGES_KEY));
+            if (usages != null) {
+                usages.add(siddhiAppExtensionUsage);
+            }
+        }
     }
 
 }
