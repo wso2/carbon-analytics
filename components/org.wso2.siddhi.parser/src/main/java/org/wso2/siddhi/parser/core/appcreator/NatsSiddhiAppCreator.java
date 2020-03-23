@@ -15,15 +15,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.siddhi.parser.core.appcreator;
+package io.siddhi.parser.core.appcreator;
 
-import org.wso2.siddhi.parser.core.topology.InputStreamDataHolder;
-import org.wso2.siddhi.parser.core.topology.OutputStreamDataHolder;
-import org.wso2.siddhi.parser.core.topology.PublishingStrategyDataHolder;
-import org.wso2.siddhi.parser.core.topology.SiddhiQueryGroup;
-import org.wso2.siddhi.parser.core.topology.SubscriptionStrategyDataHolder;
-import org.wso2.siddhi.parser.core.util.TransportStrategy;
-import org.wso2.siddhi.parser.service.model.MessagingSystem;
+import io.siddhi.parser.core.topology.InputStreamDataHolder;
+import io.siddhi.parser.core.topology.OutputStreamDataHolder;
+import io.siddhi.parser.core.topology.PublishingStrategyDataHolder;
+import io.siddhi.parser.core.topology.SiddhiQueryGroup;
+import io.siddhi.parser.core.topology.SubscriptionStrategyDataHolder;
+import io.siddhi.parser.core.util.TransportStrategy;
+import io.siddhi.parser.service.model.MessagingSystem;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 

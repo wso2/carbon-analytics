@@ -20,7 +20,7 @@
 
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="stream-processor-health-check-api-test-suite">
+<suite name="streaming-inegrator-health-check-api-test-suite">
     <test name="health-check-api-test" parallel="false">
 
     </test>

@@ -16,9 +16,9 @@
  * under the License.
  */
 
-package org.wso2.siddhi.parser.core;
+package io.siddhi.parser.core;
 
-import org.wso2.siddhi.parser.core.topology.SiddhiTopology;
+import io.siddhi.parser.core.topology.SiddhiTopology;
 
 /**
  * Topology Creator will consume a Siddhi App and produce a {@link SiddhiTopology} based on distributed annotations.

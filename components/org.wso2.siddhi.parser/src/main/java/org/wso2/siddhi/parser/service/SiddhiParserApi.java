@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.siddhi.parser.service;
+package io.siddhi.parser.service;
 
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
@@ -21,19 +21,19 @@ import io.siddhi.core.stream.ServiceDeploymentInfo;
 import io.siddhi.core.stream.input.source.Source;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.streaming.integrator.common.utils.config.FileConfigManager;
-import org.wso2.siddhi.parser.SiddhiParserDataHolder;
-import org.wso2.siddhi.parser.core.SiddhiAppCreator;
-import org.wso2.siddhi.parser.core.SiddhiTopologyCreator;
-import org.wso2.siddhi.parser.core.appcreator.DeployableSiddhiQueryGroup;
-import org.wso2.siddhi.parser.core.appcreator.NatsSiddhiAppCreator;
-import org.wso2.siddhi.parser.core.appcreator.SiddhiQuery;
-import org.wso2.siddhi.parser.core.topology.SiddhiTopology;
-import org.wso2.siddhi.parser.core.topology.SiddhiTopologyCreatorImpl;
-import org.wso2.siddhi.parser.service.model.ApiResponseMessage;
-import org.wso2.siddhi.parser.service.model.DeployableSiddhiApp;
-import org.wso2.siddhi.parser.service.model.MessagingSystem;
-import org.wso2.siddhi.parser.service.model.SiddhiParserRequest;
-import org.wso2.siddhi.parser.service.model.SourceDeploymentConfig;
+import io.siddhi.parser.SiddhiParserDataHolder;
+import io.siddhi.parser.core.SiddhiAppCreator;
+import io.siddhi.parser.core.SiddhiTopologyCreator;
+import io.siddhi.parser.core.appcreator.DeployableSiddhiQueryGroup;
+import io.siddhi.parser.core.appcreator.NatsSiddhiAppCreator;
+import io.siddhi.parser.core.appcreator.SiddhiQuery;
+import io.siddhi.parser.core.topology.SiddhiTopology;
+import io.siddhi.parser.core.topology.SiddhiTopologyCreatorImpl;
+import io.siddhi.parser.service.model.ApiResponseMessage;
+import io.siddhi.parser.service.model.DeployableSiddhiApp;
+import io.siddhi.parser.service.model.MessagingSystem;
+import io.siddhi.parser.service.model.SiddhiParserRequest;
+import io.siddhi.parser.service.model.SourceDeploymentConfig;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;

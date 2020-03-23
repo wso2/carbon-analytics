@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>3.0.33-SNAPSHOT</version>
+        <version>2.2.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -34,14 +34,6 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.event.simulator.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.siddhi.editor.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.streaming.integrator.common</artifactId>
         </dependency>
         <dependency>
@@ -50,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>carbon-analytics-streaming-integrator-osgi-tests</artifactId>
+            <artifactId>carbon-analytics-osgi-tests</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
@@ -70,19 +62,6 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.editor.log.appender</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.business.rules.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
-            <artifactId>org.wso2.carbon.business.rules.web</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.siddhi.store.api.rest</artifactId>
         </dependency>
         <dependency>
@@ -92,6 +71,14 @@
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.status.dashboard.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.status.dashboard.web</artifactId>
         </dependency>
     </dependencies>
 

@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.siddhi.parser.service.model;
+package io.siddhi.parser.service.model;
 
 import com.google.gson.annotations.SerializedName;
 

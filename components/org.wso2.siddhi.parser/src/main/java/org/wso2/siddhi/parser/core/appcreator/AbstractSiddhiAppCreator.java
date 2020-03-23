@@ -16,12 +16,12 @@
  * under the License.
  */
 
-package org.wso2.siddhi.parser.core.appcreator;
+package io.siddhi.parser.core.appcreator;
 
-import org.wso2.siddhi.parser.core.SiddhiAppCreator;
-import org.wso2.siddhi.parser.core.topology.SiddhiQueryGroup;
-import org.wso2.siddhi.parser.core.topology.SiddhiTopology;
-import org.wso2.siddhi.parser.service.model.MessagingSystem;
+import io.siddhi.parser.core.SiddhiAppCreator;
+import io.siddhi.parser.core.topology.SiddhiQueryGroup;
+import io.siddhi.parser.core.topology.SiddhiTopology;
+import io.siddhi.parser.service.model.MessagingSystem;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 import java.util.ArrayList;

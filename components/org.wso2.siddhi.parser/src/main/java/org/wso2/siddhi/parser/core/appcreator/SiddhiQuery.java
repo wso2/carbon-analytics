@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.siddhi.parser.core.appcreator;
+package io.siddhi.parser.core.appcreator;
 
 /**
  * Gives details about siddhi application.

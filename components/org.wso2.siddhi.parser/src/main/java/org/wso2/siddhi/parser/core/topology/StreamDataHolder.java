@@ -16,9 +16,9 @@
  * under the License.
  */
 
-package org.wso2.siddhi.parser.core.topology;
+package io.siddhi.parser.core.topology;
 
-import org.wso2.siddhi.parser.core.util.EventHolder;
+import io.siddhi.parser.core.util.EventHolder;
 
 /**
  * Temporary class for enable mapping.

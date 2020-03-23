@@ -26,7 +26,7 @@ import org.wso2.carbon.streaming.integrator.core.NodeInfo;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 
 /**
- * This is the data holder of stream processor statistics component.
+ * This is the data holder of streaming integrator statistics component.
  */
 public class StreamProcessorStatisticDataHolder {
     private static final Logger logger = LoggerFactory.getLogger(StreamProcessorStatisticDataHolder.class);

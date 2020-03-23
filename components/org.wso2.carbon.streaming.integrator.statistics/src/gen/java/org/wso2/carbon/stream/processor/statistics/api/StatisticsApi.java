@@ -101,7 +101,7 @@ public class StatisticsApi implements Microservice   {
     }
 
     /**
-     * Dissable the stream processor worker metrics.
+     * Dissable the streaming integrator worker metrics.
      * @param statsEnable
      * @return Resonce including state of update.
      * @throws NotFoundException

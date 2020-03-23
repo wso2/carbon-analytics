@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.siddhi.parser.core.topology;
+package io.siddhi.parser.core.topology;
 
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.partition.PartitionRuntime;
@@ -25,11 +25,11 @@ import io.siddhi.core.stream.input.source.Source;
 import io.siddhi.core.stream.output.sink.Sink;
 import io.siddhi.core.table.Table;
 import io.siddhi.core.window.Window;
-import org.wso2.siddhi.parser.SiddhiParserDataHolder;
-import org.wso2.siddhi.parser.core.SiddhiTopologyCreator;
-import org.wso2.siddhi.parser.core.util.EventHolder;
-import org.wso2.siddhi.parser.core.util.SiddhiTopologyCreatorConstants;
-import org.wso2.siddhi.parser.core.util.TransportStrategy;
+import io.siddhi.parser.SiddhiParserDataHolder;
+import io.siddhi.parser.core.SiddhiTopologyCreator;
+import io.siddhi.parser.core.util.EventHolder;
+import io.siddhi.parser.core.util.SiddhiTopologyCreatorConstants;
+import io.siddhi.parser.core.util.TransportStrategy;
 import io.siddhi.query.api.SiddhiApp;
 import io.siddhi.query.api.annotation.Annotation;
 import io.siddhi.query.api.annotation.Element;

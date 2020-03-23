@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.siddhi.parser.core.util;
+package io.siddhi.parser.core.util;
 
 /**
  * This class contains constants needed for the Topology creation.

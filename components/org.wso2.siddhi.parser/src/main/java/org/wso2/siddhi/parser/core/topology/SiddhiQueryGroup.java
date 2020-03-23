@@ -15,14 +15,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.siddhi.parser.core.topology;
+package io.siddhi.parser.core.topology;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.wso2.siddhi.parser.core.appcreator.NatsSiddhiAppCreator.APP_NAME;
+import static io.siddhi.parser.core.appcreator.NatsSiddhiAppCreator.APP_NAME;
 
 /**
  * Data Holder to hold required details of Query Groups in {@link SiddhiTopology}.

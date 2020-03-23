@@ -56,8 +56,18 @@
             <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
+            <directory>carbon-home/conf/monitor</directory>
+            <outputDirectory>conf/monitor</outputDirectory>
+            <fileMode>644</fileMode>
+        </fileSet>
+        <fileSet>
             <directory>carbon-home/conf/transports/server</directory>
             <outputDirectory>wso2/server/conf/transports</outputDirectory>
+            <fileMode>644</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>carbon-home/conf/transports/monitor</directory>
+            <outputDirectory>wso2/monitor/conf/transports</outputDirectory>
             <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
@@ -172,6 +182,18 @@
         <file>
             <source>carbon-home/runtime/default/bin/carbon.sh</source>
             <outputDirectory>wso2/server/bin/</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
+        <file>
+            <source>carbon-home/runtime/default/bin/carbon.bat</source>
+            <outputDirectory>wso2/monitor/bin/</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
+        <file>
+            <source>carbon-home/runtime/default/bin/carbon.sh</source>
+            <outputDirectory>wso2/monitor/bin/</outputDirectory>
             <filtered>true</filtered>
             <fileMode>644</fileMode>
         </file>

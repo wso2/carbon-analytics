@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.siddhi.parser.core.topology;
+package io.siddhi.parser.core.topology;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;

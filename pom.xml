@@ -27,18 +27,11 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.33-SNAPSHOT</version>
+    <version>2.2.0-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.streaming.integrator.common</module>
         <module>components/org.wso2.carbon.streaming.integrator.core</module>
-        <module>components/org.wso2.carbon.event.simulator.core</module>
-        <module>components/org.wso2.carbon.editor.log.appender</module>
-        <module>components/org.wso2.carbon.siddhi.editor.core</module>
-        <module>components/org.wso2.carbon.siddhi.extensions.installer.core</module>
-        <module>components/org.wso2.carbon.business.rules.templates.editor.core</module>
-        <module>components/org.wso2.carbon.business.rules.core</module>
-        <module>components/org.wso2.carbon.business.rules.web</module>
         <module>components/org.wso2.carbon.si.coordination.listener</module>
         <module>components/org.wso2.carbon.si.metrics.core</module>
         <module>components/org.wso2.carbon.streaming.integrator.statistics</module>
@@ -49,15 +42,11 @@
         <module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>
         <module>components/org.wso2.carbon.health.check.core</module>
         <module>components/org.wso2.siddhi.parser</module>
+        <module>components/org.wso2.carbon.status.dashboard.core</module>
+        <module>components/org.wso2.carbon.status.dashboard.web</module>
 
         <module>features/org.wso2.carbon.streaming.integrator.core.feature</module>
         <module>features/org.wso2.carbon.streaming.integrator.common.feature</module>
-        <module>features/org.wso2.carbon.event.simulator.core.feature</module>
-        <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
-        <module>features/org.wso2.carbon.siddhi.extensions.installer.core.feature</module>
-        <module>features/org.wso2.carbon.business.rules.templates.editor.core.feature</module>
-        <module>features/org.wso2.carbon.business.rules.core.feature</module>
-        <module>features/org.wso2.carbon.business.rules.web.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
         <module>features/org.wso2.carbon.si.metrics.core.feature</module>
         <module>features/org.wso2.carbon.si.coordination.listener.feature</module>
@@ -69,11 +58,11 @@
         <module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>
         <module>features/org.wso2.carbon.health.check.core.feature</module>
         <module>features/org.wso2.siddhi.parser.service.feature</module>
+        <module>features/org.wso2.carbon.status.dashboard.core.feature</module>
+        <module>features/org.wso2.carbon.status.dashboard.web.feature</module>
 
-        <module>components/si-tooling-distribution</module>
-        <module>components/si-distribution</module>
-        <module>components/streaming-integrator-osgi-tests</module>
-        <module>components/tooling-osgi-tests</module>
+        <module>components/test-distribution</module>
+        <module>components/osgi-tests</module>
         <module>coverage-reports</module>
     </modules>
 
@@ -679,6 +668,30 @@
                 <type>zip</type>
             </dependency>
 
+            <!-- Status Dashboard dependencies           -->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.status.dashboard.web.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.status.dashboard.web</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.status.dashboard.core.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.status.dashboard.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+
             <!--Databridge related feature dependencies -->
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
@@ -901,18 +914,6 @@
                 <type>zip</type>
             </dependency>
 
-            <!-- Siddhi Editor related -->
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.siddhi.editor.core</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.siddhi.editor.core.feature</artifactId>
-                <version>${carbon.analytics.version}</version>
-                <type>zip</type>
-            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.streaming.integrator.common.feature</artifactId>
@@ -923,32 +924,6 @@
                 <groupId>commons-io.wso2</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons.io.version}</version>
-            </dependency>
-
-            <!-- Siddhi Extensions Installer related -->
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.siddhi.extensions.installer.core</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.siddhi.extensions.installer.core.feature</artifactId>
-                <version>${carbon.analytics.version}</version>
-                <type>zip</type>
-            </dependency>
-
-            <!-- Business Rules Templates Editor related -->
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.business.rules.templates.editor.core</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.business.rules.templates.editor.core.feature</artifactId>
-                <version>${carbon.analytics.version}</version>
-                <type>zip</type>
             </dependency>
 
             <dependency>
@@ -1175,50 +1150,9 @@
                 <artifactId>mssql-jdbc</artifactId>
                 <version>${mssql-jdbc.version}</version>
             </dependency>
-            <!--Dependencies for  database feed simulation ends here-->
-
-            <!--Event simulator as a feature-->
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.event.simulator.core</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.event.simulator.core.feature</artifactId>
-                <version>${carbon.analytics.version}</version>
-                <type>zip</type>
-            </dependency>
-
-            <!--Business rules as a feature-->
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.business.rules.core</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.business.rules.core.feature</artifactId>
-                <version>${carbon.analytics.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.business.rules.web.feature</artifactId>
-                <version>${carbon.analytics.version}</version>
-                <type>zip</type>
-            </dependency>
-
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
                 <artifactId>org.wso2.carbon.analytics.auth.rest.api</artifactId>
-                <version>${carbon.analytics.version}</version>
-            </dependency>
-
-            <!--Editor log appender as a feature-->
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.editor.log.appender</artifactId>
                 <version>${carbon.analytics.version}</version>
             </dependency>
 
@@ -1256,14 +1190,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.test.si.distribution</artifactId>
-                <version>${carbon.analytics.version}</version>
-                <type>zip</type>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.analytics</groupId>
-                <artifactId>org.wso2.carbon.analytics.test.si.tooling.distribution</artifactId>
+                <artifactId>org.wso2.carbon.analytics.test.distribution</artifactId>
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
                 <scope>test</scope>
@@ -1584,13 +1511,13 @@
     </dependencyManagement>
 
     <properties>
-        <carbon.analytics.version>3.0.33-SNAPSHOT</carbon.analytics.version>
+        <carbon.analytics.version>2.2.0-SNAPSHOT</carbon.analytics.version>
         <siddhi.version>5.1.12</siddhi.version>
         <siddhi.bundle.version>5.1.12</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.1.45</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
-        <carbon.analytics.version.range>[3.0.0, 4.0.0)</carbon.analytics.version.range>
+        <carbon.analytics.version.range>[2.2.0, 4.0.0)</carbon.analytics.version.range>
         <com.spotify.docker.client.version>8.16.0</com.spotify.docker.client.version>
 
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>

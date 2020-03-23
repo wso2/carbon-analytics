@@ -75,7 +75,7 @@ public class LogoutApi implements Microservice {
     @io.swagger.annotations.ApiOperation(value = "", notes = "Login type check Request to Streaming Integrator.",
             response = HashMap.class, tags = {})
     @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "SSO logout Request to Stream processor",
+            @io.swagger.annotations.ApiResponse(code = 200, message = "SSO logout Request to Streaming Itegrator",
                     response = HashMap.class),
 
             @io.swagger.annotations.ApiResponse(code = 401, message = "Invalid Authorization Header",

@@ -3,7 +3,7 @@ info:
   version: 1.0.0
   title: Exposing System Run Time of Streaming Integrator
   description: >-
-    This provides information about the runtime of the stream processor.
+    This provides information about the runtime of the streaming integrator.
   contact:
     name: WSO2
     url: 'http://wso2.com/analytics'
@@ -18,15 +18,15 @@ basePath: /distributed/apis
 paths:
   '/runTime':
     get:
-      x-wso2-curl: 'curl -k -X GET http://localhost:9090/stream-processor/runTime/{host}/{port}'
-      x-wso2-request: 'GET http://localhost:9090/stream-processor/runTime/{host}/{port}'
+      x-wso2-curl: 'curl -k -X GET http://localhost:9090/streaming-integrator/runTime/{host}/{port}'
+      x-wso2-request: 'GET http://localhost:9090/streaming-integrator/runTime/{host}/{port}'
       x-wso2-response: |-
         HTTP/1.1 200 OK Content-Type: application/json {
          "manager"
         }
       tags:
         - RunTime
-      summary: Returns the runtime of the stream processor.
+      summary: Returns the runtime of the streaming integrator.
       description: >-
         Returns the run time given in the carbon.sh.
       operationId: getRunTime

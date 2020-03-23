@@ -29,7 +29,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 @Component(
-        name = "stream-processor-health-check-api",
+        name = "streaming-inegrator-health-check-api",
         service = Microservice.class,
         immediate = true
 )

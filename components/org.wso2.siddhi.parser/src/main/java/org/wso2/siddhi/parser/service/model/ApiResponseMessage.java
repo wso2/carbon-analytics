@@ -17,7 +17,7 @@
  *
  */
 
-package org.wso2.siddhi.parser.service.model;
+package io.siddhi.parser.service.model;
 
 /**
  * API response message class.

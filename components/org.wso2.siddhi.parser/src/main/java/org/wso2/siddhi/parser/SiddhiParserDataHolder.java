@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.siddhi.parser;
+package io.siddhi.parser;
 
 import io.siddhi.core.SiddhiManager;
 import org.wso2.carbon.config.provider.ConfigProvider;
