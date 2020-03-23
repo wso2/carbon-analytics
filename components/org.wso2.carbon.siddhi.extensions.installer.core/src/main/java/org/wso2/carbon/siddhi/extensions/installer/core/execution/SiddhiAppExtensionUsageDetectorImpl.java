@@ -60,9 +60,7 @@ public class SiddhiAppExtensionUsageDetectorImpl implements SiddhiAppExtensionUs
                 String extensionId = usedExtension.getExtensionInfo().get(NAME_KEY);
                 if (extensionId != null) {
                     ResponseEntityCreator.addUsedExtensionStatusResponse(
-                        usage,
-                        extensionId,
-                        dependencyRetriever.getExtensionStatus(usedExtension),
+                        usage, extensionId, dependencyRetriever.getExtensionStatus(usedExtension),
                         usedExtensionStatuses);
                 }
             }

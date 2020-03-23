@@ -35,8 +35,7 @@ public class ExtensionConfig {
 
     public List<DependencyConfig> getManuallyInstallableDependencies() {
         return dependencies.stream()
-            .filter(dependency ->
-                !dependency.isAutoDownloadable())
+            .filter(dependency -> !dependency.isAutoDownloadable())
             .collect(Collectors.toList());
     }
 

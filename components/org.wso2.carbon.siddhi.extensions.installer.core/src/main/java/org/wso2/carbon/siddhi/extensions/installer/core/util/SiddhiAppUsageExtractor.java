@@ -22,6 +22,7 @@ import io.siddhi.query.api.SiddhiApp;
 import io.siddhi.query.api.annotation.Annotation;
 import io.siddhi.query.api.annotation.Element;
 import io.siddhi.query.api.definition.StreamDefinition;
+import io.siddhi.query.api.definition.TableDefinition;
 import io.siddhi.query.compiler.SiddhiCompiler;
 import org.wso2.carbon.siddhi.extensions.installer.core.models.SiddhiAppExtensionUsage;
 
@@ -39,6 +40,7 @@ public class SiddhiAppUsageExtractor {
     private static final String NAMESPACE_KEY = "namespace";
     private static final String SOURCE_NAMESPACE = "source";
     private static final String SINK_NAMESPACE = "sink";
+    private static final String STORE_NAMESPACE = "store";
 
     private SiddhiAppUsageExtractor() {
         // Prevents instantiation.
@@ -52,7 +54,10 @@ public class SiddhiAppUsageExtractor {
      */
     public static List<SiddhiAppExtensionUsage> extractUsages(String siddhiAppString) {
         SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppString);
-        return extractUsagesFromStreams(siddhiApp);
+        List<SiddhiAppExtensionUsage> usages = new ArrayList<>();
+        usages.addAll(extractUsagesFromStreams(siddhiApp));
+        usages.addAll(extractUsagesFromTables(siddhiApp));
+        return usages;
     }
 
     private static List<SiddhiAppExtensionUsage> extractUsagesFromStreams(SiddhiApp siddhiApp) {
@@ -61,19 +66,29 @@ public class SiddhiAppUsageExtractor {
         for (Map.Entry<String, StreamDefinition> streamDefinitionEntry : streamDefinitions.entrySet()) {
             List<Annotation> streamAnnotations = streamDefinitionEntry.getValue().getAnnotations();
             if (!streamAnnotations.isEmpty()) {
-                usages.addAll(extractStreamAnnotationInfo(streamAnnotations, SOURCE_NAMESPACE));
-                usages.addAll(extractStreamAnnotationInfo(streamAnnotations, SINK_NAMESPACE));
+                usages.addAll(extractInfoFromAnnotations(streamAnnotations, SOURCE_NAMESPACE));
+                usages.addAll(extractInfoFromAnnotations(streamAnnotations, SINK_NAMESPACE));
             }
         }
         return usages;
     }
 
-    private static List<SiddhiAppExtensionUsage> extractStreamAnnotationInfo(List<Annotation> streamAnnotations,
-                                                                             String namespace) {
-        List<Annotation> namespaceAnnotations = streamAnnotations.stream()
-            .filter(annotation -> annotation.getName().equalsIgnoreCase(namespace))
-            .collect(Collectors.toList());
+    private static List<SiddhiAppExtensionUsage> extractUsagesFromTables(SiddhiApp siddhiApp) {
+        List<SiddhiAppExtensionUsage> usages = new ArrayList<>();
+        Map<String, TableDefinition> tableDefinitions = siddhiApp.getTableDefinitionMap();
+        for (Map.Entry<String, TableDefinition> tableDefinitionEntry : tableDefinitions.entrySet()) {
+            List<Annotation> tableAnnotations = tableDefinitionEntry.getValue().getAnnotations();
+            if (!tableAnnotations.isEmpty()) {
+                usages.addAll(extractInfoFromAnnotations(tableAnnotations, STORE_NAMESPACE));
+            }
+        }
+        return usages;
+    }
 
+    private static List<SiddhiAppExtensionUsage> extractInfoFromAnnotations(List<Annotation> annotations,
+                                                                            String namespace) {
+        List<Annotation> namespaceAnnotations = annotations.stream()
+            .filter(annotation -> annotation.getName().equalsIgnoreCase(namespace)).collect(Collectors.toList());
         List<SiddhiAppExtensionUsage> siddhiAppExtensionUsages = new ArrayList<>();
         for (Annotation namespaceAnnotation : namespaceAnnotations) {
             Map<String, String> annotationProperties = new HashMap<>();
