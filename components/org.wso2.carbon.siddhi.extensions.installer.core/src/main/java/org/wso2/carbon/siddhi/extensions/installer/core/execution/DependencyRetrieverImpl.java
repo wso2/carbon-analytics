@@ -62,7 +62,8 @@ public class DependencyRetrieverImpl implements DependencyRetriever {
         return getExtensionStatus(extension);
     }
 
-    private Map<String, Object> getExtensionStatus(ExtensionConfig extension) throws ExtensionsInstallerException {
+    @Override
+    public Map<String, Object> getExtensionStatus(ExtensionConfig extension) throws ExtensionsInstallerException {
         return ResponseEntityCreator.createExtensionStatusResponse(
             extension, getExtensionInstallationStatus(extension));
     }

@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,26 +29,28 @@ import java.util.stream.Collectors;
  */
 public class ExtensionConfig {
 
-    private Map<String, String> extension;
-    private List<DependencyConfig> dependencies;
+    private Map<String, String> extension = new HashMap<>();
+    private ExtensionIdentifierConfig identifier;
+    private List<DependencyConfig> dependencies = new ArrayList<>();
 
     public List<DependencyConfig> getManuallyInstallableDependencies() {
-        if (dependencies != null) {
-            return dependencies.stream().filter(dependency -> !dependency.isAutoDownloadable())
-                .collect(Collectors.toList());
-        }
-        return Collections.emptyList();
+        return dependencies.stream()
+            .filter(dependency -> !dependency.isAutoDownloadable())
+            .collect(Collectors.toList());
     }
 
     public List<DependencyConfig> getAutoDownloadableDependencies() {
-        if (dependencies != null) {
-            return dependencies.stream().filter(DependencyConfig::isAutoDownloadable).collect(Collectors.toList());
-        }
-        return Collections.emptyList();
+        return dependencies.stream()
+            .filter(DependencyConfig::isAutoDownloadable)
+            .collect(Collectors.toList());
     }
 
     public Map<String, String> getExtensionInfo() {
         return extension;
+    }
+
+    public ExtensionIdentifierConfig getIdentifier() {
+        return identifier;
     }
 
     public List<DependencyConfig> getDependencies() {
