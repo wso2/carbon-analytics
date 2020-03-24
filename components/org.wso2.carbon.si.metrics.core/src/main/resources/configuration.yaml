@@ -1,0 +1,182 @@
+metricsLabelMapping:
+  query:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Queries.*.*"
+    name: "siddhi.query.${2}"
+    labels:
+      app: "${0}"
+      type: "query"
+      element: "${1}"
+      metrics: "${2}"
+
+  sourceMapper:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.SourceMappers.*.*"
+    name: "siddhi.sourcemapper.${2}"
+    labels:
+      app: "${0}"
+      type: "sourcemapper"
+      element: "${1}"
+      metrics: "${2}"
+
+  sinkMapper:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.SinkMappers.*.*"
+    name: "siddhi.sinkmapper.${2}"
+    labels:
+      app: "${0}"
+      type: "sinkmapper"
+      element: "${1}"
+      metrics: "${2}"
+
+  source:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Sources.*.*"
+    name: "siddhi.source.${2}"
+    labels:
+      app: "${0}"
+      type: "source"
+      element: "${1}"
+      metrics: "${2}"
+
+  stream:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Streams.*.*"
+    name: "siddhi.stream.${2}"
+    labels:
+      app: "${0}"
+      type: "stream"
+      element: "${1}"
+      metrics: "${2}"
+
+  sink:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Sinks.*.*"
+    name: "siddhi.sink.${2}"
+    labels:
+      app: "${0}"
+      type: "sink"
+      element: "${1}"
+      metrics: "${2}"
+
+  onDemandQuery:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.OnDemandQueries.*.*"
+    name: "siddhi.ondemandquery.${2}"
+    labels:
+      app: "${0}"
+      type: "ondemandquery"
+      element: "${1}"
+      metrics: "${2}"
+
+  tables:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Tables.*.*"
+    name: "siddhi.table.${2}"
+    labels:
+      app: "${0}"
+      type: "table"
+      element: "${1}"
+      metrics: "${2}"
+
+  windows:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Windows.*.*"
+    name: "siddhi.window.${2}"
+    labels:
+      app: "${0}"
+      type: "window"
+      element: "${1}"
+      metrics: "${2}"
+
+  triggers:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Trigger.*.*"
+    name: "siddhi.trigger.${2}"
+    labels:
+      app: "${0}"
+      type: "trigger"
+      element: "${1}"
+      metrics: "${2}"
+
+  aggregation:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Aggregations.*.*"
+    name: "siddhi.aggregation.${2}"
+    labels:
+      app: "${0}"
+      type: "aggregation"
+      element: "${1}"
+      metrics: "${2}"
+
+  tableOperation:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Tables.*.*.*"
+    name: "siddhi.table.${3}"
+    labels:
+      app: "${0}"
+      type: "table"
+      element: "${1}"
+      operation: "${2}"
+      metrics: "${3}"
+
+  aggregationOperation:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Aggregations.*.*.*"
+    name: "siddhi.aggregation.${3}"
+    labels:
+      app: "${0}"
+      type: "aggregation"
+      element: "${1}"
+      operation: "${2}"
+      metrics: "${3}"
+
+  windowOperation:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Windows.*.*.*"
+    name: "siddhi.window.${3}"
+    labels:
+      app: "${0}"
+      type: "window"
+      element: "${1}"
+      operation: "${2}"
+      metrics: "${3}"
+
+  sinkOperation:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Sinks.*.*.*"
+    name: "siddhi.sink.${3}"
+    labels:
+      app: "${0}"
+      type: "sink"
+      element: "${1}"
+      operation: "${2}"
+      metrics: "${3}"
+
+  sourceOperation:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Sources.*.*.*"
+    name: "siddhi.source.${3}"
+    labels:
+      app: "${0}"
+      type: "source"
+      element: "${1}"
+      operation: "${2}"
+      metrics: "${3}"
+
+  sinkMapperOperationType:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.SinkMappers.*.*.*.*"
+    name: "siddhi.sinkmapper.${4}"
+    labels:
+      app: "${0}"
+      type: "sinkmapper"
+      element: "${1}"
+      operation: "${2}"
+      operationType: "${3}"
+      metrics: "${4}"
+
+  sourceMapperOperationType:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.SourceMappers.*.*.*.*"
+    name: "siddhi.sourcemapper.${4}"
+    labels:
+      app: "${0}"
+      type: "sourcemapper"
+      element: "${1}"
+      operation: "${2}"
+      operationType: "${3}"
+      metrics: "${4}"
+
+  sinkOperationType:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Sinks.*.*.*.*"
+    name: "siddhi.sink.${4}"
+    labels:
+      app: "${0}"
+      type: "sink"
+      element: "${1}"
+      operation: "${2}"
+      operationType: "${3}"
+      metrics: "${4}"

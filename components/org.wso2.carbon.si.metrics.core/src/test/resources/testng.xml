@@ -24,7 +24,8 @@
     <test name="carbon-analytics-metrics-tests" preserve-order="true" parallel="false">
         <classes>
             <class name="org.wso2.carbon.si.metrics.core.StatisticsTestCase"/>
-
+            <class name="org.wso2.carbon.si.metrics.core.MetricsConfigTest"/>
+            <class name="org.wso2.carbon.si.metrics.core.ReporterTest"/>
         </classes>
     </test>
 </suite>
