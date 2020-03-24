@@ -21,11 +21,22 @@ package org.wso2.carbon.siddhi.extensions.installer.core.execution;
 import org.wso2.carbon.siddhi.extensions.installer.core.exceptions.ExtensionsInstallerException;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface which describes methods that are used to install or un-install extension dependencies.
  */
 public interface DependencyInstaller {
+
+    /**
+     * Installs dependencies of each extension, denoted by the given set of id's.
+     *
+     * @param extensionIds Id's of extensions.
+     * @return Information about artifacts related to the installation's completion.
+     * @throws ExtensionsInstallerException Failure occurred when installing dependencies for an extension.
+     */
+    Map<String, Map<String, Object>> installDependenciesFor(Set<String> extensionIds)
+        throws ExtensionsInstallerException;
 
     /**
      * Installs dependencies of the extension, that is denoted by the given id.
