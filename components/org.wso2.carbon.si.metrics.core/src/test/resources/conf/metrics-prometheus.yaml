@@ -1,0 +1,9 @@
+# Configuration file to test metrics with prometheus reporter
+
+# Carbon Metrics Configuration Parameters
+metrics.prometheus:
+  reporting:
+    prometheus:
+      - name: prometheus
+        enabled: true
+        serverURL: "http://localhost:9005"

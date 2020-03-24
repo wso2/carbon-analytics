@@ -69,6 +69,29 @@
             <artifactId>awaitility</artifactId>
             <scope>test</scope>
         </dependency>
+
+
+        <!--Prometheus-->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_dropwizard</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_httpserver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.msf4j</groupId>
+            <artifactId>msf4j-core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -90,11 +113,17 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-                            org.wso2.carbon.si.metrics.core.*
+                            org.wso2.carbon.si.metrics.core.*,
+                            io.prometheus.client.*,
+                            org.wso2.carbon.si.metrics.prometheus.reporter.*
                         </Export-Package>
                         <Import-Package>
-                            *;resolution:=optional,
+                            org.yaml.snakeyaml.*; version="${org.yaml.snakeyaml.version.range}",
+                            *;resolution:=optional
                         </Import-Package>
+                        <Private-Package>
+                            io.prometheus.client.*,
+                        </Private-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>

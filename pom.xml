@@ -1580,6 +1580,29 @@
                 <artifactId>json-smart</artifactId>
                 <version>${net.minidev.version}</version>
             </dependency>
+
+            <!-- Prometheus Reporter dependencies -->
+            <dependency>
+                <groupId>io.prometheus</groupId>
+                <artifactId>simpleclient</artifactId>
+                <version>${prometheus.simpleclient.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.prometheus</groupId>
+                <artifactId>simpleclient_dropwizard</artifactId>
+                <version>${prometheus.simpleclient.dropwizard.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-core</artifactId>
+                <version>${dropwizard.metrics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.prometheus</groupId>
+                <artifactId>simpleclient_httpserver</artifactId>
+                <version>${prometheus.simpleclient.httpserver.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -1830,6 +1853,12 @@
         <siddhi.io.nats.version>2.0.6</siddhi.io.nats.version>
         <org.testcontainers.version>1.8.0</org.testcontainers.version>
         <net.minidev.version>2.2</net.minidev.version>
+
+        <!-- Prometheus dependency version-->
+        <prometheus.simpleclient.version>0.8.0</prometheus.simpleclient.version>
+        <prometheus.simpleclient.dropwizard.version>0.8.0</prometheus.simpleclient.dropwizard.version>
+        <dropwizard.metrics.version>3.1.2</dropwizard.metrics.version>
+        <prometheus.simpleclient.httpserver.version>0.8.0</prometheus.simpleclient.httpserver.version>
 
         <xerces.version>2.12.0</xerces.version>
     </properties>
