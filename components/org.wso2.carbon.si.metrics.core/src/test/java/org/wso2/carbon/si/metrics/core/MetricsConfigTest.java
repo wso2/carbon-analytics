@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c)  2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -17,6 +17,8 @@
  */
 package org.wso2.carbon.si.metrics.core;
 
+import org.wso2.carbon.si.metrics.core.util.TestConstants;
+import org.wso2.carbon.si.metrics.core.util.TestUtils;
 import org.wso2.carbon.si.metrics.prometheus.reporter.config.PrometheusMetricsConfig;
 import org.wso2.carbon.si.metrics.prometheus.reporter.config.PrometheusReporterConfig;
 import org.testng.Assert;
@@ -33,14 +35,14 @@ public class MetricsConfigTest {
 
     @BeforeClass
     private void load() throws ConfigurationException {
-        prometheusMetricsConfig = TestUtils.getConfigProvider("metrics-prometheus.yaml")
+        prometheusMetricsConfig = TestUtils.getConfigProvider(TestConstants.PROMETHEUS_CONFIG_FILE_NAME)
                 .getConfigurationObject(PrometheusMetricsConfig.class);
     }
 
     @Test
     public void testPrometheusConfigLoad() {
         PrometheusReporterConfig config = prometheusMetricsConfig.getReporting().getPrometheus().iterator().next();
-        Assert.assertEquals(config.getName(), "prometheus");
+        Assert.assertEquals(config.getName(), TestConstants.PROMETHEUS_REPORTER_NAME);
         Assert.assertTrue(config.isEnabled());
         Assert.assertEquals(config.getServerURL(), "http://localhost:9005");
     }

@@ -43,6 +43,7 @@ import io.siddhi.core.util.EventPrinter;
 import io.siddhi.core.util.statistics.EventBufferHolder;
 
 import java.util.concurrent.TimeUnit;
+import org.wso2.carbon.si.metrics.core.util.TestUtils;
 
 /**
  * Test case for carbon metrics inside siddhi.
@@ -52,11 +53,11 @@ public class StatisticsTestCase {
     private int count;
     private boolean eventArrived;
     protected static Metrics metrics;
-    
+
     protected static MetricService metricService;
-    
+
     protected static MetricManagementService metricManagementService;
-    
+
     @BeforeSuite
     protected void initMetrics() throws Exception {
         // Initialize the Metrics
@@ -66,7 +67,7 @@ public class StatisticsTestCase {
         metricService = metrics.getMetricService();
         metricManagementService = metrics.getMetricManagementService();
     }
-    
+
     @BeforeMethod
     public void init() {
         metricManagementService.setRootLevel(Level.ALL);
@@ -77,12 +78,12 @@ public class StatisticsTestCase {
         SPMetricsDataHolder.getInstance().setMetricManagementService(metricManagementService);
         metricManagementService.startReporter("Console");
     }
-    
+
     @AfterSuite
     protected static void destroy() throws Exception {
         metrics.deactivate();
     }
-    
+
     @Test
     public void statisticsMetricsFactory() throws InterruptedException {
         StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new SPMetricsFactory());
@@ -94,7 +95,7 @@ public class StatisticsTestCase {
                 .getFactory().createThroughputTracker("test.throughput", new SPStatisticsManager(
                         "MetricsTest"));
         AssertJUnit.assertEquals("test.throughput", throughputTracker.getName());
-        
+
         SPMemoryUsageMetric memoryUsageTracker = (SPMemoryUsageMetric) statisticsConfiguration
                 .getFactory()
                 .createMemoryUsageTracker(new SPStatisticsManager("MetricsTest"));
@@ -108,7 +109,7 @@ public class StatisticsTestCase {
             public long getBufferedEvents() {
                 return 1;
             }
-            
+
             @Override
             public boolean containsBufferedEvents() {
                 return true;
@@ -117,7 +118,7 @@ public class StatisticsTestCase {
         bufferedEventsTracker.registerEventBufferHolder(eventBufferHolder, "test.size");
         AssertJUnit.assertEquals("test.size", bufferedEventsTracker.getName(eventBufferHolder));
     }
-    
+
     @Test
     public void statisticsTest1() throws InterruptedException {
         log.info("statistics test 1");
@@ -139,7 +140,7 @@ public class StatisticsTestCase {
                 "from cseEventStream[volume > 90] " +
                 "select * " +
                 "insert into outputStream ;";
-        
+
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiApp);
         siddhiAppRuntime.addCallback("outputStream", new StreamCallback() {
             @Override
@@ -153,7 +154,7 @@ public class StatisticsTestCase {
                 }
             }
         });
-        
+
         InputHandler inputHandler = siddhiAppRuntime.getInputHandler("cseEventStream");
         siddhiAppRuntime.start();
         for (int i = 0; i < 1; i++) {
@@ -190,13 +191,13 @@ public class StatisticsTestCase {
         AssertJUnit.assertEquals("INFO", metricManagementService.getMetricLevel(name3).name());
         AssertJUnit.assertEquals("INFO", metricManagementService.getMetricLevel(name4).name());
         AssertJUnit.assertEquals("INFO", metricManagementService.getMetricLevel(name5).name());
-        
+
         AssertJUnit.assertTrue(eventArrived);
         AssertJUnit.assertEquals(3, count);
         metricManagementService.stopReporter("Console");
         siddhiAppRuntime.shutdown();
     }
-    
+
     @Test
     public void asyncTest5() throws InterruptedException {
         log.info("async test 5");
@@ -222,7 +223,7 @@ public class StatisticsTestCase {
                 "insert into outputStream ;";
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiApp);
         siddhiAppRuntime.addCallback("outputStream", new StreamCallback() {
-            
+
             @Override
             public void receive(Event[] events) {
                 EventPrinter.print(events);
@@ -236,9 +237,9 @@ public class StatisticsTestCase {
                     count++;
                 }
             }
-            
+
         });
-        
+
         InputHandler inputHandler = siddhiAppRuntime.getInputHandler("cseEventStream");
         siddhiAppRuntime.start();
         inputHandler.send(new Object[] {"WSO2", 55.6f, 100});
@@ -257,14 +258,14 @@ public class StatisticsTestCase {
         AssertJUnit.assertTrue(eventArrived);
         metricManagementService.stopReporter("Console");
     }
-    
+
     private class mockmoryObject {
         String name;
-        
+
         public mockmoryObject(String name) {
             this.name = name;
         }
-        
+
         String getName() {
             return name;
         }

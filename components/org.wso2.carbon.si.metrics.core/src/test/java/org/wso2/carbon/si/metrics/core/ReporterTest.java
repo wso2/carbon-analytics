@@ -27,6 +27,8 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.metrics.core.MetricManagementService;
 import org.wso2.carbon.metrics.core.Metrics;
+import org.wso2.carbon.si.metrics.core.util.TestConstants;
+import org.wso2.carbon.si.metrics.core.util.TestUtils;
 
 /**
  * Test Cases for Reporters.
@@ -40,7 +42,7 @@ public class ReporterTest {
 
     @BeforeSuite
     protected static void init() throws ConfigurationException {
-        metrics = new Metrics(TestUtils.getConfigProvider("metrics-prometheus.yaml"));
+        metrics = new Metrics(TestUtils.getConfigProvider(TestConstants.PROMETHEUS_CONFIG_FILE_NAME));
         metrics.activate();
         metricManagementService = metrics.getMetricManagementService();
     }
@@ -68,11 +70,11 @@ public class ReporterTest {
 
     @Test
     public void testPrometheusReporter() throws InterruptedException {
-        metricManagementService.startReporter("prometheus");
-        Assert.assertTrue(metricManagementService.isReporterRunning("prometheus"));
+        metricManagementService.startReporter(TestConstants.PROMETHEUS_REPORTER_NAME);
+        Assert.assertTrue(metricManagementService.isReporterRunning(TestConstants.PROMETHEUS_REPORTER_NAME));
         metricManagementService.report();
         Thread.sleep(10000);
-        metricManagementService.stopReporter("prometheus");
-        Assert.assertFalse(metricManagementService.isReporterRunning("prometheus"));
+        metricManagementService.stopReporter(TestConstants.PROMETHEUS_REPORTER_NAME);
+        Assert.assertFalse(metricManagementService.isReporterRunning(TestConstants.PROMETHEUS_REPORTER_NAME));
     }
 }
