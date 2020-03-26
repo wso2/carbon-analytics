@@ -32,24 +32,28 @@ public class SPStatisticsManager implements StatisticsManager {
         this.componentName = componentName;
         this.metricsManagement = SPMetricsManagement.getInstance();
     }
-    
+
     @Override
     public void startReporting() {
         this.metricsManagement.startMetrics(componentName);
     }
-    
+
     @Override
     public void stopReporting() {
         this.metricsManagement.stopMetrics(componentName);
     }
-    
+
     @Override
     public void cleanup() {
         this.metricsManagement.cleanUpMetrics(componentName);
     }
-    
+
     public String getComponentName() {
         return componentName;
     }
 
+    public SPMetricsManagement getMetricsManagement() {
+        return metricsManagement;
+    }
 }
+
