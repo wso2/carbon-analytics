@@ -1,1 +1,0 @@
-## Business Rules Manager web component
