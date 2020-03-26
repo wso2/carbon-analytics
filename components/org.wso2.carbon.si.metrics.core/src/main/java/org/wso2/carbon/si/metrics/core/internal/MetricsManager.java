@@ -52,7 +52,7 @@ public class MetricsManager implements StatisticsManager {
         return componentName;
     }
 
-    public SPMetricsManagement getMetricsManagement() {
+    public MetricsManagement getMetricsManagement() {
         return metricsManagement;
     }
 }
