@@ -29,8 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.metrics.core.MetricManagementService;
 import org.wso2.carbon.metrics.core.MetricService;
-import org.wso2.carbon.si.metrics.core.internal.SPMetricsDataHolder;
-import org.wso2.carbon.si.metrics.core.internal.SPMetricsManagement;
+import org.wso2.carbon.si.metrics.core.internal.MetricsDataHolder;
+import org.wso2.carbon.si.metrics.core.internal.MetricsManagement;
 
 /**
  * Service component for getting the wso2 carbon metrics service.
@@ -42,23 +42,23 @@ import org.wso2.carbon.si.metrics.core.internal.SPMetricsManagement;
 )
 public class MetricsServiceComponent {
     private static final Logger log = LoggerFactory.getLogger(MetricsServiceComponent.class);
-    
+
     public MetricsServiceComponent() {
     }
-    
+
     @Activate
     protected void start(BundleContext bundleContext) {
-        bundleContext.registerService(SPMetricsManagement.class.getName(), SPMetricsManagement.getInstance(),null);
+        bundleContext.registerService(MetricsManagement.class.getName(), MetricsManagement.getInstance(),null);
         log.debug("MetricsServiceComponent has been activated.");
     }
-    
-    
+
+
     @Deactivate
     protected void stop() throws Exception {
         log.debug("MetricsServiceComponent has been stop.");
     }
-    
-    
+
+
     /**
      * This is the bind method which gets called at the registration of {@link MetricService}.
      *
@@ -72,24 +72,24 @@ public class MetricsServiceComponent {
             unbind = "unsetMetricService"
     )
     protected void setMetricService(MetricService metricService) {
-        SPMetricsDataHolder.getInstance().setMetricService(metricService);
+        MetricsDataHolder.getInstance().setMetricService(metricService);
         if (log.isDebugEnabled()) {
             log.debug("@Reference(bind) CarbonMetricsService");
         }
     }
-    
+
     /**
      * This is the unbind method which gets called at the un-registration of {@link MetricService}.
      *
      * @param metricService The {@link MetricService} instance registered as an OSGi service
      */
     protected void unsetMetricService(MetricService metricService) {
-        SPMetricsDataHolder.getInstance().setMetricService(null);
+        MetricsDataHolder.getInstance().setMetricService(null);
         if (log.isDebugEnabled()) {
             log.debug("@Reference(unbind) EventStreamService");
         }
     }
-    
+
     @Reference(
             name = "carbon.metrics.management.service",
             service = MetricManagementService.class,
@@ -98,15 +98,15 @@ public class MetricsServiceComponent {
             unbind = "unsetMetricManagementService"
     )
     protected void setMetricManagementService(MetricManagementService metricManagementService) {
-        SPMetricsDataHolder.getInstance().setMetricManagementService(metricManagementService);
+        MetricsDataHolder.getInstance().setMetricManagementService(metricManagementService);
     }
-    
+
     /**
      * This is the unbind method for unbound carbon metrics MetricManagementService.
      *
      * @param metricManagementService the carbon metrics MetricManagementService service that get unregistered.
      */
     protected void unsetMetricManagementService(MetricManagementService metricManagementService) {
-        SPMetricsDataHolder.getInstance().setMetricManagementService(null);
+        MetricsDataHolder.getInstance().setMetricManagementService(null);
     }
 }

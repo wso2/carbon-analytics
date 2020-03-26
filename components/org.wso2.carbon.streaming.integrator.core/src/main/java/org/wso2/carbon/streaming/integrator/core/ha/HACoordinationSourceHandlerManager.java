@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.streaming.integrator.core.ha;
 
-import org.wso2.carbon.si.metrics.core.SPThroughputMetric;
+import org.wso2.carbon.si.metrics.core.ThroughputMetric;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppProcessorConstants;
 import io.siddhi.core.stream.input.source.SourceHandler;
@@ -29,11 +29,11 @@ import io.siddhi.core.util.SiddhiConstants;
  * Implementation of {@link SourceHandlerManager} used for 2 node minimum HA
  */
 public class HACoordinationSourceHandlerManager extends SourceHandlerManager {
-    private SPThroughputMetric throughputTracker;
+    private ThroughputMetric throughputTracker;
 
     public HACoordinationSourceHandlerManager() {
         if (throughputTracker == null) {
-            throughputTracker = (SPThroughputMetric) StreamProcessorDataHolder.getStatisticsConfiguration().
+            throughputTracker = (ThroughputMetric) StreamProcessorDataHolder.getStatisticsConfiguration().
                     getFactory().createThroughputTracker(SiddhiAppProcessorConstants.HA_METRICS_PREFIX +
                             SiddhiConstants.METRIC_DELIMITER +
                             SiddhiAppProcessorConstants.HA_METRICS_SENDING_THROUGHPUT,

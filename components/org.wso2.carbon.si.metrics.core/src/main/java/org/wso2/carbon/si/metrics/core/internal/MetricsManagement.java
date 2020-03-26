@@ -34,21 +34,21 @@ import static org.wso2.carbon.metrics.core.Level.OFF;
 /**
  * Manages the statistics management functions.
  */
-public class SPMetricsManagement {
-    private static final Logger log = LoggerFactory.getLogger(SPMetricsManagement.class);
+public class MetricsManagement {
+    private static final Logger log = LoggerFactory.getLogger(MetricsManagement.class);
 
     private Map<String, List<String>> componentMap;
     private MetricManagementService metricManagementService;
     private MetricService metricService;
-    private static SPMetricsManagement instance = new SPMetricsManagement();
+    private static MetricsManagement instance = new MetricsManagement();
 
-    private SPMetricsManagement() {
-        metricManagementService = SPMetricsDataHolder.getInstance().getMetricManagementService();
-        metricService = SPMetricsDataHolder.getInstance().getMetricService();
+    private MetricsManagement() {
+        metricManagementService = MetricsDataHolder.getInstance().getMetricManagementService();
+        metricService = MetricsDataHolder.getInstance().getMetricService();
         componentMap = new HashMap<>();
     }
 
-    public static SPMetricsManagement getInstance() {
+    public static MetricsManagement getInstance() {
         return instance;
     }
 
