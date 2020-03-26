@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.siddhi.extensions.installer.core.execution;
 
+import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.ExtensionConfig;
 import org.wso2.carbon.siddhi.extensions.installer.core.exceptions.ExtensionsInstallerException;
 import org.wso2.carbon.siddhi.extensions.installer.core.models.enums.ExtensionInstallationStatus;
 
@@ -49,6 +50,16 @@ public interface DependencyRetriever {
      * @throws ExtensionsInstallerException Failed to retrieve installation status.
      */
     Map<String, Object> getExtensionStatusFor(String extensionId) throws ExtensionsInstallerException;
+
+    /**
+     * Retrieves installation status of the given extension object.
+     * Possible installation statuses are {@link ExtensionInstallationStatus}.
+     *
+     * @param extension Configuration of an extension.
+     * @return Map containing extension information and its installation status.
+     * @throws ExtensionsInstallerException Failed to retrieve installation status.
+     */
+    Map<String, Object> getExtensionStatus(ExtensionConfig extension) throws ExtensionsInstallerException;
 
     /**
      * Retrieves statuses of all the dependencies, of the extension that has the given id.

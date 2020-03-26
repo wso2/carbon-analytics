@@ -27,11 +27,11 @@ import io.siddhi.core.util.statistics.ThroughputTracker;
 /**
  * Siddhi throughput metric tracker.
  */
-public class SPThroughputMetric implements ThroughputTracker {
+public class ThroughputMetric implements ThroughputTracker {
     private Meter eventMeter = null;
     private String throughputTrackerId;
-    
-    public SPThroughputMetric(String throughputTrackerId, MetricService metricService) {
+
+    public ThroughputMetric(String throughputTrackerId, MetricService metricService) {
         this.throughputTrackerId = throughputTrackerId;
         eventMeter = metricService.meter(this.throughputTrackerId, Level.INFO);
     }
@@ -43,7 +43,7 @@ public class SPThroughputMetric implements ThroughputTracker {
     public void eventIn() {
         eventMeter.mark();
     }
-    
+
     /**
      * This method is to notify receive of events to calculate the throughput.
      *
@@ -53,7 +53,7 @@ public class SPThroughputMetric implements ThroughputTracker {
     public void eventsIn(int eventCount) {
         eventMeter.mark(eventCount);
     }
-    
+
     /**
      * @return Name of the memory usage tracker.
      */
@@ -61,5 +61,5 @@ public class SPThroughputMetric implements ThroughputTracker {
     public String getName() {
         return throughputTrackerId;
     }
-    
+
 }

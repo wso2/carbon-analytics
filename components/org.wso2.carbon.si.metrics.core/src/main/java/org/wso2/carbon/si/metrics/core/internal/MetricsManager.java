@@ -21,16 +21,16 @@ package org.wso2.carbon.si.metrics.core.internal;
 import io.siddhi.core.util.statistics.StatisticsManager;
 
 /**
- * Functionality of SPStatisticsManager is not required to be implemented,
+ * Functionality of MetricsManager is not required to be implemented,
  * since the reporting will be handled according the Carbon Metrics configuration.
  */
-public class SPStatisticsManager implements StatisticsManager {
+public class MetricsManager implements StatisticsManager {
     private String componentName;
-    private SPMetricsManagement metricsManagement;
+    private MetricsManagement metricsManagement;
 
-    public SPStatisticsManager(String componentName) {
+    public MetricsManager(String componentName) {
         this.componentName = componentName;
-        this.metricsManagement = SPMetricsManagement.getInstance();
+        this.metricsManagement = MetricsManagement.getInstance();
     }
 
     @Override

@@ -31,8 +31,8 @@ import org.wso2.carbon.metrics.core.Level;
 import org.wso2.carbon.metrics.core.MetricManagementService;
 import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.metrics.core.Metrics;
-import org.wso2.carbon.si.metrics.core.internal.SPMetricsDataHolder;
-import org.wso2.carbon.si.metrics.core.internal.SPStatisticsManager;
+import org.wso2.carbon.si.metrics.core.internal.MetricsDataHolder;
+import org.wso2.carbon.si.metrics.core.internal.MetricsManager;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.config.StatisticsConfiguration;
@@ -74,8 +74,8 @@ public class StatisticsTestCase {
         metricManagementService.stopReporters();
         count = 0;
         eventArrived = false;
-        SPMetricsDataHolder.getInstance().setMetricService(metricService);
-        SPMetricsDataHolder.getInstance().setMetricManagementService(metricManagementService);
+        MetricsDataHolder.getInstance().setMetricService(metricService);
+        MetricsDataHolder.getInstance().setMetricManagementService(metricManagementService);
         metricManagementService.startReporter("Console");
     }
 
@@ -86,24 +86,24 @@ public class StatisticsTestCase {
 
     @Test
     public void statisticsMetricsFactory() throws InterruptedException {
-        StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new SPMetricsFactory());
-        SPLatencyMetric latencyTracker = (SPLatencyMetric) statisticsConfiguration
-                .getFactory().createLatencyTracker("test.latency", new SPStatisticsManager(
+        StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new MetricsFactory());
+        LatencyMetric latencyTracker = (LatencyMetric) statisticsConfiguration
+                .getFactory().createLatencyTracker("test.latency", new MetricsManager(
                         "MetricsTest"));
         AssertJUnit.assertEquals("test.latency", latencyTracker.getName());
-        SPThroughputMetric throughputTracker = (SPThroughputMetric) statisticsConfiguration
-                .getFactory().createThroughputTracker("test.throughput", new SPStatisticsManager(
+        ThroughputMetric throughputTracker = (ThroughputMetric) statisticsConfiguration
+                .getFactory().createThroughputTracker("test.throughput", new MetricsManager(
                         "MetricsTest"));
         AssertJUnit.assertEquals("test.throughput", throughputTracker.getName());
 
-        SPMemoryUsageMetric memoryUsageTracker = (SPMemoryUsageMetric) statisticsConfiguration
+        MemoryUsageMetric memoryUsageTracker = (MemoryUsageMetric) statisticsConfiguration
                 .getFactory()
-                .createMemoryUsageTracker(new SPStatisticsManager("MetricsTest"));
+                .createMemoryUsageTracker(new MetricsManager("MetricsTest"));
         mockmoryObject mockmoryObject = new mockmoryObject("test.memory");
         memoryUsageTracker.registerObject(mockmoryObject, "test.memory");
         AssertJUnit.assertEquals("test.memory", memoryUsageTracker.getName(mockmoryObject));
-        SPBufferedEventsMetric bufferedEventsTracker = (SPBufferedEventsMetric) statisticsConfiguration
-                .getFactory().createBufferSizeTracker(new SPStatisticsManager("MetricsTest"));
+        BufferedEventsMetric bufferedEventsTracker = (BufferedEventsMetric) statisticsConfiguration
+                .getFactory().createBufferSizeTracker(new MetricsManager("MetricsTest"));
         EventBufferHolder eventBufferHolder = new EventBufferHolder() {
             @Override
             public long getBufferedEvents() {
@@ -123,7 +123,7 @@ public class StatisticsTestCase {
     public void statisticsTest1() throws InterruptedException {
         log.info("statistics test 1");
         SiddhiManager siddhiManager = new SiddhiManager();
-        StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new SPMetricsFactory());
+        StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new MetricsFactory());
         siddhiManager.setStatisticsConfiguration(statisticsConfiguration);
         String siddhiApp = "@app:name('MetricsTest')" +
                 "@app:statistics(reporter = 'console', interval = '1' )" +
@@ -202,7 +202,7 @@ public class StatisticsTestCase {
     public void asyncTest5() throws InterruptedException {
         log.info("async test 5");
         SiddhiManager siddhiManager = new SiddhiManager();
-        StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new SPMetricsFactory());
+        StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new MetricsFactory());
         siddhiManager.setStatisticsConfiguration(statisticsConfiguration);
         String siddhiApp = "" +
                 "@app:name('MetricsTest2')" +

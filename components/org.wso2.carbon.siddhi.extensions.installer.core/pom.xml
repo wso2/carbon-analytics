@@ -67,6 +67,28 @@
             <groupId>commons-io.wso2</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
+
+        <!-- Siddhi Dependencies -->
+        <dependency>
+            <groupId>org.wso2.orbit.org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.siddhi</groupId>
+            <artifactId>siddhi-query-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.siddhi</groupId>
+            <artifactId>siddhi-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.siddhi</groupId>
+            <artifactId>siddhi-query-compiler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.siddhi</groupId>
+            <artifactId>siddhi-annotations</artifactId>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -88,6 +110,7 @@
             org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
             org.wso2.carbon.utils; version="${carbon.utils.version}",
             org.wso2.msf4j;version="${msf4j.import.version.range}",
+            io.siddhi.*;version="${siddhi.version.range}",
             *;resolution:=optional
         </import.package>
         <carbon.component>

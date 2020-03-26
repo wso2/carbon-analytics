@@ -19,7 +19,7 @@
 package org.wso2.carbon.streaming.integrator.core.event.queue;
 
 import org.apache.log4j.Logger;
-import org.wso2.carbon.si.metrics.core.SPThroughputMetric;
+import org.wso2.carbon.si.metrics.core.ThroughputMetric;
 import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSourceHandler;
 import org.wso2.carbon.streaming.integrator.core.ha.exception.InvalidByteMessageException;
 import org.wso2.carbon.streaming.integrator.core.ha.tcp.SiddhiEventConverter;
@@ -31,7 +31,6 @@ import org.wso2.carbon.streaming.integrator.core.util.BinaryMessageConverterUtil
 import io.siddhi.core.event.Event;
 import io.siddhi.core.stream.input.source.Source;
 import io.siddhi.core.util.SiddhiConstants;
-import io.siddhi.core.util.statistics.metrics.Level;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -51,12 +50,12 @@ public class EventListMapManager {
     private static long endTime;
     private static int count = 0;
     private static final int TPS_EVENT_THRESHOLD = 100000;
-    private SPThroughputMetric throughputTracker = null;
+    private ThroughputMetric throughputTracker = null;
 
     public EventListMapManager() {
         if (throughputTracker == null) {
             throughputTracker =
-                    (SPThroughputMetric) StreamProcessorDataHolder.getStatisticsConfiguration().getFactory().
+                    (ThroughputMetric) StreamProcessorDataHolder.getStatisticsConfiguration().getFactory().
                             createThroughputTracker(SiddhiAppProcessorConstants.HA_METRICS_PREFIX +
                                             SiddhiConstants.METRIC_DELIMITER +
                                             SiddhiAppProcessorConstants.HA_METRICS_RECEIVING_THROUGHPUT,

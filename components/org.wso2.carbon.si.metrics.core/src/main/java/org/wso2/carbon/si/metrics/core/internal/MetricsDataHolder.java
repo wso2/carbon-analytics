@@ -25,25 +25,25 @@ import org.wso2.carbon.metrics.core.MetricService;
 /**
  * Class which holds the OSGI Service references.
  */
-public class SPMetricsDataHolder {
-    private static SPMetricsDataHolder instance = new SPMetricsDataHolder();
-    
+public class MetricsDataHolder {
+    private static MetricsDataHolder instance = new MetricsDataHolder();
+
     private MetricService metricService;
     private MetricManagementService metricManagementService;
-    
-    private SPMetricsDataHolder() {
-    
+
+    private MetricsDataHolder() {
+
     }
-    
+
     /**
      * This returns the StreamProcessorDataHolder instance.
      *
      * @return The StreamProcessorDataHolder instance of this singleton class
      */
-    public static SPMetricsDataHolder getInstance() {
+    public static MetricsDataHolder getInstance() {
         return instance;
     }
-    
+
     /**
      * Store the wso2 carbon metrics service.
      *
@@ -52,7 +52,7 @@ public class SPMetricsDataHolder {
     public MetricService getMetricService() {
         return metricService;
     }
-    
+
     /**
      * Set the metrics service.
      *
@@ -61,7 +61,7 @@ public class SPMetricsDataHolder {
     public void setMetricService(MetricService metricService) {
         this.metricService = metricService;
     }
-    
+
     /**
      * Return the metrics management service.
      *
@@ -70,7 +70,7 @@ public class SPMetricsDataHolder {
     public MetricManagementService getMetricManagementService() {
         return metricManagementService;
     }
-    
+
     /**
      * Set the metrics managemet service for metrics management purpose such as enable disable metrics
      *

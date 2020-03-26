@@ -21,7 +21,7 @@ package org.wso2.carbon.si.metrics.core;
 import org.wso2.carbon.metrics.core.Gauge;
 import org.wso2.carbon.metrics.core.Level;
 import org.wso2.carbon.metrics.core.MetricService;
-import org.wso2.carbon.si.metrics.core.internal.SPMetricsManagement;
+import org.wso2.carbon.si.metrics.core.internal.MetricsManagement;
 import io.siddhi.core.util.statistics.BufferedEventsTracker;
 import io.siddhi.core.util.statistics.EventBufferHolder;
 
@@ -31,16 +31,16 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Siddhi Memory usage MMetrics Tracker.
  */
-public class SPBufferedEventsMetric implements BufferedEventsTracker {
+public class BufferedEventsMetric implements BufferedEventsTracker {
     private ConcurrentMap<Object, ObjectMetric> registeredObjects = new ConcurrentHashMap<Object, ObjectMetric>();
     private MetricService metricService;
     private String siddhiAppName;
 
-    public SPBufferedEventsMetric(MetricService metricService, String siddhiAppName) {
+    public BufferedEventsMetric(MetricService metricService, String siddhiAppName) {
         this.metricService = metricService;
         this.siddhiAppName = siddhiAppName;
     }
-    
+
     /**
      * Register the object that needs to be measured the buffered events count usage.
      *
@@ -51,7 +51,7 @@ public class SPBufferedEventsMetric implements BufferedEventsTracker {
     public void registerEventBufferHolder(EventBufferHolder eventBufferHolder, String bufferedEventsTrackerId) {
         if (registeredObjects.get(eventBufferHolder) == null) {
             registeredObjects.put(eventBufferHolder, new ObjectMetric(eventBufferHolder, bufferedEventsTrackerId));
-            SPMetricsManagement.getInstance().addComponent(siddhiAppName, bufferedEventsTrackerId);
+            MetricsManagement.getInstance().addComponent(siddhiAppName, bufferedEventsTrackerId);
         }
     }
 
@@ -82,7 +82,7 @@ public class SPBufferedEventsMetric implements BufferedEventsTracker {
             return null;
         }
     }
-    
+
     class ObjectMetric {
         private String name;
         private Gauge<Long> gauge;
