@@ -19,9 +19,9 @@
 package org.wso2.carbon.si.metrics.core;
 
 import org.wso2.carbon.metrics.core.MetricService;
-import org.wso2.carbon.si.metrics.core.internal.SPMetricsDataHolder;
-import org.wso2.carbon.si.metrics.core.internal.SPMetricsManagement;
-import org.wso2.carbon.si.metrics.core.internal.SPStatisticsManager;
+import org.wso2.carbon.si.metrics.core.internal.MetricsDataHolder;
+import org.wso2.carbon.si.metrics.core.internal.MetricsManagement;
+import org.wso2.carbon.si.metrics.core.internal.MetricsManager;
 import io.siddhi.core.util.statistics.BufferedEventsTracker;
 import io.siddhi.core.util.statistics.LatencyTracker;
 import io.siddhi.core.util.statistics.MemoryUsageTracker;
@@ -35,42 +35,42 @@ import java.util.List;
 /**
  * Factory to retrieve required metric tracker.
  */
-public class SPMetricsFactory implements StatisticsTrackerFactory {
+public class MetricsFactory implements StatisticsTrackerFactory {
     private MetricService metricService;
-    private SPMetricsManagement metricsManagement;
-    
-    public SPMetricsFactory() {
-        this.metricService = SPMetricsDataHolder.getInstance().getMetricService();
-        this.metricsManagement = SPMetricsManagement.getInstance();
+    private MetricsManagement metricsManagement;
+
+    public MetricsFactory() {
+        this.metricService = MetricsDataHolder.getInstance().getMetricService();
+        this.metricsManagement = MetricsManagement.getInstance();
     }
-    
+
     public LatencyTracker createLatencyTracker(String name, StatisticsManager statisticsManager) {
-        SPStatisticsManager SPStatisticsManager = (SPStatisticsManager) statisticsManager;
-        SPLatencyMetric SPLatencyMetric = new SPLatencyMetric(name, this.metricService);
-        this.metricsManagement.addComponent(SPStatisticsManager.getComponentName(), SPLatencyMetric.getName());
-        return SPLatencyMetric;
+        MetricsManager metricsManager = (MetricsManager) statisticsManager;
+        LatencyMetric latencyMetric = new LatencyMetric(name, this.metricService);
+        this.metricsManagement.addComponent(metricsManager.getComponentName(), latencyMetric.getName());
+        return latencyMetric;
     }
-    
+
     public ThroughputTracker createThroughputTracker(String name, StatisticsManager statisticsManager) {
-        SPStatisticsManager SPStatisticsManager = (SPStatisticsManager) statisticsManager;
-        SPThroughputMetric SPThroughputMetric = new SPThroughputMetric(name, this.metricService);
-        this.metricsManagement.addComponent(SPStatisticsManager.getComponentName(),
-                SPThroughputMetric.getName());
-        return SPThroughputMetric;
+        MetricsManager metricsManager = (MetricsManager) statisticsManager;
+        ThroughputMetric throughputMetric = new ThroughputMetric(name, this.metricService);
+        this.metricsManagement.addComponent(metricsManager.getComponentName(),
+                throughputMetric.getName());
+        return throughputMetric;
     }
-    
+
     public BufferedEventsTracker createBufferSizeTracker(StatisticsManager statisticsManager) {
-        SPStatisticsManager SPStatisticsManager = (SPStatisticsManager) statisticsManager;
-        return new SPBufferedEventsMetric(this.metricService, SPStatisticsManager.getComponentName());
+        MetricsManager metricsManager = (MetricsManager) statisticsManager;
+        return new BufferedEventsMetric(this.metricService, metricsManager.getComponentName());
     }
-    
+
     public MemoryUsageTracker createMemoryUsageTracker(StatisticsManager statisticsManager) {
-        SPStatisticsManager SPStatisticsManager = (SPStatisticsManager) statisticsManager;
-        return new SPMemoryUsageMetric(this.metricService, SPStatisticsManager.getComponentName());
+        MetricsManager metricsManager = (MetricsManager) statisticsManager;
+        return new MemoryUsageMetric(this.metricService, metricsManager.getComponentName());
     }
 
     @Override
     public StatisticsManager createStatisticsManager(String prefix, String componentName, List<Element> elements) {
-        return new SPStatisticsManager(componentName);
+        return new MetricsManager(componentName);
     }
 }

@@ -21,29 +21,26 @@ package org.wso2.carbon.si.metrics.core;
 import org.wso2.carbon.metrics.core.Gauge;
 import org.wso2.carbon.metrics.core.Level;
 import org.wso2.carbon.metrics.core.MetricService;
-import org.wso2.carbon.si.metrics.core.internal.SPMetricsDataHolder;
-import org.wso2.carbon.si.metrics.core.internal.SPMetricsManagement;
+import org.wso2.carbon.si.metrics.core.internal.MetricsManagement;
 import io.siddhi.core.util.statistics.MemoryUsageTracker;
 import io.siddhi.core.util.statistics.memory.ObjectSizeCalculator;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static org.wso2.carbon.metrics.core.Level.OFF;
-
 /**
  * Siddhi Memory usage MMetrics Tracker.
  */
-public class SPMemoryUsageMetric implements MemoryUsageTracker {
+public class MemoryUsageMetric implements MemoryUsageTracker {
     private ConcurrentMap<Object, ObjectMetric> registeredObjects = new ConcurrentHashMap<Object, ObjectMetric>();
     private MetricService metricService;
     private String siddhiAppName;
 
-    public SPMemoryUsageMetric(MetricService metricService, String siddhiAppName) {
+    public MemoryUsageMetric(MetricService metricService, String siddhiAppName) {
         this.metricService = metricService;
         this.siddhiAppName = siddhiAppName;
     }
-    
+
     /**
      * Register the object that needs to be measured the memory usage.
      *
@@ -54,7 +51,7 @@ public class SPMemoryUsageMetric implements MemoryUsageTracker {
     public void registerObject(Object object, String memoryTrackerId) {
         if (registeredObjects.get(object) == null) {
             registeredObjects.put(object, new ObjectMetric(object, memoryTrackerId));
-            SPMetricsManagement.getInstance().addComponent(siddhiAppName, memoryTrackerId);
+            MetricsManagement.getInstance().addComponent(siddhiAppName, memoryTrackerId);
         }
     }
 
@@ -85,7 +82,7 @@ public class SPMemoryUsageMetric implements MemoryUsageTracker {
             return null;
         }
     }
-    
+
     class ObjectMetric {
         private String name;
         private Gauge<Long> gauge;

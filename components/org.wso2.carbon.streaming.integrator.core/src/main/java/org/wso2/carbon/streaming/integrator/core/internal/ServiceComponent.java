@@ -42,8 +42,8 @@ import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
-import org.wso2.carbon.si.metrics.core.SPMetricsFactory;
-import org.wso2.carbon.si.metrics.core.internal.SPMetricsDataHolder;
+import org.wso2.carbon.si.metrics.core.MetricsFactory;
+import org.wso2.carbon.si.metrics.core.internal.MetricsDataHolder;
 import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 import org.wso2.carbon.streaming.integrator.common.HAStateChangeListener;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
@@ -154,7 +154,7 @@ public class ServiceComponent {
             }
         }
 
-        StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new SPMetricsFactory());
+        StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new MetricsFactory());
         siddhiManager.setStatisticsConfiguration(statisticsConfiguration);
         StreamProcessorDataHolder.setSiddhiManager(siddhiManager);
         StreamProcessorDataHolder.setStatisticsConfiguration(statisticsConfiguration);
@@ -362,7 +362,7 @@ public class ServiceComponent {
                 }
                 log.info("WSO2 Streaming Integrator Starting in Two Node Minimum HA Deployment");
                 StreamProcessorDataHolder.setIsStatisticsEnabled(
-                        SPMetricsDataHolder.getInstance().getMetricManagementService().isEnabled());
+                        MetricsDataHolder.getInstance().getMetricManagementService().isEnabled());
                 StatisticsManager statisticsManager = StreamProcessorDataHolder.getStatisticsConfiguration().
                         getFactory().createStatisticsManager(
                         null, HA + PERIOD + StreamProcessorDataHolder.getNodeInfo().getNodeId(), null);

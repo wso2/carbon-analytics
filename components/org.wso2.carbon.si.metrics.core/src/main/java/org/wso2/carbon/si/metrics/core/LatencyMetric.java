@@ -22,29 +22,26 @@ package org.wso2.carbon.si.metrics.core;
 import org.wso2.carbon.metrics.core.Level;
 import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.metrics.core.Timer;
-import org.wso2.carbon.si.metrics.core.internal.SPMetricsDataHolder;
+import org.wso2.carbon.si.metrics.core.internal.MetricsDataHolder;
 import io.siddhi.core.util.statistics.LatencyTracker;
-
-import static org.wso2.carbon.metrics.core.Level.INFO;
-import static org.wso2.carbon.metrics.core.Level.OFF;
 
 /**
  * Siddhi Latency metrics tracker.
  */
-public class SPLatencyMetric implements LatencyTracker {
+public class LatencyMetric implements LatencyTracker {
     // Using thread local variables to keep the timer track
     // the time of the same execution path by different threads.
     private ThreadLocal<Timer> execLatencyTimer;
     private ThreadLocal<Timer.Context> context;
     private String latencyTrackerId;
-    
-    public SPLatencyMetric(String latencyTrackerId, MetricService metricService) {
+
+    public LatencyMetric(String latencyTrackerId, MetricService metricService) {
         this.latencyTrackerId = latencyTrackerId;
         Timer timer = metricService.timer(this.latencyTrackerId, Level.INFO);
         execLatencyTimer = new ThreadLocal<Timer>() {
             protected Timer initialValue() {
-                SPMetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel
-                        (SPLatencyMetric.this.latencyTrackerId, Level.INFO);
+                MetricsDataHolder.getInstance().getMetricManagementService().setMetricLevel
+                        (LatencyMetric.this.latencyTrackerId, Level.INFO);
                 return timer;
             }
         };
@@ -53,9 +50,9 @@ public class SPLatencyMetric implements LatencyTracker {
                 return null;
             }
         };
-        
+
     }
-    
+
     /**
      * This is called when the processing of the event is started. This is called at
      * ProcessStreamReceiver#receive before the event is passed into process chain.
@@ -67,7 +64,7 @@ public class SPLatencyMetric implements LatencyTracker {
         }
         context.set(execLatencyTimer.get().start());
     }
-    
+
     /**
      * This is called to when the processing of an event is finished. This is called at two places,
      * 1. OutputRateLimiter#sendToCallBacks - When the event is processed and by the full chain and emitted out.
@@ -81,7 +78,7 @@ public class SPLatencyMetric implements LatencyTracker {
             context.set(null);
         }
     }
-    
+
     /**
      * @return Name of the latency tracker.
      */
@@ -89,5 +86,5 @@ public class SPLatencyMetric implements LatencyTracker {
     public String getName() {
         return latencyTrackerId;
     }
-    
+
 }
