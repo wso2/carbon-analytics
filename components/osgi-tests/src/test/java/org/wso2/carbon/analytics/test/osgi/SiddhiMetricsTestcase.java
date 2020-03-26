@@ -148,60 +148,6 @@ public class SiddhiMetricsTestcase {
         Assert.assertEquals(coreBundle.getState(), Bundle.ACTIVE);
     }
 
-    // TODO: 11/22/17 Fix
-//    @Test
-//    public void testMetrics() throws Exception {
-//        SiddhiManager siddhiManager = new SiddhiManager();
-//        StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new SiddhiMetricsFactory());
-//        siddhiManager.setStatisticsConfiguration(statisticsConfiguration);
-//        StreamProcessorDataHolder.setSiddhiManager(siddhiManager);
-//        String siddhiApp = "@App:name('TestApp')" +
-//                "@app:statistics(reporter = 'jdbc', interval = '2' )" +
-//                " " +
-//                "define stream cseEventStream (symbol string, price float, volume int);" +
-//                "" +
-//                "@info(name = 'query1') " +
-//                "from cseEventStream[price < 70] " +
-//                "select * " +
-//                "insert into outputStream ;" +
-//                "" +
-//                "@info(name = 'query2') " +
-//                "from cseEventStream[volume > 90] " +
-//                "select * " +
-//                "insert into outputStream ;";
-//
-//        SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiApp);
-//        siddhiAppRuntime.enableStats(true);
-//
-//        siddhiAppRuntime.addCallback("outputStream", new StreamCallback() {
-//            @Override
-//            public void receive(Event[] events) {
-//                EventPrinter.print(events);
-//            }
-//        });
-//
-//        siddhiAppRuntime.start();
-//        MetricsMXBean metricsMXBean = null;
-//        try {
-//            ObjectName n = new ObjectName(MBEAN_NAME);
-//            metricsMXBean = JMX.newMXBeanProxy(ManagementFactory.getPlatformMBeanServer(), n, MetricsMXBean.class);
-//        } catch (MalformedObjectNameException e) {
-//            Assert.fail(e.getMessage());
-//        }
-//        Assert.assertNotNull(metricsMXBean);
-//        Assert.assertTrue(metricsMXBean.isEnabled());
-//        // Check whether the reporters are started at the startup
-//        Assert.assertTrue(metricsMXBean.isReporterRunning("JDBC"));
-//        Assert.assertTrue(metricsMXBean.getMetricsCount() > 0);
-//        Assert.assertEquals(metricsMXBean.getRootLevel(), Level.INFO.name());
-//        Assert.assertEquals(metricsMXBean.getDefaultSource(), "wso2-sp");
-//        Assert.assertEquals(metricsMXBean.getMetricLevel("io.siddhi.SiddhiApps.TestApp.Siddhi.Streams." +
-//                "cseEventStream.throughput"), Level.INFO.name());
-//        Assert.assertEquals(metricsMXBean.getMetricLevel("io.siddhi.SiddhiApps.TestApp.Siddhi.Streams" +
-//                ".cseEventStream2.throughput"), Level.INFO.name());
-//        siddhiAppRuntime.shutdown();
-//    }
-
     private void testMBean(String MBeanName) throws Exception {
 
         SiddhiAppRuntime siddhiAppRuntime = siddhiAppRuntimeService.getActiveSiddhiAppRuntimes().get("MetricsTestApp2");

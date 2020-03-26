@@ -540,11 +540,11 @@
                                 </feature>
                                 <feature>
                                     <id>org.wso2.carbon.status.dashboard.web.feature</id>
-                                    <version>${carbon.analytics.version}</version>
+                                    <version>${project.version}</version>
                                 </feature>
                                 <feature>
                                     <id>org.wso2.carbon.status.dashboard.core.feature</id>
-                                    <version>${carbon.analytics.version}</version>
+                                    <version>${project.version}</version>
                                 </feature>
                                 <!-- Clustering -->
                                 <feature>
@@ -965,11 +965,11 @@
                                 </feature>
                                 <feature>
                                     <id>org.wso2.carbon.status.dashboard.web.feature</id>
-                                    <version>${carbon.analytics.version}</version>
+                                    <version>${project.version}</version>
                                 </feature>
                                 <feature>
                                     <id>org.wso2.carbon.status.dashboard.core.feature</id>
-                                    <version>${carbon.analytics.version}</version>
+                                    <version>${project.version}</version>
                                 </feature>
                             </features>
                         </configuration>

@@ -310,7 +310,7 @@
                                 </org.wso2.carbon.test.default.distribution>
                                 <org.ops4j.pax.logging.DefaultServiceLog.level>DEBUG
                                 </org.ops4j.pax.logging.DefaultServiceLog.level>
-                                <carbon.analytic.version>${carbon.analytics.version}</carbon.analytic.version>
+                                <carbon.analytic.version>${project.version}</carbon.analytic.version>
                             </systemPropertyVariables>
                             <environmentVariables>
                                 <DATABASE_TYPE>MySQL</DATABASE_TYPE>
@@ -527,7 +527,7 @@
                                 </org.wso2.carbon.test.default.distribution>
                                 <org.ops4j.pax.logging.DefaultServiceLog.level>DEBUG
                                 </org.ops4j.pax.logging.DefaultServiceLog.level>
-                                <carbon.analytic.version>${carbon.analytics.version}</carbon.analytic.version>
+                                <carbon.analytic.version>${project.version}</carbon.analytic.version>
                             </systemPropertyVariables>
                             <environmentVariables>
                                 <DATABASE_TYPE>POSTGRES</DATABASE_TYPE>
@@ -742,7 +742,7 @@
                                 </org.wso2.carbon.test.default.distribution>
                                 <org.ops4j.pax.logging.DefaultServiceLog.level>DEBUG
                                 </org.ops4j.pax.logging.DefaultServiceLog.level>
-                                <carbon.analytic.version>${carbon.analytics.version}</carbon.analytic.version>
+                                <carbon.analytic.version>${project.version}</carbon.analytic.version>
                             </systemPropertyVariables>
                             <environmentVariables>
                                 <DATABASE_TYPE>MSSQL</DATABASE_TYPE>
@@ -953,7 +953,7 @@
                                 </org.wso2.carbon.test.default.distribution>
                                 <org.ops4j.pax.logging.DefaultServiceLog.level>DEBUG
                                 </org.ops4j.pax.logging.DefaultServiceLog.level>
-                                <carbon.analytic.version>${carbon.analytics.version}</carbon.analytic.version>
+                                <carbon.analytic.version>${project.version}</carbon.analytic.version>
                             </systemPropertyVariables>
                             <environmentVariables>
                                 <DATABASE_TYPE>ORACLE</DATABASE_TYPE>
@@ -1091,7 +1091,7 @@
                                 </org.wso2.carbon.test.default.distribution>
                                 <org.ops4j.pax.logging.DefaultServiceLog.level>DEBUG
                                 </org.ops4j.pax.logging.DefaultServiceLog.level>
-                                <carbon.analytic.version>${carbon.analytics.version}</carbon.analytic.version>
+                                <carbon.analytic.version>${project.version}</carbon.analytic.version>
                             </systemPropertyVariables>
                             <suiteXmlFiles>
                                 <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>

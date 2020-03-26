@@ -82,13 +82,11 @@ public class SiddhiMetricsAPITestcase {
 
     @Configuration
     public Option[] createConfiguration() {
-        log.info("Running - " + this.getClass().getName()+"============================= "+ System.currentTimeMillis());
         return new Option[]{
                 copyCarbonYAMLOption(),
                 copySiddhiFileOption(),
                 carbonDistribution(Paths.get("target", "test-distribution-" + System.getProperty("carbon.analytic.version")),
                         "server"),
-                CarbonDistributionOption.debug(5005)
         };
     }
 
@@ -124,7 +122,6 @@ public class SiddhiMetricsAPITestcase {
     //Server is started with statistics enabled from the deployment.yaml. So we need to test re-enabling.
     @Test
     public void testReEnableMetricsFirstTime() throws Exception {
-        log.info("---------------------------------------------------------enable Metrics");
         Thread.sleep(5000);
         enableMetrics();
     }
