@@ -98,4 +98,12 @@ public class MetricsManagement {
             componentMap.remove(siddhiAppName);
         }
     }
+
+    public Map<String, List<String>> getComponentMap() {
+        return componentMap;
+    }
+
+    public MetricService getMetricService() {
+        return metricService;
+    }
 }
