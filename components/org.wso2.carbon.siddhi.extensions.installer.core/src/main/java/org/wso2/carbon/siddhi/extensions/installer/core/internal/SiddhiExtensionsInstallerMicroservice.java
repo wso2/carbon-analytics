@@ -47,6 +47,7 @@ import javax.ws.rs.core.Response;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Set;
 
 import static org.wso2.carbon.siddhi.extensions.installer.core.models.enums.ExtensionInstallationStatus.NOT_INSTALLED;
 import static org.wso2.carbon.siddhi.extensions.installer.core.models.enums.ExtensionUnInstallationStatus.NOT_UNINSTALLED;
@@ -148,6 +149,32 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 .build();
         } catch (ExtensionsInstallerException e) {
             LOGGER.error(String.format("Failed to install dependencies for extension: %s.", extensionId), e);
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+    }
+
+    @POST
+    @Path("/install")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response installDependencies(Set<String> extensionIds) {
+        try {
+            DependencyInstaller dependencyInstaller = new DependencyInstallerImpl(extensionConfigs);
+            Map<String, Map<String, Object>> responseEntities =
+                dependencyInstaller.installDependenciesFor(extensionIds);
+            Response.Status responseStatus =
+                responseEntities.entrySet().stream().anyMatch(entity -> isActionFailure(entity.getValue())) ?
+                    Response.Status.INTERNAL_SERVER_ERROR : Response.Status.OK;
+            return Response
+                .status(responseStatus)
+                .entity(responseEntities)
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+        } catch (ExtensionsInstallerException e) {
+            LOGGER.error("There were failures when installing dependencies for the given extensions.", e);
             return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(e.getMessage())

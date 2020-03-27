@@ -36,6 +36,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,6 +58,16 @@ public class DependencyInstallerImpl implements DependencyInstaller {
 
     public DependencyInstallerImpl(Map<String, ExtensionConfig> extensionConfigs) {
         this.extensionConfigs = extensionConfigs;
+    }
+
+    @Override
+    public Map<String, Map<String, Object>> installDependenciesFor(Set<String> extensionIds)
+        throws ExtensionsInstallerException {
+        Map<String, Map<String, Object>> installationResponses = new HashMap<>();
+        for (String extensionId : extensionIds) {
+            installationResponses.put(extensionId, installDependenciesFor(extensionId));
+        }
+        return installationResponses;
     }
 
     @Override
