@@ -34,6 +34,7 @@ import org.wso2.carbon.siddhi.extensions.installer.core.execution.DependencyRetr
 import org.wso2.carbon.siddhi.extensions.installer.core.execution.DependencyRetrieverImpl;
 import org.wso2.carbon.siddhi.extensions.installer.core.execution.SiddhiAppExtensionUsageDetector;
 import org.wso2.carbon.siddhi.extensions.installer.core.execution.SiddhiAppExtensionUsageDetectorImpl;
+import org.wso2.carbon.siddhi.extensions.installer.core.util.MissingExtensionsInstaller;
 import org.wso2.msf4j.Microservice;
 
 import javax.ws.rs.Consumes;
@@ -58,7 +59,8 @@ import static org.wso2.carbon.siddhi.extensions.installer.core.util.ResponseEnti
  * Exposes Siddhi Extensions Installer as a micro-service.
  */
 @Component(
-    service = Microservice.class,
+    name = "org.wso2.carbon.siddhi.extensions.installer.core.internal.SiddhiExtensionsInstallerMicroservice",
+    service = {SiddhiExtensionsInstallerMicroservice.class, Microservice.class},
     immediate = true
 )
 @Path("/siddhi-extensions")
@@ -259,6 +261,24 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(e.getMessage())
                 .build();
+        }
+    }
+
+    /**
+     * Installs extensions that have been used in the given Siddhi app, but not have been installed.
+     *
+     * @param siddhiAppBody Body of a Siddhi app.
+     * @param siddhiAppName Name of the Siddhi app.
+     */
+    public void installMissingExtensions(String siddhiAppBody, String siddhiAppName) {
+        try {
+            SiddhiAppExtensionUsageDetector usageDetector = new SiddhiAppExtensionUsageDetectorImpl(extensionConfigs);
+            DependencyInstaller dependencyInstaller = new DependencyInstallerImpl(extensionConfigs);
+            MissingExtensionsInstaller.installMissingExtensions(
+                siddhiAppBody, siddhiAppName, usageDetector, dependencyInstaller);
+        } catch (ExtensionsInstallerException e) {
+            LOGGER.error(String.format(
+                "There were failures when installing missing extensions for Siddhi app: %s.", siddhiAppName), e);
         }
     }
 

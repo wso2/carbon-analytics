@@ -92,6 +92,10 @@ public class StreamProcessorDeployer implements Deployer {
                         siddhiAppName = StreamProcessorDataHolder.getStreamProcessorService().
                                 getSiddhiAppName(siddhiApp);
                         if (siddhiAppFileNameWithoutExtension.equals(siddhiAppName)) {
+                            if (StreamProcessorDataHolder.getExtensionsInstaller() != null) {
+                                StreamProcessorDataHolder.getExtensionsInstaller()
+                                    .installMissingExtensions(siddhiApp, siddhiAppName);
+                            }
                             StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(siddhiApp,
                                     siddhiAppName);
                         } else {
