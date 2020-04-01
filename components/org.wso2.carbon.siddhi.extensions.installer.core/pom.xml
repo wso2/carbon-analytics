@@ -114,7 +114,8 @@
             *;resolution:=optional
         </import.package>
         <carbon.component>
-            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
+            osgi.service; objectClass="org.wso2.carbon.siddhi.extensions.installer.core.internal.SiddhiExtensionsInstallerMicroservice",
+            osgi.service; objectClass="org.wso2.msf4j.Microservice"
         </carbon.component>
     </properties>
 

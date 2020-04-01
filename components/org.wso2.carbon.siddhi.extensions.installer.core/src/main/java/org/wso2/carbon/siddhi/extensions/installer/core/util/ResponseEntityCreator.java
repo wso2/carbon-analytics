@@ -29,10 +29,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
- * Contains methods that organize data to create responses, for requests sent to
- * {@link org.wso2.carbon.siddhi.extensions.installer.core.internal.SiddhiExtensionsInstallerMicroservice}.
+ * Contains methods that organize data to create responses for requests sent to
+ * {@link org.wso2.carbon.siddhi.extensions.installer.core.internal.SiddhiExtensionsInstallerMicroservice},
+ * and to extract data from such responses.
  */
 public class ResponseEntityCreator {
 
@@ -48,6 +52,7 @@ public class ResponseEntityCreator {
     private static final String EXTENSION_STATUS_KEY = "extensionStatus";
     private static final String DEPENDENCY_INFO_KEY = "dependencyInfo";
     private static final String DEPENDENCY_IS_INSTALLED_KEY = "isInstalled";
+    private static final String EXTENSION_KEY = "extension";
     private static final String USAGES_KEY = "usages";
 
     private ResponseEntityCreator() {
@@ -195,7 +200,7 @@ public class ResponseEntityCreator {
             Map<String, Object> extensionAndUsages = new HashMap<>();
             List<SiddhiAppExtensionUsage> usages = new ArrayList<>();
             usages.add(siddhiAppExtensionUsage);
-            extensionAndUsages.put(EXTENSION_STATUS_KEY, extensionStatusResponse);
+            extensionAndUsages.put(EXTENSION_KEY, extensionStatusResponse);
             extensionAndUsages.put(USAGES_KEY, usages);
             usedExtensionStatuses.put(extensionId, extensionAndUsages);
         } else {
@@ -206,6 +211,76 @@ public class ResponseEntityCreator {
                 usages.add(siddhiAppExtensionUsage);
             }
         }
+    }
+
+    /**
+     * Extracts keys of extensions - whose installation status is anything other than installed,
+     * from the given map of extensions used in a Siddhi app.
+     *
+     * @param usedExtensionStatuses A map that contains installation statuses of multiple extensions.
+     * @return Keys of extensions - whose installation status is anything other than installed.
+     */
+    public static Set<String> extractNonInstalledExtensionKeys(Map<String, Map<String, Object>> usedExtensionStatuses) {
+        return usedExtensionStatuses.entrySet().stream().filter(
+            usedExtensionStatusEntry -> {
+                Object extensionDetails = usedExtensionStatusEntry.getValue().get(EXTENSION_KEY);
+                if (extensionDetails != null) {
+                    Object extensionStatus = ((Map<String, Object>) extensionDetails).get(EXTENSION_STATUS_KEY);
+                    if (extensionStatus != null) {
+                        return !Objects.equals(extensionStatus, ExtensionInstallationStatus.INSTALLED);
+                    }
+                }
+                /*
+                Ideally we will not reach here.
+                This would mean that, enough information to install a particular extension is not present.
+                Therefore, the extension will not be considered for installation.
+                 */
+                return false;
+            }).map(Map.Entry::getKey).collect(Collectors.toSet());
+    }
+
+    /**
+     * Extracts keys of extensions - whose installations were not successful, from the given map of
+     * installation responses.
+     *
+     * @param installationResponses A map that contains installation responses of multiple extensions.
+     * @return Keys of extensions - whose installations were not successful.
+     */
+    public static Set<String> extractIncompleteInstallations(
+        Map<String, Map<String, Object>> installationResponses) {
+        return installationResponses.entrySet().stream().filter(
+            installationResponseEntry -> {
+                Map<String, Object> installationResponse = installationResponseEntry.getValue();
+                if (installationResponse.containsKey(ACTION_STATUS_KEY)) {
+                    return !Objects.equals(
+                        installationResponse.get(ACTION_STATUS_KEY), ExtensionInstallationStatus.INSTALLED);
+                }
+                /*
+                Ideally we will not reach here.
+                This would mean that, an extension's installation haven't returned a status.
+                Therefore, the extension will be considered as not installed.
+                 */
+                return true;
+            }).map(Map.Entry::getKey).collect(Collectors.toSet());
+    }
+
+    /**
+     * Extracts manually installable dependencies (if any) from each entry of the given map of installation responses.
+     *
+     * @param installationResponses A map that contains installation responses of multiple extensions.
+     * @return A map that contains manually installable dependencies of extensions.
+     */
+    public static Map<String, List<DependencyConfig>> extractManuallyInstallableDependencies(
+        Map<String, Map<String, Object>> installationResponses) {
+        Map<String, List<DependencyConfig>> manuallyInstallableDependencies = new HashMap<>();
+        for (Map.Entry<String, Map<String, Object>> installationResponseEntry : installationResponses.entrySet()) {
+            if (installationResponseEntry.getValue().containsKey(MANUALLY_INSTALLABLE_DEPENDENCIES_KEY)) {
+                manuallyInstallableDependencies.put(installationResponseEntry.getKey(),
+                    (List<DependencyConfig>) (installationResponseEntry.getValue()
+                        .get(MANUALLY_INSTALLABLE_DEPENDENCIES_KEY)));
+            }
+        }
+        return manuallyInstallableDependencies;
     }
 
 }

@@ -35,4 +35,7 @@ public class DownloadConfig {
         return url;
     }
 
+    public String getInstructions() {
+        return instructions;
+    }
 }
