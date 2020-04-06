@@ -27,24 +27,25 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * Class use for loading the deafault values from YML file.
  */
 public class DefaultConfigurationBuilder {
-    
+
     private static final Logger log = LoggerFactory.getLogger(DefaultConfigurationBuilder.class);
-    
+
     private static DefaultConfigurationBuilder instance = new DefaultConfigurationBuilder();
-    
+
+    private DefaultConfigurationBuilder() {
+    }
+
     public static DefaultConfigurationBuilder getInstance() {
         return instance;
     }
-    
-    private DefaultConfigurationBuilder() {
-    }
-    
+
     /**
      * Get the Environment {@code DashboardsConfiguration}
      * <p>
@@ -62,6 +63,12 @@ public class DefaultConfigurationBuilder {
                     (DeploymentConfigs.class, DeploymentConfigs.class.getClassLoader()));
             yaml.setBeanAccess(BeanAccess.FIELD);
             dashboardConfiguration = yaml.loadAs(inputStream, DeploymentConfigs.class);
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                log.error("Error occurred while closing the inputStream ", e);
+            }
+
         } else {
             throw new RuntimeException("Dashboard configuration file not found in: " +
                     " ,hence using default configuration");
