@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.2.1-SNAPSHOT</version>
+    <version>2.2.1</version>
     <name>WSO2 Carbon Analytics - Status Dashboard</name>
     <modules>
         <module>components/org.wso2.carbon.status.dashboard.core</module>
@@ -278,7 +278,7 @@
         <url>https://github.com/wso2/carbon-analytics.git</url>
         <developerConnection>scm:git:https://github.com/wso2/carbon-analytics.git</developerConnection>
         <connection>scm:git:https://github.com/wso2/carbon-analytics.git</connection>
-        <tag>HEAD</tag>
+        <tag>v2.2.1</tag>
     </scm>
 
     <dependencyManagement>
