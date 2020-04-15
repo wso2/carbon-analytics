@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.metrics.core.reporter.impl.AbstractReporter;
+import org.wso2.carbon.si.metrics.prometheus.reporter.config.CustomMapperConfig;
+import org.wso2.carbon.si.metrics.prometheus.reporter.config.CustomMappingBuilder;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
@@ -82,9 +84,9 @@ public class PrometheusReporter extends AbstractReporter {
             yaml.setBeanAccess(BeanAccess.FIELD);
             PrometheusMetricsLabelsMapper metricsLabelsMapping = yaml.loadAs(inputStream,
                                                                                 PrometheusMetricsLabelsMapper.class);
-            List<MapperConfig> metricsMappings = new ArrayList<>(
+            List<CustomMapperConfig> metricsMappings = new ArrayList<>(
                                                                 metricsLabelsMapping.getMetricsLabelMapping().values());
-            SampleBuilder sampleBuilder = new CustomMappingSampleBuilder(metricsMappings);
+            SampleBuilder sampleBuilder = new CustomMappingBuilder(metricsMappings);
             Collector collector = new DropwizardExports(metricRegistry, sampleBuilder);
             collectorRegistry.register(collector);
         } catch (IOException e) {
