@@ -31,6 +31,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.siddhi.extensions.installer.core.internal.SiddhiExtensionsInstallerMicroservice;
 import org.wso2.carbon.streaming.integrator.common.HAStateChangeListener;
 import org.wso2.carbon.streaming.integrator.core.NodeInfo;
 import org.wso2.carbon.streaming.integrator.core.ha.HAManager;
@@ -57,6 +58,7 @@ public class StreamProcessorDataHolder {
     private static NodeInfo nodeInfo;
     private static RecordTableHandlerManager recordTableHandlerManager;
     private static PermissionProvider permissionProvider;
+    private static SiddhiExtensionsInstallerMicroservice extensionsInstaller;
     private CarbonRuntime carbonRuntime;
     private BundleContext bundleContext;
     private ConfigProvider configProvider;
@@ -262,5 +264,13 @@ public class StreamProcessorDataHolder {
 
     public static void setIsStatisticsEnabled(boolean isStatisticsEnabled) {
         StreamProcessorDataHolder.isStatisticsEnabled = isStatisticsEnabled;
+    }
+
+    public static SiddhiExtensionsInstallerMicroservice getExtensionsInstaller() {
+        return extensionsInstaller;
+    }
+
+    public static void setExtensionsInstaller(SiddhiExtensionsInstallerMicroservice extensionsInstaller) {
+        StreamProcessorDataHolder.extensionsInstaller = extensionsInstaller;
     }
 }

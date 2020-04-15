@@ -149,6 +149,13 @@
             <type>zip</type>
         </dependency>
 
+        <!-- Extension Installer -->
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.siddhi.extensions.installer.core.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.siddhi.store.api.rest.feature</artifactId>
@@ -480,6 +487,12 @@
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
 
+                                <!-- Extension Installer -->
+                                <feature>
+                                    <id>org.wso2.carbon.siddhi.extensions.installer.core.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
+
                                 <!-- Authentication feature -->
                                 <feature>
                                     <id>org.wso2.carbon.analytics.msf4j.interceptor.common.feature</id>
@@ -698,6 +711,12 @@
                                 </feature>
                                 <feature>
                                     <id>org.wso2.carbon.siddhi.store.api.rest.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
+
+                                <!-- Extension Installer -->
+                                <feature>
+                                    <id>org.wso2.carbon.siddhi.extensions.installer.core.feature</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
 
