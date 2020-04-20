@@ -5,6 +5,9 @@
       "displayName": "Kafka",
       "version": "5.0.4"
     },
+    "identifier": {
+      "alternativeTypes": ["kafkaMultiDC"]
+    },
     "dependencies": [
       {
         "name": "siddhi-io-kafka",
@@ -296,6 +299,11 @@
       "displayName": "Change Data Capture - MySQL",
       "version": "2.0.3"
     },
+    "identifier": {
+      "type": "cdc",
+      "uniqueAttribute": "url",
+      "uniqueAttributeValueRegex": "jdbc:mysql:(.*)"
+    },
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
@@ -335,6 +343,11 @@
       "name": "cdc-oracle",
       "displayName": "Change Data Capture - Oracle",
       "version": "2.0.3"
+    },
+    "identifier": {
+      "type": "cdc",
+      "uniqueAttribute": "url",
+      "uniqueAttributeValueRegex": "jdbc:oracle:(.*)"
     },
     "dependencies": [
       {
@@ -391,6 +404,11 @@
       "displayName": "Change Data Capture - PostgreSQL",
       "version": "2.0.3"
     },
+    "identifier": {
+      "type": "cdc",
+      "uniqueAttribute": "url",
+      "uniqueAttributeValueRegex": "jdbc:postgresql:(.*)"
+    },
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
@@ -431,6 +449,11 @@
       "displayName": "Change Data Capture - MS SQL",
       "version": "2.0.3"
     },
+    "identifier": {
+      "type": "cdc",
+      "uniqueAttribute": "url",
+      "uniqueAttributeValueRegex": "jdbc:sqlserver:(.*)"
+    },
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
@@ -470,6 +493,11 @@
       "name": "cdc-mongodb",
       "displayName": "Change Data Capture - Mongo DB",
       "version": "2.0.3"
+    },
+    "identifier": {
+      "type": "cdc",
+      "uniqueAttribute": "url",
+      "uniqueAttributeValueRegex": "jdbc:mongodb:(.*)"
     },
     "dependencies": [
       {
@@ -681,6 +709,14 @@
       "displayName": "gRPC",
       "version": "1.0.3"
     },
+    "identifier": {
+      "alternativeTypes": [
+        "grpc-call",
+        "grpc-service-response",
+        "grpc-call-response",
+        "grpc-service"
+      ]
+    },
     "dependencies": [
       {
         "name": "siddhi-io-grpc",
@@ -761,6 +797,11 @@
       "displayName": "RDBMS - MySQL",
       "version": "6.0.4"
     },
+    "identifier": {
+      "type": "rdbms",
+      "uniqueAttribute": "jdbc.driver.name",
+      "uniqueAttributeValue": "com.mysql.jdbc.Driver"
+    },
     "dependencies": [
       {
         "name": "siddhi-store-rdbms",
@@ -800,6 +841,11 @@
       "name": "rdbms-mssql",
       "displayName": "RDBMS - MS SQL",
       "version": "6.0.4"
+    },
+    "identifier": {
+      "type": "rdbms",
+      "uniqueAttribute": "jdbc.driver.name",
+      "uniqueAttributeValue": "com.microsoft.sqlserver.jdbc.SQLServerDriver"
     },
     "dependencies": [
       {
@@ -841,6 +887,11 @@
       "displayName": "RDBMS - Postgre SQL",
       "version": "6.0.4"
     },
+    "identifier": {
+      "type": "rdbms",
+      "uniqueAttribute": "jdbc.driver.name",
+      "uniqueAttributeValue": "org.postgresql.Driver"
+    },
     "dependencies": [
       {
         "name": "siddhi-store-rdbms",
@@ -880,6 +931,11 @@
       "name": "rdbms-oracle",
       "displayName": "RDBMS - Oracle",
       "version": "6.0.4"
+    },
+    "identifier": {
+      "type": "rdbms",
+      "uniqueAttribute": "jdbc.driver.name",
+      "uniqueAttributeValue": "oracle.jdbc.driver.OracleDriver"
     },
     "dependencies": [
       {
@@ -1056,6 +1112,18 @@
       "displayName": "HTTP Transport",
       "version": "2.2.0"
     },
+    "identifier": {
+      "alternativeTypes": [
+        "http-call",
+        "http-request",
+        "http-response",
+        "http-service-response",
+        "http-call-response",
+        "http-request",
+        "http-response",
+        "http-service"
+      ]
+    },
     "dependencies": [
       {
         "name": "siddhi-io-http",
@@ -1080,6 +1148,9 @@
       "name": "file",
       "displayName": "File",
       "version": "2.0.3"
+    },
+    "identifier": {
+      "alternativeTypes": ["fileeventlistener"]
     },
     "dependencies": [
       {
@@ -1256,6 +1327,9 @@
       "displayName": "WebSockets",
       "version": "3.0.0"
     },
+    "identifier": {
+      "alternativeTypes": ["websocket-server"]
+    },
     "dependencies": [
       {
         "name": "siddhi-io-websocket",
@@ -1350,9 +1424,9 @@
     ]
   },
 
-  "gcs": {
+  "google-cloud-storage": {
     "extension": {
-      "name": "gcs",
+      "name": "google-cloud-storage",
       "displayName": "Google Cloud Storage",
       "version": "1.0.0"
     },
@@ -1408,7 +1482,7 @@
     },
     "dependencies": [
       {
-        "name": "siddhi-io-solr",
+        "name": "siddhi-store-solr",
         "version": "2.0.0",
         "download": {
           "autoDownloadable": true,
@@ -1433,7 +1507,7 @@
     },
     "dependencies": [
       {
-        "name": "siddhi-io-elasticsearch",
+        "name": "siddhi-store-elasticsearch",
         "version": "3.1.1",
         "download": {
           "autoDownloadable": true,
@@ -1458,7 +1532,7 @@
     },
     "dependencies": [
       {
-        "name": "siddhi-io-influxdb",
+        "name": "siddhi-store-influxdb",
         "version": "2.0.0",
         "download": {
           "autoDownloadable": true,
