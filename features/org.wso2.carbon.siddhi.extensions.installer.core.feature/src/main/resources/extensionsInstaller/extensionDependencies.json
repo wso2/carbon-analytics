@@ -307,10 +307,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.3",
+        "version": "2.0.6",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.3/siddhi-io-cdc-2.0.3.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.6/siddhi-io-cdc-2.0.6.jar"
         },
         "usages": [
           {
@@ -318,18 +318,18 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])2.0.3.jar"
+        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])2.0.6.jar"
       },
       {
         "name": "mysql-connector-java",
-        "version": "5.1.45",
+        "version": "8.0.18",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.45/mysql-connector-java-5.1.45.jar"
+          "url": "https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.18/mysql-connector-java-8.0.18.jar"
         },
         "usages": [
           {
-            "type": "JAR",
+            "type": "BUNDLE",
             "usedBy": "RUNTIME"
           }
         ],
