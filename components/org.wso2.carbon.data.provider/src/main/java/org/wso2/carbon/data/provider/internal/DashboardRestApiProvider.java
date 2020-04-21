@@ -43,7 +43,7 @@ import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDat
 @Component(service = RestApiProvider.class, immediate = true)
 public class DashboardRestApiProvider implements RestApiProvider {
 
-    public static final String DASHBOARD_PORTAL_APP_NAME = "portal";
+    public static final String DASHBOARD_PORTAL_APP_NAME = "analytics-dashboard";
     private static final Logger LOGGER = LoggerFactory.getLogger(DashboardRestApiProvider.class);
 
     @Activate
