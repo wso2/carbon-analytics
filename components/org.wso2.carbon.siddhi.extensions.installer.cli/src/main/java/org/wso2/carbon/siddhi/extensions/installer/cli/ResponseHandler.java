@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class ResponseHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResponseHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
 
     private static final String EXTENSION_INFO = "extensionInfo";
     private static final String NAME = "name";
@@ -100,7 +100,7 @@ public class ResponseHandler {
                     ((JsonObject) extension.getValue()).keySet().contains(MANUALLY_INSTALL)));
                 message.append(System.lineSeparator());
             }
-            LOGGER.info(message.toString());
+            logger.info(message.toString());
         }
     }
 
@@ -131,7 +131,7 @@ public class ResponseHandler {
                 message.append(System.lineSeparator());
                 message.append(manuallyInstall);
             }
-            LOGGER.info(message.toString());
+            logger.info(message.toString());
         }
     }
 
@@ -173,8 +173,8 @@ public class ResponseHandler {
                 message.append(manuallyInstallMessage);
             }
             message.append(System.lineSeparator());
-            LOGGER.info(message.toString());
-            LOGGER.warn("Please restart the server.");
+            logger.info(message.toString());
+            logger.warn("Please restart the server.");
         }
     }
 
@@ -238,7 +238,7 @@ public class ResponseHandler {
             ((JsonObject) parsedResponse).get(DOES_SHARE_DEPENDENCIES).getAsBoolean()) {
             String message = "The extension shares its dependencies with the following extensions: " +
                 String.join(", ", ((JsonObject) parsedResponse).get(SHARES_WITH).getAsJsonObject().keySet());
-            LOGGER.warn(message);
+            logger.warn(message);
             return true;
         }
         return false;
@@ -265,8 +265,8 @@ public class ResponseHandler {
                 message.append(failureOccurredMessage);
             }
             message.append(System.lineSeparator());
-            LOGGER.info(message.toString());
-            LOGGER.warn("Please restart the server.");
+            logger.info(message.toString());
+            logger.warn("Please restart the server.");
         }
     }
 }

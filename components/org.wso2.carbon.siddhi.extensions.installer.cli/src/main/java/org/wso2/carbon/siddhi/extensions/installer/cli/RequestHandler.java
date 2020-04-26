@@ -32,7 +32,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class RequestHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RequestHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private static final String GET_STATUS_CURL_FORMAT = "curl -s --location --request GET %s/status";
     private static final String GET_STATUS_EXTENSION_CURL_FORMAT = "curl -s --location --request GET %s/status/%s";
@@ -112,7 +112,7 @@ public class RequestHandler {
     public static void doInstall(String extensionName, String baseUrl) throws ExtensionsInstallerCliException {
         try {
             String command = String.format(INSTALL_CURL_FORMAT, baseUrl, extensionName);
-            LOGGER.info(String.format("Installing %s ...", extensionName));
+            logger.info(String.format("Installing %s ...", extensionName));
             String response = executeCurl(command);
             ResponseHandler.handleInstallationResponse(response);
         } catch (IOException e) {
@@ -152,7 +152,7 @@ public class RequestHandler {
     public static void doUnInstall(String extensionName, String baseUrl) throws ExtensionsInstallerCliException {
         try {
             String command = String.format(UN_INSTALL_CURL_FORMAT, baseUrl, extensionName);
-            LOGGER.info(String.format("Un-installing %s ...", extensionName));
+            logger.info(String.format("Un-installing %s ...", extensionName));
             String response = executeCurl(command);
             ResponseHandler.handleUnInstallationResponse(response);
         } catch (IOException e) {

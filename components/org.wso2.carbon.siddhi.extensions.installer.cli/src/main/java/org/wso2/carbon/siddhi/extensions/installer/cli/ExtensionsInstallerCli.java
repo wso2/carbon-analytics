@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ExtensionsInstallerCli {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionsInstallerCli.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExtensionsInstallerCli.class);
 
     private static final String STATUS_COMMAND = "status";
     private static final String INSTALL_COMMAND = "install";
@@ -51,7 +51,7 @@ public class ExtensionsInstallerCli {
             resolveConfig();
             executeCommand(args);
         } catch (ExtensionsInstallerCliException e) {
-            LOGGER.error("Unable to execute Extension Installer.", e);
+            logger.error("Unable to execute Extension Installer.", e);
         }
     }
 
@@ -102,11 +102,11 @@ public class ExtensionsInstallerCli {
                     executeUnInstallCommand(args);
                     break;
                 default:
-                    LOGGER.error(String.format("Unknown command: '%s'.", args[0]));
+                    logger.error(String.format("Unknown command: '%s'.", args[0]));
                     showAvailableCommands();
             }
         } else {
-            LOGGER.error("No command specified.");
+            logger.error("No command specified.");
             showAvailableCommands();
         }
     }
@@ -191,7 +191,7 @@ public class ExtensionsInstallerCli {
 
     private static void confirmAndUnInstall(String extensionName) throws ExtensionsInstallerCliException {
         Scanner input = new Scanner(System.in, StandardCharsets.UTF_8.name());
-        LOGGER.warn("Are you sure you want to un-install? [y/n] ");
+        logger.warn("Are you sure you want to un-install? [y/n] ");
         String choice = input.next().trim();
         if ("y".equalsIgnoreCase(choice) || "yes".equalsIgnoreCase(choice)) {
             unInstall(extensionName);
@@ -220,12 +220,12 @@ public class ExtensionsInstallerCli {
     private static void showAvailableCommands() {
         String message = "Available commands:" + System.lineSeparator() + getStatusCommandUsage() +
             System.lineSeparator() + getInstallCommandUsage() + System.lineSeparator() + getUnInstallCommandUsage();
-        LOGGER.info(message);
+        logger.info(message);
     }
 
     private static void showCorrectUsages(String command, String expectedUsages) {
         String message = String.format("Invalid usage of command: '%s'.", command) +
             System.lineSeparator() + "Available usage(s): " + System.lineSeparator() + expectedUsages;
-        LOGGER.error(message);
+        logger.error(message);
     }
 }
