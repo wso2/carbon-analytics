@@ -183,8 +183,7 @@ public class QueryExecutor {
             statement = getStatementForRetrievingBusinessRule(conn, uuid);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                Blob blob = resultSet.getBlob(2);
-                byte[] bdata = blob.getBytes(1, (int) blob.length());
+                byte[] bdata = resultSet.getBytes(2);
 
                 JsonObject jsonObject = gson.fromJson(new String(bdata, Charset.forName("UTF-8")), JsonObject
                         .class).getAsJsonObject();
@@ -236,8 +235,7 @@ public class QueryExecutor {
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 String businessRuleUUID = resultSet.getString(1);
-                Blob blob = resultSet.getBlob(2);
-                byte[] bdata = blob.getBytes(1, (int) blob.length());
+                byte[] bdata = resultSet.getBytes(2);
 
                 JsonObject jsonObject = gson.fromJson(new String(bdata, Charset.forName("UTF-8")),
                         JsonObject.class).getAsJsonObject();
@@ -288,8 +286,7 @@ public class QueryExecutor {
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Integer deploymentStatus = resultSet.getInt(3);
-                Blob blob = resultSet.getBlob(2);
-                byte[] bdata = blob.getBytes(1, (int) blob.length());
+                byte[] bdata = resultSet.getBytes(2);
 
                 JsonObject jsonObject = gson.fromJson(new String(bdata, Charset.forName("UTF-8")),
                         JsonObject.class).getAsJsonObject();
