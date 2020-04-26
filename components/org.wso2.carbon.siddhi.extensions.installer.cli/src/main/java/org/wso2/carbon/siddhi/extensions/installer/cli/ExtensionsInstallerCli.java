@@ -39,12 +39,12 @@ public class ExtensionsInstallerCli {
     private static final String UNINSTALL_COMMAND = "uninstall";
     private static final String EXTENSION_INSTALLER_ENDPOINT_URL_FORMAT = "%s:%s/siddhi-extensions";
     private static final String CONFIG_FILE_NAME = "config.properties";
-    private static final String WORKER_HOST_CONFIG_PROPERTY = "worker.host";
-    private static final String WORKER_PORT_CONFIG_PROPERTY = "worker.port";
+    private static final String SERVER_HOST_CONFIG_PROPERTY = "server.host";
+    private static final String SERVER_PORT_CONFIG_PROPERTY = "server.port";
     private static final String COMMAND_USAGE_FORMAT = "%-50s%-50s";
 
-    private static String workerHost;
-    private static String workerPort;
+    private static String serverHost;
+    private static String serverPort;
 
     public static void main(String[] args) {
         try {
@@ -56,7 +56,7 @@ public class ExtensionsInstallerCli {
     }
 
     /**
-     * Resolves values for worker host and worker port, from the config file.
+     * Resolves values for server host and server port, from the config file.
      *
      * @throws ExtensionsInstallerCliException Error occurred while resolving values from the config file.
      */
@@ -66,14 +66,14 @@ public class ExtensionsInstallerCli {
         if (inputStream != null) {
             try {
                 properties.load(inputStream);
-                if (properties.getProperty(WORKER_HOST_CONFIG_PROPERTY) != null &&
-                    properties.getProperty(WORKER_PORT_CONFIG_PROPERTY) != null) {
-                    workerHost = properties.getProperty(WORKER_HOST_CONFIG_PROPERTY);
-                    workerPort = properties.getProperty(WORKER_PORT_CONFIG_PROPERTY);
+                if (properties.getProperty(SERVER_HOST_CONFIG_PROPERTY) != null &&
+                    properties.getProperty(SERVER_PORT_CONFIG_PROPERTY) != null) {
+                    serverHost = properties.getProperty(SERVER_HOST_CONFIG_PROPERTY);
+                    serverPort = properties.getProperty(SERVER_PORT_CONFIG_PROPERTY);
                 } else {
                     throw new ExtensionsInstallerCliException(
                         String.format("Both '%s' and '%s' properties are required in the config file.",
-                            WORKER_HOST_CONFIG_PROPERTY, WORKER_PORT_CONFIG_PROPERTY));
+                            SERVER_HOST_CONFIG_PROPERTY, SERVER_PORT_CONFIG_PROPERTY));
                 }
             } catch (IOException e) {
                 throw new ExtensionsInstallerCliException("Unable to load the config file.", e);
@@ -169,7 +169,7 @@ public class ExtensionsInstallerCli {
      * @return Base URL of the Extension Installer REST API.
      */
     private static String constructExtensionInstallerBaseUrl() {
-        return String.format(EXTENSION_INSTALLER_ENDPOINT_URL_FORMAT, workerHost, workerPort);
+        return String.format(EXTENSION_INSTALLER_ENDPOINT_URL_FORMAT, serverHost, serverPort);
     }
 
     private static void listStatuses() throws ExtensionsInstallerCliException {
