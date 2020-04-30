@@ -86,7 +86,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 self.formUtils.renderAttributeTemplate(attributes, self.propertyDiv.find("#define-attribute"));
             } else {
                 //if the stream object is already edited
-                $('#streamName').val(name);
+                formContainer.find('#streamName').val(name);
 
                 //load the saved attributes
                 var attributeList = streamObject.getAttributeList();
@@ -138,7 +138,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 self.formUtils.removeErrorClass();
                 var previouslySavedStreamName = streamObject.getName();
 
-                var configName = $('#streamName').val().trim();
+                var configName = formContainer.find('#streamName').val().trim();
                 var streamName;
                 var firstCharacterInStreamName;
                 var isStreamNameUsed;
@@ -211,7 +211,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 }
                 if (attributeNameList.length == 0) {
                     self.formUtils.addErrorClass($('.attribute:eq(0)').find('.attr-name'));
-                    $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.")
+                    formcontainer.find('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.")
                     isErrorOccurred = true;
                     return;
                 }
@@ -244,7 +244,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                     //clear the previously saved attribute list
                     streamObject.clearAttributeList();
                     //add the attributes to the attribute list
-                    $('.attribute .attr-content').each(function () {
+                    formContainer.find('.attribute .attr-content').each(function () {
                         var nameValue = $(this).find('.attr-name').val().trim();
                         var typeValue = $(this).find('.attr-type').val();
                         if (nameValue != "") {
@@ -307,6 +307,157 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             });
 
         };
+
+        StreamForm.prototype.generatePropertiesFormForWizard = function (formContainer, _uniqueStreamId, streamObject) {
+            var self = this;
+            var id = _uniqueStreamId;
+            var previousStreamObject = _.cloneDeep(streamObject);
+
+            var propertyDiv = $('<div class="clearfix form-min-width"><div id = "stream-form-container" class = "stream-form-container"> <label> ' +
+                '<span class="mandatory-symbol"> *</span> Name </label> <input type="text" id="streamName" ' +
+                'class="clearfix name"> <label class="error-message" id="streamNameErrorMessage"> </label>' +
+                '<div id="define-attribute"></div> </div> <div class= "stream-form-container"> ' +
+                '<div class ="define-annotation"> </div> </div>');
+
+            formContainer.html(propertyDiv);
+
+            self.formUtils.addEventListenerToRemoveRequiredClass();
+            self.formUtils.addEventListenerToShowInputContentOnHover();
+
+            var annotations = [];
+            var predefinedAnnotationList = _.cloneDeep(self.configurationData.application.config.stream_predefined_annotations);
+            var checkedAnnotations = [];
+
+            //var name = streamObject.getName();
+            var name = streamObject.name;
+            if (!name) {
+                //if stream form is freshly opened [new object]
+                annotations = predefinedAnnotationList;
+                var attributes = [{name: ""}];
+                self.formUtils.renderAttributeTemplateForWizard(attributes, formContainer);
+            } else {
+                //if the stream object is already edited
+                formContainer.find('#streamName').val(name);
+
+                //load the saved attributes
+
+                var attributeList = streamObject.attributeList;
+                self.formUtils.renderAttributeTemplateForWizard(attributeList, formContainer);
+                self.formUtils.selectTypesOfSavedAttributesForWizard(attributeList, formContainer);
+
+                //load the saved annotations
+                var annotationListObjects = streamObject.annotationListObjects;
+
+                _.forEach(predefinedAnnotationList, function (predefinedAnnotation) {
+                    var foundPredefined = false;
+                    _.forEach(annotationListObjects, function (savedAnnotation) {
+                        if (savedAnnotation.name.toLowerCase() === predefinedAnnotation.name.toLowerCase()) {
+                            //if an optional annotation is found push it to the checkedAnnotations[]
+                            if (!predefinedAnnotation.isMandatory) {
+                                checkedAnnotations.push(savedAnnotation.name);
+                            }
+                            foundPredefined = true;
+                            _.forEach(predefinedAnnotation.elements, function (predefinedAnnotationElement) {
+                                _.forEach(savedAnnotation.elements, function (savedAnnotationElement) {
+                                    if (predefinedAnnotationElement.name.toLowerCase() === savedAnnotationElement.key
+                                        .toLowerCase()) {
+                                        //if an optional property is found push it to the checkedAnnotations[]
+                                        if (!predefinedAnnotationElement.isMandatory) {
+                                            checkedAnnotations.push(savedAnnotationElement.name);
+                                        }
+                                        predefinedAnnotationElement.defaultValue = savedAnnotationElement.value;
+                                    }
+                                })
+                            })
+                            annotations.push(predefinedAnnotation)
+                        } else {
+                            annotations.push(savedAnnotation)
+                        }
+                    });
+                    if (!foundPredefined) {
+                        annotations.push(predefinedAnnotation)
+                    }
+                });
+            }
+
+            self.formUtils.renderAnnotationTemplateForWizard("define-annotation", annotations, formContainer);
+            self.formUtils.checkPredefinedAnnotationsForWizard(checkedAnnotations, formContainer);
+        };
+
+        StreamForm.prototype.generatePropertiesFormForEditWizard = function (formContainer, id) {
+            var self = this;
+            var streamObject = self.configurationData.getSiddhiAppConfig().getStream(id);
+            var previousStreamObject = _.cloneDeep(streamObject);
+
+            var propertyDiv = $('<div class="clearfix form-min-width"><div id = "stream-form-container" class = "stream-form-container"> <label> ' +
+                '<span class="mandatory-symbol"> *</span> Name </label> <input type="text" id="streamName" ' +
+                'class="clearfix name"> <label class="error-message" id="streamNameErrorMessage"> </label>' +
+                '<div id="define-attribute"></div> </div> <div class= "stream-form-container"> ' +
+                '<div class ="define-annotation"> </div> </div>');
+
+            formContainer.html(propertyDiv);
+
+            var streamForm = formContainer.find('.stream-form-container');
+
+            var annotations = [];
+            var predefinedAnnotationList = _.cloneDeep(self.configurationData.application.config.stream_predefined_annotations);
+            var checkedAnnotations = [];
+
+            var name = streamObject.getName();
+            if (!name) {
+                //if stream form is freshly opened [new object]
+                annotations = predefinedAnnotationList;
+                var attributes = [{name: ""}];
+                self.formUtils.renderAttributeTemplateForWizard(attributeList, formContainer)
+            } else {
+                //if the stream object is already edited
+                streamForm.find('#streamName').val(name);
+
+                //load the saved attributes
+                var attributeList = streamObject.getAttributeList();
+                self.formUtils.renderAttributeTemplateForWizard(attributeList, formContainer);
+                self.formUtils.selectTypesOfSavedAttributesForWizard(attributeList, formContainer);
+
+                //load the saved annotations
+                var annotationListObjects = streamObject.getAnnotationListObjects();
+
+                _.forEach(predefinedAnnotationList, function (predefinedAnnotation) {
+                    var foundPredefined = false;
+                    _.forEach(annotationListObjects, function (savedAnnotation) {
+                        if (savedAnnotation.name.toLowerCase() === predefinedAnnotation.name.toLowerCase()) {
+                            //if an optional annotation is found push it to the checkedAnnotations[]
+                            if (!predefinedAnnotation.isMandatory) {
+                                checkedAnnotations.push(savedAnnotation.name);
+                            }
+                            foundPredefined = true;
+                            _.forEach(predefinedAnnotation.elements, function (predefinedAnnotationElement) {
+                                _.forEach(savedAnnotation.elements, function (savedAnnotationElement) {
+                                    if (predefinedAnnotationElement.name.toLowerCase() === savedAnnotationElement.key
+                                        .toLowerCase()) {
+                                        //if an optional property is found push it to the checkedAnnotations[]
+                                        if (!predefinedAnnotationElement.isMandatory) {
+                                            checkedAnnotations.push(savedAnnotationElement.name);
+                                        }
+                                        predefinedAnnotationElement.defaultValue = savedAnnotationElement.value;
+                                    }
+                                })
+                            })
+                            annotations.push(predefinedAnnotation)
+                        } else {
+                            annotations.push(savedAnnotation)
+                        }
+                    });
+                    if (!foundPredefined) {
+                        annotations.push(predefinedAnnotation)
+                    }
+                });
+            }
+
+            self.formUtils.renderAnnotationTemplateForWizard("define-annotation", annotations, formContainer);
+            self.formUtils.checkPredefinedAnnotationsForWizard(checkedAnnotations, formContainer);
+
+        };
+
         return StreamForm;
     });
 

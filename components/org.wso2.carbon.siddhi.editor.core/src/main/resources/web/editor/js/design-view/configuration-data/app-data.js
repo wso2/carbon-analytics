@@ -680,5 +680,49 @@ define(['require', 'elementUtils', 'lodash'],
             return requestedElement;
         };
 
+        AppData.prototype.checkInnerStreamIsConnected = function (streamName) {
+            var self = this;
+            var isStreamConnected = false;
+            _.forEach(self.sourceList, function (source) {
+                if (source.getConnectedElementName() === streamName) {
+                    isStreamConnected = true;
+                }
+            });
+            return isStreamConnected;
+        };
+
+        AppData.prototype.connectedSourceWithInnerStream = function (streamName) {
+            var self = this;
+            var connectedSourceId;
+            _.forEach(self.sourceList, function (source) {
+                if (source.getConnectedElementName() === streamName) {
+                    connectedSourceId = source.getId();
+                }
+            });
+            return connectedSourceId;
+        };
+
+        AppData.prototype.numberOfConnectedSourceWithInnerStream = function (streamName) {
+            var self = this;
+            var noOfConnectedSource = 0;
+            _.forEach(self.sourceList, function (source) {
+                if (source.getConnectedElementName() === streamName) {
+                    noOfConnectedSource++;
+                }
+            });
+            return noOfConnectedSource;
+        };
+
+        AppData.prototype.connectedStreamWithOuterSource = function (connectedElementName) {
+            var self = this;
+            var connectedStreamId;
+            _.forEach(self.streamList, function (stream) {
+                if (stream.getName() === connectedElementName) {
+                    connectedStreamId = stream.getId();
+                }
+            });
+            return connectedStreamId;
+        };
+
         return AppData;
     });

@@ -1,0 +1,199 @@
+/** contains css for form wizard **/
+body {
+  font-size: 1.4rem;
+}
+
+.form-wizard-form-scrollable-block {
+    padding: 20px 20px;
+    overflow: auto;
+    height: 50%;
+    width: 90%;
+    background-color: #2C2C2C;
+    margin-left: 30px;
+}
+
+.errors-container {
+    margin: 50px 20px 20px 20px;
+}
+
+hr.style1 {
+    border-top: 1px solid #2C2C2C;
+    width: 100%;
+    padding: 0 0 5px;
+}
+
+.form-wizard {
+    width: 93%;
+}
+
+.form-wizard .modal-body {
+}
+
+.form-wizard .modal-body .sw-container{
+    margin-top: 12px;
+}
+
+.form-wizard-title {
+    padding:10px 10px 10px 10px;
+}
+
+.form-wizard-label {
+    margin-top: 8px;
+    margin-left: 20px;
+    font-weight: 300;
+}
+
+.divider {
+    width: 5px;
+    height: auto;
+    display: inline-block;
+}
+
+hr.form-wizard-hr {
+    border-top: 1px solid #2C2C2C;
+    width: 100%;
+}
+
+.form-wizard-form-label {
+    margin-top: 8px;
+    font-weight: 300;
+}
+
+.form-wizard-form-divider {
+    height: 10px;
+}
+
+.form-list {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.form-wizard-form-scrollable-block-list {
+    padding: 0px 10px;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    background-color: #2C2C2C;
+}
+
+.sw-theme-default > ul.step-anchor.form_wizard_item li {
+    width: 20%;
+}
+
+.sw-theme-default .sw-btn-group-final{
+    width: 85% !important;
+    float: left !important;
+}
+
+.btn {
+  font-size: 1.4rem;
+}
+
+.form-selector {
+    background-color: #2C2C2C !important;
+    height: 98% !important;
+}
+
+.design-view-form-content .error-message {
+    display: none;
+    color: red;
+    padding-top: 4px;
+}
+
+.design-view-form-content .attribute-map-div {
+    width: 20%;
+}
+
+.design-view-form-content .mapper-div {
+    width: 15%;
+}
+
+.design-view-form-content .source-div{
+    width: 35%;
+}
+
+.stream-form-container {
+    width: 20%;
+}
+
+.design-view-form-content .attr-content {
+    width: 65%;
+}
+
+.design-view-form-content {
+    padding: 10px;
+    height: 100%
+}
+
+.design-view-form-content input[type="text"].name,
+ .design-view-form-content input:read-only.name,
+ .design-view-form-content textarea {
+    width: 77%;
+}
+
+.design-view-form-content #attribute-div input[type="text"] {
+    width: 63%;
+}
+
+.design-view-form-content .attributes-container {
+    margin-top: 15px;
+}
+
+.form-min-width {
+    min-width: 1500px;
+}
+
+.design-view-form-content select {
+    font-size: 10px;
+}
+
+.design-view-form-content .attr-nav,
+.design-view-form-content .attr-content {
+    display: inline-block;
+    float: left;
+}
+
+.design-view-form-content .attr-nav {
+    margin-top: -2px;
+}
+
+.stream-form-container .attr-nav {
+    margin-left: -15px;
+}
+
+.source-sink-form-container #mapper-attributes input[type="text"].attr-value,
+.source-sink-form-container #mapper-attributes input:read-only.attr-key,
+.source-sink-form-container #mapper-attributes input[type="text"].attr-key {
+    width: 40%;
+}
+
+.design-view-form-content input[type="text"]{
+    border: 1px solid #716e6e;
+    line-height: 20px;
+    padding: 0 5px;
+    color: #ccc;
+    background: #424242;
+}
+
+.design-view-form-content input[type="text"].option-value {
+    width: 85%;
+    margin-bottom: 2px;
+    margin-left: 20px;
+}
+
+.design-view-form-content input:read-only, .design-view-form-content select:disabled {
+    cursor: not-allowed;
+    background: #1d1d1d;
+    border: 1px solid #545353;
+}
+
+.design-view-form-content .btn-default {
+    margin-top: 15px;
+}
+
+.design-view-form-content .btn {
+    font-size: 10px;
+}

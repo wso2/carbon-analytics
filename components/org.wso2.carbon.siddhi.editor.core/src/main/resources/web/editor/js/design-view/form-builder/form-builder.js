@@ -127,7 +127,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForSources = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.SOURCE_TITLE);
-            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
+            var formContainer = formConsole.getContentContainer().find('#form-action');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -146,7 +146,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForSinks = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.SINK_TITLE);
-            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
+            var formContainer = formConsole.getContentContainer().find('#form-action');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -165,7 +165,7 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
         FormBuilder.prototype.GeneratePropertiesFormForStreams = function (element) {
             var self = this;
             var formConsole = this.createTabForForm(Constants.STREAM_TITLE);
-            var formContainer = formConsole.getContentContainer().find('.design-view-form-content');;
+            var formContainer = formConsole.getContentContainer().find('#form-action');;
 
             var formOptions = {};
             _.set(formOptions, 'configurationData', self.configurationData);
@@ -352,6 +352,92 @@ define(['require', 'log', 'jquery', 'lodash', 'formUtils', 'streamForm', 'tableF
             _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
             var partitionForm = new PartitionForm(formOptions);
             partitionForm.generatePropertiesForm(element, formConsole, formContainer);
+        };
+
+        FormBuilder.prototype.GeneratePropertiesFormForStreamWizard = function (formContainer, _uniqueStreamId, streamObject) {
+            var self = this;
+
+            var formOptions = {};
+            _.set(formOptions, 'configurationData', self.configurationData);
+            _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'dropElementInstance', self.dropElementInstance);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
+            _.set(formOptions, 'designGrid', self.designGrid);
+            var streamForm = new StreamForm(formOptions);
+            streamForm.generatePropertiesFormForWizard(formContainer, _uniqueStreamId, streamObject);
+        };
+
+        FormBuilder.prototype.GeneratePropertiesFormForStreamEditWizard = function (formContainer, id) {
+            var self = this;
+            var formOptions = {};
+            _.set(formOptions, 'configurationData', self.configurationData);
+            _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'dropElementInstance', self.dropElementInstance);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
+            _.set(formOptions, 'designGrid', self.designGrid);
+            var streamForm = new StreamForm(formOptions);
+            streamForm.generatePropertiesFormForEditWizard(formContainer, id);
+        };
+        /**
+         * @function generate the property window for an existing source
+         * @param element selected element(source)
+         */
+        FormBuilder.prototype.GeneratePropertiesFormForSourceWizard = function (formContainer, _uniqueId, sourceObject) {
+            var self = this;
+
+            var formOptions = {};
+            _.set(formOptions, 'configurationData', self.configurationData);
+            _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'dropElementInstance', self.dropElementInstance);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
+            _.set(formOptions, 'designGrid', self.designGrid);
+            var sourceForm = new SourceForm(formOptions);
+            sourceForm.generatePropertiesFormForWizard(formContainer, _uniqueId, sourceObject);
+        };
+
+        FormBuilder.prototype.GeneratePropertiesFormForSourceEditWizard = function (formContainer, _uniqueId) {
+            var self = this;
+
+            var formOptions = {};
+            _.set(formOptions, 'configurationData', self.configurationData);
+            _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'dropElementInstance', self.dropElementInstance);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
+            _.set(formOptions, 'designGrid', self.designGrid);
+            var sourceForm = new SourceForm(formOptions);
+            sourceForm.generatePropertiesFormForEditWizard(formContainer, _uniqueId);
+        };
+
+        FormBuilder.prototype.GeneratePropertiesFormForSourceMapWizard = function (mapContainer,id,sourceObject, connectedElementName, streamAttributes) {
+            var self = this;
+
+            var formOptions = {};
+            _.set(formOptions, 'configurationData', self.configurationData);
+            _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'dropElementInstance', self.dropElementInstance);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
+            _.set(formOptions, 'designGrid', self.designGrid);
+            var sourceForm = new SourceForm(formOptions);
+            sourceForm.generatePropertiesFormMapConfig(mapContainer, id , sourceObject,connectedElementName, streamAttributes);
+        };
+
+        FormBuilder.prototype.GeneratePropertiesFormForSourceMapWizardForEdit = function (mapContainer,id, streamAttributes, connectedElementName) {
+            var self = this;
+
+            var formOptions = {};
+            _.set(formOptions, 'configurationData', self.configurationData);
+            _.set(formOptions, 'application', self.application);
+            _.set(formOptions, 'formUtils', self.formUtils);
+            _.set(formOptions, 'dropElementInstance', self.dropElementInstance);
+            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
+            _.set(formOptions, 'designGrid', self.designGrid);
+            var sourceForm = new SourceForm(formOptions);
+            sourceForm.generatePropertiesFormMapConfigForEdit(mapContainer, id, streamAttributes, connectedElementName);
         };
 
         return FormBuilder;

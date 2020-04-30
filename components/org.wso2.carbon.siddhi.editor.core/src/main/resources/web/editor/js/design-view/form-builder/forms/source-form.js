@@ -37,6 +37,15 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             }
         };
 
+        var renderAttributeMappingForWizard = function (formContainer) {
+            if (!$.trim(formContainer.find('#define-attribute').html()).length) {
+                var attributeDiv = $('<div class="clearfix"> <label id="attribute-map-label">' +
+                    '<input type="checkbox" id="attributeMap-checkBox"> Map Attribute As Key/Value Pairs ' +
+                    '</label> </div>');
+                formContainer.find('#define-attribute').html(attributeDiv);
+            }
+        };
+
         /**
          * @function to render the attribute-map div using handlebars
          * @param {Object} attributes which needs to be mapped on to the template
@@ -47,6 +56,11 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             $('#attribute-map-content').html(attributeMapFormTemplate);
         };
 
+        var renderAttributeMappingContentForWizard = function (id, attributes,formContainer) {
+            var attributeMapFormTemplate = Handlebars.compile($('#source-sink-map-attribute-template').html())
+            ({ id: id, attributes: attributes });
+            formContainer.find('#attribute-map-content').html(attributeMapFormTemplate);
+        };
         /**
          * @function to create attribute-map object
          * @param {Object} savedMapperAttributes Saved attribute-map
@@ -369,5 +383,329 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
                 });
             }
         };
+
+        SourceForm.prototype.generatePropertiesFormForWizard = function (formContainer , _uniqueId, sourceObject) {
+            var self = this;
+            var id = _uniqueId;
+            var predefinedSources = _.orderBy(this.configurationData.rawExtensions["source"], ['name'], ['asc']);
+            var predefinedSourceMaps = _.orderBy(this.configurationData.rawExtensions["sourceMaps"], ['name'], ['asc']);
+
+            var propertyDiv = '<div class="clearfix form-min-width">'+
+                '<div id = "source-sink-form-source-container" class="source-sink-form-container source-div">' +
+                '<div id="define-source"></div>' +
+                '<div class = "source-sink-map-options" id="source-options-div"></div>'+
+                '</div></div>';
+
+            formContainer.html(propertyDiv);
+
+           //declaration of variables
+            var currentSourceOptions = [];
+            var sourceOptionsWithValues = [];
+            var customizedSourceOptions = [];
+            var attributes = [];
+
+            self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.SOURCE, formContainer);
+           // self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.MAPPER, formContainer);
+
+            self.formUtils.renderSourceSinkStoreTypeDropDownForWizard(Constants.SOURCE, predefinedSources, formContainer);
+
+            //get the clicked element's information
+            var type = sourceObject.type;
+            var sourceOptions = sourceObject.options;
+            //var map = sourceObject.map;
+
+            //onchange of the source-type selection
+            formContainer.find('#source-type').change(function () {
+                currentSourceOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedSources);
+                if (type && (type.toLowerCase() == this.value.toLowerCase()) && sourceOptions) {
+                    //if the selected type is same as the saved source-type
+                    sourceOptionsWithValues = self.formUtils.mapUserOptionValues(currentSourceOptions, sourceOptions);
+                    customizedSourceOptions = self.formUtils.getCustomizedOptions(currentSourceOptions, sourceOptions);
+                } else {
+                    sourceOptionsWithValues = self.formUtils.createObjectWithValues(currentSourceOptions);
+                    customizedSourceOptions = [];
+                }
+                self.formUtils.renderOptionsForWizard(sourceOptionsWithValues, customizedSourceOptions, Constants.SOURCE, formContainer);
+            });
+
+            if (type) {
+                //if source object is already edited
+                formContainer.find('#define-source').find('#source-type option').filter(function () {
+                    return ($(this).val().toLowerCase() == (type.toLowerCase()));
+                }).prop('selected', true);
+                currentSourceOptions = self.formUtils.getSelectedTypeParameters(type, predefinedSources);
+                if (sourceOptions) {
+                    //get the saved Source options values and map it
+                    sourceOptionsWithValues = self.formUtils.mapUserOptionValues(currentSourceOptions, sourceOptions);
+                    customizedSourceOptions = self.formUtils.getCustomizedOptions(currentSourceOptions, sourceOptions);
+                } else {
+                    //create option object with empty values
+                    sourceOptionsWithValues = self.formUtils.createObjectWithValues(currentSourceOptions);
+                    customizedSourceOptions = [];
+                }
+                self.formUtils.renderOptionsForWizard(sourceOptionsWithValues, customizedSourceOptions, Constants.SOURCE, formContainer);
+            }
+        };
+
+        SourceForm.prototype.generatePropertiesFormForEditWizard = function (formContainer , _uniqueId) {
+            var self = this;
+            var id = _uniqueId;
+            var sourceObject = self.configurationData.getSiddhiAppConfig().getSource(id);
+
+            var predefinedSources = _.orderBy(this.configurationData.rawExtensions["source"], ['name'], ['asc']);
+            var predefinedSourceMaps = _.orderBy(this.configurationData.rawExtensions["sourceMaps"], ['name'], ['asc']);
+
+            var propertyDiv = '<div class="clearfix form-min-width">'+
+                '<div id = "source-sink-form-source-container" class="source-sink-form-container source-div">' +
+                '<div id="define-source"></div>' +
+                '<div class = "source-sink-map-options" id="source-options-div"></div>'+
+                '</div></div>';
+
+            formContainer.html(propertyDiv);
+
+           //declaration of variables
+            var currentSourceOptions = [];
+            var sourceOptionsWithValues = [];
+            var customizedSourceOptions = [];
+            var attributes = [];
+
+            self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.SOURCE , formContainer);
+            //self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.MAPPER, formContainer);
+
+            self.formUtils.renderSourceSinkStoreTypeDropDownForWizard(Constants.SOURCE, predefinedSources ,formContainer);
+
+            //get the clicked element's information
+            var type = sourceObject.getType();
+            var sourceOptions = sourceObject.getOptions();
+            //var map = sourceObject.getMap();
+
+            //onchange of the source-type selection
+            formContainer.find('#source-type').change(function () {
+                currentSourceOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedSources);
+                if (type && (type.toLowerCase() == this.value.toLowerCase()) && sourceOptions) {
+                    //if the selected type is same as the saved source-type
+                    sourceOptionsWithValues = self.formUtils.mapUserOptionValues(currentSourceOptions, sourceOptions);
+                    customizedSourceOptions = self.formUtils.getCustomizedOptions(currentSourceOptions, sourceOptions);
+                } else {
+                    sourceOptionsWithValues = self.formUtils.createObjectWithValues(currentSourceOptions);
+                    customizedSourceOptions = [];
+                }
+                self.formUtils.renderOptionsForWizard(sourceOptionsWithValues, customizedSourceOptions, Constants.SOURCE , formContainer);
+            });
+
+            if (type) {
+                //if source object is already edited
+                formContainer.find('#define-source').find('#source-type option').filter(function () {
+                    return ($(this).val().toLowerCase() == (type.toLowerCase()));
+                }).prop('selected', true);
+                currentSourceOptions = self.formUtils.getSelectedTypeParameters(type, predefinedSources);
+                if (sourceOptions) {
+                    //get the saved Source options values and map it
+                    sourceOptionsWithValues = self.formUtils.mapUserOptionValues(currentSourceOptions, sourceOptions);
+                    customizedSourceOptions = self.formUtils.getCustomizedOptions(currentSourceOptions, sourceOptions);
+                } else {
+                    //create option object with empty values
+                    sourceOptionsWithValues = self.formUtils.createObjectWithValues(currentSourceOptions);
+                    customizedSourceOptions = [];
+                }
+                self.formUtils.renderOptionsForWizard(sourceOptionsWithValues, customizedSourceOptions, Constants.SOURCE, formContainer);
+            }
+        };
+
+        SourceForm.prototype.generatePropertiesFormMapConfig = function (mapContainer, id ,sourceObject, connectedElementName, Attributes) {
+            var self = this;
+
+            var connectedElement = connectedElementName;
+            var predefinedSources = _.orderBy(this.configurationData.rawExtensions["source"], ['name'], ['asc']);
+            var predefinedSourceMaps = _.orderBy(this.configurationData.rawExtensions["sourceMaps"], ['name'], ['asc']);
+            var streamAttributes = self.formUtils.createStreamAttributesObject(Attributes);
+
+            var propertyDiv = $('<div class="clearfix form-min-width">'+
+                  '<div id = "source-sink-form-map-container" class="source-sink-form-container mapper-div">'+
+                  '<div id="define-map"> </div> ' +
+                  '<div class="source-sink-map-options" id="mapper-options-div">' +
+                  '</div> </div>' +
+                  '<div id = "source-sink-form-attribute-container" class= "source-sink-form-container attribute-map-div">' +
+                  '<div id="define-attribute"> </div> <div id="attribute-map-content"></div> </div>' +
+                  '</div></div>');
+
+            mapContainer.html(propertyDiv);
+
+           //declaration of variables
+            var currentSourceOptions = [];
+            var sourceOptionsWithValues = [];
+            var customizedSourceOptions = [];
+            var currentMapperOptions = [];
+            var mapperOptionsWithValues = [];
+            var customizedMapperOptions = [];
+            var attributes = [];
+
+            self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.SOURCE , mapContainer);
+            self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.MAPPER , mapContainer);
+
+            self.formUtils.renderSourceSinkStoreTypeDropDownForWizard(Constants.SOURCE, predefinedSources, mapContainer);
+
+            //event listener for attribute-map checkbox
+            mapContainer.find('#define-attribute').on('change', '#attributeMap-checkBox', function () {
+                if ($(this).is(':checked')) {
+                    var attributes = createAttributeObjectList(mapperAttributes, streamAttributes);
+                    mapContainer.find('#attribute-map-content').show();
+                    renderAttributeMappingContentForWizard(Constants.SOURCE, attributes, mapContainer)
+                } else {
+                    mapContainer.find('#attribute-map-content').hide();
+                }
+                self.formUtils.updatePerfectScroller();
+            });
+            //get the clicked element's information
+            var map = sourceObject.map;
+
+            if (!map && !$.trim(mapContainer.find('#mapper-options-div').html()).length) {
+                self.formUtils.buildMapSectionForWizard(predefinedSourceMaps, mapContainer);
+                renderAttributeMappingForWizard(mapContainer);
+            }
+            //onchange of map type selection
+            mapContainer.find('#define-map').on('change', '#map-type', function () {
+                currentMapperOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedSourceMaps);
+                if ((map) && (mapperType) && (mapperType.toLowerCase() == this.value.toLowerCase()) && mapperOptions) {
+                    //if the selected type is same as the saved map type
+                    mapperOptionsWithValues = self.formUtils.mapUserOptionValues(currentMapperOptions, mapperOptions);
+                    customizedMapperOptions = self.formUtils.getCustomizedOptions(currentMapperOptions, mapperOptions);
+                } else {
+                    mapperOptionsWithValues = self.formUtils.createObjectWithValues(currentMapperOptions);
+                    customizedMapperOptions = [];
+                }
+                self.formUtils.renderOptionsForWizard(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER , mapContainer)
+
+            });
+
+            if (map) {
+                //if map section is filled
+                self.formUtils.renderMapForWizard(predefinedSourceMaps, mapContainer);
+                renderAttributeMappingForWizard(mapContainer);
+                var mapperType = map.getType();
+                var mapperOptions = map.getOptions();
+                var mapperAttributes = map.getPayloadOrAttribute();
+                if (mapperType) {
+                    mapContainer.find('#define-map').find('#map-type option').filter(function () {
+                        return ($(this).val().toLowerCase() == (mapperType.toLowerCase()));
+                    }).prop('selected', true);
+                    currentMapperOptions = self.formUtils.getSelectedTypeParameters(mapperType, predefinedSourceMaps);
+                    if (mapperOptions) {
+                        //get the saved Map options values and map it
+                        mapperOptionsWithValues = self.formUtils.mapUserOptionValues(currentMapperOptions, mapperOptions);
+                        customizedMapperOptions = self.formUtils.getCustomizedOptions(currentMapperOptions, mapperOptions);
+                    } else {
+                        //create option object with empty values
+                        mapperOptionsWithValues = self.formUtils.createObjectWithValues(currentMapperOptions);
+                        customizedMapperOptions = [];
+                    }
+                    self.formUtils.renderOptionsForWizard(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER, mapContainer);
+                }
+                if (mapperAttributes) {
+                    mapContainer.find('#define-attribute #attributeMap-checkBox').prop('checked', true);
+                    attributes = createAttributeObjectList(mapperAttributes, streamAttributes);
+                    renderAttributeMappingContentForWizard(Constants.SOURCE, attributes, mapContainer);
+                }
+
+            }
+        };
+
+        SourceForm.prototype.generatePropertiesFormMapConfigForEdit = function (mapContainer, id, Attributes, connectedElementName) {
+            var self = this;
+            var sourceObject = self.configurationData.getSiddhiAppConfig().getSource(id);
+            var connectedElement = sourceObject.getConnectedElementName();
+            var streamAttributes = self.formUtils.createStreamAttributesObject(Attributes);
+
+            var predefinedSources = _.orderBy(this.configurationData.rawExtensions["source"], ['name'], ['asc']);
+            var predefinedSourceMaps = _.orderBy(this.configurationData.rawExtensions["sourceMaps"], ['name'], ['asc']);
+
+            var propertyDiv = $('<div class="clearfix form-min-width">'+
+                  '<div id = "source-sink-form-map-container" class="source-sink-form-container mapper-div">'+
+                  '<div id="define-map"> </div> ' +
+                  '<div class="source-sink-map-options" id="mapper-options-div">' +
+                  '</div> </div>' +
+                  '<div id = "source-sink-form-attribute-container" class= "source-sink-form-container attribute-map-div">' +
+                  '<div id="define-attribute"> </div> <div id="attribute-map-content"></div> </div>' +
+                  '</div></div>');
+
+            mapContainer.html(propertyDiv);
+
+           //declaration of variables
+
+            var currentMapperOptions = [];
+            var mapperOptionsWithValues = [];
+            var customizedMapperOptions = [];
+            var attributes = [];
+
+            self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.SOURCE , mapContainer);
+            self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.MAPPER , mapContainer);
+
+            self.formUtils.renderSourceSinkStoreTypeDropDownForWizard(Constants.SOURCE, predefinedSources, mapContainer);
+
+           //get the clicked element's information
+           var map = sourceObject.getMap();
+
+           if (!map && !$.trim(mapContainer.find('#mapper-options-div').html()).length) {
+               self.formUtils.buildMapSectionForWizard(predefinedSourceMaps, mapContainer);
+               renderAttributeMappingForWizard(mapContainer);
+           }
+
+            //event listener for attribute-map checkbox
+            mapContainer.find('#define-attribute').on('change', '#attributeMap-checkBox', function () {
+                if ($(this).is(':checked')) {
+                    var attributes = createAttributeObjectList(mapperAttributes, streamAttributes);
+                    mapContainer.find('#attribute-map-content').show();
+                    renderAttributeMappingContentForWizard(Constants.SOURCE, attributes, mapContainer)
+                } else {
+                    mapContainer.find('#attribute-map-content').hide();
+                }
+                self.formUtils.updatePerfectScroller();
+            });
+
+            //onchange of map type selection
+            mapContainer.find('#define-map').on('change', '#map-type', function () {
+                currentMapperOptions = self.formUtils.getSelectedTypeParameters(this.value, predefinedSourceMaps);
+                if ((map) && (mapperType) && (mapperType.toLowerCase() == this.value.toLowerCase()) && mapperOptions) {
+                    //if the selected type is same as the saved map type
+                    mapperOptionsWithValues = self.formUtils.mapUserOptionValues(currentMapperOptions, mapperOptions);
+                    customizedMapperOptions = self.formUtils.getCustomizedOptions(currentMapperOptions, mapperOptions);
+                } else {
+                    mapperOptionsWithValues = self.formUtils.createObjectWithValues(currentMapperOptions);
+                    customizedMapperOptions = [];
+                }
+                self.formUtils.renderOptionsForWizard(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER , mapContainer)
+            });
+
+            if (map) {
+                //if map section is filled
+                self.formUtils.renderMapForWizard(predefinedSourceMaps, mapContainer);
+                renderAttributeMappingForWizard(mapContainer);
+                var mapperType = map.getType();
+                var mapperOptions = map.getOptions();
+                var mapperAttributes = map.getPayloadOrAttribute();
+                if (mapperType) {
+                    mapContainer.find('#define-map').find('#map-type option').filter(function () {
+                        return ($(this).val().toLowerCase() == (mapperType.toLowerCase()));
+                    }).prop('selected', true);
+                    currentMapperOptions = self.formUtils.getSelectedTypeParameters(mapperType, predefinedSourceMaps);
+                    if (mapperOptions) {
+                        //get the saved Map options values and map it
+                        mapperOptionsWithValues = self.formUtils.mapUserOptionValues(currentMapperOptions, mapperOptions);
+                        customizedMapperOptions = self.formUtils.getCustomizedOptions(currentMapperOptions, mapperOptions);
+                    } else {
+                        //create option object with empty values
+                        mapperOptionsWithValues = self.formUtils.createObjectWithValues(currentMapperOptions);
+                        customizedMapperOptions = [];
+                    }
+                    self.formUtils.renderOptionsForWizard(mapperOptionsWithValues, customizedMapperOptions, Constants.MAPPER, mapContainer);
+                }
+                if (mapperAttributes) {
+                    mapContainer.find('#define-attribute #attributeMap-checkBox').prop('checked', true);
+                    attributes = createAttributeObjectList(mapperAttributes, streamAttributes);
+                    renderAttributeMappingContentForWizard(Constants.SOURCE, attributes, mapContainer);
+                }
+            }
+        };
+
         return SourceForm;
     });

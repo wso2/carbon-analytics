@@ -153,7 +153,8 @@ requirejs.config({
         dockerConfigDialog: "js/export-deployment-artifacts/docker-config-dialog",
         dockerImageTypeDialog: "js/export-deployment-artifacts/docker-image-type-dialog",
         fillTemplateValueDialog: "js/export-deployment-artifacts/fill-template-value-dialog",
-        kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog"
+        kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog",
+        sourceFormWizard: "js/design-view/form-wizard/source-form-wizard"
     },
     map: {
         "*": {
