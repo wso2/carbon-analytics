@@ -32,6 +32,7 @@ import org.wso2.carbon.deployment.engine.Artifact;
 import org.wso2.carbon.deployment.engine.ArtifactType;
 import org.wso2.carbon.deployment.engine.Deployer;
 import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
+import org.wso2.carbon.siddhi.extensions.installer.core.internal.SiddhiExtensionsInstallerMicroservice;
 import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 import org.wso2.carbon.streaming.integrator.common.SimulationDependencyListener;
 import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppAlreadyExistException;
@@ -92,10 +93,7 @@ public class StreamProcessorDeployer implements Deployer {
                         siddhiAppName = StreamProcessorDataHolder.getStreamProcessorService().
                                 getSiddhiAppName(siddhiApp);
                         if (siddhiAppFileNameWithoutExtension.equals(siddhiAppName)) {
-                            if (StreamProcessorDataHolder.getExtensionsInstaller() != null) {
-                                StreamProcessorDataHolder.getExtensionsInstaller()
-                                    .installMissingExtensions(siddhiApp, siddhiAppName);
-                            }
+                            notifyDeploymentToExtensionsInstaller(siddhiAppName, siddhiApp);
                             StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(siddhiApp,
                                     siddhiAppName);
                         } else {
@@ -344,6 +342,7 @@ public class StreamProcessorDeployer implements Deployer {
     public void undeploy(Object key) throws CarbonDeploymentException {
         StreamProcessorDataHolder.getStreamProcessorService().
                 undeploySiddhiApp(getFileNameWithoutExtenson((String) key));
+        notifyUnDeploymentToExtensionsInstaller(getFileNameWithoutExtenson((String) key));
         broadcastDelete();
     }
 
@@ -399,6 +398,30 @@ public class StreamProcessorDeployer implements Deployer {
     }
 
     /**
+     * Notifies the Extensions Installer about the given Siddhi app's deployment.
+     * This can be either due to adding a Siddhi app, or updating an existing Siddhi app.
+     *
+     * @param siddhiAppName Name of the deployed Siddhi app.
+     * @param siddhiAppBody Body of the deployed Siddhi app.
+     */
+    private static void notifyDeploymentToExtensionsInstaller(String siddhiAppName, String siddhiAppBody) {
+        if (StreamProcessorDataHolder.getExtensionsInstaller() != null) {
+            StreamProcessorDataHolder.getExtensionsInstaller().reflectDeployment(siddhiAppName, siddhiAppBody);
+        }
+    }
+
+    /**
+     * Notifies the Extensions Installer about the given Siddhi app's un-deployment.
+     *
+     * @param siddhiAppName Name of the un-deployed Siddhi app.
+     */
+    private static void notifyUnDeploymentToExtensionsInstaller(String siddhiAppName) {
+        if (StreamProcessorDataHolder.getExtensionsInstaller() != null) {
+            StreamProcessorDataHolder.getExtensionsInstaller().reflectUnDeployment(siddhiAppName);
+        }
+    }
+
+    /**
      * This bind method will be called when Greeter OSGi service is registered.
      */
     @Reference(
@@ -434,6 +457,27 @@ public class StreamProcessorDeployer implements Deployer {
 
     protected void unsubscribeFromListener(SimulationDependencyListener simulationDependencyListener) {
         this.simulationDependencyListener = null;
+    }
+
+    /**
+     * The bind method, which gets called for Siddhi Extensions Installer microservice registration
+     * that satisfies the policy.
+     *
+     * @param extensionInstallerService Siddhi Extensions Installer microservice
+     */
+    @Reference(
+        name = "org.wso2.carbon.siddhi.extensions.installer.core.internal.SiddhiExtensionsInstallerMicroservice",
+        service = SiddhiExtensionsInstallerMicroservice.class,
+        cardinality = ReferenceCardinality.MANDATORY,
+        policy = ReferencePolicy.DYNAMIC,
+        unbind = "unsetExtensionInstaller"
+    )
+    protected void setExtensionInstaller(SiddhiExtensionsInstallerMicroservice extensionInstallerService) {
+        StreamProcessorDataHolder.setExtensionsInstaller(extensionInstallerService);
+    }
+
+    protected void unsetExtensionInstaller(SiddhiExtensionsInstallerMicroservice extensionInstallerService) {
+        StreamProcessorDataHolder.setExtensionsInstaller(null);
     }
 
 

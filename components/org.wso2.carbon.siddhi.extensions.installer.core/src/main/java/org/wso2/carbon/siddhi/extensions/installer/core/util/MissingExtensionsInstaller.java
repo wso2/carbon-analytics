@@ -18,14 +18,12 @@
 
 package org.wso2.carbon.siddhi.extensions.installer.core.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.DependencyConfig;
 import org.wso2.carbon.siddhi.extensions.installer.core.exceptions.ExtensionsInstallerException;
 import org.wso2.carbon.siddhi.extensions.installer.core.execution.DependencyInstaller;
 import org.wso2.carbon.siddhi.extensions.installer.core.execution.SiddhiAppExtensionUsageDetector;
+import org.wso2.carbon.siddhi.extensions.installer.core.models.SiddhiAppStore;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,87 +32,51 @@ import java.util.Set;
  */
 public class MissingExtensionsInstaller {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MissingExtensionsInstaller.class);
-
     private MissingExtensionsInstaller() {
         // Prevents Instantiation.
     }
 
     /**
-     * Installs extensions that are used in the given Siddhi app, but have not been installed.
+     * Installs extensions that are used in Siddhi apps of the Siddhi app store,
+     * but are not installed.
      *
-     * @param siddhiAppBody       Body of a Siddhi app.
-     * @param siddhiAppName       Name of the Siddhi app.
-     * @param usageDetector       Siddhi app usage detector, which detects extension usages from the
-     *                            Siddhi app.
-     * @param dependencyInstaller Dependency installer, which installs dependencies related to extensions.
-     * @throws ExtensionsInstallerException Failure occurred when installing missing extensions.
+     * @param siddhiAppStore      Siddhi app store.
+     * @param usageDetector       Siddhi app extension usage detector.
+     * @param dependencyInstaller Dependency installer.
+     * @return Response of the installation.
+     * @throws ExtensionsInstallerException Failed to install missing extensions.
      */
-    public static void installMissingExtensions(String siddhiAppBody,
-                                                String siddhiAppName,
-                                                SiddhiAppExtensionUsageDetector usageDetector,
-                                                DependencyInstaller dependencyInstaller)
-        throws ExtensionsInstallerException {
-        Map<String, Map<String, Object>> usedExtensions = usageDetector.getUsedExtensionStatuses(siddhiAppBody);
-        Set<String> nonInstalledExtensionKeys = ResponseEntityCreator.extractNonInstalledExtensionKeys(usedExtensions);
-        if (!nonInstalledExtensionKeys.isEmpty()) {
-            LOGGER.info(String.format(
-                "Installing extensions: %s for Siddhi app: '%s'.", nonInstalledExtensionKeys, siddhiAppName));
-            Map<String, Map<String, Object>> installationResponse =
-                dependencyInstaller.installDependenciesFor(nonInstalledExtensionKeys);
-            notifyIncompleteInstallations(installationResponse);
-            notifyManuallyRequiredInstallations(installationResponse);
-            LOGGER.warn(String.format(
-                "Extensions installation finished for Siddhi app: '%s'. Please restart the server.", siddhiAppName));
-        }
-    }
-
-    private static void notifyIncompleteInstallations(Map<String, Map<String, Object>> installationResponse) {
-        Set<String> nonSuccessfulInstallations =
-            ResponseEntityCreator.extractIncompleteInstallations(installationResponse);
-        if (!nonSuccessfulInstallations.isEmpty()) {
-            // Notify about installations, whose installation statuses are anything other than successful.
-            LOGGER.error(String.format("Installations were not complete for extensions: %s.",
-                nonSuccessfulInstallations));
-        }
-    }
-
-    private static void notifyManuallyRequiredInstallations(Map<String, Map<String, Object>> installationResponse) {
-        Map<String, List<DependencyConfig>> manuallyRequiredInstallations =
-            ResponseEntityCreator.extractManuallyInstallableDependencies(installationResponse);
-        if (!manuallyRequiredInstallations.isEmpty()) {
-            // Notify about each extension's manually installable dependency.
-            int extensionCounter = 1;
-            StringBuilder manuallyInstallMessage = new StringBuilder();
-            for (Map.Entry<String, List<DependencyConfig>> extensionEntry : manuallyRequiredInstallations.entrySet()) {
-                // Gather extension's details.
-                manuallyInstallMessage.append(extensionCounter);
-                manuallyInstallMessage.append(". Extension: ");
-                manuallyInstallMessage.append(extensionEntry.getKey());
-                manuallyInstallMessage.append(System.lineSeparator());
-                // Gather dependencies' details.
-                manuallyInstallMessage.append("Dependencies:");
-                manuallyInstallMessage.append(System.lineSeparator());
-                for (DependencyConfig manuallyInstallableDependency : extensionEntry.getValue()) {
-                    manuallyInstallMessage.append("- ");
-                    manuallyInstallMessage.append(manuallyInstallableDependency.getRepresentableName());
-                    manuallyInstallMessage.append(":");
-                    manuallyInstallMessage.append(System.lineSeparator());
-                    if (manuallyInstallableDependency.getDownload() != null) {
-                        String instructions = manuallyInstallableDependency.getDownload().getInstructions();
-                        if (instructions != null) {
-                            instructions = instructions.replaceAll("<br/>", System.lineSeparator());
-                            manuallyInstallMessage.append(instructions);
-                            manuallyInstallMessage.append(System.lineSeparator());
-                        }
-                    }
-                }
-                manuallyInstallMessage.append(System.lineSeparator());
-                extensionCounter++;
+    public static Map<String, Map<String, Object>> installMissingExtensions(
+        SiddhiAppStore siddhiAppStore, SiddhiAppExtensionUsageDetector usageDetector,
+        DependencyInstaller dependencyInstaller) throws ExtensionsInstallerException {
+        Map<String, Map<String, Object>> responses = new HashMap<>();
+        for (Map.Entry<String, String> siddhiAppEntry : siddhiAppStore.getSiddhiApps().entrySet()) {
+            String siddhiAppName = siddhiAppEntry.getKey();
+            String siddhiAppBody = siddhiAppEntry.getValue();
+            Set<String> nonInstalledExtensionKeys = getNotInstalledExtensionKeys(usageDetector, siddhiAppBody);
+            if (!nonInstalledExtensionKeys.isEmpty()) {
+                Map<String, Map<String, Object>> installationResponses =
+                    dependencyInstaller.installDependenciesFor(nonInstalledExtensionKeys);
+                Map<String, Object> response =
+                    ResponseEntityCreator.createMissingExtensionsInstallationResponse(installationResponses);
+                responses.put(siddhiAppName, response);
             }
-            LOGGER.info(String.format(
-                "Please follow the instructions and install the following dependencies manually:%n%n%s",
-                manuallyInstallMessage.toString()));
         }
+        return responses;
+    }
+
+    /**
+     * Returns a set of names, of extensions - that are used in the given Siddhi app, but are not installed.
+     *
+     * @param usageDetector Siddhi app extension usage detector.
+     * @param siddhiAppBody Body of the Siddhi app.
+     * @return A set containing names of extensions - that are used in the given Siddhi app,
+     * but are not installed.
+     * @throws ExtensionsInstallerException Failed to get used extension statuses.
+     */
+    public static Set<String> getNotInstalledExtensionKeys(SiddhiAppExtensionUsageDetector usageDetector,
+                                                           String siddhiAppBody) throws ExtensionsInstallerException {
+        Map<String, Map<String, Object>> usedExtensions = usageDetector.getUsedExtensionStatuses(siddhiAppBody);
+        return ResponseEntityCreator.extractNonInstalledExtensionKeys(usedExtensions);
     }
 }

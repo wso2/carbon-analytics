@@ -34,14 +34,15 @@ public class ExtensionsInstallerCli {
 
     private static final Logger logger = LoggerFactory.getLogger(ExtensionsInstallerCli.class);
 
-    private static final String STATUS_COMMAND = "status";
+    private static final String LIST_COMMAND = "list";
+    private static final String ALL_FLAG = "--all";
     private static final String INSTALL_COMMAND = "install";
     private static final String UNINSTALL_COMMAND = "uninstall";
     private static final String EXTENSION_INSTALLER_ENDPOINT_URL_FORMAT = "%s:%s/siddhi-extensions";
     private static final String CONFIG_FILE_NAME = "config.properties";
     private static final String SERVER_HOST_CONFIG_PROPERTY = "server.host";
     private static final String SERVER_PORT_CONFIG_PROPERTY = "server.port";
-    private static final String COMMAND_USAGE_FORMAT = "%-50s%-50s";
+    private static final String COMMAND_USAGE_FORMAT = "  %-50s%-50s";
 
     private static String serverHost;
     private static String serverPort;
@@ -92,8 +93,8 @@ public class ExtensionsInstallerCli {
     private static void executeCommand(String[] args) throws ExtensionsInstallerCliException {
         if (args.length > 0) {
             switch (args[0]) {
-                case STATUS_COMMAND:
-                    executeStatusCommand(args);
+                case LIST_COMMAND:
+                    executeListCommand(args);
                     break;
                 case INSTALL_COMMAND:
                     executeInstallCommand(args);
@@ -106,27 +107,30 @@ public class ExtensionsInstallerCli {
                     showAvailableCommands();
             }
         } else {
-            logger.error("No command specified.");
             showAvailableCommands();
         }
     }
 
     /**
-     * Executes {@value STATUS_COMMAND} command, with the given args.
+     * Executes {@value LIST_COMMAND} command, with the given args.
      *
      * @param args Command line arguments given by the user.
-     * @throws ExtensionsInstallerCliException Failed to execute {@value STATUS_COMMAND} command.
+     * @throws ExtensionsInstallerCliException Failed to execute {@value LIST_COMMAND} command.
      */
-    private static void executeStatusCommand(String[] args) throws ExtensionsInstallerCliException {
+    private static void executeListCommand(String[] args) throws ExtensionsInstallerCliException {
         switch (args.length) {
             case 1:
-                listStatuses();
+                listInstalledExtensions();
                 break;
             case 2:
-                listStatus(args[1]);
+                if (ALL_FLAG.equals(args[1])) {
+                    listAllExtensions();
+                } else {
+                    listExtension(args[1]);
+                }
                 break;
             default:
-                showCorrectUsages(STATUS_COMMAND, getStatusCommandUsage());
+                showCorrectUsages(LIST_COMMAND, getStatusCommandUsage());
         }
     }
 
@@ -137,10 +141,15 @@ public class ExtensionsInstallerCli {
      * @throws ExtensionsInstallerCliException Failed to execute {@value INSTALL_COMMAND} command.
      */
     private static void executeInstallCommand(String[] args) throws ExtensionsInstallerCliException {
-        if (args.length == 2) {
-            install(args[1]);
-        } else {
-            showCorrectUsages(INSTALL_COMMAND, getInstallCommandUsage());
+        switch (args.length) {
+            case 1:
+                confirmAndInstallMissingExtensions();
+                break;
+            case 2:
+                installExtension(args[1]);
+                break;
+            default:
+                showCorrectUsages(INSTALL_COMMAND, getInstallCommandUsage());
         }
     }
 
@@ -156,7 +165,7 @@ public class ExtensionsInstallerCli {
             if (doesShareDependencies(extensionName)) {
                 confirmAndUnInstall(extensionName);
             } else {
-                unInstall(extensionName);
+                unInstallExtension(extensionName);
             }
         } else {
             showCorrectUsages(UNINSTALL_COMMAND, getUnInstallCommandUsage());
@@ -172,16 +181,29 @@ public class ExtensionsInstallerCli {
         return String.format(EXTENSION_INSTALLER_ENDPOINT_URL_FORMAT, serverHost, serverPort);
     }
 
-    private static void listStatuses() throws ExtensionsInstallerCliException {
-        RequestHandler.doGetAllExtensionStatuses(constructExtensionInstallerBaseUrl());
+    private static void listInstalledExtensions() throws ExtensionsInstallerCliException {
+        RequestHandler.doGetInstalledExtensions(constructExtensionInstallerBaseUrl());
     }
 
-    private static void listStatus(String extensionName) throws ExtensionsInstallerCliException {
-        RequestHandler.doGetExtensionStatus(extensionName, constructExtensionInstallerBaseUrl());
+    private static void listAllExtensions() throws ExtensionsInstallerCliException {
+        RequestHandler.doGetAllExtensions(constructExtensionInstallerBaseUrl());
     }
 
-    private static void install(String extensionName) throws ExtensionsInstallerCliException {
-        RequestHandler.doInstall(extensionName, constructExtensionInstallerBaseUrl());
+    private static void listExtension(String extensionName) throws ExtensionsInstallerCliException {
+        RequestHandler.doGetExtension(extensionName, constructExtensionInstallerBaseUrl());
+    }
+
+    private static void confirmAndInstallMissingExtensions() throws ExtensionsInstallerCliException {
+        Scanner input = new Scanner(System.in, StandardCharsets.UTF_8.name());
+        logger.warn("Are you sure you want to install missing extensions? [y/n] ");
+        String choice = input.next().trim();
+        if ("y".equalsIgnoreCase(choice) || "yes".equalsIgnoreCase(choice)) {
+            RequestHandler.doInstallMissingExtensions(constructExtensionInstallerBaseUrl());
+        }
+    }
+
+    private static void installExtension(String extensionName) throws ExtensionsInstallerCliException {
+        RequestHandler.doInstallExtension(extensionName, constructExtensionInstallerBaseUrl());
     }
 
     private static boolean doesShareDependencies(String extensionName) throws ExtensionsInstallerCliException {
@@ -194,23 +216,30 @@ public class ExtensionsInstallerCli {
         logger.warn("Are you sure you want to un-install? [y/n] ");
         String choice = input.next().trim();
         if ("y".equalsIgnoreCase(choice) || "yes".equalsIgnoreCase(choice)) {
-            unInstall(extensionName);
+            unInstallExtension(extensionName);
         }
     }
 
-    private static void unInstall(String extensionName) throws ExtensionsInstallerCliException {
-        RequestHandler.doUnInstall(extensionName, constructExtensionInstallerBaseUrl());
+    private static void unInstallExtension(String extensionName) throws ExtensionsInstallerCliException {
+        RequestHandler.doUnInstallExtension(extensionName, constructExtensionInstallerBaseUrl());
     }
 
     private static String getStatusCommandUsage() {
-        return String.format(COMMAND_USAGE_FORMAT, STATUS_COMMAND, "List installation statuses of all extensions") +
+        return String.format(COMMAND_USAGE_FORMAT, LIST_COMMAND, "List installed extensions") +
             System.lineSeparator() +
-            String.format(COMMAND_USAGE_FORMAT, STATUS_COMMAND + " [extension name]",
-                "List installation status and manually installable dependencies (if any) of an extension");
+            String.format(COMMAND_USAGE_FORMAT, LIST_COMMAND + " " + ALL_FLAG,
+                "List installation statuses of all the extensions") +
+            System.lineSeparator() +
+            String.format(COMMAND_USAGE_FORMAT, LIST_COMMAND + " [extension name]",
+                "List the installation status, and instructions of manually installable dependencies (if any) " +
+                    "of an extension");
     }
 
     private static String getInstallCommandUsage() {
-        return String.format(COMMAND_USAGE_FORMAT, INSTALL_COMMAND + " [extension name]", "Install an extension");
+        return String.format(COMMAND_USAGE_FORMAT, INSTALL_COMMAND,
+            "Install extensions that are used in Siddhi apps, but are not installed") +
+            System.lineSeparator() +
+            String.format(COMMAND_USAGE_FORMAT, INSTALL_COMMAND + " [extension name]", "Install an extension");
     }
 
     private static String getUnInstallCommandUsage() {
@@ -218,7 +247,8 @@ public class ExtensionsInstallerCli {
     }
 
     private static void showAvailableCommands() {
-        String message = "Available commands:" + System.lineSeparator() + getStatusCommandUsage() +
+        String message = "Extension Installer manages Siddhi Extensions." + System.lineSeparator() +
+            System.lineSeparator() + "Available Commands:" + System.lineSeparator() + getStatusCommandUsage() +
             System.lineSeparator() + getInstallCommandUsage() + System.lineSeparator() + getUnInstallCommandUsage();
         logger.info(message);
     }

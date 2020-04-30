@@ -36,7 +36,9 @@ public class RequestHandler {
 
     private static final String GET_STATUS_CURL_FORMAT = "curl -s --location --request GET %s/status";
     private static final String GET_STATUS_EXTENSION_CURL_FORMAT = "curl -s --location --request GET %s/status/%s";
-    private static final String INSTALL_CURL_FORMAT = "curl -s --location --request POST %s/%s/install";
+    private static final String INSTALL_MISSING_EXTENSIONS_CURL_FORMAT =
+        "curl -s --location --request POST %s/missing-extensions/install";
+    private static final String INSTALL_EXTENSION_CURL_FORMAT = "curl -s --location --request POST %s/%s/install";
     private static final String DEPENDENCY_SHARING_EXTENSIONS_CURL_FORMAT =
         "curl -s --location --request GET %s/%s/dependency-sharing-extensions";
     private static final String UN_INSTALL_CURL_FORMAT = "curl -s --location --request POST %s/%s/uninstall";
@@ -68,37 +70,71 @@ public class RequestHandler {
     }
 
     /**
+     * Performs request to get installed extensions.
+     *
+     * @param baseUrl Base URL of Extensions Installer REST API.
+     * @throws ExtensionsInstallerCliException Failed to get installation statuses of extensions.
+     */
+    public static void doGetInstalledExtensions(String baseUrl) throws ExtensionsInstallerCliException {
+        try {
+            String command = String.format(GET_STATUS_CURL_FORMAT, baseUrl);
+            String response = executeCurl(command);
+            ResponseHandler.handleInstalledExtensionsResponse(response);
+        } catch (IOException e) {
+            throw new ExtensionsInstallerCliException("Failed to get installed extensions.", e);
+        }
+    }
+
+    /**
      * Performs request to get installation statuses of all the extensions.
      *
      * @param baseUrl Base URL of Extensions Installer REST API.
      * @throws ExtensionsInstallerCliException Failed to get installation statuses of extensions.
      */
-    public static void doGetAllExtensionStatuses(String baseUrl) throws ExtensionsInstallerCliException {
+    public static void doGetAllExtensions(String baseUrl) throws ExtensionsInstallerCliException {
         try {
             String command = String.format(GET_STATUS_CURL_FORMAT, baseUrl);
             String response = executeCurl(command);
-            ResponseHandler.handleAllExtensionStatusesResponse(response);
+            ResponseHandler.handleAllExtensionsResponse(response);
         } catch (IOException e) {
             throw new ExtensionsInstallerCliException("Failed to get statuses of extensions.", e);
         }
     }
 
     /**
-     * Performs request to get the installation status of the extension, which has the given name.
+     * Performs request to get the details of the extension, which has the given name.
      *
      * @param extensionName Name of the extension of which, installation status is requested.
      * @param baseUrl       Base URL of Extensions Installer REST API.
      * @throws ExtensionsInstallerCliException Failed to get installation status of the extension.
      */
-    public static void doGetExtensionStatus(String extensionName, String baseUrl)
+    public static void doGetExtension(String extensionName, String baseUrl)
         throws ExtensionsInstallerCliException {
         try {
             String command = String.format(GET_STATUS_EXTENSION_CURL_FORMAT, baseUrl, extensionName);
             String response = executeCurl(command);
-            ResponseHandler.handleExtensionStatusResponse(response, extensionName);
+            ResponseHandler.handleExtensionResponse(response, extensionName);
         } catch (IOException e) {
             throw new ExtensionsInstallerCliException(
                 String.format("Failed to get status of extension: %s .", extensionName), e);
+        }
+    }
+
+    /**
+     * Performs request to install extensions - that are used within Siddhi apps deployed in the SI server,
+     * but are not installed.
+     *
+     * @param baseUrl Base URL of Extensions Installer REST API.
+     * @throws ExtensionsInstallerCliException Failed to install missing extensions.
+     */
+    public static void doInstallMissingExtensions(String baseUrl) throws ExtensionsInstallerCliException {
+        try {
+            String command = String.format(INSTALL_MISSING_EXTENSIONS_CURL_FORMAT, baseUrl);
+            logger.info("Installing missing extensions...");
+            String response = executeCurl(command);
+            ResponseHandler.handleMissingExtensionsInstallationResponse(response);
+        } catch (IOException e) {
+            throw new ExtensionsInstallerCliException("Failed to install missing extensions.", e);
         }
     }
 
@@ -109,12 +145,12 @@ public class RequestHandler {
      * @param baseUrl       Base URL of Extensions Installer REST API.
      * @throws ExtensionsInstallerCliException Failed to install the extension.
      */
-    public static void doInstall(String extensionName, String baseUrl) throws ExtensionsInstallerCliException {
+    public static void doInstallExtension(String extensionName, String baseUrl) throws ExtensionsInstallerCliException {
         try {
-            String command = String.format(INSTALL_CURL_FORMAT, baseUrl, extensionName);
+            String command = String.format(INSTALL_EXTENSION_CURL_FORMAT, baseUrl, extensionName);
             logger.info(String.format("Installing %s ...", extensionName));
             String response = executeCurl(command);
-            ResponseHandler.handleInstallationResponse(response);
+            ResponseHandler.handleExtensionInstallationResponse(response);
         } catch (IOException e) {
             throw new ExtensionsInstallerCliException(
                 String.format("Failed to install extension: %s .", extensionName), e);
@@ -149,12 +185,12 @@ public class RequestHandler {
      * @param baseUrl       Base URL of Extensions Installer REST API.
      * @throws ExtensionsInstallerCliException Failed to un-install the extension.
      */
-    public static void doUnInstall(String extensionName, String baseUrl) throws ExtensionsInstallerCliException {
+    public static void doUnInstallExtension(String extensionName, String baseUrl) throws ExtensionsInstallerCliException {
         try {
             String command = String.format(UN_INSTALL_CURL_FORMAT, baseUrl, extensionName);
             logger.info(String.format("Un-installing %s ...", extensionName));
             String response = executeCurl(command);
-            ResponseHandler.handleUnInstallationResponse(response);
+            ResponseHandler.handleExtensionUnInstallationResponse(response);
         } catch (IOException e) {
             throw new ExtensionsInstallerCliException(
                 String.format("Failed to un-install extension: %s .", extensionName), e);
