@@ -18,6 +18,8 @@
 package org.wso2.carbon.si.metrics.prometheus.reporter.impl;
 
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
+import org.wso2.carbon.si.metrics.prometheus.reporter.config.CustomMapperConfig;
+
 import java.util.Map;
 
 /**
@@ -25,13 +27,13 @@ import java.util.Map;
  */
 public class PrometheusMetricsLabelsMapper {
 
-    private Map<String, MapperConfig> metricsLabelMapping;
+    private Map<String, CustomMapperConfig> metricsLabelMapping;
 
-    public Map<String, MapperConfig> getMetricsLabelMapping() {
+    public Map<String, CustomMapperConfig> getMetricsLabelMapping() {
         return metricsLabelMapping;
     }
 
-    public void setMetricsLabelMapping(Map<String, MapperConfig> metricsLabelMapping) {
+    public void setMetricsLabelMapping(Map<String, CustomMapperConfig> metricsLabelMapping) {
         this.metricsLabelMapping = metricsLabelMapping;
     }
 

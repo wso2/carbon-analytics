@@ -180,3 +180,83 @@ metricsLabelMapping:
       operation: "${2}"
       operationType: "${3}"
       metrics: "${4}"
+
+#Siddhi-io-file Metrics
+
+  siddhi.io.file.apps:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.File"
+    name: "siddhi.file.apps"
+    labels:
+      app_name: "${0}"
+
+  siddhi.io.file.sink.event.count:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.File.Sinks.event.count.(.*).filename.*.*.(.*)"
+    name: "siddhi.file.sink.event.count"
+    labels:
+      app_name: "${0}"
+      file_name: "${1}"
+      mode: "${2}"
+      stream_name: "${3}"
+      file_path: "${4}"
+
+  siddhi.io.file.sink.metrics:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.File.Sinks.*.(.*)"
+    name: "siddhi.file.sink.${1}"
+    labels:
+      app_name: "${0}"
+      file_path: "${2}"
+
+  siddhi.io.file.source.event.count:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.File.Source.event.count.(.*).filename.*.*.(.*)"
+    name: "siddhi.file.source.event.count"
+    labels:
+      app_name: "${0}"
+      file_name: "${1}"
+      mode: "${2}"
+      stream_name: "${3}"
+      file_path: "${4}"
+
+  siddhi.io.file.source.metrics:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.File.Source.*.(.*)"
+    name: "siddhi.file.source.${1}"
+    labels:
+      app_name: "${0}"
+      file_path: "${2}"
+
+
+  siddhi.io.file.archive: # no extension
+    match: "io.siddhi.SiddhiApps.*.Siddhi.File.Operations.Archived.*.(.*).time.(.*).source.(.*).destination"
+    name: "siddhi.file.archive"
+    labels:
+      app_name: "${0}"
+      type: "${1}"
+      time: "${2}"
+      _source: "${3}"
+      destination: "${4}"
+
+  siddhi.io.file.copy: #both source and destination does not have extension
+    match: "io.siddhi.SiddhiApps.*.Siddhi.File.Operations.Copy.(.*).time.(.*).source.(.*).destination"
+    name: "siddhi.file.copy"
+    labels:
+      app_name: "${0}"
+      time: "${1}"
+      _source: "${2}"
+      destination: "${3}"
+
+  siddhi.io.file.delete: #source does not have extension
+    match: "io.siddhi.SiddhiApps.*.Siddhi.File.Operations.Delete.(.*).time.(.*).source"
+    name: "siddhi.file.delete"
+    labels:
+      app_name: "${0}"
+      time: "${1}"
+      _source: "${2}"
+
+  siddhi.io.file.move: #both source and destination does not have extension
+    match: "io.siddhi.SiddhiApps.(.*).Siddhi.File.Operations.Move.(.*).time.(.*).source.(.*).destination"
+    name: "siddhi.file.move"
+    labels:
+      app_name: "${0}"
+      time: "${1}"
+      _source: "${2}"
+      destination: "${3}"
+
