@@ -1493,17 +1493,13 @@ public class TemplateManagerService implements BusinessRulesService {
             Object templates = nodes.get(node);
             if (templates instanceof List) {
                 List templateList = (List) templates;
-                if (!templateList.contains(ruleTemplateUUID.toString())) {
-                    return new ArrayList<String>(nodes.keySet());
-                } else {
-                    for (Object uuid : templateList) {
-                        if (ruleTemplateUUID.equals(uuid.toString())) {
-                            nodeList.add(node);
-                            break;
-                        }
-                    }
+                if (templateList.contains(ruleTemplateUUID)) {
+                    nodeList.add(node);
                 }
             }
+        }
+        if (nodeList.isEmpty()) {
+            return new ArrayList<String>(nodes.keySet());
         }
         return nodeList;
     }
