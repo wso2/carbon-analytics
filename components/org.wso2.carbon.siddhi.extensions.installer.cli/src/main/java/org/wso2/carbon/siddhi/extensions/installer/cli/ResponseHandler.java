@@ -25,7 +25,10 @@ import com.google.gson.JsonSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Handles responses of requests, made by the {@link RequestHandler}.
@@ -41,8 +44,6 @@ public class ResponseHandler {
     private static final String DOWNLOAD = "download";
     private static final String INSTRUCTIONS = "instructions";
     private static final String EXTENSION_STATUS = "extensionStatus";
-    private static final String INSTALLATION_INCOMPLETE_EXTENSIONS = "installationIncompleteExtensions";
-    private static final String MANUALLY_REQUIRED_INSTALLATIONS = "manuallyRequiredInstallations";
     private static final String INSTALLED = "INSTALLED";
     private static final String MANUALLY_INSTALL = "manuallyInstall";
     private static final String STATUS = "status";
@@ -98,6 +99,9 @@ public class ResponseHandler {
                 message.append(System.lineSeparator());
             });
             logger.info(message.toString());
+        } else {
+            // Ideally we won't reach here. This would mean that the parsed response is not a JsonObject.
+            throw new ExtensionsInstallerCliException("Invalid response for listing installed extensions.");
         }
     }
 
@@ -123,6 +127,9 @@ public class ResponseHandler {
                 message.append(System.lineSeparator());
             }
             logger.info(message.toString());
+        } else {
+            // Ideally we won't reach here. This would mean that the parsed response is not a JsonObject.
+            throw new ExtensionsInstallerCliException("Invalid response for listing all extensions.");
         }
     }
 
@@ -163,11 +170,15 @@ public class ResponseHandler {
             if (((JsonObject) parsedResponse).get(MANUALLY_INSTALL) != null) {
                 message.append(getExtensionRow(extensionName, displayName, version, status, true));
                 message.append(System.lineSeparator());
+                message.append(System.lineSeparator());
                 message.append(getManuallyInstallMessage((JsonObject) parsedResponse));
             } else {
                 message.append(getExtensionRow(extensionName, displayName, version, status, false));
             }
             logger.info(message.toString());
+        } else {
+            // Ideally we won't reach here. This would mean that the parsed response is not a JsonObject.
+            throw new ExtensionsInstallerCliException("Invalid response for listing an extension.");
         }
     }
 
@@ -183,64 +194,40 @@ public class ResponseHandler {
     }
 
     /**
-     * Notifies information about installation of missing extensions, from the given response.
+     * Gets missing extension names from the given response.
      *
      * @param response The response received by the corresponding request.
-     * @throws ExtensionsInstallerCliException Failed to parse the given response.
+     * @return Names of missing extensions.
+     * @throws ExtensionsInstallerCliException Failed to get missing extension names.
      */
-    public static void handleMissingExtensionsInstallationResponse(String response)
-        throws ExtensionsInstallerCliException {
+    public static Set<String> getMissingExtensionNames(String response) throws ExtensionsInstallerCliException {
         JsonElement parsedResponse = parseResponse(response);
         if (parsedResponse instanceof JsonObject) {
-            StringBuilder message = new StringBuilder();
-            message.append(System.lineSeparator());
-            for (Map.Entry<String, JsonElement> siddhiAppEntry : ((JsonObject) parsedResponse).entrySet()) {
-                message.append("Finished extension installations for Siddhi app: ");
-                message.append(siddhiAppEntry.getKey());
-                message.append(".");
+            Map<String, JsonElement> missingExtensions =
+                ((JsonObject) parsedResponse).entrySet().stream().filter(extension -> {
+                    String status = ((JsonObject) extension.getValue()).get(EXTENSION_STATUS).getAsString();
+                    return !INSTALLED.equals(status);
+                }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            if (!missingExtensions.isEmpty()) {
+                StringBuilder message = new StringBuilder();
                 message.append(System.lineSeparator());
-
-                // Failed extension keys (if any).
-                if (siddhiAppEntry.getValue().getAsJsonObject().get(INSTALLATION_INCOMPLETE_EXTENSIONS) != null) {
-                    message.append("Installations of the following extensions were not complete:");
+                message.append("The following extensions have been used in Siddhi apps, but have not been installed.");
+                message.append(System.lineSeparator());
+                message.append(System.lineSeparator());
+                message.append(getExtensionRowHeader());
+                message.append(System.lineSeparator());
+                for (Map.Entry<String, JsonElement> extensionEntry : missingExtensions.entrySet()) {
+                    message.append(getExtensionEntryAsRow(extensionEntry));
                     message.append(System.lineSeparator());
-                    for (JsonElement extensionName : siddhiAppEntry.getValue().getAsJsonObject()
-                        .get(INSTALLATION_INCOMPLETE_EXTENSIONS).getAsJsonArray()) {
-                        message.append(" ");
-                        message.append(extensionName.getAsString());
-                        message.append(System.lineSeparator());
-                    }
                 }
-
-                // Manually required installations of extension dependencies (if any).
-                if (siddhiAppEntry.getValue().getAsJsonObject().get(MANUALLY_REQUIRED_INSTALLATIONS) != null) {
-                    message.append(System.lineSeparator());
-                    message.append(getManuallyRequiredInstallationsMessage(siddhiAppEntry.getValue().getAsJsonObject()
-                        .get(MANUALLY_REQUIRED_INSTALLATIONS).getAsJsonObject()));
-                }
+                message.append(System.lineSeparator());
+                logger.info(message.toString());
+                return missingExtensions.keySet();
             }
-            message.append(System.lineSeparator());
-            message.append("Please restart the server.");
-            logger.info(message.toString());
+            return Collections.emptySet();
         }
-    }
-
-    private static String getManuallyRequiredInstallationsMessage(JsonObject manuallyRequiredInstallations) {
-        StringBuilder message = new StringBuilder("The following dependencies should be manually installed: ");
-        message.append(System.lineSeparator());
-        int extensionCounter = 1;
-        for (Map.Entry<String, JsonElement> extensionEntry : manuallyRequiredInstallations.entrySet()) {
-            // Manually installable dependencies' details.
-            message.append(extensionCounter);
-            message.append(". Dependencies for: ");
-            message.append(extensionEntry.getKey());
-            message.append(System.lineSeparator());
-            for (JsonElement manuallyInstallableDependency : extensionEntry.getValue().getAsJsonArray()) {
-                message.append(printManuallyInstallableDependency(manuallyInstallableDependency));
-            }
-            extensionCounter++;
-        }
-        return message.toString();
+        // Ideally we won't reach here. This would mean that the parsed response is not a JsonObject.
+        throw new ExtensionsInstallerCliException("Invalid response for getting missing extension names.");
     }
 
     /**
@@ -270,7 +257,9 @@ public class ResponseHandler {
             }
             message.append(System.lineSeparator());
             logger.info(message.toString());
-            logger.warn("Please restart the server.");
+        } else {
+            // Ideally we won't reach here. This would mean that the parsed response is not a JsonObject.
+            throw new ExtensionsInstallerCliException("Invalid extension installation response.");
         }
     }
 
@@ -301,7 +290,6 @@ public class ResponseHandler {
             instructions = instructions.replace("<br/>", System.lineSeparator());
             message.append(instructions);
             message.append(System.lineSeparator());
-            message.append(System.lineSeparator());
         }
         return message.toString();
     }
@@ -325,24 +313,32 @@ public class ResponseHandler {
     }
 
     /**
-     * Checks whether an extension shares dependencies with other extensions, from the given response.
+     * Gets dependency sharing extension names from the given response.
      *
      * @param response The response received by the corresponding request.
-     * @return Whether the extension shares dependencies with other extensions.
-     * @throws ExtensionsInstallerCliException Failed to parse the given response.
+     * @return Names of dependency sharing extensions.
+     * @throws ExtensionsInstallerCliException Failed to get dependency sharing extensions.
      */
-    public static boolean isDependencySharingExtensionsAvailable(String response)
+    public static Set<String> getDependencySharingExtensionNames(String response)
         throws ExtensionsInstallerCliException {
         JsonElement parsedResponse = parseResponse(response);
-        if (parsedResponse instanceof JsonObject &&
-            ((JsonObject) parsedResponse).get(DOES_SHARE_DEPENDENCIES) != null &&
-            ((JsonObject) parsedResponse).get(DOES_SHARE_DEPENDENCIES).getAsBoolean()) {
-            String message = "The extension shares its dependencies with the following extensions: " +
-                String.join(", ", ((JsonObject) parsedResponse).get(SHARES_WITH).getAsJsonObject().keySet());
-            logger.warn(message);
-            return true;
+        if (parsedResponse instanceof JsonObject) {
+            if (((JsonObject) parsedResponse).get(DOES_SHARE_DEPENDENCIES) != null &&
+                ((JsonObject) parsedResponse).get(DOES_SHARE_DEPENDENCIES).getAsBoolean()) {
+                Set<String> dependencySharingExtensionKeys =
+                    ((JsonObject) parsedResponse).get(SHARES_WITH).getAsJsonObject().keySet();
+                StringBuilder message = new StringBuilder();
+                message.append(System.lineSeparator());
+                message.append("The extension shares its dependencies with the following extensions: ");
+                message.append(String.join(", ", dependencySharingExtensionKeys));
+                message.append(System.lineSeparator());
+                logger.warn(message.toString());
+                return dependencySharingExtensionKeys;
+            }
+            return Collections.emptySet();
         }
-        return false;
+        // Ideally we won't reach here. This would mean that the parsed response is not a JsonObject.
+        throw new ExtensionsInstallerCliException("Invalid dependency sharing extensions response.");
     }
 
     /**
@@ -367,7 +363,9 @@ public class ResponseHandler {
             }
             message.append(System.lineSeparator());
             logger.info(message.toString());
-            logger.warn("Please restart the server.");
+        } else {
+            // Ideally we won't reach here. This would mean that the parsed response is not a JsonObject.
+            throw new ExtensionsInstallerCliException("Invalid response for extension un-installation.");
         }
     }
 }

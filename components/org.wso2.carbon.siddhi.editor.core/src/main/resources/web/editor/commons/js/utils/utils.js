@@ -210,9 +210,16 @@ define(['require', 'jquery', 'constants'],
             }
 
             var serviceUrl = app.config.services.extensionsInstallation.endpoint;
-            var installUninstallUrl = serviceUrl + "/" + extension.extensionInfo.name + "/" + action.toLowerCase();
+            var installUninstallUrl = serviceUrl + "/" + extension.extensionInfo.name;
+            var requestType;
+            if (action.toLowerCase() === 'install') {
+                requestType = 'POST';
+            } else if (action.toLowerCase() === 'uninstall') {
+                requestType = 'DELETE';
+            }
+
             $.ajax({
-                type: "POST",
+                type: requestType,
                 contentType: "json",
                 url: installUninstallUrl,
                 async: true,

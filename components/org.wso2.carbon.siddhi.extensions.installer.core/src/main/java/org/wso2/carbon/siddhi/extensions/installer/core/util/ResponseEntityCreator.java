@@ -127,7 +127,7 @@ public class ResponseEntityCreator {
 
     /**
      * Creates response after retrieving extension statuses, through:
-     * {@link DependencyRetriever#getAllExtensionStatuses()} or
+     * {@link DependencyRetriever#getAllExtensionStatuses(boolean)} or
      * {@link DependencyRetriever#getExtensionStatusFor(String)}.
      *
      * @param extension Configuration of the extension.

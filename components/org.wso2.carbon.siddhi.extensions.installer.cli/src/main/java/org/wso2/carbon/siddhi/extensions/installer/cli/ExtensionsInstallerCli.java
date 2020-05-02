@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public class ExtensionsInstallerCli {
     private static final String ALL_FLAG = "--all";
     private static final String INSTALL_COMMAND = "install";
     private static final String UNINSTALL_COMMAND = "uninstall";
-    private static final String EXTENSION_INSTALLER_ENDPOINT_URL_FORMAT = "%s:%s/siddhi-extensions";
+    private static final String EXTENSION_INSTALLER_ENDPOINT_URL_FORMAT = "http://%s:%s/siddhi-extensions";
     private static final String CONFIG_FILE_NAME = "config.properties";
     private static final String SERVER_HOST_CONFIG_PROPERTY = "server.host";
     private static final String SERVER_PORT_CONFIG_PROPERTY = "server.port";
@@ -161,12 +162,7 @@ public class ExtensionsInstallerCli {
      */
     private static void executeUnInstallCommand(String[] args) throws ExtensionsInstallerCliException {
         if (args.length == 2) {
-            String extensionName = args[1];
-            if (doesShareDependencies(extensionName)) {
-                confirmAndUnInstall(extensionName);
-            } else {
-                unInstallExtension(extensionName);
-            }
+            confirmAndUnInstall(args[1]);
         } else {
             showCorrectUsages(UNINSTALL_COMMAND, getUnInstallCommandUsage());
         }
@@ -194,34 +190,45 @@ public class ExtensionsInstallerCli {
     }
 
     private static void confirmAndInstallMissingExtensions() throws ExtensionsInstallerCliException {
-        Scanner input = new Scanner(System.in, StandardCharsets.UTF_8.name());
-        logger.warn("Are you sure you want to install missing extensions? [y/n] ");
-        String choice = input.next().trim();
-        if ("y".equalsIgnoreCase(choice) || "yes".equalsIgnoreCase(choice)) {
-            RequestHandler.doInstallMissingExtensions(constructExtensionInstallerBaseUrl());
+        Set<String> missingExtensionNames =
+            RequestHandler.getMissingExtensionNames(constructExtensionInstallerBaseUrl());
+        if (!missingExtensionNames.isEmpty()) {
+            Scanner input = new Scanner(System.in, StandardCharsets.UTF_8.name());
+            logger.info("Are you sure you want to install missing extensions? [y/n] ");
+            String choice = input.next().trim();
+            if ("y".equalsIgnoreCase(choice) || "yes".equalsIgnoreCase(choice)) {
+                RequestHandler.doInstallMissingExtensions(missingExtensionNames,
+                    constructExtensionInstallerBaseUrl());
+                logger.info("Please restart the server.");
+            }
+        } else {
+            logger.info("All the required extensions have been already installed.");
         }
     }
 
     private static void installExtension(String extensionName) throws ExtensionsInstallerCliException {
         RequestHandler.doInstallExtension(extensionName, constructExtensionInstallerBaseUrl());
-    }
-
-    private static boolean doesShareDependencies(String extensionName) throws ExtensionsInstallerCliException {
-        return RequestHandler
-            .isDependencySharingExtensionsAvailable(extensionName, constructExtensionInstallerBaseUrl());
+        logger.info("Please restart the server.");
     }
 
     private static void confirmAndUnInstall(String extensionName) throws ExtensionsInstallerCliException {
-        Scanner input = new Scanner(System.in, StandardCharsets.UTF_8.name());
-        logger.warn("Are you sure you want to un-install? [y/n] ");
-        String choice = input.next().trim();
-        if ("y".equalsIgnoreCase(choice) || "yes".equalsIgnoreCase(choice)) {
+        Set<String> dependencySharingExtensionNames =
+            RequestHandler.getDependencySharingExtensionNames(extensionName, constructExtensionInstallerBaseUrl());
+        if (!dependencySharingExtensionNames.isEmpty()) {
+            Scanner input = new Scanner(System.in, StandardCharsets.UTF_8.name());
+            logger.warn("Are you sure you want to un-install? [y/n] ");
+            String choice = input.next().trim();
+            if ("y".equalsIgnoreCase(choice) || "yes".equalsIgnoreCase(choice)) {
+                unInstallExtension(extensionName);
+            }
+        } else {
             unInstallExtension(extensionName);
         }
     }
 
     private static void unInstallExtension(String extensionName) throws ExtensionsInstallerCliException {
         RequestHandler.doUnInstallExtension(extensionName, constructExtensionInstallerBaseUrl());
+        logger.info("Please restart the server.");
     }
 
     private static String getStatusCommandUsage() {

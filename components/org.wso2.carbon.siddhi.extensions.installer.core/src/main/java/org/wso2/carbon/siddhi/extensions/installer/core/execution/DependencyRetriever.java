@@ -20,6 +20,7 @@ package org.wso2.carbon.siddhi.extensions.installer.core.execution;
 
 import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.ExtensionConfig;
 import org.wso2.carbon.siddhi.extensions.installer.core.exceptions.ExtensionsInstallerException;
+import org.wso2.carbon.siddhi.extensions.installer.core.models.SiddhiAppStore;
 import org.wso2.carbon.siddhi.extensions.installer.core.models.enums.ExtensionInstallationStatus;
 
 import java.util.List;
@@ -30,15 +31,19 @@ import java.util.Map;
  */
 public interface DependencyRetriever {
 
+    void setSiddhiAppStore(SiddhiAppStore siddhiAppStore);
+
     /**
      * Retrieves installation statuses of all the extensions that have been configured in the configuration file.
      * Possible installation statuses are
      * {@link ExtensionInstallationStatus}
      *
+     * @param shouldFilterUsed Whether to filter extensions used in Siddhi apps.
      * @return Map containing extension information and their installation statuses.
      * @throws ExtensionsInstallerException Failed to retrieve installation statuses.
      */
-    Map<String, Map<String, Object>> getAllExtensionStatuses() throws ExtensionsInstallerException;
+    Map<String, Map<String, Object>> getAllExtensionStatuses(boolean shouldFilterUsed)
+        throws ExtensionsInstallerException;
 
     /**
      * Retrieves installation status of the extension which has the given id.
