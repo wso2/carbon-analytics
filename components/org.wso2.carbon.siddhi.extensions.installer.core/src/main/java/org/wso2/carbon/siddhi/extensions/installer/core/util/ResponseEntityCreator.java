@@ -54,6 +54,8 @@ public class ResponseEntityCreator {
     private static final String DEPENDENCY_IS_INSTALLED_KEY = "isInstalled";
     private static final String EXTENSION_KEY = "extension";
     private static final String USAGES_KEY = "usages";
+    private static final String INSTALLATION_INCOMPLETE_EXTENSIONS_KEY = "installationIncompleteExtensions";
+    private static final String MANUALLY_REQUIRED_INSTALLATIONS = "manuallyRequiredInstallations";
 
     private ResponseEntityCreator() {
         // Prevents instantiation.
@@ -125,7 +127,7 @@ public class ResponseEntityCreator {
 
     /**
      * Creates response after retrieving extension statuses, through:
-     * {@link DependencyRetriever#getAllExtensionStatuses()} or
+     * {@link DependencyRetriever#getAllExtensionStatuses(boolean)} or
      * {@link DependencyRetriever#getExtensionStatusFor(String)}.
      *
      * @param extension Configuration of the extension.
@@ -240,47 +242,39 @@ public class ResponseEntityCreator {
     }
 
     /**
-     * Extracts keys of extensions - whose installations were not successful, from the given map of
-     * installation responses.
+     * Creates response after re-organizing the given installation response,
+     * which belongs to the installation of a single Siddhi app's missing extensions.
      *
-     * @param installationResponses A map that contains installation responses of multiple extensions.
-     * @return Keys of extensions - whose installations were not successful.
+     * @param installationResponses Installation response of extensions.
+     * @return Restructured information of a Siddhi app's missing extensions installation.
      */
-    public static Set<String> extractIncompleteInstallations(
+    public static Map<String, Object> createMissingExtensionsInstallationResponse(
         Map<String, Map<String, Object>> installationResponses) {
-        return installationResponses.entrySet().stream().filter(
-            installationResponseEntry -> {
-                Map<String, Object> installationResponse = installationResponseEntry.getValue();
-                if (installationResponse.containsKey(ACTION_STATUS_KEY)) {
-                    return !Objects.equals(
-                        installationResponse.get(ACTION_STATUS_KEY), ExtensionInstallationStatus.INSTALLED);
-                }
-                /*
-                Ideally we will not reach here.
-                This would mean that, an extension's installation haven't returned a status.
-                Therefore, the extension will be considered as not installed.
-                 */
-                return true;
-            }).map(Map.Entry::getKey).collect(Collectors.toSet());
-    }
-
-    /**
-     * Extracts manually installable dependencies (if any) from each entry of the given map of installation responses.
-     *
-     * @param installationResponses A map that contains installation responses of multiple extensions.
-     * @return A map that contains manually installable dependencies of extensions.
-     */
-    public static Map<String, List<DependencyConfig>> extractManuallyInstallableDependencies(
-        Map<String, Map<String, Object>> installationResponses) {
-        Map<String, List<DependencyConfig>> manuallyInstallableDependencies = new HashMap<>();
-        for (Map.Entry<String, Map<String, Object>> installationResponseEntry : installationResponses.entrySet()) {
-            if (installationResponseEntry.getValue().containsKey(MANUALLY_INSTALLABLE_DEPENDENCIES_KEY)) {
-                manuallyInstallableDependencies.put(installationResponseEntry.getKey(),
-                    (List<DependencyConfig>) (installationResponseEntry.getValue()
-                        .get(MANUALLY_INSTALLABLE_DEPENDENCIES_KEY)));
-            }
+        Map<String, Object> response = new HashMap<>();
+        /*
+        Filter extensions of which, installations were incomplete.
+        This can be either due to the presence of extensions with manually installable dependencies,
+        or failures in installations.
+         */
+        Set<String> installationIncompleteExtensions =
+            installationResponses.entrySet().stream().filter(installationResponse ->
+                installationResponse.getValue().containsKey(ACTION_STATUS_KEY) && !Objects.equals(
+                    installationResponse.getValue().get(ACTION_STATUS_KEY), ExtensionInstallationStatus.INSTALLED)
+            ).map(Map.Entry::getKey).collect(Collectors.toSet());
+        if (!installationIncompleteExtensions.isEmpty()) {
+            response.put(INSTALLATION_INCOMPLETE_EXTENSIONS_KEY, installationIncompleteExtensions);
         }
-        return manuallyInstallableDependencies;
+
+        // Filter extensions that contain manually installable dependencies.
+        Map<String, List<DependencyConfig>> manuallyRequiredInstallations =
+            installationResponses.entrySet().stream().filter(installationResponse ->
+                installationResponse.getValue().containsKey(MANUALLY_INSTALLABLE_DEPENDENCIES_KEY)
+            ).collect(Collectors.toMap(Map.Entry::getKey,
+                x -> (List<DependencyConfig>) (x.getValue().get(MANUALLY_INSTALLABLE_DEPENDENCIES_KEY))));
+        if (!manuallyRequiredInstallations.isEmpty()) {
+            response.put(MANUALLY_REQUIRED_INSTALLATIONS, manuallyRequiredInstallations);
+        }
+        return response;
     }
 
 }

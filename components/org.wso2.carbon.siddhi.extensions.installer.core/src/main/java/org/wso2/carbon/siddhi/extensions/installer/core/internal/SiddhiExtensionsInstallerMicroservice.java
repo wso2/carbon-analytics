@@ -34,19 +34,20 @@ import org.wso2.carbon.siddhi.extensions.installer.core.execution.DependencyRetr
 import org.wso2.carbon.siddhi.extensions.installer.core.execution.DependencyRetrieverImpl;
 import org.wso2.carbon.siddhi.extensions.installer.core.execution.SiddhiAppExtensionUsageDetector;
 import org.wso2.carbon.siddhi.extensions.installer.core.execution.SiddhiAppExtensionUsageDetectorImpl;
+import org.wso2.carbon.siddhi.extensions.installer.core.models.SiddhiAppStore;
 import org.wso2.carbon.siddhi.extensions.installer.core.util.MissingExtensionsInstaller;
+import org.wso2.carbon.streaming.integrator.common.SiddhiAppDeploymentListener;
 import org.wso2.msf4j.Microservice;
 
-import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,33 +61,33 @@ import static org.wso2.carbon.siddhi.extensions.installer.core.util.ResponseEnti
  */
 @Component(
     name = "org.wso2.carbon.siddhi.extensions.installer.core.internal.SiddhiExtensionsInstallerMicroservice",
-    service = {SiddhiExtensionsInstallerMicroservice.class, Microservice.class},
+    service = {Microservice.class, SiddhiAppDeploymentListener.class},
     immediate = true
 )
 @Path("/siddhi-extensions")
-public class SiddhiExtensionsInstallerMicroservice implements Microservice {
+public class SiddhiExtensionsInstallerMicroservice implements Microservice, SiddhiAppDeploymentListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SiddhiExtensionsInstallerMicroservice.class);
+    private static final Logger logger = LoggerFactory.getLogger(SiddhiExtensionsInstallerMicroservice.class);
 
     private Map<String, ExtensionConfig> extensionConfigs;
-
-    public SiddhiExtensionsInstallerMicroservice() {
-        // Prevents instantiation.
-    }
+    private SiddhiAppStore siddhiAppStore;
 
     @GET
     @Path("/status")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllExtensionStatuses() {
+    public Response getAllExtensionStatuses(@QueryParam("isUsed") boolean shouldFilterUsed) {
         try {
             DependencyRetriever dependencyRetriever = new DependencyRetrieverImpl(extensionConfigs);
+            if (shouldFilterUsed) {
+                dependencyRetriever.setSiddhiAppStore(siddhiAppStore);
+            }
             return Response
                 .status(Response.Status.OK)
-                .entity(dependencyRetriever.getAllExtensionStatuses())
+                .entity(dependencyRetriever.getAllExtensionStatuses(shouldFilterUsed))
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         } catch (ExtensionsInstallerException e) {
-            LOGGER.error("Failed to get installation statuses of all the extensions.", e);
+            logger.error("Failed to get installation statuses of all the extensions.", e);
             return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(e.getMessage())
@@ -95,7 +96,7 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
     }
 
     @GET
-    @Path("/status/{extensionId}")
+    @Path("/{extensionId}/status")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getExtensionStatus(@PathParam("extensionId") String extensionId) {
         try {
@@ -106,7 +107,7 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         } catch (ExtensionsInstallerException e) {
-            LOGGER.error(String.format("Failed to get installation status of extension: %s.", extensionId), e);
+            logger.error(String.format("Failed to get installation status of extension: %s.", extensionId), e);
             return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(e.getMessage())
@@ -115,7 +116,7 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
     }
 
     @GET
-    @Path("/status/{extensionId}/dependencies")
+    @Path("/{extensionId}/dependencies/status")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDependencyStatuses(@PathParam("extensionId") String extensionId) {
         try {
@@ -126,7 +127,7 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         } catch (ExtensionsInstallerException e) {
-            LOGGER.error(String.format(
+            logger.error(String.format(
                 "Failed to get installation statuses of dependencies, of extension: %s.", extensionId), e);
             return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -136,7 +137,7 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
     }
 
     @POST
-    @Path("/{extensionId}/install")
+    @Path("/{extensionId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response installDependencies(@PathParam("extensionId") String extensionId) {
         try {
@@ -150,7 +151,7 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         } catch (ExtensionsInstallerException e) {
-            LOGGER.error(String.format("Failed to install dependencies for extension: %s.", extensionId), e);
+            logger.error(String.format("Failed to install dependencies for extension: %s.", extensionId), e);
             return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(e.getMessage())
@@ -159,24 +160,19 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
     }
 
     @POST
-    @Path("/install")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response installDependencies(Set<String> extensionIds) {
+    public Response installMissingExtensions() {
         try {
+            SiddhiAppExtensionUsageDetector usageDetector = new SiddhiAppExtensionUsageDetectorImpl(extensionConfigs);
             DependencyInstaller dependencyInstaller = new DependencyInstallerImpl(extensionConfigs);
-            Map<String, Map<String, Object>> responseEntities =
-                dependencyInstaller.installDependenciesFor(extensionIds);
-            Response.Status responseStatus =
-                responseEntities.entrySet().stream().anyMatch(entity -> isActionFailure(entity.getValue())) ?
-                    Response.Status.INTERNAL_SERVER_ERROR : Response.Status.OK;
             return Response
-                .status(responseStatus)
-                .entity(responseEntities)
-                .type(MediaType.APPLICATION_JSON)
+                .status(Response.Status.OK)
+                .entity(MissingExtensionsInstaller
+                    .installMissingExtensions(siddhiAppStore, usageDetector, dependencyInstaller))
                 .build();
         } catch (ExtensionsInstallerException e) {
-            LOGGER.error("There were failures when installing dependencies for the given extensions.", e);
+            logger.error("Failed to auto install missing extensions.", e);
             return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(e.getMessage())
@@ -196,7 +192,7 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         } catch (ExtensionsInstallerException e) {
-            LOGGER.error(
+            logger.error(
                 String.format("Failed to get dependency sharing extensions for extension: %s.", extensionId), e);
             return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -205,8 +201,8 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
         }
     }
 
-    @POST
-    @Path("/{extensionId}/uninstall")
+    @DELETE
+    @Path("/{extensionId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response uninstallDependencies(@PathParam("extensionId") String extensionId) {
         try {
@@ -220,7 +216,7 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         } catch (ExtensionsInstallerException e) {
-            LOGGER.error(String.format("Failed to un-install dependencies for extension: %s.", extensionId), e);
+            logger.error(String.format("Failed to un-install dependencies for extension: %s.", extensionId), e);
             return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(e.getMessage())
@@ -241,47 +237,6 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
                 NOT_UNINSTALLED == responseEntity.get(ACTION_STATUS_KEY));
     }
 
-    @POST
-    @Path("/siddhi-app-usages")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsedExtensionStatuses(String siddhiAppStringBase64) {
-        try {
-            String siddhiAppString =
-                new String(Base64.getDecoder().decode(siddhiAppStringBase64), StandardCharsets.UTF_8);
-            SiddhiAppExtensionUsageDetector siddhiAppExtensionUsageDetector =
-                new SiddhiAppExtensionUsageDetectorImpl(extensionConfigs);
-            return Response
-                .status(Response.Status.OK)
-                .entity(siddhiAppExtensionUsageDetector.getUsedExtensionStatuses(siddhiAppString))
-                .build();
-        } catch (ExtensionsInstallerException e) {
-            LOGGER.error("Failed to get installation statuses of extensions used in the Siddhi app.", e);
-            return Response
-                .status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(e.getMessage())
-                .build();
-        }
-    }
-
-    /**
-     * Installs extensions that have been used in the given Siddhi app, but not have been installed.
-     *
-     * @param siddhiAppBody Body of a Siddhi app.
-     * @param siddhiAppName Name of the Siddhi app.
-     */
-    public void installMissingExtensions(String siddhiAppBody, String siddhiAppName) {
-        try {
-            SiddhiAppExtensionUsageDetector usageDetector = new SiddhiAppExtensionUsageDetectorImpl(extensionConfigs);
-            DependencyInstaller dependencyInstaller = new DependencyInstallerImpl(extensionConfigs);
-            MissingExtensionsInstaller.installMissingExtensions(
-                siddhiAppBody, siddhiAppName, usageDetector, dependencyInstaller);
-        } catch (ExtensionsInstallerException e) {
-            LOGGER.error(String.format(
-                "There were failures when installing missing extensions for Siddhi app: %s.", siddhiAppName), e);
-        }
-    }
-
     /**
      * This is the activation method of SiddhiExtensionsInstallerMicroservice.
      * This will be called when its references are satisfied.
@@ -292,6 +247,7 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
         extensionConfigs = ConfigMapper.loadAllExtensionConfigs(ExtensionsInstallerConstants.CONFIG_FILE_LOCATION);
+        siddhiAppStore = new SiddhiAppStore();
     }
 
     /**
@@ -305,4 +261,30 @@ public class SiddhiExtensionsInstallerMicroservice implements Microservice {
 
     }
 
+    @Override
+    public void beforeDeploy(String siddhiAppName, String siddhiAppBody) {
+        siddhiAppStore.addOrUpdateSiddhiApp(siddhiAppName, siddhiAppBody);
+        try {
+            SiddhiAppExtensionUsageDetector usageDetector = new SiddhiAppExtensionUsageDetectorImpl(extensionConfigs);
+            Set<String> notInstalledExtensionKeys =
+                MissingExtensionsInstaller.getNotInstalledExtensionKeys(usageDetector, siddhiAppBody);
+            if (!notInstalledExtensionKeys.isEmpty()) {
+                String message = String.format("The following extensions are required for Siddhi app '%s': %s. ",
+                    siddhiAppName, notInstalledExtensionKeys) + "Please use the Extension Installer to install them.";
+                logger.warn(message);
+            }
+        } catch (ExtensionsInstallerException e) {
+            logger.error("Failed to detect not installed extensions from Siddhi app.", e);
+        }
+    }
+
+    @Override
+    public void onDeploy(String siddhiAppName, String siddhiAppBody) {
+        // Absorb, since we have handled the appropriate beforeDeploy scenario.
+    }
+
+    @Override
+    public void onDelete(String siddhiAppName) {
+        siddhiAppStore.removeSiddhiApp(siddhiAppName);
+    }
 }

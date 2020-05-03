@@ -44,7 +44,6 @@ import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.si.metrics.core.MetricsFactory;
 import org.wso2.carbon.si.metrics.core.internal.MetricsDataHolder;
-import org.wso2.carbon.siddhi.extensions.installer.core.internal.SiddhiExtensionsInstallerMicroservice;
 import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 import org.wso2.carbon.streaming.integrator.common.HAStateChangeListener;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
@@ -81,11 +80,6 @@ import static org.wso2.carbon.streaming.integrator.core.impl.utils.Constants.PER
 public class ServiceComponent {
 
     private static final Logger log = LoggerFactory.getLogger(ServiceComponent.class);
-
-    /**
-     * This flag denotes whether extensions used in Siddhi apps should be automatically installed or not.
-     */
-    private static final String AUTO_INSTALL_EXTENSIONS_FLAG = "autoInstallExtensions";
 
     private ServiceRegistration streamServiceRegistration;
     private ServiceRegistration siddhiAppRuntimeServiceRegistration;
@@ -450,30 +444,6 @@ public class ServiceComponent {
 
     protected void unregisterHAStateChangeListener(HAStateChangeListener haStateChangeListener) {
         StreamProcessorDataHolder.removeHAStateChangeListener(haStateChangeListener);
-    }
-
-    /**
-     * The bind method, which gets called for Siddhi Extensions Installer microservice registration
-     * that satisfies the policy.
-     *
-     * @param extensionsInstallerMicroservice Siddhi Extensions Installer microservice
-     */
-    @Reference(
-        name = "org.wso2.carbon.siddhi.extensions.installer.core.internal.SiddhiExtensionsInstallerMicroservice",
-        service = SiddhiExtensionsInstallerMicroservice.class,
-        cardinality = ReferenceCardinality.MANDATORY,
-        policy = ReferencePolicy.DYNAMIC,
-        unbind = "unsetExtensionInstaller"
-    )
-    protected void setExtensionInstaller(SiddhiExtensionsInstallerMicroservice extensionsInstallerMicroservice) {
-        if ("true".equalsIgnoreCase(System.getProperty(AUTO_INSTALL_EXTENSIONS_FLAG))) {
-            log.warn("Auto installation of Siddhi extensions is enabled.");
-            StreamProcessorDataHolder.setExtensionsInstaller(extensionsInstallerMicroservice);
-        }
-    }
-
-    protected void unsetExtensionInstaller(SiddhiExtensionsInstallerMicroservice extensionsInstallerMicroservice) {
-        StreamProcessorDataHolder.setExtensionsInstaller(null);
     }
 
 }

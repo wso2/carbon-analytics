@@ -35,6 +35,7 @@
         <module>components/org.wso2.carbon.event.simulator.core</module>
         <module>components/org.wso2.carbon.editor.log.appender</module>
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
+        <module>components/org.wso2.carbon.siddhi.extensions.installer.cli</module>
         <module>components/org.wso2.carbon.siddhi.extensions.installer.core</module>
         <module>components/org.wso2.carbon.business.rules.templates.editor.core</module>
         <module>components/org.wso2.carbon.business.rules.core</module>

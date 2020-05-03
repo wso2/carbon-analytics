@@ -22,6 +22,7 @@ import org.wso2.carbon.siddhi.extensions.installer.core.exceptions.ExtensionsIns
 import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.DependencyConfig;
 import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.ExtensionConfig;
 import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.UsageConfig;
+import org.wso2.carbon.siddhi.extensions.installer.core.models.SiddhiAppStore;
 import org.wso2.carbon.siddhi.extensions.installer.core.models.enums.ExtensionInstallationStatus;
 import org.wso2.carbon.siddhi.extensions.installer.core.util.ResponseEntityCreator;
 import org.wso2.carbon.siddhi.extensions.installer.core.util.ExtensionsInstallerUtils;
@@ -30,9 +31,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.PatternSyntaxException;
 
@@ -42,16 +45,29 @@ import java.util.regex.PatternSyntaxException;
 public class DependencyRetrieverImpl implements DependencyRetriever {
 
     private final Map<String, ExtensionConfig> extensionConfigs;
+    private SiddhiAppStore siddhiAppStore;
 
     public DependencyRetrieverImpl(Map<String, ExtensionConfig> extensionConfigs) {
         this.extensionConfigs = extensionConfigs;
     }
 
+    public void setSiddhiAppStore(SiddhiAppStore siddhiAppStore) {
+        this.siddhiAppStore = siddhiAppStore;
+    }
+
     @Override
-    public Map<String, Map<String, Object>> getAllExtensionStatuses() throws ExtensionsInstallerException {
+    public Map<String, Map<String, Object>> getAllExtensionStatuses(boolean shouldFilterUsed)
+        throws ExtensionsInstallerException {
+        Set<String> usedExtensionKeys = new HashSet<>();
+        if (shouldFilterUsed && siddhiAppStore != null) {
+            SiddhiAppExtensionUsageDetector usageDetector = new SiddhiAppExtensionUsageDetectorImpl(extensionConfigs);
+            usedExtensionKeys = usageDetector.getUsedExtensionKeys(siddhiAppStore);
+        }
         Map<String, Map<String, Object>> extensionStatuses = new TreeMap<>();
         for (Map.Entry<String, ExtensionConfig> extension : extensionConfigs.entrySet()) {
-            extensionStatuses.put(extension.getKey(), getExtensionStatus(extension.getValue()));
+            if (!shouldFilterUsed || usedExtensionKeys.contains(extension.getKey())) {
+                extensionStatuses.put(extension.getKey(), getExtensionStatus(extension.getValue()));
+            }
         }
         return extensionStatuses;
     }

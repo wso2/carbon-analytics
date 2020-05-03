@@ -31,8 +31,8 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
-import org.wso2.carbon.siddhi.extensions.installer.core.internal.SiddhiExtensionsInstallerMicroservice;
 import org.wso2.carbon.streaming.integrator.common.HAStateChangeListener;
+import org.wso2.carbon.streaming.integrator.common.SiddhiAppDeploymentListener;
 import org.wso2.carbon.streaming.integrator.core.NodeInfo;
 import org.wso2.carbon.streaming.integrator.core.ha.HAManager;
 import org.wso2.carbon.streaming.integrator.core.internal.beans.DeploymentConfig;
@@ -58,7 +58,6 @@ public class StreamProcessorDataHolder {
     private static NodeInfo nodeInfo;
     private static RecordTableHandlerManager recordTableHandlerManager;
     private static PermissionProvider permissionProvider;
-    private static SiddhiExtensionsInstallerMicroservice extensionsInstaller;
     private CarbonRuntime carbonRuntime;
     private BundleContext bundleContext;
     private ConfigProvider configProvider;
@@ -74,6 +73,11 @@ public class StreamProcessorDataHolder {
      * List used to hold all the registered subscribers.
      */
     private static List<ServerEventListener> serverListeners = new ArrayList<>();
+
+    /**
+     * List used to hold all the registered Siddhi app deployment listeners.
+     */
+    private static List<SiddhiAppDeploymentListener> siddhiAppDeploymentListeners = new ArrayList<>();
 
     private StreamProcessorDataHolder() {
 
@@ -192,6 +196,18 @@ public class StreamProcessorDataHolder {
         haStateChangeListenerList.remove(haStateChangeListener);
     }
 
+    public static void addSiddhiAppDeploymentListener(SiddhiAppDeploymentListener siddhiAppDeploymentListener) {
+        siddhiAppDeploymentListeners.add(siddhiAppDeploymentListener);
+    }
+
+    public static List<SiddhiAppDeploymentListener> getSiddhiAppDeploymentListeners() {
+        return siddhiAppDeploymentListeners;
+    }
+
+    public static void removeSiddhiAppDeploymentListener(SiddhiAppDeploymentListener siddhiAppDeploymentListener) {
+        siddhiAppDeploymentListeners.remove(siddhiAppDeploymentListener);
+    }
+
     public static List<HAStateChangeListener> getHaStateChangeListenerList() {
         return haStateChangeListenerList;
     }
@@ -264,13 +280,5 @@ public class StreamProcessorDataHolder {
 
     public static void setIsStatisticsEnabled(boolean isStatisticsEnabled) {
         StreamProcessorDataHolder.isStatisticsEnabled = isStatisticsEnabled;
-    }
-
-    public static SiddhiExtensionsInstallerMicroservice getExtensionsInstaller() {
-        return extensionsInstaller;
-    }
-
-    public static void setExtensionsInstaller(SiddhiExtensionsInstallerMicroservice extensionsInstaller) {
-        StreamProcessorDataHolder.extensionsInstaller = extensionsInstaller;
     }
 }

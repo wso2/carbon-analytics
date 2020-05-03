@@ -19,8 +19,10 @@
 package org.wso2.carbon.siddhi.extensions.installer.core.execution;
 
 import org.wso2.carbon.siddhi.extensions.installer.core.exceptions.ExtensionsInstallerException;
+import org.wso2.carbon.siddhi.extensions.installer.core.models.SiddhiAppStore;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface which describes methods, that are used to detect extension usages in a Siddhi app.
@@ -37,5 +39,13 @@ public interface SiddhiAppExtensionUsageDetector {
      */
     Map<String, Map<String, Object>> getUsedExtensionStatuses(String siddhiAppString)
         throws ExtensionsInstallerException;
+
+    /**
+     * Returns keys of extensions, that are used in Siddhi apps present in the given Siddhi app store.
+     *
+     * @param siddhiAppStore Siddhi app store which contains Siddhi apps.
+     * @return Keys of used extensions.
+     */
+    Set<String> getUsedExtensionKeys(SiddhiAppStore siddhiAppStore);
 
 }

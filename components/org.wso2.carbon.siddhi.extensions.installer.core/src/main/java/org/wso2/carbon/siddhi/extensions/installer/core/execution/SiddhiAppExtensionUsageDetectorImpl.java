@@ -22,14 +22,17 @@ import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.Ex
 import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.ExtensionIdentifierConfig;
 import org.wso2.carbon.siddhi.extensions.installer.core.exceptions.ExtensionsInstallerException;
 import org.wso2.carbon.siddhi.extensions.installer.core.models.SiddhiAppExtensionUsage;
+import org.wso2.carbon.siddhi.extensions.installer.core.models.SiddhiAppStore;
 import org.wso2.carbon.siddhi.extensions.installer.core.util.ResponseEntityCreator;
 import org.wso2.carbon.siddhi.extensions.installer.core.util.SiddhiAppUsageExtractor;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Detects extensions that have been used in Siddhi apps.
@@ -66,6 +69,21 @@ public class SiddhiAppExtensionUsageDetectorImpl implements SiddhiAppExtensionUs
             }
         }
         return usedExtensionStatuses;
+    }
+
+    @Override
+    public Set<String> getUsedExtensionKeys(SiddhiAppStore siddhiAppStore) {
+        Set<String> usedExtensionKeys = new HashSet<>();
+        for (Map.Entry<String, String> siddhiAppEntry : siddhiAppStore.getSiddhiApps().entrySet()) {
+            List<SiddhiAppExtensionUsage> usages = SiddhiAppUsageExtractor.extractUsages(siddhiAppEntry.getValue());
+            for (SiddhiAppExtensionUsage usage : usages) {
+                ExtensionConfig usedExtension = detectUsedExtension(usage);
+                if (usedExtension != null && usedExtension.getExtensionInfo() != null) {
+                    usedExtensionKeys.add(usedExtension.getExtensionInfo().get(NAME_KEY));
+                }
+            }
+        }
+        return usedExtensionKeys;
     }
 
     /**
