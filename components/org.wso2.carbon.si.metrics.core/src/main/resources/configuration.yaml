@@ -260,3 +260,74 @@ metricsLabelMapping:
       _source: "${2}"
       destination: "${3}"
 
+  #Siddhi-io-cdc Metrics
+
+  siddhi.io.cdc.apps:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc"
+    name: "siddhi.cdc.apps"
+    labels:
+      app_name: "${0}"
+
+  siddhi.io.cdc.source.listening.metrics.events.per.table:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Listening.events.per.table.*.(.*)"
+    name: "siddhi.cdc.source.listening.mode.events.per.table"
+    labels:
+      app_name: "${0}"
+      tablename: "${1}"
+      db_url: "${2}"
+
+  siddhi.io.cdc.source.listening.event.count:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Listening.event.count.*.*.*.*.*.(.*)"
+    name: "siddhi.cdc.source.listening.mode.event.count"
+    labels:
+      app_name: "${0}"
+      db_type: "${1}"
+      host: "${2}"
+      operation_type: "${3}"
+      database: "${4}"
+      tablename: "${5}"
+      db_url: "${6}"
+
+  siddhi.io.cdc.source.listening.metrics.last.update:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Listening.*.*.(.*)"
+    name: "siddhi.cdc.source.listening.mode.${1}"
+    labels:
+      app_name: "${0}"
+      operation_type: "${2}"
+      db_url: "${3}"
+
+  siddhi.io.cdc.source.listening.metrics:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Listening.*.(.*)"
+    name: "siddhi.cdc.source.listening.mode.${1}"
+    labels:
+      app_name: "${0}"
+      db_url: "${2}"
+
+  siddhi.io.cdc.source.polling.event.count:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Polling.event.count.*.*.*.*.(.*)"
+    name: "siddhi.cdc.source.polling.mode.event.count"
+    labels:
+      app_name: "${0}"
+      db_type: "${1}"
+      host: "${2}"
+      database: "${3}"
+      tablename: "${4}"
+      db_url: "${5}"
+
+  siddhi.io.cdc.source.polling.details.metrics.:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Polling.Details.*.*.*.(.*)"
+    name: "siddhi.cdc.source.polling.mode.polling.details"
+    labels:
+      app_name: "${0}"
+      _started_time: "${1}"
+      duration: "${2}"
+      status: "${3}"
+      db_url: "${4}"
+
+  siddhi.io.cdc.source.polling.metrics:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Polling.*.(.*)"
+    name: "siddhi.cdc.source.polling.mode.${1}"
+    labels:
+      app_name: "${0}"
+      db_url: "${2}"
+
