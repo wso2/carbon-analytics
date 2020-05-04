@@ -46,7 +46,6 @@ public class DockerBuilder extends Thread {
     private static final String STEP_PUSHING = "Pushing";
     private static final String STEP_COMPLETED = "Completed";
     private static final String STEP_ERROR = "Error";
-    private static final String STEP_ERR = "test";
     private DockerClient dockerClient;
     private DockerBuilderStatus dockerBuilderStatus;
     private String imageId;
