@@ -938,6 +938,11 @@
                 <version>${carbon.analytics.version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.siddhi.extensions.installer.cli</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
 
             <!-- Business Rules Templates Editor related -->
             <dependency>
