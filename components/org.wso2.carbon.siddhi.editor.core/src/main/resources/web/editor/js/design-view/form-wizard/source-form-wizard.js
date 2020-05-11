@@ -15,8 +15,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edge', 'designViewUtils','dropElements' ,'smart_wizard','stream', 'formBuilder','formUtils', 'stream','sourceOrSinkAnnotation', 'mapAnnotation' ,'attribute','jsonValidator','constants', 'payloadOrAttribute'],
-    function (require, _ , $, log, AppData, ConfigurationData, Edge, DesignViewUtils,DropElements, smartWizard, Stream , FormBuilder, FormUtils, Stream , SourceOrSinkAnnotation, MapAnnotation, Attribute, JSONValidator, Constants, PayloadOrAttribute) {
+define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edge', 'designViewUtils','dropElements' ,
+    'smart_wizard','stream', 'formBuilder','formUtils', 'stream','sourceOrSinkAnnotation', 'mapAnnotation',
+    'attribute','jsonValidator','constants', 'payloadOrAttribute'],
+    function (require, _ , $, log, AppData, ConfigurationData, Edge, DesignViewUtils,DropElements,
+        smartWizard, Stream , FormBuilder, FormUtils, Stream , SourceOrSinkAnnotation, MapAnnotation,
+        Attribute, JSONValidator, Constants, PayloadOrAttribute) {
 
         var self;
 
@@ -29,70 +33,24 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
             this.application = option.application;
             this.jsPlumbInstance = option.jsPlumbInstance;
             this.designGrid = option.designGrid;
-            this.formUtils = option.formUtils;
             this.formUtils = new FormUtils(this.application, this.configurationData, this.jsPlumbInstance);
             this._uniqueStreamId = option.uniqueStreamId;
-            this._uniqueId = option.uniqueId;
+            this._uniqueSourceId = option.uniqueSourceId;
             this._isEditflow = option.isEditflow;
-            this._isDeleteflow = option.isDeleteflow;
-            this._StreamId = option.StreamId;
-            this._settingIcon = "" + this._uniqueId + "-dropSourceSettingsId";
-
-            var formOptions = {};
-            _.set(formOptions, 'configurationData', self.configurationData);
-            _.set(formOptions, 'application', self.application);
-            _.set(formOptions, 'formUtils', self.formUtils);
-            _.set(formOptions, 'dropElementInstance', this);
-            _.set(formOptions, 'jsPlumbInstance', self.jsPlumbInstance);
-            _.set(formOptions, 'designGrid', self.designGrid);
-            this.formBuilder = new FormBuilder(formOptions);
-
-            this._btnSubmitForm =  $('' + '<form><button type="button" class="btn btn-primary hidden" id="submit-btn">Submit</button></form>' );
-
-            if(this._isEditflow === undefined){
-                if(this._isDeleteflow === undefined){
-                    this._sourceOptions = {};
-                    _.set(this._sourceOptions, 'id', this._uniqueId);
-                    _.set(this._sourceOptions, 'previousCommentSegment',  self.previousCommentSegment);
-                    _.set(this._sourceOptions, 'connectedElementName',  self.connectedElementName);
-                    _.set(this._sourceOptions, 'connectedRightElementName',  self.connectedRightElementName);
-                    _.set(this._sourceOptions, 'annotationType',  'SOURCE');
-                    _.set(this._sourceOptions, 'type',  self.type);
-                    _.set(this._sourceOptions, 'options',  self.options);
-                    _.set(this._sourceOptions, 'map',  self.map);
-                    var source = new SourceOrSinkAnnotation(this._sourceOptions);
-                }
-                this._streamObject = {};
-                _.set(this._streamObject, 'id', this._uniqueStreamId);
-                _.set(this._streamObject, 'previousCommentSegment', self.previousCommentSegment);
-                _.set(this._streamObject, 'name', self.name);
-                _.set(this._streamObject, 'connectedSourceID', self.connectedSourceID);
-                _.set(this._streamObject, 'attributeList', self.attributeList);
-                _.set(this._streamObject, 'annotationList', self.annotationList);
-                _.set(this._streamObject, 'annotationListObjects', self.annotationListObjects);
-                var stream = new Stream(this._streamObject);
-            }else if(this._isDeleteflow !== undefined){
-                  this._streamObject = {};
-                  _.set(this._streamObject, 'id', this._uniqueStreamId);
-                  _.set(this._streamObject, 'previousCommentSegment', self.previousCommentSegment);
-                  _.set(this._streamObject, 'name', self.name);
-                  _.set(this._streamObject, 'attributeList', self.attributeList);
-                  _.set(this._streamObject, 'annotationList', self.annotationList);
-                  _.set(this._streamObject, 'annotationListObjects', self.annotationListObjects);
-                  var stream = new Stream(this._streamObject);
-            }else if(this._isEditflow !== undefined){
-                if(this._openFormModal.find('#exist-stream-checkbox').is(':checked') === false){
-
-                    this._streamOption = {};
-                    _.set(this._streamOption, 'id',this._StreamId);
-                    _.set(this._streamOption, 'previousCommentSegment', self.previousCommentSegment);
-                    _.set(this._streamOption, 'name', self.name);
-                    _.set(this._streamOption, 'attributeList', self.attributeList);
-                    _.set(this._streamOption, 'annotationList', self.annotationList);
-                    _.set(this._streamOption, 'annotationListObjects', self.annotationListObjects);
-                    var stream = new Stream(this._streamOption);
-                }
-            }
+            this._isStreamDeleteflow = option.isStreamDeleteflow;
+            this._sourceOptions = {};
+            this._streamObject = {};
+            this._formOptions = {
+                'configurationData':self.configurationData,
+                'application':self.application,
+                'formUtils':self.formUtils,
+                'dropElementInstance':this,
+                'jsPlumbInstance':self.jsPlumbInstance,
+                'designGrid':self.designGrid
+            };
+            this.formBuilder = new FormBuilder(this._formOptions);
+            this._btnSubmitForm = $('<form><button type="button" class="btn btn-primary hidden" id="submit-btn">Submit'+
+                                        '</button></form>' );
         };
 
         SourceFormWizard.prototype.constructor = SourceFormWizard;
@@ -100,132 +58,144 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
         SourceFormWizard.prototype.render = function () {
             var self = this;
             var uniqueStreamId = this._uniqueStreamId;
-            var StreamId = this._StreamId;
-            var uniqueId = this._uniqueId;
+            var uniqueSourceId = this._uniqueSourceId;
             var streamObject = this._streamObject;
-            var streamOption = this._streamOption;
             var sourceObject = this._sourceOptions;
             var isEditflow = this._isEditflow;
-            var isDeleteflow = this._isDeleteflow;
-            var form = self._openFormModal.find('#source-form');
-            var settingIcon = this._settingIcon;
-
+            var isStreamDeleteflow = this._isStreamDeleteflow;
+            var form = self._openFormModal.find('#form-modal');
             // Toolbar extra buttons
             var btnSubmitForm = this._btnSubmitForm;
 
-            var sourceObj = sourceObject;
+            var FormWizardforSourceAndStream = $('<ul id="form-step" class="form_wizard_item">'+
+                '<li><a href="#step1" class="link-disabled"><br><small> Create/Configure the Stream</small></a></li>'+
+                '<li><a href="#step2" class="link-disabled"><br><small> Configure the Source</small></a></li>'+
+                '<li><a href="#step3" class="link-disabled"><br><small> Configure the Map Property</small></a></li>'+
+                '</ul>'+
+                '<div id="form-container" class="sw-container tab-content">'+
+                '<div id="step1">'+
+                '<div id = "stream-config"></div></div>'+
+                '<div id="step2">'+
+                '<div id = "source-config">'+
+                '<div class="form-group">'+
+                '<div class="form-wizard-form-scrollable-block-list">'+
+                '<div id="source-view" style="display: block">'+
+                '<div class = "clearfix">'+
+                '<div class="form-wrapper">'+
+                '<div id = "sourceNano" class = "nano">'+
+                '<div class = "nano-content">'+
+                '<div id="design-view-source-form-wizard-contentId" class="design-view-form-content">'+
+                '</div></div></div></div></div></div></div></div></div></div>'+
+                '<div id = "step3">'+
+                '<div id = "map-config">'+
+                '<div class="form-group">'+
+                '<div class="form-wizard-form-scrollable-block-list">'+
+                '<div style="display: block">'+
+                '<div class = "clearfix">'+
+                '<div class="form-wrapper">'+
+                '<div id = "mapNano" class = "nano">'+
+                '<div class = "nano-content">'+
+                '<div id="design-view-source-map-propertyID" class="design-view-form-content">'+
+                '</div></div></div></div></div></div></div></div></div></div></div>');
+
+            form.html(FormWizardforSourceAndStream);
 
             btnSubmitForm.find('#submit-btn').on('click', function () {
-                if(isEditflow === undefined && isDeleteflow === undefined){
-                    var errorMap = self.validateSourceMap();
-                    if(errorMap === undefined || errorMap === true){
-                        self.designGrid.handleSourceForWizard(100, 50, false, "Source",uniqueId);
-                        self.savedSourceForm();
-                        var source = new SourceOrSinkAnnotation(sourceObj);
+                if(isEditflow === undefined && isStreamDeleteflow === undefined){
+                    var isError = self.validateMappingProperty();
+                    if(isError !== true) {
+                        var source = new SourceOrSinkAnnotation(sourceObject);
+                        self.designGrid.handleSourceAnnotation(100, 50, false, sourceObject.type,uniqueSourceId,source);
                         self.configurationData.getSiddhiAppConfig().addSource(source);
+                        self.setTheValueToSource();
 
                         var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
                         if (self._openFormModal.find('#exist-stream-checkbox').is(':checked')){
                             if(self._openFormModal.find('#exist-stream-list :selected')) {
                                 var j = self._openFormModal.find('#exist-stream-list :selected').val();
                                 var ExistStreamId = streamList[j].getId();
-                                addEdges(ExistStreamId, uniqueId);
+                                addEdges(ExistStreamId, uniqueSourceId);
                             }
-                        }else{
+                        } else {
                             var scratchStreamName = streamObject.name;
-                            var streamToolTip;
-                            self.designGrid.handleStreamForWizard(100, 200, false,uniqueStreamId,scratchStreamName,streamToolTip,streamObject);
-                            self.SaveStreamForm();
-
                             var stream = new Stream(streamObject);
                             self.configurationData.getSiddhiAppConfig().addStream(stream);
-
-                            var scratchStreamObject = self.configurationData.getSiddhiAppConfig().getStream(uniqueStreamId);
+                            self.designGrid.handleStreamForWizard
+                                   (100, 200, false,uniqueStreamId,scratchStreamName,stream);
+                            self.setTheValueToStream();
+                            var scratchStreamObject = self.configurationData.getSiddhiAppConfig().
+                                                                                           getStream(uniqueStreamId);
                             scratchStreamObject.setAttributeList(streamObject.attributeList);
                             scratchStreamObject.setAnnotationList(streamObject.annotationList);
-
-                            addEdges(uniqueStreamId, uniqueId);
+                            addEdges(uniqueStreamId, uniqueSourceId);
                         }
                         self._openFormModal.modal('hide');
                     }
-                }else if(isEditflow === true){
-                     var errorMap = self.validateSourceMapForEdit();
+                } else if(isEditflow === true) {
+                     var isError = self.validateMappingPropertyForEdit();
                      var id;
                      var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
-                     if(errorMap === undefined){
+                     if(isError !== true){
                         if(self._openFormModal.find('#exist-stream-checkbox').is(':checked')){
                             var j = self._openFormModal.find('#exist-stream-list :selected').val();
                             id = streamList[j].getId();
-
                             if(uniqueStreamId !== undefined){
                                 if(id !== uniqueStreamId){
-                                    removeEdges(uniqueStreamId, uniqueId);
+                                    removeEdges(uniqueStreamId, uniqueSourceId);
+                                    addEdges(id, uniqueSourceId);
                                 }
+                            } else {
+                                addEdges(id, uniqueSourceId);
                             }
-                            self.SaveStreamFormForEdit();
-
-                            addEdges(id, uniqueId);
-
-                            self.savedSourceFormForEdit();
-
+                            self.setTheValueToStreamForEdit();
+                            self.setTheValueToSourceForEdit();
                             self._openFormModal.modal('hide');
-
-                        }else{
-                            if(uniqueStreamId !== undefined){
-                                removeEdges(uniqueStreamId,uniqueId);
+                        } else {
+                            if(uniqueStreamId !== undefined) {
+                                 removeEdges(uniqueStreamId,uniqueSourceId);
                             }
-
-                            var scratchStreamName = streamOption.name;
-
-                            var streamToolTip;
-                            self.designGrid.handleStreamForWizard(180, 200, false,StreamId,scratchStreamName,streamToolTip,streamOption);
-                            self.SaveStreamForm();
-
-                            var stream = new Stream(streamOption);
+                            var scratchStreamName = streamObject.name;
+                            var streamId = streamObject.id;
+                            var stream = new Stream(streamObject);
                             self.configurationData.getSiddhiAppConfig().addStream(stream);
+                            self.designGrid.handleStreamForWizard
+                                        (180, 200, false,streamId,scratchStreamName,stream);
+                            self.setTheValueToStream();
+                            var scratchStreamObject = self.configurationData.getSiddhiAppConfig().getStream(streamId);
+                            scratchStreamObject.setAttributeList(streamObject.attributeList);
+                            scratchStreamObject.setAnnotationList(streamObject.annotationList);
 
-                            var scratchStreamObject = self.configurationData.getSiddhiAppConfig().getStream(StreamId);
-                            scratchStreamObject.setAttributeList(streamOption.attributeList);
-                            scratchStreamObject.setAnnotationList(streamOption.annotationList);
-
-                            self.savedSourceFormForEdit();
-                            addEdges(StreamId, uniqueId);
-
-                            var sourceObject = self.configurationData.getSiddhiAppConfig().getSource(uniqueId);
-
+                            self.setTheValueToSourceForEdit();
+                            addEdges(streamId, uniqueSourceId);
                             self._openFormModal.modal('hide');
                         }
                      }
-                }else if(isDeleteflow !== undefined){
-                     var errorMap = self.validateSourceMapForEdit();
-                     if(errorMap === undefined){
-                         self.savedSourceFormForEdit();
-
+                }else if(isStreamDeleteflow !== undefined){
+                     var isError = self.validateMappingPropertyForEdit();
+                     if(isError !== true){
+                         self.setTheValueToSourceForEdit();
                          var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
                          if (self._openFormModal.find('#exist-stream-checkbox').is(':checked')){
                                  var j = self._openFormModal.find('#exist-stream-list :selected').val();
                                  var ExistStreamId = streamList[j].getId();
-                                 addEdges(ExistStreamId, uniqueId);
-                         }else{
+                                 addEdges(ExistStreamId, uniqueSourceId);
+                         } else {
                              var scratchStreamName = streamObject.name;
-                             var streamToolTip;
-
-                             self.designGrid.handleStreamForWizard(100, 200, false,uniqueStreamId,scratchStreamName,streamToolTip,streamObject);
-                             self.SaveStreamForm();
-
                              var stream = new Stream(streamObject);
                              self.configurationData.getSiddhiAppConfig().addStream(stream);
-
-                             var scratchStreamObject = self.configurationData.getSiddhiAppConfig().getStream(uniqueStreamId);
+                             self.designGrid.handleStreamForWizard
+                                        (100, 200, false, uniqueStreamId, scratchStreamName, stream);
+                             self.setTheValueToStream();
+                             var scratchStreamObject = self.configurationData.getSiddhiAppConfig().getStream
+                                                                                                    (uniqueStreamId);
                              scratchStreamObject.setAttributeList(streamObject.attributeList);
                              scratchStreamObject.setAnnotationList(streamObject.annotationList);
-                             addEdges(uniqueStreamId, uniqueId);
+                             addEdges(uniqueStreamId, uniqueSourceId);
                          }
                          self._openFormModal.modal('hide');
                      }
-                 }
+                }
             });
-
             form.smartWizard({
                 selected: 0,
                 keyNavigation: false,
@@ -236,47 +206,45 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 contentCache: false,
                 toolbarSettings: {
                     toolbarPosition: 'bottom',
-                    toolbarExtraButtons: [btnSubmitForm],
-                    toolbarExtraButtonPosition: 'left'
+                    toolbarExtraButtons: [btnSubmitForm]
                 }
             });
-
             form.on("leaveStep", function (e, anchorObject, stepNumber, stepDirection) {
                 if (stepDirection === 'forward') {
-                    if((isEditflow === undefined && isDeleteflow === undefined) || isDeleteflow !== undefined){
+                    if((isEditflow ===undefined && isStreamDeleteflow ===undefined) || isStreamDeleteflow !==undefined){
                         if (stepNumber === 0) {
                             if (self._openFormModal.find('#exist-stream-checkbox').is(':checked')){
                                 return self.validateListOfStream();
-                            }else{
+                            } else {
                                 return self.validateStreamForm();
                             }
                         }else if(stepNumber === 1){
-                            return self.validateSourceForm();
+                            return self.validateTransportProperty();
                         }
                     }else if(isEditflow !== undefined){
                         if (stepNumber === 0) {
                             if (self._openFormModal.find('#exist-stream-checkbox').is(':checked')){
-                                 return self.validateListOfStream();
-                            }else{
+                                  return self.validateListOfStream();
+                            } else {
                                 return self.validateStreamForm();
                             }
-                        }else if(stepNumber === 1){
-                            return self.validateSourceFormForEdit();
+                        } else if(stepNumber === 1) {
+                            return self.validateTransportPropertyForEdit();
                         }
                     }
                 }
             });
             // Step is passed successfully
            form.on("showStep", function (e, anchorObject, stepNumber, stepDirection, stepPosition) {
-                if(stepPosition === 'first'){
+                if(stepPosition === 'first') {
                      form.find(".sw-btn-prev").addClass('disabled');
                      form.find(".sw-btn-prev").addClass('hidden');
                      form.find(".sw-btn-prev").parent().removeClass("sw-btn-group-final");
-                }else if(stepPosition === 'final'){
+                } else if(stepPosition === 'final') {
                     form.find(".sw-btn-next").addClass('hidden disabled');
                     form.find(".sw-btn-next").parent().addClass("sw-btn-group-final");
                     form.find("#submit-btn").removeClass('hidden');
-                }else{
+                } else {
                     form.find(".sw-btn-next").removeClass('disabled');
                     form.find(".sw-btn-next").removeClass('hidden');
                     form.find(".sw-btn-prev").removeClass('disabled');
@@ -286,28 +254,26 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 }
                 if (stepDirection === 'forward') {
                     if (stepNumber === 1) {
-                        return self.SourceConfigStep();
+                        return self.configureTransportProperty();
                     }else if(stepNumber === 2){
-                        return self.SourceMapConfigStep();
+                        return self.configureMappingProperty();
                     }
                 }
            });
            self._openFormModal.modal('show');
-           self.StreamConfigStep();
+           self.configureStream();
         };
 
-        SourceFormWizard.prototype.SourceMapConfigStep = function(){
+        SourceFormWizard.prototype.configureMappingProperty = function(){
             var self = this;
             var uniqueStreamId = this._uniqueStreamId;
-            var StreamId = this._StreamId;
-            var uniqueId = this._uniqueId;
+            var streamId = this._streamId;
+            var uniqueSourceId = this._uniqueSourceId;
             var streamObject = this._streamObject;
-            var streamOption = this._streamOption;
             var isEditflow = this._isEditflow;
-            var isDeleteflow = this._isDeleteflow;
+            var isStreamDeleteflow = this._isStreamDeleteflow;
             var sourceObject = this._sourceOptions;
-
-            var form = self._openFormModal.find('#source-form');
+            var form = self._openFormModal.find('#form-modal');
             var connectedElement;
             var streamAttributes;
             var sourceMapContainer = self._openFormModal.find("#design-view-source-map-propertyID");
@@ -315,24 +281,24 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
             var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
             self._openFormModal.find("#mapNano").nanoScroller();
 
-            if((isEditflow === undefined && isDeleteflow === undefined)){
+            if((isEditflow === undefined && isStreamDeleteflow === undefined)){
                 if (self._openFormModal.find('#exist-stream-checkbox').is(':checked')){
                     var j = self._openFormModal.find('#exist-stream-list :selected').val();
                     var id = streamList[j].getId();
                     var existStreamObject = self.configurationData.getSiddhiAppConfig().getStream(id);
                     connectedElement = existStreamObject.getName();
                     streamAttributes = existStreamObject.getAttributeList();
-                }else{
+                } else {
                     connectedElement = streamName;
                     streamAttributes = streamObject.attributeList;
                 }
+                _.set(sourceObject, 'id', uniqueSourceId);
+                _.set(sourceObject, 'annotationType',  'SOURCE');
                 _.set(sourceObject, 'connectedElementName',connectedElement);
-                var source = new SourceOrSinkAnnotation(sourceObject);
-
-                self.formBuilder.GeneratePropertiesFormForSourceMapWizard(sourceMapContainer, uniqueId , sourceObject , connectedElement, streamAttributes);
-
-            }else if(isEditflow === true){
-                sourceObject = self.configurationData.getSiddhiAppConfig().getSource(uniqueId);
+                self.formBuilder.GeneratePropertiesFormForSourceMapWizard
+                                (sourceMapContainer, uniqueSourceId, sourceObject, connectedElement, streamAttributes);
+            } else if(isEditflow === true){
+                sourceObject = self.configurationData.getSiddhiAppConfig().getSource(uniqueSourceId);
                 sourceObject.setConnectedElementName(streamName);
 
                 if(self._openFormModal.find('#exist-stream-checkbox').is(':checked')){
@@ -344,18 +310,15 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                       streamAttributes = existStreamObject.getAttributeList();
                 }
                 else{
-                    streamAttributes = streamOption.attributeList;
-                    connectedElement = streamOption.name;
+                    streamAttributes = streamObject.attributeList;
+                    connectedElement = streamObject.name;
                 }
                 _.set(sourceObject, 'connectedElementName',connectedElement);
-                var source = new SourceOrSinkAnnotation(sourceObject);
-
-                self.formBuilder.GeneratePropertiesFormForSourceMapWizardForEdit(sourceMapContainer, uniqueId, streamAttributes, connectedElement);
-
-            }else if(isDeleteflow === true ){
-                 sourceObject = self.configurationData.getSiddhiAppConfig().getSource(uniqueId);
+                self.formBuilder.GeneratePropertiesFormForSourceMapWizardForEdit
+                                                    (sourceMapContainer, uniqueSourceId, streamAttributes, connectedElement);
+            } else if(isStreamDeleteflow === true ) {
+                 sourceObject = self.configurationData.getSiddhiAppConfig().getSource(uniqueSourceId);
                  sourceObject.setConnectedElementName(streamName);
-
                  if(self._openFormModal.find('#exist-stream-checkbox').is(':checked')){
                      var j = self._openFormModal.find('#exist-stream-list :selected').val();
                      var id = streamList[j].getId();
@@ -368,77 +331,82 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                      connectedElement = streamObject.name;
                  }
                  _.set(sourceObject, 'connectedElementName',connectedElement);
-                 var source = new SourceOrSinkAnnotation(sourceObject);
-
-                 self.formBuilder.GeneratePropertiesFormForSourceMapWizardForEdit(sourceMapContainer, uniqueId, streamAttributes, connectedElement);
+                 self.formBuilder.GeneratePropertiesFormForSourceMapWizardForEdit
+                                            (sourceMapContainer, uniqueSourceId, streamAttributes, connectedElement);
             }
         };
 
-        SourceFormWizard.prototype.SourceConfigStep = function(){
+        SourceFormWizard.prototype.configureTransportProperty = function(){
             var self = this;
             var sourceObject = this._sourceOptions;
-            var form = self._openFormModal.find('#source-form');
-            var uniqueId = this._uniqueId;
+            var form = self._openFormModal.find('#form-modal');
+            var uniqueSourceId = this._uniqueSourceId;
             var isEditflow = this._isEditflow;
-            var isDeleteflow = this._isDeleteflow;
+            var isStreamDeleteflow = this._isStreamDeleteflow;
 
             var sourceContainer = self._openFormModal.find("#design-view-source-form-wizard-contentId");
             self._openFormModal.find("#sourceNano").nanoScroller();
 
-            if((isEditflow === undefined && isDeleteflow === undefined) ){
-                self.formBuilder.GeneratePropertiesFormForSourceWizard(sourceContainer, uniqueId, sourceObject);
-            }else if(isEditflow !== undefined || isDeleteflow !== undefined){
-                self.formBuilder.GeneratePropertiesFormForSourceEditWizard(sourceContainer, uniqueId);
+            if((isEditflow === undefined && isStreamDeleteflow === undefined) ){
+                _.set(sourceObject, 'id', uniqueSourceId);
+                _.set(sourceObject, 'annotationType',  'SOURCE');
+                self.formBuilder.GeneratePropertiesFormForSourceWizard(sourceContainer, uniqueSourceId, sourceObject);
+            }else if(isEditflow !== undefined || isStreamDeleteflow !== undefined){
+                self.formBuilder.GeneratePropertiesFormForSourceEditWizard(sourceContainer, uniqueSourceId);
             }
         };
 
-        SourceFormWizard.prototype.StreamConfigStep = function(){
+        SourceFormWizard.prototype.configureStream = function(){
             var self = this;
-            var form = self._openFormModal.find('#source-form');
+            var form = self._openFormModal.find('#form-modal');
             var uniqueStreamId = this._uniqueStreamId;
-            var StreamId = this._StreamId;
-            var uniqueId = this._uniqueId;
+            var uniqueSourceId = this._uniqueSourceId;
             var isEditflow = this._isEditflow;
-            var isDeleteflow = this._isDeleteflow;
+            var isStreamDeleteflow = this._isStreamDeleteflow;
             var streamObject = this._streamObject;
-            var streamOption = this._streamOption;
 
             var stream_config = '<div class = "form-group"><div class = "form-wizard-form-scrollable-block-list">' +
-                    '<div id = "stream-list" style="display: block"><div class = "clearfix"><div id= "streamNano" class = "nano"><div class = "nano-content">' +
-                    '<input type = "checkbox" class = "option-checkbox" id = "exist-stream-checkbox" name = "streamView">' +
-                    '&nbsp;&nbsp;<label for = "exist-stream-checkbox"> Using existing stream </label><div id = "exist-stream" ></div> <br>' +
-                    '<div id = "form-template"><div class = "form-wrapper">'+
-                    '<div id = "design-view-form-wizard-contentId" class = "design-view-form-content">'+
-                    '</div></div></div></div></div></div></div></div></div>';
+                '<div id = "stream-list" style = "display:block"><div class = "clearfix">'+
+                '<div id = "streamNano" class = "nano"><div class = "nano-content">' +
+                '<input type = "checkbox" class="option-checkbox" id="exist-stream-checkbox"'+
+                ' name = "streamView" style = "margin:10px 10px 10px 15px">' +
+                '<label id = "labelForStreamList" for = "exist-stream-checkbox">Using existing stream</label>'+
+                '<div id="exist-stream"></div>'+
+                '<div id = "form-template"><div class = "form-wrapper">'+
+                '<div id = "design-view-form-wizard-contentId" class = "design-view-form-content">'+
+                '</div></div></div></div></div></div></div></div></div>';
 
             self._openFormModal.find("#stream-config").append(stream_config);
 
-            var example = '<select name="stream-name" class="form-control" id = "exist-stream-list" style = "width:50%">'+
+            var existStreamList = '<select name = "stream-name" class = "form-control" id = "exist-stream-list"'+
+            ' style = "width:50%; margin: 0px 10px 0px 15px">'+
             '<option value = -1> ----Please select a stream---- </option></select>'+
-            '<label class="error" id="streamListErrorMessage"> </label>';
+            '<label class = "error" id = "streamListErrorMessage"> </label>';
 
             var streamContainer = self._openFormModal.find("#design-view-form-wizard-contentId");
             self._openFormModal.find("#streamNano").nanoScroller();
-
             if(isEditflow === true){
                 self._openFormModal.find('#exist-stream-checkbox').attr('checked', 'checked');
-                self._openFormModal.find('#exist-stream').append(example);
+                self._openFormModal.find('#exist-stream').append(existStreamList);
                 self.ListOfStream();
                 if(uniqueStreamId !== undefined){
+                    self._openFormModal.find("#labelForStreamList").html('Stream Name');
                     var existStreamObject = self.configurationData.getSiddhiAppConfig().getStream(uniqueStreamId);
                     var streamName = existStreamObject.getName();
                     var s = self._openFormModal.find('#exist-stream-list');
                     self.setSelectedIndex(s,streamName);
-
                     self.formBuilder.GeneratePropertiesFormForStreamEditWizard(streamContainer, uniqueStreamId);
-                }else{
-                    self.formBuilder.GeneratePropertiesFormForStreamWizard(streamContainer, StreamId, streamOption);
+                } else {
+                     var streamId = self.designGrid.getNewAgentId();
+                     _.set(streamObject, 'id', streamId);
+                     self._openFormModal.find('#exist-stream-checkbox').prop('checked', false);
+                     self._openFormModal.find('#exist-stream').empty();
+                    self.formBuilder.GeneratePropertiesFormForStreamWizard(streamContainer, streamId, streamObject);
                 }
-
-
                 self._openFormModal.find('#stream-list').on('change', '#exist-stream-checkbox', function () {
                    if ($(this).is(':checked')) {
-                       self._openFormModal.find('#exist-stream').append(example);
+                       self._openFormModal.find("#labelForStreamList").html('Stream Name');
+                       self._openFormModal.find('#exist-stream').append(existStreamList);
                        self.ListOfStream();
                        var existStreamObject = self.configurationData.getSiddhiAppConfig().getStream(uniqueStreamId);
                        var streamName = existStreamObject.getName();
@@ -446,39 +414,39 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                        self.setSelectedIndex(s,streamName);
                        self.formBuilder.GeneratePropertiesFormForStreamEditWizard(streamContainer, uniqueStreamId);
                    } else {
+                        var streamId = self.designGrid.getNewAgentId();
+                        _.set(streamObject, 'id', streamId);
                        self._openFormModal.find('#exist-stream').empty();
-                       self.formBuilder.GeneratePropertiesFormForStreamWizard(streamContainer, StreamId, streamOption);
+                       self.formBuilder.GeneratePropertiesFormForStreamWizard(streamContainer, streamId, streamObject);
                    }
                 });
             }
-
-            if(isEditflow === undefined || isDeleteflow !== undefined){
+            if(isEditflow === undefined || isStreamDeleteflow !== undefined){
+                _.set(streamObject, 'id', uniqueStreamId);
                 self._openFormModal.find('#stream-list').on('change', '#exist-stream-checkbox', function () {
                    if ($(this).is(':checked')) {
-                       self._openFormModal.find('#exist-stream').append(example);
+                       self._openFormModal.find('#exist-stream').append(existStreamList);
                        self.ListOfStream();
                    } else {
                        self._openFormModal.find('#exist-stream').empty();
-                       self.formBuilder.GeneratePropertiesFormForStreamWizard(streamContainer, uniqueStreamId, streamObject);
+                       self.formBuilder.GeneratePropertiesFormForStreamWizard
+                                    (streamContainer, uniqueStreamId, streamObject);
                    }
                 });
                 self.formBuilder.GeneratePropertiesFormForStreamWizard(streamContainer, uniqueStreamId, streamObject);
             }
-
             self._openFormModal.find('#stream-list').on('change', '#exist-stream-list', function () {
                var j = self._openFormModal.find('#exist-stream-list :selected').val();
                var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
                var id = streamList[j].getId();
                self.formBuilder.GeneratePropertiesFormForStreamEditWizard(streamContainer, id);
             });
-
         };
 
         SourceFormWizard.prototype.ListOfStream = function(){
             var self = this;
             var form = self._openFormModal.find('#exist-stream-list');
             var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
-
             var i;
             var streamNameList;
             var optionValues;
@@ -502,29 +470,25 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
             }
         };
 
-        SourceFormWizard.prototype.validateSourceForm = function () {
+        SourceFormWizard.prototype.validateTransportProperty = function () {
              var self = this;
              var sourceObject = this._sourceOptions;
-             var uniqueId = this._uniqueId;
-             var id = uniqueId;
-             var sourceContainer = self._openFormModal.find("#design-view-source-form-wizard-contentId");
+             var id = this._uniqueSourceId;
 
+             var sourceContainer = self._openFormModal.find("#design-view-source-form-wizard-contentId");
             var currentSourceOptions = [];
-            var attributes = [];
 
             var predefinedSources = _.orderBy(this.configurationData.rawExtensions["source"], ['name'], ['asc']);
-
             self.formUtils.removeErrorClass();
             var isErrorOccurred = false;
 
             var selectedSourceType = self._openFormModal.find('#define-source #source-type').val();;
-
             if (selectedSourceType === null) {
                 DesignViewUtils.prototype.errorAlert("Select a source type to submit.");
                 return false;
-            }else {
+            } else {
                 currentSourceOptions = self.formUtils.getSelectedTypeParameters(selectedSourceType, predefinedSources);
-                 if (self.formUtils.validateOptionsForWizard(currentSourceOptions, Constants.SOURCE, sourceContainer)) {
+                 if (self.formUtils.validateOptionsForWizard(currentSourceOptions, Constants.SOURCE, sourceContainer)){
                      isErrorOccurred = true;
                      return false;
                  }
@@ -542,25 +506,18 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 self.formUtils.buildCustomizedOptionForWizard(annotationOptions, Constants.SOURCE, sourceContainer);
                 if (annotationOptions.length == 0) {
                     _.set(sourceObject, 'options', undefined);
-
                 } else {
                     _.set(sourceObject, 'options', annotationOptions);
-
                 }
                 var source = new SourceOrSinkAnnotation(sourceObject);
             }
         };
 
-        SourceFormWizard.prototype.savedSourceForm = function () {
-             var self = this;
-             var sourceObject = this._sourceOptions;
-             var form = self._openFormModal.find('#source-form');
-             var uniqueId = this._uniqueId;
-             var id = uniqueId;
-             var sourceContainer = self._openFormModal.find("#design-view-source-form-wizard-contentId");
+        SourceFormWizard.prototype.setTheValueToSource = function () {
+            var self = this;
+            var sourceObject = this._sourceOptions;
+            var id = this._uniqueSourceId;
 
-            self.formUtils.removeErrorClass();
-            var isErrorOccurred = false;
             var predefinedSources = _.orderBy(this.configurationData.rawExtensions["source"], ['name'], ['asc']);
 
             var selectedSourceType = sourceObject.type;
@@ -570,24 +527,20 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
             textNode.html(selectedSourceType);
 
             $('#' + id).removeClass('incomplete-element');
-
             var sourceToolTip = self.formUtils.getTooltipForWizard(sourceObject, Constants.SOURCE);
             $('#' + id).prop('title', sourceToolTip);
 
-            self.formBuilder.designGrid.dropElements.generateSpecificSourceConnectionElements(selectedSourceType,self.jsPlumbInstance, id, $('#' + id));
-
+            self.formBuilder.designGrid.dropElements.generateSpecificSourceConnectionElements
+                                                (selectedSourceType,self.jsPlumbInstance, id, $('#' + id));
             // set the isDesignViewContentChanged to true
             self.configurationData.setIsDesignViewContentChanged(true);
-
         };
 
-        SourceFormWizard.prototype.validateSourceFormForEdit = function () {
+        SourceFormWizard.prototype.validateTransportPropertyForEdit = function () {
             var self = this;
-            var uniqueId = this._uniqueId;
-            var sourceObject = self.configurationData.getSiddhiAppConfig().getSource(uniqueId);
-
+            var uniqueSourceId = this._uniqueSourceId;
+            var sourceObject = self.configurationData.getSiddhiAppConfig().getSource(uniqueSourceId);
             var sourceContainer = self._openFormModal.find("#design-view-source-form-wizard-contentId");
-
             self.formUtils.removeErrorClass();
             var isErrorOccurred = false;
             var predefinedSources = _.orderBy(this.configurationData.rawExtensions["source"], ['name'], ['asc']);
@@ -605,74 +558,58 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
             }
         };
 
-        SourceFormWizard.prototype.savedSourceFormForEdit = function () {
-             var self = this;
-             var uniqueId = this._uniqueId;
-             var id = uniqueId;
-             var sourceObject = self.configurationData.getSiddhiAppConfig().getSource(id);
-             var sourceContainer = self._openFormModal.find("#design-view-source-form-wizard-contentId");
-
-            self.formUtils.removeErrorClass();
+        SourceFormWizard.prototype.setTheValueToSourceForEdit = function () {
+            var self = this;
+            var id = this._uniqueSourceId;
+            var sourceObject = self.configurationData.getSiddhiAppConfig().getSource(id);
+            var sourceContainer = self._openFormModal.find("#design-view-source-form-wizard-contentId");
 
             var selectedSourceType = self._openFormModal.find('#define-source #source-type').val();
-
             sourceObject.setType(selectedSourceType);
             var textNode = $('#' + id).find('.sourceNameNode');
             textNode.html(selectedSourceType);
 
             var annotationOptions = [];
             var sourceOptionsValue = sourceObject.getOptions();
-            self.formUtils.buildOptionsForWizard(annotationOptions, Constants.SOURCE,sourceContainer);
-            self.formUtils.buildCustomizedOptionForWizard(annotationOptions, Constants.SOURCE,sourceContainer);
+            self.formUtils.buildOptionsForWizard(annotationOptions, Constants.SOURCE, sourceContainer);
+            self.formUtils.buildCustomizedOptionForWizard(annotationOptions, Constants.SOURCE, sourceContainer);
             if (annotationOptions.length == 0) {
                 sourceObject.setOptions(undefined);
-
             } else {
                 sourceObject.setOptions(annotationOptions);
             }
-
             $('#' + id).removeClass('error-element');
-
+            //Send source element to the backend and generate tooltip
             var sourceToolTip = self.formUtils.getTooltip(sourceObject, Constants.SOURCE);
             $('#' + id).prop('title', sourceToolTip);
 
-            self.formBuilder.designGrid.dropElements.generateSpecificSourceConnectionElements(selectedSourceType,self.jsPlumbInstance, id, $('#' + id));
-
+            self.formBuilder.designGrid.dropElements.generateSpecificSourceConnectionElements
+                                    (selectedSourceType,self.jsPlumbInstance, id, $('#' + id));
             // set the isDesignViewContentChanged to true
             self.configurationData.setIsDesignViewContentChanged(true);
-
         };
 
         SourceFormWizard.prototype.validateStreamForm = function(){
             var self = this;
-            var form = self._openFormModal.find('#source-form');
             var uniqueStreamId = this._uniqueStreamId;
-            var StreamId = this._StreamId;
             var isEditflow = this._isEditflow;
             var streamObject = this._streamObject;
-            var streamOption = this._streamOption;
-
-            var id; var streamObj;
-            if(isEditflow === true){
-                id = StreamId;
-                streamObj = streamOption;
-            }else{
+            var id;
+            if(isEditflow === true) {
+                id = streamObject.id;
+            } else {
                 id = uniqueStreamId;
-                streamObj = streamObject;
             }
-
             var streamContainer = self._openFormModal.find("#design-view-form-wizard-contentId");
             self.formUtils.removeErrorClass();
-
-            var previouslySavedStreamName = streamObj.name;
-
+            var previouslySavedStreamName = streamObject.name;
             var configName = self._openFormModal.find('#streamName').val().trim();
             var streamName;
             var firstCharacterInStreamName;
             var isStreamNameUsed;
             var isErrorOccurred = false;
-
-            var predefinedAnnotationList = _.cloneDeep(self.configurationData.application.config.stream_predefined_annotations);
+            var predefinedAnnotationList =
+                               _.cloneDeep(self.configurationData.application.config.stream_predefined_annotations);
             /*
             * check whether the stream is inside a partition and if yes check whether it begins with '#'.
             *  If not add '#' to the beginning of the stream name.
@@ -682,20 +619,18 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
             if (!isStreamSavedInsideAPartition) {
                 firstCharacterInStreamName = (configName).charAt(0);
                 if (firstCharacterInStreamName === '#') {
-                    self.formUtils.addErrorClass("#streamName");
-                    self._openFormModal.find('#streamNameErrorMessage').text("'#' is used to define inner streams only.")
-                    //$('#streamNameErrorMessage').text("'#' is used to define inner streams only.")
+                    self.formUtils.addErrorClass(self._openFormModal.find("#streamName"));
+                    self._openFormModal.find('#streamNameErrorMessage').text
+                                                ("'#' is used to define inner streams only.")
                     isErrorOccurred = true;
                     return false;
                 } else {
                     streamName = configName;
                 }
-                isStreamNameUsed
-                    = self.formUtils.isDefinitionElementNameUsed(streamName, id);
+                isStreamNameUsed = self.formUtils.isDefinitionElementNameUsed(streamName, id);
                 if (isStreamNameUsed) {
-                    self.formUtils.addErrorClass("#streamName");
+                    self.formUtils.addErrorClass(self._openFormModal.find("#streamName"));
                     self._openFormModal.find('#streamNameErrorMessage').text("Stream name is already defined.")
-                    //$('#streamNameErrorMessage').text("Stream name is already defined.")
                     isErrorOccurred = true;
                     return false;
                 }
@@ -712,44 +647,43 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 isStreamNameUsed
                     = self.formUtils.isStreamDefinitionNameUsedInPartition(partitionId, streamName, id);
                 if (isStreamNameUsed) {
-                    self.formUtils.addErrorClass("#streamName");
-                    self._openFormModal.find('#streamNameErrorMessage').text("Stream name is already defined in the partition.")
-                    //$('#streamNameErrorMessage').text("Stream name is already defined in the partition.")
+                    self.formUtils.addErrorClass(self._openFormModal.find("#streamName"));
+                    self._openFormModal.find('#streamNameErrorMessage').text
+                                ("Stream name is already defined in the partition.")
                     isErrorOccurred = true;
                     return false;
                 }
             }
             //check if stream name is empty
             if (streamName == "") {
-                self.formUtils.addErrorClass("#streamName");
+                self.formUtils.addErrorClass(self._openFormModal.find("#streamName"));
                 self._openFormModal.find('#streamNameErrorMessage').text("Stream name is required.")
-                //$('#streamNameErrorMessage').text("Stream name is required.")
                 isErrorOccurred = true;
                 return false;
             }
-            var previouslySavedName = streamObj.name;
+            var previouslySavedName = streamObject.name;
             if (previouslySavedName === undefined) {
                 previouslySavedName = "";
             }
             if (previouslySavedName !== streamName) {
-                if (self.formUtils.validateAttributeOrElementNameForWizard("#streamName", Constants.STREAM, streamName, streamContainer)) {
+                if (self.formUtils.validateAttributeOrElementNameForWizard
+                            ("#streamName", Constants.STREAM, streamName,streamContainer)) {
                     isErrorOccurred = true;
                     return false;
                 }
             }
-
             var attributeNameList = [];
             if (self.formUtils.validateAttributesForWizard(attributeNameList,streamContainer)) {
                 isErrorOccurred = true;
                 return false;
             }
             if (attributeNameList.length == 0) {
-                self.formUtils.addErrorClass($('.attribute:eq(0)').find('.attr-name'));
-                self._openFormModal.find('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.")
+                self.formUtils.addErrorClass(self._openFormModal.find('.attribute:eq(0)').find('.attr-name'));
+                self._openFormModal.find('.attribute:eq(0)').find('.error-message').text
+                                                                ("Minimum one attribute is required.")
                 isErrorOccurred = true;
                 return false;
             }
-
             var annotationNodes = [];
             if (self.formUtils.validateAnnotationsForWizard(predefinedAnnotationList, annotationNodes , streamContainer)) {
                 isErrorOccurred = true;
@@ -767,28 +701,24 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                     return false;
                 }
             }
-
             if (!isErrorOccurred) {
                 // update selected stream model
-                _.set(streamObj, 'name', streamName);
-
+                _.set(streamObject, 'name', streamName);
                 //add the attributes to the attribute list
                 var attributeList = [];
                 self._openFormModal.find('.attribute .attr-content').each(function () {
                     var nameValue = $(this).find('.attr-name').val().trim();
                     var typeValue = $(this).find('.attr-type').val();
-
                     if (nameValue != "") {
                         attributeObject = new Attribute({name: nameValue, type: typeValue});
                         attributeList.push(attributeObject);
                     }
                 });
-                _.set(streamObj, 'attributeList', attributeList);
-
+                _.set(streamObject, 'attributeList', attributeList);
                 var annotationStringList = [];
                 var annotationObjectList = [];
-
-                self.formUtils.buildAnnotationForWizard(annotationNodes, annotationStringList, annotationObjectList, streamContainer);
+                self.formUtils.buildAnnotationForWizard
+                                    (annotationNodes, annotationStringList, annotationObjectList, streamContainer);
                 var annotationList = [];
                 var annotationListObjects = []
                 _.forEach(annotationStringList, function (annotation) {
@@ -797,45 +727,35 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 _.forEach(annotationObjectList, function (annotation) {
                     annotationListObjects.push(annotation);
                 });
-                _.set(streamObj, 'annotationList', annotationList);
-                _.set(streamObj, 'annotationListObjects', annotationListObjects);
-                var stream = new Stream(streamObj);
+                _.set(streamObject, 'annotationList', annotationList);
+                _.set(streamObject, 'annotationListObjects', annotationListObjects);
             }
         };
 
-        SourceFormWizard.prototype.SaveStreamForm = function(){
+        SourceFormWizard.prototype.setTheValueToStream = function(){
             var self = this;
-            var form = self._openFormModal.find('#source-form');
             var uniqueStreamId = this._uniqueStreamId;
-            var StreamId = this._StreamId;
             var isEditflow = this._isEditflow;
             var streamObject = this._streamObject;
-            var streamOption = this._streamOption;
-            var id,streamObj;
+            var id;
             if(isEditflow === true){
-                id = StreamId;
-                streamObj = streamOption;
+                id = streamObject.id;
             }else{
                 id = uniqueStreamId;
-                streamObj = streamObject;
             }
-
             var streamName = self._openFormModal.find('#streamName').val().trim();
-
             var textNode = $('#' + id).find('.streamNameNode');
             textNode.html(streamName);
 
            $('#' + id).removeClass('incomplete-element');
            //Send stream element to the backend and generate tooltip
-           var streamToolTip = self.formUtils.getTooltipForWizard(streamObj, Constants.STREAM);
+           var streamToolTip = self.formUtils.getTooltipForWizard(streamObject, Constants.STREAM);
            $('#' + id).prop('title', streamToolTip);
-
            // set the isDesignViewContentChanged to true
            self.configurationData.setIsDesignViewContentChanged(true)
-
         };
 
-        SourceFormWizard.prototype.SaveStreamFormForEdit = function(){
+        SourceFormWizard.prototype.setTheValueToStreamForEdit = function(){
             var self = this;
             var uniqueStreamId = this._uniqueStreamId;
             var streamList = self.configurationData.getSiddhiAppConfig().getStreamList();
@@ -844,126 +764,20 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 var j = self._openFormModal.find('#exist-stream-list :selected').val();
                  id = streamList[j].getId();
             }
-
             var streamObject = self.configurationData.getSiddhiAppConfig().getStream(id);
-
             var previousStreamObject = _.cloneDeep(streamObject);
-
             var streamContainer = self._openFormModal.find("#design-view-form-wizard-contentId");
-
-            self.formUtils.removeErrorClass();
             var previouslySavedStreamName = streamObject.getName();
-            var annotateVaue = streamObject.getAnnotationList();
-
-            var configName = self._openFormModal.find('#streamName').val().trim();
-            var streamName;
-            var firstCharacterInStreamName;
-            var isStreamNameUsed;
             var isErrorOccurred = false;
-
-            var predefinedAnnotationList = _.cloneDeep(self.configurationData.application.config.stream_predefined_annotations);
-            /*
-            * check whether the stream is inside a partition and if yes check whether it begins with '#'.
-            *  If not add '#' to the beginning of the stream name.
-            * */
-            var isStreamSavedInsideAPartition
-                = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
-            if (!isStreamSavedInsideAPartition) {
-                firstCharacterInStreamName = (configName).charAt(0);
-                if (firstCharacterInStreamName === '#') {
-                    self.formUtils.addErrorClass("#streamName");
-                    self._openFormModal.find('#streamNameErrorMessage').text("'#' is used to define inner streams only.")
-                    isErrorOccurred = true;
-                    return false;
-                } else {
-                    streamName = configName;
-                }
-                isStreamNameUsed
-                    = self.formUtils.isDefinitionElementNameUsed(streamName, id);
-                if (isStreamNameUsed) {
-                    self.formUtils.addErrorClass("#streamName");
-                    self._openFormModal.find('#streamNameErrorMessage').text("Stream name is already defined.")
-                    isErrorOccurred = true;
-                    return false;
-                }
-            } else {
-                firstCharacterInStreamName = (configName).charAt(0);
-                if (firstCharacterInStreamName !== '#') {
-                    streamName = '#' + configName;
-                } else {
-                    streamName = configName;
-                }
-                var partitionWhereStreamIsSaved
-                    = self.configurationData.getSiddhiAppConfig().getPartitionWhereStreamIsSaved(id);
-                var partitionId = partitionWhereStreamIsSaved.getId();
-                isStreamNameUsed
-                    = self.formUtils.isStreamDefinitionNameUsedInPartition(partitionId, streamName, id);
-                if (isStreamNameUsed) {
-                    self.formUtils.addErrorClass("#streamName");
-                    self._openFormModal.find('#streamNameErrorMessage').text("Stream name is already defined in the partition.")
-                    isErrorOccurred = true;
-                    return false;
-                }
-            }
-
-            //check if stream name is empty
-            if (streamName == "") {
-                self.formUtils.addErrorClass("#streamName");
-                self._openFormModal.find('#streamNameErrorMessage').text("Stream name is required.")
-                isErrorOccurred = true;
-                return false;
-            }
-            var previouslySavedName = streamObject.name;
-            if (previouslySavedName === undefined) {
-                previouslySavedName = "";
-            }
-            if (previouslySavedName !== streamName) {
-                if (self.formUtils.validateAttributeOrElementNameForWizard("#streamName", Constants.STREAM, streamName, streamContainer)) {
-                    isErrorOccurred = true;
-                    return false;
-                }
-            }
-
-            var attributeNameList = [];
-            if (self.formUtils.validateAttributesForWizard(attributeNameList, streamContainer)) {
-                isErrorOccurred = true;
-                return false;
-            }
-
-            if (attributeNameList.length == 0) {
-                self.formUtils.addErrorClass($('.attribute:eq(0)').find('.attr-name'));
-                self._openFormModal.find('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.")
-                isErrorOccurred = true;
-                return false;
-            }
-
+            var predefinedAnnotationList =
+                            _.cloneDeep(self.configurationData.application.config.stream_predefined_annotations);
             var annotationNodes = [];
-            if (self.formUtils.validateAnnotationsForWizard(predefinedAnnotationList, annotationNodes,streamContainer)) {
+            if (self.formUtils.validateAnnotationsForWizard(predefinedAnnotationList,annotationNodes,streamContainer)) {
                 isErrorOccurred = true;
-                return;
+                return false;
             }
-
-            // If this is an inner stream perform validation
-            var streamSavedInsideAPartition
-                = self.configurationData.getSiddhiAppConfig().getStreamSavedInsideAPartition(id);
-            // if streamSavedInsideAPartition is undefined then the stream is not inside a partition
-            if (streamSavedInsideAPartition !== undefined) {
-                var isValid = JSONValidator.prototype.validateInnerStream(streamObject, self.jsPlumbInstance,
-                    false);
-                if (!isValid) {
-                    isErrorOccurred = true;
-                    return false;
-                }
-            }
-
             if (!isErrorOccurred) {
-                // update selected stream model
-                streamObject.setName(streamName);
-                var textNode = $('#' + id).find('.streamNameNode');
-                textNode.html(streamName);
-
                 streamObject.clearAttributeList();
-
                 //add the attributes to the attribute list
                 self._openFormModal.find('.attribute .attr-content').each(function () {
                     var nameValue = $(this).find('.attr-name').val().trim();
@@ -973,66 +787,52 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                         streamObject.addAttribute(attributeObject);
                     }
                 });
-
                 var annotationStringList = [];
                 var annotationObjectList = [];
-
                 //clear the saved annotations
-                //if(annotateVaue !== undefined){
-                    streamObject.clearAnnotationList();
-                    streamObject.clearAnnotationListObjects();
-                //}
-
-                self.formUtils.buildAnnotationForWizard(annotationNodes, annotationStringList, annotationObjectList,streamContainer);
+                streamObject.clearAnnotationList();
+                streamObject.clearAnnotationListObjects();
+                self.formUtils.buildAnnotationForWizard
+                                        (annotationNodes, annotationStringList, annotationObjectList,streamContainer);
                 _.forEach(annotationStringList, function (annotation) {
                     streamObject.addAnnotation(annotation);
                 });
                 _.forEach(annotationObjectList, function (annotation) {
                     streamObject.addAnnotationObject(annotation);
                 });
-
-                self.formBuilder.designGrid.dropElements.toggleFaultStreamConnector(streamObject,self.jsPlumbInstance,previouslySavedStreamName);
-
+                self.formBuilder.designGrid.dropElements.toggleFaultStreamConnector
+                                            (streamObject, self.jsPlumbInstance, previouslySavedStreamName);
                 $('#' + id).removeClass('incomplete-element');
                 //Send stream element to the backend and generate tooltip
                 var streamToolTip = self.formUtils.getTooltip(streamObject, Constants.STREAM);
                 $('#' + id).prop('title', streamToolTip);
-
                 // set the isDesignViewContentChanged to true
                 self.configurationData.setIsDesignViewContentChanged(true)
             }
         };
 
-        SourceFormWizard.prototype.validateSourceMap = function(){
+        SourceFormWizard.prototype.validateMappingProperty = function(){
             var self = this;
             var sourceObject = this._sourceOptions;
             var mapContainer = self._openFormModal.find("#design-view-source-map-propertyID");
-
             self.formUtils.removeErrorClass();
-
             var isErrorOccurred = false;
-
             var selectedMapType = mapContainer.find('#define-map #map-type').val();
-
             var predefinedSourceMaps = _.orderBy(this.configurationData.rawExtensions["sourceMaps"], ['name'], ['asc']);
-
             var currentMapperOptions = [];
-
             currentMapperOptions = self.formUtils.getSelectedTypeParameters(selectedMapType, predefinedSourceMaps);
-
             if (self.formUtils.validateOptionsForWizard(currentMapperOptions, Constants.MAPPER, mapContainer)) {
                 isErrorOccurred = true;
-                return false;
+                return isErrorOccurred;
             }
             if (self.formUtils.validateCustomizedOptionsForWizard(Constants.MAPPER, mapContainer)) {
                 isErrorOccurred = true;
                 return false;
             }
-
             if (mapContainer.find('#define-attribute #attributeMap-checkBox').is(":checked")) {
                 //if attribute section is checked
                 var mapperAttributeValuesArray = {};
-                var boolean;
+                var isHasValue;
                 mapContainer.find('#mapper-attributes .attribute').each(function () {
                     //validate mapper  attributes if value is not filled
                     var key = $(this).find('.attr-key').val().trim();
@@ -1041,15 +841,14 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                         $(this).find('.error-message').text('Attribute Value is required.');
                         self.formUtils.addErrorClass($(this).find('.attr-value'));
                         isErrorOccurred = true;
-                        boolean = false;
+                        isHasValue = false;
                     } else {
                         mapperAttributeValuesArray[key] = value;
-                        boolean = true;
+                        isHasValue = true;
                     }
                 });
-                return boolean;
+                return isHasValue;
             }
-
             if (!isErrorOccurred) {
                 var mapper = {};
                 var mapperAnnotationOptions = [];
@@ -1061,7 +860,6 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 } else {
                     _.set(mapper, 'options', mapperAnnotationOptions);
                 }
-
                 if (mapContainer.find('#define-attribute #attributeMap-checkBox').is(":checked")) {
                     payloadOrAttributeOptions = {};
                     _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTES');
@@ -1074,27 +872,20 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 }
                 var mapperObject = new MapAnnotation(mapper);
                 _.set(sourceObject,'map',mapperObject);
-                var source = new SourceOrSinkAnnotation(sourceObject);
             }
         };
 
-        SourceFormWizard.prototype.validateSourceMapForEdit = function(){
+        SourceFormWizard.prototype.validateMappingPropertyForEdit = function(){
             var self = this;
-            var uniqueId = this._uniqueId;
-            var sourceObject = self.configurationData.getSiddhiAppConfig().getSource(uniqueId);
-
+            var uniqueSourceId = this._uniqueSourceId;
+            var sourceObject = self.configurationData.getSiddhiAppConfig().getSource(uniqueSourceId);
             var mapContainer = self._openFormModal.find("#design-view-source-map-propertyID");
             self.formUtils.removeErrorClass();
-
             var isErrorOccurred = false;
-
             var predefinedSourceMaps = _.orderBy(this.configurationData.rawExtensions["sourceMaps"], ['name'], ['asc']);
             var currentMapperOptions = [];
-
             var selectedMapType = mapContainer.find('#define-map #map-type').val();
-
             currentMapperOptions = self.formUtils.getSelectedTypeParameters(selectedMapType, predefinedSourceMaps);
-
             if (self.formUtils.validateOptionsForWizard(currentMapperOptions, Constants.MAPPER, mapContainer)) {
                 isErrorOccurred = true;
                 return false;
@@ -1103,7 +894,6 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 isErrorOccurred = true;
                 return false;
             }
-
             if (mapContainer.find('#define-attribute #attributeMap-checkBox').is(":checked")) {
                 //if attribute section is checked
                 var mapperAttributeValuesArray = {};
@@ -1124,7 +914,6 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 });
                 return boolean;
             }
-
             if (!isErrorOccurred) {
                 var mapper = {};
                 var mapperAnnotationOptions = [];
@@ -1136,7 +925,6 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 } else {
                     _.set(mapper, 'options', mapperAnnotationOptions);
                 }
-
                 if (mapContainer.find('#define-attribute #attributeMap-checkBox').is(":checked")) {
                     payloadOrAttributeOptions = {};
                     _.set(payloadOrAttributeOptions, 'annotationType', 'ATTRIBUTES');
@@ -1162,12 +950,14 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
              }).attr('selected', 'selected');
         };
 
-        function addEdges(uniqueStreamId, uniqueId) {
-            var sourceId = uniqueId;
+        function addEdges(uniqueStreamId, uniqueSourceId) {
+            var sourceId = uniqueSourceId;
             var targetId = uniqueStreamId;
             var edgeId = sourceId + "_" + targetId;
-            var sourceType = self.configurationData.getSiddhiAppConfig().getDefinitionElementById(sourceId, true, true).type;
-            var targetType = self.configurationData.getSiddhiAppConfig().getDefinitionElementById(targetId, true, true).type;
+            var sourceType = self.configurationData.getSiddhiAppConfig().getDefinitionElementById
+                                                                                        (sourceId, true, true).type;
+            var targetType = self.configurationData.getSiddhiAppConfig().getDefinitionElementById
+                                                                                (targetId, true, true).type;
             var edgeOptions = {};
                 _.set(edgeOptions, 'id', edgeId);
                 _.set(edgeOptions, 'childId', targetId);
@@ -1175,7 +965,6 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 _.set(edgeOptions, 'parentId', sourceId);
                 _.set(edgeOptions, 'parentType', sourceType);
                 var edge = new Edge(edgeOptions);
-
             if (edge.parentType === 'STREAM') {
                 // check if this is originating from the fault stream and get the correct parent id and set
                 var stream = getStreambyId(self.configurationData.siddhiAppConfig.getStreamList(), newParentId);
@@ -1187,7 +976,6 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 }
             }
             self.configurationData.addEdge(new Edge(edgeOptions));
-
             self.configurationData.setIsStillDrawingGraph(true);
             var targetId;
             var sourceId;
@@ -1197,7 +985,6 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 outlineStroke: "transparent",
                 outlineWidth: "3"
             };
-
             if (edge.getChildType() === 'PARTITION') {
                 targetId = edge.getChildId();
                 sourceId = edge.getParentId() + '-out';
@@ -1225,7 +1012,6 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
                 }
                 targetId = edge.getChildId() + '-in';
             }
-
             self.jsPlumbInstance.connect({
                 source: sourceId,
                 target: targetId,
@@ -1235,13 +1021,10 @@ define(['require', 'lodash', 'jquery', 'log', 'appData','configurationData','edg
 
         function removeEdges(targetId ,sourceId){
             var targetElement = $('#' + targetId);
-
             var outConnection = self.jsPlumbInstance.getConnections({source: sourceId + '-out'})[0];
-
             if (outConnection.connector !== null) {
                 self.jsPlumbInstance.deleteConnection(outConnection);
             }
         };
-
     return SourceFormWizard;
 });

@@ -431,6 +431,14 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             self.addEventListenersForAttributeDivForWizard(formContainer);
         };
 
+        FormUtils.prototype.renderAttributeTemplateForWizard = function (attributes, formContainer) {
+            var self = this;
+            var attributeFormTemplate = Handlebars.compile($('#attribute-form-template').html())(attributes);
+
+            formContainer.find('#define-attribute').html(attributeFormTemplate);
+            self.changeAttributeNavigationForWizard('#attribute-div' , formContainer);
+            self.addEventListenersForAttributeDivForWizard(formContainer);
+        };
         /**
          * @function render the user defined select atributes
          * @param {Object} attributes user saved attribute expression to be rendered
@@ -485,6 +493,16 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 $('#define-map #map-type').val('passThrough');
                 $('#define-map #map-type option:contains("' + Constants.DEFAULT_MAPPER_TYPE + '")')
                     .text('passThrough (default)');
+            }
+        };
+
+        FormUtils.prototype.renderMapForWizard = function (predefinedMaps, formContainer) {
+            if (!$.trim(formContainer.find('#define-map').html()).length) {
+                var mapFormTemplate = Handlebars.compile($('#type-selection-form-template').html())
+                ({id: "map", types: predefinedMaps});
+                formContainer.find('#define-map').html(mapFormTemplate);
+                formContainer.find('#define-map #map-type').val('passThrough');
+                formContainer.find('#define-map #map-type option:contains("' + Constants.DEFAULT_MAPPER_TYPE + '")').text('passThrough (default)');
             }
         };
 
@@ -1316,6 +1334,30 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             return isError;
         };
 
+        FormUtils.prototype.validateOptionsForWizard = function (predefinedOptions, id, sourceContainer) {
+            var self = this;
+            var isError = false;
+            sourceContainer.find('#' + id + '-options .option').each(function () {
+                var optionName = $(this).find('.option-name').text().trim();
+                var optionValue = $(this).find('.option-value').val().trim();
+                var predefinedOptionObject = self.getObject(optionName, predefinedOptions);
+                if ($(this).find('.option-name').hasClass('mandatory-option')) {
+                    if (!self.checkOptionValue(optionValue, predefinedOptionObject, this)) {
+                        isError = true;
+                        return false;
+                    }
+                } else {
+                    if ($(this).find('.option-checkbox').is(":checked")) {
+                        if (!self.checkOptionValue(optionValue, predefinedOptionObject, this)) {
+                            isError = true;
+                            return false;
+                        }
+                    }
+                }
+            });
+            return isError;
+        };
+
         /**
          * @function to validate conditions of pattern and sequence query
          */
@@ -1842,6 +1884,31 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             return isError;
         };
 
+        FormUtils.prototype.validateCustomizedOptionsForWizard = function (id ,sourceContainer) {
+            var self = this;
+            var isError = false;
+            if (sourceContainer.find('#customized-' + id + '-options ul').has('li').length != 0) {
+                sourceContainer.find('#customized-' + id + '-options .option').each(function () {
+                    var custOptName = $(this).find('.cust-option-key');
+                    var custOptValue = $(this).find('.cust-option-value');
+                    if ((custOptName.val().trim() != "") || (custOptValue.val().trim() != "")) {
+                        if (custOptName.val().trim() == "") {
+                            self.addErrorClass(custOptName);
+                            custOptName.parent().next('.error-message').text('Option key is required.');
+                            isError = true;
+                            return false;
+                        } else if (custOptValue.val().trim() == "") {
+                            custOptValue.parent().next('.error-message').text('Option value is required.');
+                            self.addErrorClass(custOptValue);
+                            isError = true;
+                            return false;
+                        }
+                    }
+                });
+            }
+            return isError;
+        };
+
         /**
          * @function to check if a particular value is valid
          * @param {String} optionValue value which needs to be validated
@@ -1991,6 +2058,31 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             return false;
         };
 
+        FormUtils.prototype.validateAttributeOrElementNameForWizard = function (id, type, name, formContainer) {
+            var self = this;
+            var errorMessageLabel;
+            if (type === Constants.ATTRIBUTE) {
+                //errorMessageLabel = $(id).parents(".attribute").find(".error-message");
+                errorMessageLabel = formContainer.find(id).parents(".attribute").find(".error-message");
+            } else {
+                //errorMessageLabel = $(id + 'ErrorMessage');
+                errorMessageLabel = formContainer.find(id + 'ErrorMessage');
+            }
+
+            if (name.indexOf(' ') >= 0) {
+                errorMessageLabel.text(self.capitalizeFirstLetter(type) + " name can not have white space.")
+                self.addErrorClass(id);
+                return true;
+            }
+            if (!Constants.ALPHABETIC_VALIDATOR_REGEX.test(name.charAt(0))) {
+                errorMessageLabel.text
+                (self.capitalizeFirstLetter(type) + " name must start with an alphabetical character.");
+                self.addErrorClass(id);
+                return true;
+            }
+            return false;
+        };
+
         /**
          * @function validate the attributes
          * @param {Object} attributeNameList to add the valid attributes
@@ -2004,6 +2096,23 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 var attributeName = $(this).val().trim();
                 if (attributeName != "") {
                     var isError = self.validateAttributeOrElementName(this, Constants.ATTRIBUTE, attributeName);
+                    if (!isError) {
+                        attributeNameList.push(attributeName)
+                    } else {
+                        isErrorOccurred = true;
+                    }
+                }
+            });
+            return isErrorOccurred;
+        };
+
+        FormUtils.prototype.validateAttributesForWizard = function (attributeNameList, streamContainer) {
+            var self = this;
+            var isErrorOccurred = false;
+            streamContainer.find('.attr-name').each(function () {
+                var attributeName = $(this).val().trim();
+                if (attributeName != "") {
+                    var isError = self.validateAttributeOrElementNameForWizard(this, Constants.ATTRIBUTE, attributeName,streamContainer);
                     if (!isError) {
                         attributeNameList.push(attributeName)
                     } else {
@@ -2155,6 +2264,23 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
         FormUtils.prototype.buildOptions = function (selectedOptions, id) {
             var option;
             $('#' + id + '-options .option').each(function () {
+                var optionName = $(this).find('.option-name').text().trim();
+                var optionValue = $(this).find('.option-value').val().trim();
+                if ($(this).find('.option-name').hasClass('mandatory-option')) {
+                    option = optionName + " = \"" + optionValue + "\"";
+                    selectedOptions.push(option);
+                } else {
+                    if ($(this).find('.option-checkbox').is(":checked")) {
+                        option = optionName + " = \"" + optionValue + "\"";
+                        selectedOptions.push(option);
+                    }
+                }
+            });
+        };
+
+        FormUtils.prototype.buildOptionsForWizard = function (selectedOptions, id, sourceContainer) {
+            var option;
+            sourceContainer.find('#' + id + '-options .option').each(function () {
                 var optionName = $(this).find('.option-name').text().trim();
                 var optionValue = $(this).find('.option-value').val().trim();
                 if ($(this).find('.option-name').hasClass('mandatory-option')) {
@@ -2357,6 +2483,20 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var option = "";
             if ($('#customized-' + id + '-options ul').has('li').length != 0) {
                 $('#customized-' + id + '-options .option').each(function () {
+                    var custOptName = $(this).find('.cust-option-key').val().trim();
+                    var custOptValue = $(this).find('.cust-option-value').val().trim();
+                    if ((custOptName != "") && (custOptValue != "")) {
+                        option = custOptName + " = \"" + custOptValue + "\"";
+                        selectedOptions.push(option);
+                    }
+                });
+            }
+        };
+
+        FormUtils.prototype.buildCustomizedOptionForWizard = function (selectedOptions, id, sourceContainer) {
+            var option = "";
+            if (sourceContainer.find('#customized-' + id + '-options ul').has('li').length != 0) {
+                sourceContainer.find('#customized-' + id + '-options .option').each(function () {
                     var custOptName = $(this).find('.cust-option-key').val().trim();
                     var custOptValue = $(this).find('.cust-option-value').val().trim();
                     if ((custOptName != "") && (custOptValue != "")) {
@@ -3125,6 +3265,30 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             return isErrorOccurred;
         };
 
+        FormUtils.prototype.validateAnnotationsForWizard = function (predefinedAnnotationList, annotationNodes ,formContainer) {
+            var self = this;
+            //gets all the parent nodes
+            var jsTreeAnnotationList = formContainer.find('#annotation-div').jstree(true)._model.data['#'].children;
+            var isErrorOccurred = false;
+            _.forEach(jsTreeAnnotationList, function (jsTreeAnnotation) {
+                var node_info = formContainer.find('#annotation-div').jstree("get_node", jsTreeAnnotation);
+                var predefinedObject = self.isPredefinedAnnotation(predefinedAnnotationList, node_info.text.trim())
+                if (predefinedObject) {
+                    if ((predefinedObject.isMandatory) || (!predefinedObject.isMandatory && node_info.state.checked)) {
+                        if (self.validatePredefinedAnnotationForWizard(node_info, predefinedObject, formContainer)) {
+                            isErrorOccurred = true;
+                            return false;
+                        } else {
+                            annotationNodes.push(jsTreeAnnotation)
+                        }
+                    }
+                } else {
+                    annotationNodes.push(jsTreeAnnotation)
+                }
+            });
+            return isErrorOccurred;
+        };
+
         /**
          * @function to validate the primary and index annotations
          * @return {boolean} isErrorOccurred
@@ -3133,6 +3297,28 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             var self = this;
             var isErrorOccurred = false;
             $('#primary-index-annotations .annotation').each(function () {
+                var annotationValues = [];
+                if ($(this).find('.annotation-checkbox').is(':checked')) {
+                    $(this).find('.annotation-value').each(function () {
+                        if ($(this).val().trim() != "") {
+                            annotationValues.push($(this).val());
+                        }
+                    });
+                    if (annotationValues.length == 0) {
+                        self.addErrorClass($(this).find('.annotation-value:eq(0)'));
+                        $(this).find('.error-message:eq(0)').text("Minimum one value is required");
+                        isErrorOccurred = true;
+                        return false;
+                    }
+                }
+            });
+            return isErrorOccurred;
+        };
+
+        FormUtils.prototype.validatePrimaryIndexAnnotationsForWizard = function (formContainer) {
+            var self = this;
+            var isErrorOccurred = false;
+            formContainer.find('#primary-index-annotations .annotation').each(function () {
                 var annotationValues = [];
                 if ($(this).find('.annotation-checkbox').is(':checked')) {
                     $(this).find('.annotation-value').each(function () {
@@ -3229,6 +3415,31 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             return isErrorOccurred;
         };
 
+        FormUtils.prototype.validatePredefinedAnnotationForWizard = function (node_info, predefinedAnnotationObject, formContainer) {
+            var self = this;
+            var isErrorOccurred = false;
+            var childrenOFPredefinedAnnotationNode = node_info.children;
+            _.forEach(childrenOFPredefinedAnnotationNode, function (jsTreePredefinedAnnotationElement) {
+                var annotation_key_info = formContainer.find('#annotation-div').jstree("get_node",
+                    jsTreePredefinedAnnotationElement);
+                var annotation_value_info = formContainer.find('#annotation-div').jstree("get_node", annotation_key_info
+                    .children[0])
+                //validate for checked(optional)properties which has empty values
+                if (annotation_key_info.state.checked && annotation_value_info.text.trim() == "") {
+                    DesignViewUtils.prototype.errorAlert("Property '" + annotation_key_info.text.trim() +
+                        "' is empty");
+                    isErrorOccurred = true;
+                    return false;
+                }
+                if (self.validateMandatoryElementsOfPredefinedObjects(annotation_key_info,
+                    annotation_value_info, predefinedAnnotationObject)) {
+                    isErrorOccurred = true;
+                    return false;
+                }
+            });
+            return isErrorOccurred;
+        };
+
         /**
          * @function validate the elements of the annotation
          * @param {Object} annotationKey jstree annotation key
@@ -3265,6 +3476,18 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 _.forEach(jsTreeNodes, function (node) {
                     if (node.text.trim().toLowerCase() == checkedBoxName.toLowerCase()) {
                         $("#annotation-div").jstree(true).check_node(node.id)
+                        return false;
+                    }
+                })
+            });
+        };
+
+        FormUtils.prototype.checkPredefinedAnnotationsForWizard = function (checkedBoxes , formContainer) {
+            var jsTreeNodes = formContainer.find('#annotation-div').jstree(true).get_json('#', {'flat': true});
+            _.forEach(checkedBoxes, function (checkedBoxName) {
+                _.forEach(jsTreeNodes, function (node) {
+                    if (node.text.trim().toLowerCase() == checkedBoxName.toLowerCase()) {
+                        formContainer.find("#annotation-div").jstree(true).check_node(node.id)
                         return false;
                     }
                 })
@@ -3373,6 +3596,27 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
         };
 
+        var annotation = "";
+        FormUtils.prototype.buildAnnotationForWizard = function (annotationNodes, annotationStringList, annotationObjectList, formContainer) {
+            var self = this;
+            _.forEach(annotationNodes, function (node) {
+                var node_info = formContainer.find('#annotation-div').jstree("get_node", node);
+                var childArray = node_info.children
+                if (childArray.length != 0) {
+                    annotation += "@" + node_info.text.trim() + "( "
+                    //create annotation object
+                    var annotationObject = new AnnotationObject();
+                    annotationObject.setName(node_info.text.trim())
+                    self.traverseChildAnnotationsForWizard(childArray, annotationObject, formContainer)
+                    annotation = annotation.substring(0, annotation.length - 1);
+                    annotation += ")"
+                    annotationObjectList.push(annotationObject)
+                    annotationStringList.push(annotation);
+                    annotation = "";
+                }
+            });
+        };
+
         /**
          * @function to traverse the children of the parent annotaions
          * @param {Object} children the children of a parent annotation node
@@ -3395,6 +3639,27 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     }
                 } else {
                     self.addAnnotationElement(node_info, annotationObject);
+                }
+            });
+        };
+
+        FormUtils.prototype.traverseChildAnnotationsForWizard = function (children, annotationObject, formContainer) {
+            var self = this;
+            children.forEach(function (node) {
+                var node_info = formContainer.find('#annotation-div').jstree("get_node", node);
+                //if the child is a sub annotation
+                if (self.isChildSubAnnotation(node_info)) {
+                    if (node_info.children.length != 0) {
+                        annotation += "@" + node_info.text.trim() + "( "
+                        var childAnnotation = new AnnotationObject();
+                        childAnnotation.setName(node_info.text.trim())
+                        self.traverseChildAnnotationsForWizard(node_info.children, childAnnotation,formContainer)
+                        annotationObject.addAnnotation(childAnnotation)
+                        annotation = annotation.substring(0, annotation.length - 1);
+                        annotation += "),"
+                    }
+                } else {
+                    self.addAnnotationElementForWizard(node_info, annotationObject,formContainer);
                 }
             });
         };
@@ -3445,6 +3710,20 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             } else {
                 annotation += node_info.text.trim() + "="
                 var node_value = formContainer.find('#annotation-div').jstree("get_node", node_info.children[0]).text.trim();
+                annotation += "'" + node_value + "' ,";
+                var element = new AnnotationElement(node_info.text.trim(), node_value)
+                annotationObject.addElement(element);
+            }
+        };
+
+        FormUtils.prototype.addAnnotationElementForWizard = function (node_info, annotationObject,formContainer) {
+            if (node_info.li_attr.class != undefined && (node_info.li_attr.class == "optional-key")
+                && node_info.state.checked == false) {
+                //not to add the child property if it hasn't been checked(predefined optional-key only)
+            } else {
+                annotation += node_info.text.trim() + "="
+                var node_value = formContainer.find('#annotation-div').jstree("get_node", node_info.children[0]).text.trim();
+                //var node_value = $('#annotation-div').jstree("get_node", node_info.children[0]).text.trim();
                 annotation += "'" + node_value + "' ,";
                 var element = new AnnotationElement(node_info.text.trim(), node_value)
                 annotationObject.addElement(element);
@@ -3674,6 +3953,96 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                     $("#btn-del-annotation").hide();
                     $("#btn-add-annotation").show();
                     $("#btn-add-key-val").hide();
+                    tree.deselect_all();
+                }
+            });
+        };
+
+        FormUtils.prototype.addEventListenersForJstreeForWizard = function (tree, formContainer) {
+            var self = this;
+            //to add key-value for annotation node
+            formContainer.find("#btn-add-key-val").on("click", function () {
+                var selectedNode = formContainer.find("#annotation-div").jstree("get_selected");
+                tree.create_node(selectedNode,
+                    {
+                        text: "property", class: "annotation-key", state: {"opened": true},
+                        "a_attr": {"class": "annotation-key"}, icon: "/editor/commons/images/properties.png",
+                        children: [{
+                            text: "value", class: "annotation-value", "a_attr": {"class": "annotation-value"},
+                            icon: "/editor/commons/images/value.png"
+                        }]
+                    }
+                );
+                tree.open_node(selectedNode);
+                tree.deselect_all();
+                self.updatePerfectScroller();
+            });
+
+            //to add annotation node
+            formContainer.find("#btn-add-annotation").on("click", function () {
+                var selectedNode = formContainer.find("#annotation-div").jstree("get_selected");
+                if (selectedNode == "") {
+                    selectedNode = "#"
+                }
+                tree.create_node(selectedNode, {
+                    text: "Annotation", class: "annotation", state: {"opened": true},
+                    "a_attr": {"class": "annotation"}, icon: "/editor/commons/images/annotation.png",
+                    children: [{
+                        text: "property", class: "annotation-key", icon: "/editor/commons/images/properties.png",
+                        "a_attr": {"class": "annotation-key"},
+                        children: [{
+                            text: "value", class: "annotation-value", "a_attr": {"class": "annotation-value"},
+                            icon: "/editor/commons/images/value.png"
+                        }]
+                    }]
+
+                });
+                tree.open_node(selectedNode);
+                tree.deselect_all();
+                self.updatePerfectScroller();
+            });
+
+            //to delete an annotation or a key-value node
+            formContainer.find("#btn-del-annotation").on("click", function () {
+                var selectedNode = formContainer.find("#annotation-div").jstree("get_selected");
+                tree.delete_node([selectedNode]);
+                tree.deselect_all();
+                self.updatePerfectScroller();
+            })
+
+            //to edit the selected node
+            //to hide/show the buttons corresponding to the node selected
+            formContainer.find('#annotation-div').on("select_node.jstree", function (e, data) {
+                var node_info = formContainer.find('#annotation-div').jstree("get_node", data.node)
+                if ((node_info.original != undefined && (node_info.original.class == "annotation")) ||
+                    (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation"))) {
+                    tree.edit(data.node)
+                    formContainer.find("#btn-del-annotation").show();
+                    formContainer.find("#btn-add-annotation").show();
+                    formContainer.find("#btn-add-key-val").show();
+
+                } else if ((node_info.original != undefined && (node_info.original.class == "annotation-key")) ||
+                    (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation-key"))) {
+                    tree.edit(data.node);
+                    formContainer.find("#btn-del-annotation").show();
+                    formContainer.find("#btn-add-annotation").hide();
+                    formContainer.find("#btn-add-key-val").hide();
+
+                } else if ((node_info.original != undefined && (node_info.original.class == "annotation-value")) ||
+                    (node_info.li_attr != undefined && (node_info.li_attr.class == "annotation-value"))) {
+                    formContainer.find("#btn-del-annotation").hide();
+                    formContainer.find("#btn-add-annotation").hide();
+                    formContainer.find("#btn-add-key-val").hide();
+                    tree.edit(data.node);
+                }
+            });
+
+            //to unselect the nodes when user clicks other than the nodes in jstree
+            $(document).on('click', function (e) {
+                if ($(e.target).closest('.jstree').length) {
+                    formContainer.find("#btn-del-annotation").hide();
+                    formContainer.find("#btn-add-annotation").show();
+                    formContainer.find("#btn-add-key-val").hide();
                     tree.deselect_all();
                 }
             });
@@ -4588,6 +4957,44 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
         };
 
+        FormUtils.prototype.addEventListenersForAttributeDivForWizard = function (formContainer) {
+            var self = this;
+            //To add attribute
+            formContainer.find("#define-attribute").on('click', '#btn-add-attribute', function () {
+                formContainer.find("#attribute-div").append(self.addAttribute());
+                self.changeAttributeNavigationForWizard('#attribute-div', formContainer);
+                self.updatePerfectScroller();
+            });
+
+            //To delete attribute
+            formContainer.find("#define-attribute").on('click', '#attribute-div .btn-del-attr', function () {
+                $(this).closest('li').remove();
+                self.changeAttributeNavigationForWizard('#attribute-div', formContainer);
+                self.updatePerfectScroller();
+            });
+
+            //To reorder up the attribute
+            formContainer.find("#define-attribute").on('click', ' #attribute-div .reorder-up', function () {
+                var $current = $(this).closest('li');
+                var $previous = $current.prev('li');
+                if ($previous.length !== 0) {
+                    $current.insertBefore($previous);
+                }
+                self.changeAttributeNavigationForWizard('#attribute-div', formContainer);
+            });
+
+            //To reorder down the attribute
+            formContainer.find("#define-attribute").on('click', ' #attribute-div .reorder-down', function () {
+                var $current = $(this).closest('li');
+                var $next = $current.next('li');
+                if ($next.length !== 0) {
+                    $current.insertAfter($next);
+                }
+                self.changeAttributeNavigationForWizard('#attribute-div', formContainer);
+            });
+        };
+
+
         /**
          * @function to hide and show the description of the info icon
          */
@@ -4678,6 +5085,44 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
         };
 
+        FormUtils.prototype.addEventListenersForGenericOptionsDivForWizard = function (id ,formContainer) {
+            var self = this;
+            //To hide and show the option content of the optional options
+            formContainer.find('#' + id + '-options-div').on('change', '.option-checkbox', function () {
+                var optionParent = $(this).parents(".option");
+                if ($(this).is(':checked')) {
+                    optionParent.find(".option-value").show();
+                } else {
+                    optionParent.find(".option-value").hide();
+                    optionParent.find(".option-value").removeClass("required-input-field");
+                    optionParent.find(".error-message").text("");
+                }
+                self.updatePerfectScroller();
+            });
+
+            //To add customized option
+            formContainer.find('#' + id + '-options-div').on('click', '#btn-add-' + id + '-options', function () {
+                var custOptDiv = '<li class="option">' +
+                    '<div class = "clearfix"> <label>option.key</label> <input type="text" class="cust-option-key"' +
+                    'value=""> </div> <label class = "error-message"></label> ' +
+                    '<div class="clearfix"> <label>option.value</label> ' +
+                    '<input type="text" class="cust-option-value" value="">' +
+                    '<a class = "btn-del btn-del-option"><i class="fw fw-delete"></i></a></div>' +
+                    '<label class = "error-message"></label></li>';
+                formContainer.find('#customized-' + id + '-options .cust-options').append(custOptDiv);
+                self.changeCustomizedOptDivForWizard(id, formContainer);
+                self.updatePerfectScroller();
+            });
+
+            //To delete customized option
+            formContainer.find('#' + id + '-options-div').on('click', '.btn-del-option', function () {
+                $(this).closest('li').remove();
+                self.changeCustomizedOptDivForWizard(id , formContainer);
+                self.updatePerfectScroller();
+            });
+        };
+
+
         /**
          * @function to add event listeners for the primary index annotation div
          */
@@ -4701,6 +5146,38 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
 
             // To show the values of the primaryKey and index annotations on change of the checkbox
             $('#primary-index-annotations').on('change', '.annotation-checkbox', function () {
+                var parent = $(this).parents(".annotation");
+                if ($(this).is(':checked')) {
+                    parent.find('.annotation-content').show();
+                } else {
+                    parent.find('.annotation-content').hide();
+                    parent.find('.error-message').text("");
+                    parent.find('.annotation-value').removeClass('required-input-field')
+                }
+                self.updatePerfectScroller();
+            });
+        };
+
+        FormUtils.prototype.addEventListenerForPrimaryIndexAnnotationDivForWizard = function (formContainer) {
+            var self = this;
+            //To add annotation value
+            formContainer.find('#primary-index-annotations').on('click', '.btn-add-annot-value', function () {
+                $(this).parents(".annotation").find("ul").append
+                ('<li class = "clearfix primary-index-annotation-value"> <div class="clearfix"> ' +
+                    '<input type = "text" value = "" class = "annotation-value"/> ' +
+                    '<a class = "btn-del-annot-value"> <i class = "fw fw-delete"> </i> </a> </div> ' +
+                    '<label class="error-message"></label> </li>');
+                self.updatePerfectScroller();
+            });
+
+            //To delete annotation value
+            formContainer.find('#primary-index-annotations').on('click', '.btn-del-annot-value', function () {
+                $(this).closest('li').remove();
+                self.updatePerfectScroller();
+            });
+
+            // To show the values of the primaryKey and index annotations on change of the checkbox
+            formContainer.find('#primary-index-annotations').on('change', '.annotation-checkbox', function () {
                 var parent = $(this).parents(".annotation");
                 if ($(this).is(':checked')) {
                     parent.find('.annotation-content').show();
@@ -4778,12 +5255,39 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             });
         };
 
+        FormUtils.prototype.addEventListenersForPredefinedAnnotationsForWizard = function (formContainer) {
+            var self = this;
+            formContainer.find('.define-predefined-annotations').on('change', '.annotation-checkbox', function () {
+                var parent = $(this).closest(".predefined-annotation");
+                if ($(this).is(':checked')) {
+                    parent.find('.annotation-content').first().show();
+                } else {
+                    parent.find('.annotation-content').first().hide();
+                    parent.find('.error-message').text("");
+                    parent.find('.option-value').removeClass('required-input-field')
+                }
+                self.updatePerfectScroller();
+            });
+        }
+
         /**
          * @function to change the heading and the button text of the customized options div
          */
         FormUtils.prototype.changeCustomizedOptDiv = function (id) {
             var customizedOptionList = $('#customized-' + id + '-options').find('.cust-options .option');
             var parent = $('#customized-' + id + '-options');
+            if (customizedOptionList.length > 0) {
+                parent.find('h4').show();
+                parent.find('.btn-add-options').html('+ More');
+            } else {
+                parent.find('h4').hide();
+                parent.find('.btn-add-options').html('+ Customized Option');
+            }
+        };
+
+        FormUtils.prototype.changeCustomizedOptDivForWizard = function (id, formContainer) {
+            var customizedOptionList = formContainer.find('#customized-' + id + '-options').find('.cust-options .option');
+            var parent = formContainer.find('#customized-' + id + '-options');
             if (customizedOptionList.length > 0) {
                 parent.find('h4').show();
                 parent.find('.btn-add-options').html('+ More');
@@ -4832,6 +5336,32 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 }
                 $(ulDiv).find('li:eq(0)').find('.attr-nav a:eq(0)').remove();
                 $(ulDiv).find('li:eq(' + lastIndex + ')').find('.attr-nav a:eq(1)').remove();
+            }
+        };
+
+        FormUtils.prototype.changeAttributeNavigationForWizard = function (ulDiv , formContainer) {
+            formContainer.find(ulDiv).find('.attr-nav').empty();
+            var attrLength = formContainer.find(ulDiv).find('li').length;
+
+            if (attrLength == 1) {
+                formContainer.find(ulDiv).find('li:eq(0)').find('.attr-nav').empty();
+            }
+            if (attrLength == 2) {
+                formContainer.find(ulDiv).find('li:eq(0)').find('.attr-nav').append('<a class = "reorder-down"><i class="fw ' +
+                    'fw-sort-down"> </i></a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
+                formContainer.find(ulDiv).find('li:eq(1)').find('.attr-nav').append('<a class="reorder-up"> <i class="fw fw-sort-up">' +
+                    '</i> </a><a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
+            }
+            if (attrLength > 2) {
+                var lastIndex = attrLength - 1;
+                for (var i = 0; i < attrLength; i++) {
+                    formContainer.find(ulDiv).find('li:eq(' + i + ')').find('.attr-nav').append('<a class="reorder-up"> ' +
+                        '<i class="fw fw-sort-up"></i></a>' +
+                        '<a class = "reorder-down"><i class="fw fw-sort-down"> </i></a>' +
+                        '<a class = "btn-del-attr"><i class="fw fw-delete"></i></a>');
+                }
+                formContainer.find(ulDiv).find('li:eq(0)').find('.attr-nav a:eq(0)').remove();
+                formContainer.find(ulDiv).find('li:eq(' + lastIndex + ')').find('.attr-nav a:eq(1)').remove();
             }
         };
 
@@ -5150,6 +5680,90 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 success: function (response) {
                     var toolTipObject = _.find(response, function (toolTip) {
                         return toolTip.id === element.getId();
+                    });
+                    if (toolTipObject !== undefined) {
+                        result = toolTipObject.text;
+                    }
+                },
+                error: function (error) {
+                    if (error.responseText) {
+                        log.error(error.responseText);
+                    } else {
+                        log.error("Error occurred while processing the request");
+                    }
+                }
+            });
+            return result;
+        };
+
+        FormUtils.prototype.getTooltipForWizard = function (element, type) {
+            var appData = new AppData();
+
+            switch (type) {
+                case Constants.AGGREGATION:
+                    appData.addAggregation(element);
+                    break;
+
+                case Constants.FUNCTION:
+                    appData.addFunction(element);
+                    break;
+
+                case Constants.JOIN_QUERY:
+                    appData.addJoinQuery(element);
+                    break;
+
+                case Constants.PARTITION:
+                    appData.addPartition(element);
+                    break;
+
+                case Constants.PATTERN_QUERY:
+                    appData.addPatternQuery(element);
+                    break;
+
+                case Constants.SEQUENCE_QUERY:
+                    appData.addSequenceQuery(element);
+                    break;
+
+                case Constants.SINK:
+                    appData.addSink(element);
+                    break;
+
+                case Constants.SOURCE:
+                    appData.addSource(element);
+                    break;
+
+                case Constants.STREAM:
+                    appData.addStream(element);
+                    break;
+
+                case Constants.TABLE:
+                    appData.addTable(element);
+                    break;
+
+                case Constants.TRIGGER:
+                    appData.addTrigger(element);
+                    break;
+
+                case Constants.WINDOW:
+                    appData.addWindow(element);
+                    break;
+
+                case Constants.WINDOW_FILTER_PROJECTION_QUERY:
+                    appData.addWindowFilterProjectionQuery(element);
+                    break;
+            };
+
+            var self = this;
+            var result = '';
+            self.tooltipsURL = window.location.protocol + "//" + window.location.host + "/editor/tooltips";
+            $.ajax({
+                type: "POST",
+                url: self.tooltipsURL,
+                data: self.configurationData.application.utils.base64EncodeUnicode(JSON.stringify(appData)),
+                async: false,
+                success: function (response) {
+                    var toolTipObject = _.find(response, function (toolTip) {
+                        return toolTip.id === element.id;
                     });
                     if (toolTipObject !== undefined) {
                         result = toolTipObject.text;

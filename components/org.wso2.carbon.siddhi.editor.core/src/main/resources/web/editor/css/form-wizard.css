@@ -1,7 +1,4 @@
 /** contains css for form wizard **/
-body {
-  font-size: 1.4rem;
-}
 
 .form-wizard-form-scrollable-block {
     padding: 20px 20px;
@@ -26,6 +23,10 @@ hr.style1 {
     width: 93%;
 }
 
+.form-wizard .form-group {
+    margin: 10px 0;
+}
+
 .form-wizard .modal-body {
 }
 
@@ -34,7 +35,7 @@ hr.style1 {
 }
 
 .form-wizard-title {
-    padding:10px 10px 10px 10px;
+    padding:0 0 10px 10px;
 }
 
 .form-wizard-label {
@@ -80,16 +81,16 @@ hr.form-wizard-hr {
 }
 
 .sw-theme-default > ul.step-anchor.form_wizard_item li {
-    width: 20%;
+    max-width: 16.65%;
 }
 
-.sw-theme-default .sw-btn-group-final{
-    width: 85% !important;
-    float: left !important;
+.sw-theme-default > ul.step-anchor > li > a, .sw-theme-default > ul.step-anchor > li > a:hover {
+    height: initial;
 }
 
-.btn {
-  font-size: 1.4rem;
+.sw-theme-default > ul.step-anchor > li > a::after {
+    bottom: auto;
+    top: 0px;
 }
 
 .form-selector {
@@ -97,103 +98,27 @@ hr.form-wizard-hr {
     height: 98% !important;
 }
 
-.design-view-form-content .error-message {
-    display: none;
-    color: red;
-    padding-top: 4px;
-}
-
-.design-view-form-content .attribute-map-div {
-    width: 20%;
-}
-
-.design-view-form-content .mapper-div {
-    width: 15%;
-}
-
-.design-view-form-content .source-div{
-    width: 35%;
-}
-
-.stream-form-container {
-    width: 20%;
-}
-
-.design-view-form-content .attr-content {
-    width: 65%;
-}
-
-.design-view-form-content {
-    padding: 10px;
-    height: 100%
-}
-
-.design-view-form-content input[type="text"].name,
- .design-view-form-content input:read-only.name,
- .design-view-form-content textarea {
-    width: 77%;
+.stream-form-container{
+    width: 32%;
 }
 
 .design-view-form-content #attribute-div input[type="text"] {
-    width: 63%;
+    width: 82%;
 }
 
-.design-view-form-content .attributes-container {
-    margin-top: 15px;
-}
-
-.form-min-width {
-    min-width: 1500px;
-}
-
-.design-view-form-content select {
-    font-size: 10px;
-}
-
-.design-view-form-content .attr-nav,
 .design-view-form-content .attr-content {
-    display: inline-block;
-    float: left;
+    width: 80%;
 }
 
-.design-view-form-content .attr-nav {
-    margin-top: -2px;
+input[type="checkbox"]{
+    margin: 10px 10px 0px 0;
+    vertical-align: middle;
+    padding: 20px;
 }
 
-.stream-form-container .attr-nav {
-    margin-left: -15px;
+.design-view-form-content input[type="text"].name,
+.design-view-form-content input:read-only.name,
+.design-view-form-content textarea {
+    width: 77%;
 }
 
-.source-sink-form-container #mapper-attributes input[type="text"].attr-value,
-.source-sink-form-container #mapper-attributes input:read-only.attr-key,
-.source-sink-form-container #mapper-attributes input[type="text"].attr-key {
-    width: 40%;
-}
-
-.design-view-form-content input[type="text"]{
-    border: 1px solid #716e6e;
-    line-height: 20px;
-    padding: 0 5px;
-    color: #ccc;
-    background: #424242;
-}
-
-.design-view-form-content input[type="text"].option-value {
-    width: 85%;
-    margin-bottom: 2px;
-    margin-left: 20px;
-}
-
-.design-view-form-content input:read-only, .design-view-form-content select:disabled {
-    cursor: not-allowed;
-    background: #1d1d1d;
-    border: 1px solid #545353;
-}
-
-.design-view-form-content .btn-default {
-    margin-top: 15px;
-}
-
-.design-view-form-content .btn {
-    font-size: 10px;
-}

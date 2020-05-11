@@ -3,11 +3,11 @@
  */
 define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dropElements', 'dagre', 'edge',
         'windowFilterProjectionQueryInput', 'joinQueryInput', 'patternOrSequenceQueryInput', 'queryOutput',
-        'partitionWith', 'jsonValidator', 'constants', 'dragSelect','sourceFormWizard','sourceForm'],
+        'partitionWith', 'jsonValidator', 'constants', 'dragSelect','sourceFormWizard'],
 
     function (require, log, $, Backbone, _, DesignViewUtils, DropElements, dagre, Edge,
               WindowFilterProjectionQueryInput, JoinQueryInput, PatternOrSequenceQueryInput, QueryOutput,
-              PartitionWith, JSONValidator, Constants, DragSelect, SourceFormWizard, SourceForm) {
+              PartitionWith, JSONValidator, Constants, DragSelect, SourceFormWizard) {
 
         const TAB_INDEX = 10;
         const ENTER_KEY = 13;
@@ -195,8 +195,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
 
                         // If the dropped Element is a Source annotation then->
                         if ($(droppedElement).hasClass('source-drag')) {
-                            //self.handleSourceAnnotation(mouseTop, mouseLeft, false, "Source");
-                            _.set(self.options, 'uniqueId', self.getNewAgentId());
+                            _.set(self.options, 'uniqueSourceId', self.getNewAgentId());
                             _.set(self.options, 'uniqueStreamId', self.getNewAgentId());
                             self._sourceformDialogModel = new SourceFormWizard(self.options);
                             self._sourceformDialogModel.render();
@@ -2238,11 +2237,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
         };
 
         DesignGrid.prototype.handleSourceAnnotation = function (mouseTop, mouseLeft, isCodeToDesignMode, sourceName,
-                                                                sourceId, sourceToolTip) {
+                                                                sourceId, source, sourceToolTip) {
             var self = this;
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
-                elementId = self.getNewAgentId();
+                elementId = sourceId;
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
                 if (sourceId !== undefined) {
                     elementId = sourceId;
@@ -2262,7 +2261,7 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }
             self.canvas.append(newAgent);
             // Drop the source element. Inside this a it generates the source definition form.
-            self.dropElements.dropSource(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, sourceName);
+            self.dropElements.dropSource(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, sourceName,source);
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
@@ -2766,21 +2765,20 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             return result;
         };
 
-        DesignGrid.prototype.handleStreamForWizard = function (mouseTop,mouseLeft,isCodeToDesignMode, streamId, streamName, streamToolTip, stream) {
+        DesignGrid.prototype.handleStreamForWizard = function (mouseTop,mouseLeft,isCodeToDesignMode, streamId,
+                                                                            streamName,stream, streamToolTip) {
             var self = this;
-
             var elementId;
             if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
-                elementId = stream && stream.id ? stream.id: self.getNewAgentId();
+                elementId = stream && stream.getId() ? stream.getId() : self.getNewAgentId();
             } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if (streamId !== undefined) {
+                if (streamId) {
                     elementId = streamId;
-                    self.generateNextNewAgentId();
                 } else {
-                    console.log("streamId parameter is undefined");
+                    log.error("streamId parameter is undefined");
                 }
             } else {
-                console.log("isCodeToDesignMode parameter is undefined");
+                log.error("isCodeToDesignMode parameter is undefined");
             }
 
             var newAgent = $('<div>').attr({
@@ -2789,6 +2787,10 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             }).addClass(constants.STREAM);
 
             var inFaultStreamCreationPath = false;
+            if (stream && stream.isFaultStream()) {
+                newAgent.hide();
+                inFaultStreamCreationPath = true;
+            }
 
             if (isCodeToDesignMode) {
                 newAgent.attr('title', streamToolTip);
@@ -2796,44 +2798,11 @@ define(['require', 'log', 'jquery', 'backbone', 'lodash', 'designViewUtils', 'dr
             self.canvas.append(newAgent);
             // Drop the stream element. Inside this a it generates the stream definition form.
             self.dropElements.dropStreamForWizard(newAgent, elementId, mouseTop,mouseLeft,isCodeToDesignMode,
-                false, streamName, stream && false, inFaultStreamCreationPath);
+                false, streamName, stream && stream.hasFaultStream(), inFaultStreamCreationPath,stream);
             self.configurationData.getSiddhiAppConfig()
                 .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
             self.dropElements.registerElementEventListeners(newAgent);
             self.enableMultipleSelection();
         };
-
-        DesignGrid.prototype.handleSourceForWizard = function (mouseTop, mouseLeft, isCodeToDesignMode, sourceName,
-                                                                        sourceId, sourceToolTip) {
-            var self = this;
-            var elementId;
-            if (isCodeToDesignMode !== undefined && !isCodeToDesignMode) {
-                elementId = sourceId;
-            } else if (isCodeToDesignMode !== undefined && isCodeToDesignMode) {
-                if (sourceId !== undefined) {
-                    elementId = sourceId;
-                    self.generateNextNewAgentId();
-                } else {
-                    console.log("sourceId parameter is undefined");
-                }
-            } else {
-                console.log("isCodeToDesignMode parameter is undefined");
-            }
-            var newAgent = $('<div>').attr({
-                'id': elementId,
-                'tabindex': TAB_INDEX
-            }).addClass(constants.SOURCE);
-            if (isCodeToDesignMode) {
-                newAgent.attr('title', sourceToolTip);
-            }
-            self.canvas.append(newAgent);
-            // Drop the source element. Inside this a it generates the source definition form.
-            self.dropElements.dropSourceForWizard(newAgent, elementId, mouseTop, mouseLeft, isCodeToDesignMode, sourceName);
-            self.configurationData.getSiddhiAppConfig()
-                .setFinalElementCount(self.configurationData.getSiddhiAppConfig().getFinalElementCount() + 1);
-            self.dropElements.registerElementEventListeners(newAgent);
-            self.enableMultipleSelection();
-        };
-
         return DesignGrid;
     });

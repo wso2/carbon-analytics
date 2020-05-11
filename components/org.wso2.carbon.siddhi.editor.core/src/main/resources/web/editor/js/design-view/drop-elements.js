@@ -5,8 +5,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
         'jsonValidator', 'sourceOrSinkAnnotation', 'stream', 'table', 'window', 'trigger', 'functionDefinition',
         'constants', 'attribute', 'sourceFormWizard'],
     function (require, log, _, $, Partition, Stream, Query, FormBuilder, Aggregation, JSONValidator,
-              SourceOrSinkAnnotation, Stream, Table, Window, Trigger, FunctionDefinition,Constants,Attribute,SourceFormWizard) {
-
+              SourceOrSinkAnnotation, Stream, Table, Window, Trigger, FunctionDefinition,
+              Constants, Attribute, SourceFormWizard) {
         /**
          * @class DesignView
          * @constructor
@@ -62,20 +62,13 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param isCodeToDesignMode whether code to design mode is enable or not
          * @param sourceName name of the source
          */
-        DropElements.prototype.dropSource = function (newAgent, i, top, left, isCodeToDesignMode, sourceName) {
+        DropElements.prototype.dropSource = function (newAgent, i, top, left, isCodeToDesignMode, sourceName,source) {
 
             var self = this;
             var name;
             if (isCodeToDesignMode) {
                 name = sourceName;
             } else {
-                var sourceOptions = {};
-                _.set(sourceOptions, 'id', i);
-                _.set(sourceOptions, 'annotationType', 'SOURCE');
-                _.set(sourceOptions, 'type', undefined);
-                var source = new SourceOrSinkAnnotation(sourceOptions);
-                self.configurationData.getSiddhiAppConfig().addSource(source);
-
                 JSONValidator.prototype.validateSourceOrSinkAnnotation(source, 'Source', true)
             }
             var node = $('<div> ' + name + ' </div>');
@@ -85,38 +78,32 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             var sourceObject;
             var connectedElementName;
-            var connectedStreamId
+            var connectedStreamId;
 
             var nodeId = $('#' + i)[0];
             nodeId.addEventListener('dblclick', function () {
-                //self.formBuilder.GeneratePropertiesFormForSources(this.children)
                 sourceObject = self.configurationData.getSiddhiAppConfig().getSource(i);
                 connectedElementName = sourceObject.getConnectedElementName();
-                connectedStreamId = self.configurationData.getSiddhiAppConfig().connectedStreamWithOuterSource(connectedElementName);
-
-                 _.set(self.options, 'uniqueStreamId', connectedStreamId);
-                _.set(self.options, 'uniqueId', i);
-                _.set(self.options, 'StreamId', self.designGrid.getNewAgentId());
+                connectedStreamId = self.configurationData.getSiddhiAppConfig().
+                                                                connectedStreamWithOuterSource(connectedElementName);
+                _.set(self.options, 'uniqueStreamId', connectedStreamId);
+                _.set(self.options, 'uniqueSourceId', i);
                 _.set(self.options,'isEditflow', true);
-                _.set(self.options,'isDeleteflow', undefined);
-                self._sourceformDialogModel = new SourceFormWizard(self.options);
-                self._sourceformDialogModel.render();
+                _.set(self.options,'isStreamDeleteflow', undefined);
+                new SourceFormWizard(self.options).render();
             });
 
             $('#' + i).on('keydown', function (key) {
                 if (key.keyCode == ENTER_KEY) {
-                    //self.formBuilder.GeneratePropertiesFormForSources(this.children)
                     sourceObject = self.configurationData.getSiddhiAppConfig().getSource(i);
                     connectedElementName = sourceObject.getConnectedElementName();
-                    connectedStreamId = self.configurationData.getSiddhiAppConfig().connectedStreamWithOuterSource(connectedElementName);
-
-                     _.set(self.options, 'uniqueStreamId', connectedStreamId);
-                    _.set(self.options, 'uniqueId', i);
-                    _.set(self.options, 'StreamId', self.designGrid.getNewAgentId());
+                    connectedStreamId = self.configurationData.getSiddhiAppConfig().
+                                                                   connectedStreamWithOuterSource(connectedElementName);
+                    _.set(self.options, 'uniqueStreamId', connectedStreamId);
+                    _.set(self.options, 'uniqueSourceId', i);
                     _.set(self.options,'isEditflow', true);
-                    _.set(self.options,'isDeleteflow', undefined);
-                    self._sourceformDialogModel = new SourceFormWizard(self.options);
-                    self._sourceformDialogModel.render();
+                    _.set(self.options,'isStreamDeleteflow', undefined);
+                    new SourceFormWizard(self.options).render();
                 }
             });
             /*
@@ -133,18 +120,15 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
 
             var settingsIconElement = $('#' + settingsIconId)[0];
             settingsIconElement.addEventListener('click', function () {
-                //self.formBuilder.GeneratePropertiesFormForSources(this);
                 sourceObject = self.configurationData.getSiddhiAppConfig().getSource(i);
                 connectedElementName = sourceObject.getConnectedElementName();
-                connectedStreamId = self.configurationData.getSiddhiAppConfig().connectedStreamWithOuterSource(connectedElementName);
-
-                 _.set(self.options, 'uniqueStreamId', connectedStreamId);
-                _.set(self.options, 'uniqueId', i);
-                _.set(self.options, 'StreamId', self.designGrid.getNewAgentId());
+                connectedStreamId = self.configurationData.getSiddhiAppConfig().
+                                                                connectedStreamWithOuterSource(connectedElementName);
+                _.set(self.options, 'uniqueStreamId', connectedStreamId);
+                _.set(self.options, 'uniqueSourceId', i);
                 _.set(self.options,'isEditflow', true);
-                _.set(self.options,'isDeleteflow', undefined);
-                self._sourceformDialogModel = new SourceFormWizard(self.options);
-                self._sourceformDialogModel.render();
+                _.set(self.options,'isStreamDeleteflow', undefined);
+                new SourceFormWizard(self.options).render();
             });
 
             var finalElement = newAgent;
@@ -277,7 +261,7 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
          * @param streamName name of the stream
          */
         DropElements.prototype.dropStream = function (newAgent, i, top, left, isCodeToDesignMode,
-                                                      isGenerateStreamFromQueryOutput, streamName, hasFaultStream, inFaultStreamCreationPath) {
+                              isGenerateStreamFromQueryOutput, streamName, hasFaultStream, inFaultStreamCreationPath) {
             /*
              The node hosts a text node where the Stream's name input by the user will be held.
              Rather than simply having a `newAgent.text(streamName)` statement, as the text function tends to
@@ -314,17 +298,17 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             nodeId.addEventListener('dblclick', function () {
                 streamObject = self.configurationData.getSiddhiAppConfig().getStream(i);
                 streamName = streamObject.getName();
-                isStreamConnected = self.configurationData.getSiddhiAppConfig().checkInnerStreamIsConnected(streamName);
-
-                if(isStreamConnected){
-                    connectedSourceId = self.configurationData.getSiddhiAppConfig().connectedSourceWithInnerStream(streamName);
+                isStreamConnected = self.configurationData.getSiddhiAppConfig().
+                                                                checkStreamIsConnectedWithSource(streamName);
+                if(isStreamConnected) {
+                    connectedSourceId = self.configurationData.getSiddhiAppConfig().
+                                                                connectedSourceWithInnerStream(streamName);
                     _.set(self.options, 'uniqueStreamId', i);
-                    _.set(self.options, 'uniqueId', connectedSourceId);
+                    _.set(self.options, 'uniqueSourceId', connectedSourceId);
                     _.set(self.options,'isEditflow', true);
-                    _.set(self.options,'isDeleteflow', undefined);
-                    self._sourceformDialogModel = new SourceFormWizard(self.options);
-                    self._sourceformDialogModel.render();
-                }else{
+                    _.set(self.options,'isStreamDeleteflow', undefined);
+                    new SourceFormWizard(self.options).render();
+                } else {
                     self.formBuilder.GeneratePropertiesFormForStreams(this.children)
                 }
             });
@@ -333,20 +317,21 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 if (key.keyCode == ENTER_KEY) {
                     streamObject = self.configurationData.getSiddhiAppConfig().getStream(i);
                     streamName = streamObject.getName();
-                    isStreamConnected = self.configurationData.getSiddhiAppConfig().checkInnerStreamIsConnected(streamName);
-
-                    if(isStreamConnected){
-                        connectedSourceId = self.configurationData.getSiddhiAppConfig().connectedSourceWithInnerStream(streamName);
+                    isStreamConnected = self.configurationData.getSiddhiAppConfig().
+                                                        checkStreamIsConnectedWithSource(streamName);
+                    if(isStreamConnected) {
+                        connectedSourceId = self.configurationData.getSiddhiAppConfig().
+                                                            connectedSourceWithInnerStream(streamName);
                         _.set(self.options, 'uniqueStreamId', i);
-                        _.set(self.options, 'uniqueId', connectedSourceId);
+                        _.set(self.options, 'uniqueSourceId', connectedSourceId);
                         _.set(self.options,'isEditflow', true);
-                        _.set(self.options,'isDeleteflow', undefined);
-                        self._sourceformDialogModel = new SourceFormWizard(self.options);
-                        self._sourceformDialogModel.render();
-                    }else{
+                        _.set(self.options,'isStreamDeleteflow', undefined);
+                        new SourceFormWizard(self.options).render();
+                    } else {
                         self.formBuilder.GeneratePropertiesFormForStreams(this.children)
                     }
                 }
+
             });
 
             /*
@@ -365,17 +350,17 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             settingsIconElement.addEventListener('click', function () {
                 streamObject = self.configurationData.getSiddhiAppConfig().getStream(i);
                 streamName = streamObject.getName();
-                isStreamConnected = self.configurationData.getSiddhiAppConfig().checkInnerStreamIsConnected(streamName);
-
-                if(isStreamConnected){
-                    connectedSourceId = self.configurationData.getSiddhiAppConfig().connectedSourceWithInnerStream(streamName);
+                isStreamConnected = self.configurationData.getSiddhiAppConfig().
+                                            checkStreamIsConnectedWithSource(streamName);
+                if(isStreamConnected) {
+                    connectedSourceId = self.configurationData.getSiddhiAppConfig().
+                                                    connectedSourceWithInnerStream(streamName);
                     _.set(self.options, 'uniqueStreamId', i);
-                    _.set(self.options, 'uniqueId', connectedSourceId);
+                    _.set(self.options, 'uniqueSourceId', connectedSourceId);
                     _.set(self.options,'isEditflow', true);
-                    _.set(self.options,'isDeleteflow', undefined);
-                    self._sourceformDialogModel = new SourceFormWizard(self.options);
-                    self._sourceformDialogModel.render();
-                }else{
+                    _.set(self.options,'isStreamDeleteflow', undefined);
+                    new SourceFormWizard(self.options).render();
+                } else {
                     self.formBuilder.GeneratePropertiesFormForStreams(this)
                 }
             });
@@ -1734,42 +1719,34 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 // set the isDesignViewContentChanged to true
                 self.configurationData.setIsDesignViewContentChanged(true);
                 var elementId = newElement[0].id;
-
-                var uniqueId;
-                var noOfConnectedSource;
                 var streamObject = self.configurationData.getSiddhiAppConfig().getStream(elementId);
+                var isStreamConnected;
+                var noOfConnectedSource
+                var uniqueSourceId;
                 if(streamObject !== undefined){
                      var streamName = streamObject.getName();
-                     var isStreamConnected = self.configurationData.getSiddhiAppConfig().checkInnerStreamIsConnected(streamName);
-                     noOfConnectedSource = self.configurationData.getSiddhiAppConfig().numberOfConnectedSourceWithInnerStream(streamName);
-
-                     if(isStreamConnected){
-                         uniqueId = self.configurationData.getSiddhiAppConfig().connectedSourceWithInnerStream(streamName);
-                     }
-                }else{
-                     uniqueId =  self.designGrid.getCurrentAgentId();
+                     isStreamConnected = self.configurationData.getSiddhiAppConfig().
+                                                                checkStreamIsConnectedWithSource(streamName);
+                     noOfConnectedSource = self.configurationData.getSiddhiAppConfig().
+                                                            numberOfConnectedSourceWithInnerStream(streamName);
+                     uniqueSourceId = self.configurationData.getSiddhiAppConfig().connectedSourceWithInnerStream
+                                                                                                    (streamName);
                 }
-
-               var deleteIconId = "" + uniqueId + "-dropSourceDeleteId";
-
                 self.jsPlumbInstance.remove(newElement, true);
                 if (self.jsPlumbInstance.getGroupFor(newElement)) {
                     self.jsPlumbInstance.removeFromGroup(newElement);
                 }
                 if (newElement.hasClass('streamDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeStream(elementId);
-
-                    if($('#' + deleteIconId).length){
+                    if(isStreamConnected){
                         if(noOfConnectedSource === 1){
                             _.set(self.options, 'uniqueStreamId', self.designGrid.getNewAgentId());
-                            _.set(self.options, 'uniqueId', uniqueId);
-                            _.set(self.options,'isDeleteflow', true);
+                            _.set(self.options, 'uniqueSourceId', uniqueSourceId);
+                            _.set(self.options,'isStreamDeleteflow', true);
                             _.set(self.options,'isEditflow', undefined);
-                            self._sourceformDialogModel = new SourceFormWizard(self.options);
-                            self._sourceformDialogModel.render();
+                            new SourceFormWizard(self.options).render();
                         }
                     }
-
                 } else if (newElement.hasClass('tableDrop')) {
                     self.configurationData.getSiddhiAppConfig().removeTable(elementId);
                 } else if (newElement.hasClass('windowDrop')) {
@@ -1843,7 +1820,8 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             }
         };
 
-        DropElements.prototype.dropStreamForWizard = function (newAgent, i,top,left, isCodeToDesignMode,isGenerateStreamFromQueryOutput, streamName, hasFaultStream, inFaultStreamCreationPath) {
+        DropElements.prototype.dropStreamForWizard = function (newAgent, i,top,left, isCodeToDesignMode,
+                       isGenerateStreamFromQueryOutput, streamName, hasFaultStream, inFaultStreamCreationPath,stream) {
 
             var self = this;
             var name;
@@ -1853,11 +1831,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 if (isGenerateStreamFromQueryOutput) {
                     name = streamName;
                 } else if (!hasFaultStream) {
-                    var streamOptions = {};
-                    _.set(streamOptions, 'id', i);
-                    _.set(streamOptions, 'name', undefined);
-                    var stream = new Stream(streamOptions);
-
                     JSONValidator.prototype.validateForElementName(stream, "Stream", true)
                 }
             }
@@ -1875,16 +1848,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             nodeId.addEventListener('dblclick', function () {
                 streamObject = self.configurationData.getSiddhiAppConfig().getStream(i);
                 streamName = streamObject.getName();
-                isStreamConnected = self.configurationData.getSiddhiAppConfig().checkInnerStreamIsConnected(streamName);
+                isStreamConnected = self.configurationData.getSiddhiAppConfig().checkStreamIsConnectedWithSource
+                                                                                                        (streamName);
                 if(isStreamConnected){
-                    connectedSourceId = self.configurationData.getSiddhiAppConfig().connectedSourceWithInnerStream(streamName);
+                    connectedSourceId = self.configurationData.getSiddhiAppConfig().
+                                                            connectedSourceWithInnerStream(streamName);
                     _.set(self.options, 'uniqueStreamId', i);
-                    _.set(self.options, 'uniqueId', connectedSourceId);
-                    _.set(self.options, 'StreamId', self.designGrid.getNewAgentId());
+                    _.set(self.options, 'uniqueSourceId', connectedSourceId);
                     _.set(self.options,'isEditflow', true);
-                    _.set(self.options,'isDeleteflow', undefined);
-                    self._sourceformDialogModel = new SourceFormWizard(self.options);
-                    self._sourceformDialogModel.render();
+                    _.set(self.options,'isStreamDeleteflow', undefined);
+                    new SourceFormWizard(self.options).render();
                 }else{
                     self.formBuilder.GeneratePropertiesFormForStreams(this.children)
                 }
@@ -1893,16 +1866,16 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                 if (key.keyCode == ENTER_KEY) {
                     streamObject = self.configurationData.getSiddhiAppConfig().getStream(i);
                     streamName = streamObject.getName();
-                    isStreamConnected = self.configurationData.getSiddhiAppConfig().checkInnerStreamIsConnected(streamName);
+                    isStreamConnected = self.configurationData.getSiddhiAppConfig().
+                                                checkStreamIsConnectedWithSource(streamName);
                     if(isStreamConnected){
-                        connectedSourceId = self.configurationData.getSiddhiAppConfig().connectedSourceWithInnerStream(streamName);
+                        connectedSourceId = self.configurationData.getSiddhiAppConfig().
+                                                                        connectedSourceWithInnerStream(streamName);
                         _.set(self.options, 'uniqueStreamId', i);
-                        _.set(self.options, 'uniqueId', connectedSourceId);
-                        _.set(self.options, 'StreamId', self.designGrid.getNewAgentId());
+                        _.set(self.options, 'uniqueSourceId', connectedSourceId);
                         _.set(self.options,'isEditflow', true);
-                        _.set(self.options,'isDeleteflow', undefined);
-                        self._sourceformDialogModel = new SourceFormWizard(self.options);
-                        self._sourceformDialogModel.render();
+                        _.set(self.options,'isStreamDeleteflow', undefined);
+                        new SourceFormWizard(self.options).render();;
                     }else{
                         self.formBuilder.GeneratePropertiesFormForStreams(this.children)
                     }
@@ -1921,17 +1894,17 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
             settingsIconElement.addEventListener('click', function () {
                 streamObject = self.configurationData.getSiddhiAppConfig().getStream(i);
                 streamName = streamObject.getName();
-                isStreamConnected = self.configurationData.getSiddhiAppConfig().checkInnerStreamIsConnected(streamName);
+                isStreamConnected = self.configurationData.getSiddhiAppConfig().
+                                                                    checkStreamIsConnectedWithSource(streamName);
 
                 if(isStreamConnected){
-                    connectedSourceId = self.configurationData.getSiddhiAppConfig().connectedSourceWithInnerStream(streamName);
+                    connectedSourceId = self.configurationData.getSiddhiAppConfig().
+                                                                          connectedSourceWithInnerStream(streamName);
                     _.set(self.options, 'uniqueStreamId', i);
-                    _.set(self.options, 'uniqueId', connectedSourceId);
-                    _.set(self.options, 'StreamId', self.designGrid.getNewAgentId());
+                    _.set(self.options, 'uniqueSourceId', connectedSourceId);
                     _.set(self.options,'isEditflow', true);
-                    _.set(self.options,'isDeleteflow', undefined);
-                    self._sourceformDialogModel = new SourceFormWizard(self.options);
-                    self._sourceformDialogModel.render();
+                    _.set(self.options,'isStreamDeleteflow', undefined);
+                    new SourceFormWizard(self.options).render();
                 }else{
                     self.formBuilder.GeneratePropertiesFormForStreams(this)
                 }
@@ -1994,123 +1967,6 @@ define(['require', 'log', 'lodash', 'jquery', 'partition', 'stream', 'query', 'f
                         outlineWidth: '3' }
                 });
             }
-        };
-
-        DropElements.prototype.dropSourceForWizard = function (newAgent, i, top, left, isCodeToDesignMode, sourceName) {
-            var self = this;
-            var name;
-            if (isCodeToDesignMode) {
-                name = sourceName;
-            } else {
-                var sourceOptions = {};
-                _.set(sourceOptions, 'id', i);
-                _.set(sourceOptions, 'annotationType', 'SOURCE');
-                _.set(sourceOptions, 'type', undefined);
-                var source = new SourceOrSinkAnnotation(sourceOptions);
-
-                JSONValidator.prototype.validateSourceOrSinkAnnotation(source, 'Source', true)
-            }
-            var node = $('<div> ' + name + ' </div>');
-            newAgent.append(node);
-            node.attr('id', i + "-nodeInitial");
-            node.attr('class', "sourceNameNode");
-
-            var sourceObject;
-            var connectedElementName;
-            var connectedStreamId;
-
-            var nodeId = $('#' + i)[0];
-            nodeId.addEventListener('dblclick', function () {
-                //self.formBuilder.GeneratePropertiesFormForSources(this.children)
-                sourceObject = self.configurationData.getSiddhiAppConfig().getSource(i);
-                connectedElementName = sourceObject.getConnectedElementName();
-                connectedStreamId = self.configurationData.getSiddhiAppConfig().connectedStreamWithOuterSource(connectedElementName);
-
-                 _.set(self.options, 'uniqueStreamId', connectedStreamId);
-                 _.set(self.options, 'uniqueId', i);
-                 _.set(self.options, 'StreamId', self.designGrid.getNewAgentId());
-                 _.set(self.options,'isEditflow', true);
-                 _.set(self.options,'isDeleteflow', undefined);
-                 self._sourceformDialogModel = new SourceFormWizard(self.options);
-                 self._sourceformDialogModel.render()
-            });
-
-            $('#' + i).on('keydown', function (key) {
-                if (key.keyCode == ENTER_KEY) {
-                    //self.formBuilder.GeneratePropertiesFormForSources(this.children)
-                    sourceObject = self.configurationData.getSiddhiAppConfig().getSource(i);
-                    connectedElementName = sourceObject.getConnectedElementName();
-                    connectedStreamId = self.configurationData.getSiddhiAppConfig().connectedStreamWithOuterSource(connectedElementName);
-
-                     _.set(self.options, 'uniqueStreamId', connectedStreamId);
-                    _.set(self.options, 'uniqueId', i);
-                    _.set(self.options, 'StreamId', self.designGrid.getNewAgentId());
-                    _.set(self.options,'isEditflow', true);
-                    _.set(self.options,'isDeleteflow', undefined);
-                    self._sourceformDialogModel = new SourceFormWizard(self.options);
-                    self._sourceformDialogModel.render()
-                }
-            });
-
-            /*
-             prop --> When clicked on this icon, a definition and related information of the Source Element will
-             be displayed in a form
-            */
-            var settingsIconId = "" + i + "-dropSourceSettingsId";
-            var deleteIconId = "" + i + "-dropSourceDeleteId";
-            var prop = $('<i id="' + settingsIconId + '" ' +
-                'class="fw fw-settings element-prop-icon collapse"></i>');
-            var propdelete = $('<i id="' + deleteIconId + '" ' +
-                            'class="fw fw-delete element-close-icon collapse" data-toggle="popover"></i>');
-            newAgent.append(node).append(propdelete).append(prop);
-
-            var settingsIconElement = $('#' + settingsIconId)[0];
-
-            settingsIconElement.addEventListener('click', function () {
-                //self.formBuilder.GeneratePropertiesFormForSources(this);
-                sourceObject = self.configurationData.getSiddhiAppConfig().getSource(i);
-                connectedElementName = sourceObject.getConnectedElementName();
-                connectedStreamId = self.configurationData.getSiddhiAppConfig().connectedStreamWithOuterSource(connectedElementName);
-
-                 _.set(self.options, 'uniqueStreamId', connectedStreamId);
-                _.set(self.options, 'uniqueId', i);
-                _.set(self.options, 'StreamId', self.designGrid.getNewAgentId());
-                _.set(self.options,'isEditflow', true);
-                _.set(self.options,'isDeleteflow', undefined);
-                self._sourceformDialogModel = new SourceFormWizard(self.options);
-                self._sourceformDialogModel.render()
-            });
-
-            var finalElement = newAgent;
-
-            /*
-             connection --> The connection anchor point is appended to the element
-             */
-            self.generateSpecificSourceConnectionElements(name,self.jsPlumbInstance, i, finalElement);
-            var connection = $('<div class="connectorOutSource">').attr('id', i + "-out").addClass('connection');
-
-            finalElement.append(connection);
-
-            finalElement.css({
-                'top': top,
-                'left': left
-            });
-
-            $(self.container).append(finalElement);
-
-            self.jsPlumbInstance.draggable(finalElement, {
-                containment: true,
-                start: function (e) {
-                    finalElement.attr('data-x', e.e.clientX);
-                    finalElement.attr('data-y', e.e.clientY);
-                }
-            });
-
-            self.jsPlumbInstance.makeSource(connection, {
-                deleteEndpointsOnDetach: true,
-                anchor: 'Right',
-                maxConnections: 1
-            });
         };
 
         return DropElements;

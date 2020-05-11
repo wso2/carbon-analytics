@@ -724,5 +724,45 @@ define(['require', 'elementUtils', 'lodash'],
             return connectedStreamId;
         };
 
+        AppData.prototype.checkStreamIsConnectedWithSource = function (streamName) {
+            var isStreamConnected = false;
+            _.forEach(this.sourceList, function (source) {
+                if (source.getConnectedElementName() === streamName) {
+                    isStreamConnected = true;
+                }
+            });
+            return isStreamConnected;
+        };
+
+        AppData.prototype.connectedSourceWithInnerStream = function (streamName) {
+            var connectedSourceId;
+            _.forEach(this.sourceList, function (source) {
+                if (source.getConnectedElementName() === streamName) {
+                    connectedSourceId = source.getId();
+                }
+            });
+            return connectedSourceId;
+        };
+
+        AppData.prototype.numberOfConnectedSourceWithInnerStream = function (streamName) {
+            var noOfConnectedSource = 0;
+            _.forEach(this.sourceList, function (source) {
+                if (source.getConnectedElementName() === streamName) {
+                    noOfConnectedSource++;
+                }
+            });
+            return noOfConnectedSource;
+        };
+
+        AppData.prototype.connectedStreamWithOuterSource = function (connectedElementName) {
+            var connectedStreamId;
+            _.forEach(this.streamList, function (stream) {
+                if (stream.getName() === connectedElementName) {
+                    connectedStreamId = stream.getId();
+                }
+            });
+            return connectedStreamId;
+        };
+
         return AppData;
     });

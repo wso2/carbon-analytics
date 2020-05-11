@@ -174,7 +174,6 @@ define(['require', 'log', 'jquery', 'lodash', 'designViewUtils', 'constants'],
             var errorMessage;
             removeTooltipErrorMessage(annotation.id);
             if (!annotation.connectedElementName) {
-                //errorMessage = type + ' annotation does not contain a connected stream';
                 errorMessage = type + ' is incomplete';
                 if (annotation.type) {
                     highlightErrorElement(annotation.id, errorMessage);

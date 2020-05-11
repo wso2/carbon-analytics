@@ -61,6 +61,7 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             ({ id: id, attributes: attributes });
             formContainer.find('#attribute-map-content').html(attributeMapFormTemplate);
         };
+
         /**
          * @function to create attribute-map object
          * @param {Object} savedMapperAttributes Saved attribute-map
@@ -405,14 +406,12 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             var attributes = [];
 
             self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.SOURCE, formContainer);
-           // self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.MAPPER, formContainer);
 
             self.formUtils.renderSourceSinkStoreTypeDropDownForWizard(Constants.SOURCE, predefinedSources, formContainer);
 
             //get the clicked element's information
             var type = sourceObject.type;
             var sourceOptions = sourceObject.options;
-            //var map = sourceObject.map;
 
             //onchange of the source-type selection
             formContainer.find('#source-type').change(function () {
@@ -470,14 +469,12 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             var attributes = [];
 
             self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.SOURCE , formContainer);
-            //self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.MAPPER, formContainer);
 
             self.formUtils.renderSourceSinkStoreTypeDropDownForWizard(Constants.SOURCE, predefinedSources ,formContainer);
 
             //get the clicked element's information
             var type = sourceObject.getType();
             var sourceOptions = sourceObject.getOptions();
-            //var map = sourceObject.getMap();
 
             //onchange of the source-type selection
             formContainer.find('#source-type').change(function () {
@@ -540,7 +537,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             var customizedMapperOptions = [];
             var attributes = [];
 
-            self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.SOURCE , mapContainer);
             self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.MAPPER , mapContainer);
 
             self.formUtils.renderSourceSinkStoreTypeDropDownForWizard(Constants.SOURCE, predefinedSources, mapContainer);
@@ -637,7 +633,6 @@ define(['log', 'jquery', 'lodash', 'sourceOrSinkAnnotation', 'mapAnnotation', 'p
             var customizedMapperOptions = [];
             var attributes = [];
 
-            self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.SOURCE , mapContainer);
             self.formUtils.addEventListenersForGenericOptionsDivForWizard(Constants.MAPPER , mapContainer);
 
             self.formUtils.renderSourceSinkStoreTypeDropDownForWizard(Constants.SOURCE, predefinedSources, mapContainer);

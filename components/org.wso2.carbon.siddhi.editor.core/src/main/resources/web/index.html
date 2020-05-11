@@ -66,6 +66,7 @@
     <link rel="stylesheet" type="text/css" href="/editor/css/form-wizard.css" />
 
     <script type="text/javascript" src="http://requirejs.org/docs/release/2.3.2/minified/require.js"></script>
+
     <title>Streaming Integrator Tooling</title>
 </head>
 
@@ -2632,63 +2633,7 @@
                 <hr class="form-wizard-hr">
             </div>
             <div class="modal-body">
-                <div id="source-form" class="clearfix sw-main sw-theme-default">
-                    <ul id="form-step" class="form_wizard_item">
-                        <li style="height: 12%;width: 20%;font-size:1.4em" ><a href="#step1" class="link-disabled"><br><small> Configure the Stream</small></a></li>
-                        <li style="height: 12%;width: 20%;font-size:1.4em" ><a href="#step2" class="link-disabled"><br><small> Configure the Source</small></a></li>
-                        <li style="height: 12%;width: 24%;font-size:1.4em" ><a href="#step3" class="link-disabled"><br><small> Configure the Map Property</small></a></li>
-                    </ul>
-
-                    <div id='form-container' class='sw-container tab-content'>
-                        <div id='step1'>
-                            <div id = "stream-config"></div>
-                        </div>
-                        <div id='step2'>
-                            <div id = "source-config">
-                                <div class="form-group">
-                                    <div class="form-wizard-form-scrollable-block-list">
-                                        <div id="source-view" style="display: block">
-                                            <div class = "clearfix">
-                                                <div id="form-template">
-                                                    <div class="form-wrapper">
-                                                        <div id = "sourceNano" class = "nano">
-                                                            <div class = "nano-content">
-                                                                <div id="design-view-source-form-wizard-contentId" class="design-view-form-content">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id = "step3">
-                            <div id = "map-config">
-                                <div class="form-group">
-                                    <div class="form-wizard-form-scrollable-block-list">
-                                        <div style="display: block">
-                                            <div class = "clearfix">
-                                                <div id="form-template">
-                                                    <div class="form-wrapper">
-                                                        <div id = "mapNano" class = "nano">
-                                                            <div class = "nano-content">
-                                                                <div id="design-view-source-map-propertyID" class="design-view-form-content">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div id="form-modal" class="clearfix sw-main sw-theme-default">
                 </div>
             </div>
         </div>

@@ -86,7 +86,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 self.formUtils.renderAttributeTemplate(attributes, self.propertyDiv.find("#define-attribute"));
             } else {
                 //if the stream object is already edited
-                formContainer.find('#streamName').val(name);
+                $('#streamName').val(name);
 
                 //load the saved attributes
                 var attributeList = streamObject.getAttributeList();
@@ -138,7 +138,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 self.formUtils.removeErrorClass();
                 var previouslySavedStreamName = streamObject.getName();
 
-                var configName = formContainer.find('#streamName').val().trim();
+                var configName = $('#streamName').val().trim();
                 var streamName;
                 var firstCharacterInStreamName;
                 var isStreamNameUsed;
@@ -211,7 +211,7 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 }
                 if (attributeNameList.length == 0) {
                     self.formUtils.addErrorClass($('.attribute:eq(0)').find('.attr-name'));
-                    formcontainer.find('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.")
+                    $('.attribute:eq(0)').find('.error-message').text("Minimum one attribute is required.")
                     isErrorOccurred = true;
                     return;
                 }
@@ -308,13 +308,19 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
 
         };
 
+        /**
+         * @function generate properties form for a stream
+         * @param element selected element(stream)
+         * @param formConsole Console which holds the form
+         * @param formContainer Container which holds the form
+         */
         StreamForm.prototype.generatePropertiesFormForWizard = function (formContainer, _uniqueStreamId, streamObject) {
             var self = this;
             var id = _uniqueStreamId;
             var previousStreamObject = _.cloneDeep(streamObject);
 
             var propertyDiv = $('<div class="clearfix form-min-width"><div id = "stream-form-container" class = "stream-form-container"> <label> ' +
-                '<span class="mandatory-symbol"> *</span> Name </label> <input type="text" id="streamName" ' +
+                '<span class="mandatory-symbol"> *</span> Stream Name </label> <input type="text" id="streamName" ' +
                 'class="clearfix name"> <label class="error-message" id="streamNameErrorMessage"> </label>' +
                 '<div id="define-attribute"></div> </div> <div class= "stream-form-container"> ' +
                 '<div class ="define-annotation"> </div> </div>');
@@ -340,7 +346,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                 formContainer.find('#streamName').val(name);
 
                 //load the saved attributes
-
                 var attributeList = streamObject.attributeList;
                 self.formUtils.renderAttributeTemplateForWizard(attributeList, formContainer);
                 self.formUtils.selectTypesOfSavedAttributesForWizard(attributeList, formContainer);
@@ -379,7 +384,6 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
                     }
                 });
             }
-
             self.formUtils.renderAnnotationTemplateForWizard("define-annotation", annotations, formContainer);
             self.formUtils.checkPredefinedAnnotationsForWizard(checkedAnnotations, formContainer);
         };
@@ -389,9 +393,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             var streamObject = self.configurationData.getSiddhiAppConfig().getStream(id);
             var previousStreamObject = _.cloneDeep(streamObject);
 
-            var propertyDiv = $('<div class="clearfix form-min-width"><div id = "stream-form-container" class = "stream-form-container"> <label> ' +
-                '<span class="mandatory-symbol"> *</span> Name </label> <input type="text" id="streamName" ' +
-                'class="clearfix name"> <label class="error-message" id="streamNameErrorMessage"> </label>' +
+            var propertyDiv = $('<div class="clearfix form-min-width"><div id = "stream-form-container"'+
+                ' class = "stream-form-container"> '+
                 '<div id="define-attribute"></div> </div> <div class= "stream-form-container"> ' +
                 '<div class ="define-annotation"> </div> </div>');
 
@@ -400,7 +403,8 @@ define(['require', 'log', 'jquery', 'lodash', 'attribute', 'jsonValidator', 'con
             var streamForm = formContainer.find('.stream-form-container');
 
             var annotations = [];
-            var predefinedAnnotationList = _.cloneDeep(self.configurationData.application.config.stream_predefined_annotations);
+            var predefinedAnnotationList =
+                                _.cloneDeep(self.configurationData.application.config.stream_predefined_annotations);
             var checkedAnnotations = [];
 
             var name = streamObject.getName();
