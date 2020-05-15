@@ -39,7 +39,7 @@
     overflow-y: auto;
 }
 
-.new-welcome-button, .open-welcome-button {
+.new-welcome-button, .open-welcome-button, .create-new-etl-flow-button {
     color: #f1f6fa;
     font-size: 1.286em;
     width: 200px;
@@ -55,6 +55,18 @@
 }
 
 .new-welcome-button:hover, .new-welcome-button:active {
+    background-color: #f17b31;
+    color: #333;
+}
+
+.create-new-etl-flow-button {
+    background-color: #f17b31;
+    margin-bottom: 25px;
+    z-index: 1;
+    position: relative;
+}
+
+.create-new-etl-flow-button:hover, .create-new-etl-flow-button:active {
     background-color: #f17b31;
     color: #333;
 }

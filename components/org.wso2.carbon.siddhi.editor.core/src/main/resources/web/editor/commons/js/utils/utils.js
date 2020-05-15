@@ -16,6 +16,14 @@ define(['require', 'jquery', 'constants'],
             editorUrl: window.location.protocol + "//" + window.location.host + '/editor'
         };
 
+        var global_constants = {
+            VIEW_ETL_FLOW_WIZARD: "etl-wizard-view"
+        };
+
+        Utils.prototype.getGlobalConstnts = function () {
+            return global_constants;
+        };
+
         /**
          * Installs or un-installs an extension.
          *

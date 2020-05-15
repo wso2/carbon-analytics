@@ -22,7 +22,8 @@ define(['app/main', 'jquery'],
                 samplesPane: "samples-pane",
                 quickLinksPane: "quick-links-pane",
                 buttonNew: " btn btn-block new-welcome-button",
-                buttonOpen: " btn btn-block open-welcome-button"
+                buttonOpen: " btn btn-block open-welcome-button",
+                buttonCreateNewETLFlow: " btn btn-block create-new-etl-flow-button"
             },
             samples: ["artifacts/CDCSample/CDCWithListeningMode.siddhi",
                 "artifacts/HelloKafka/HelloKafka.siddhi",
@@ -661,7 +662,7 @@ define(['app/main', 'jquery'],
                         debug_state: 'debug-state',
                         tab_close_btn: 'close closeTab pull-right'
                     },
-                    das_editor: {
+                    editor: {
                         canvas: {
                             // relative selector within container for a tab
                             container: '.canvas-container'
@@ -673,6 +674,10 @@ define(['app/main', 'jquery'],
                         source: {
                             // relative selector within container for a tab
                             container: '.source-container'
+                        },
+                        etl_wizard: {
+                            // relative selector within container for a tab
+                            container: '.etl-wizard-container'
                         },
                         debug: {
                             // relative selector within container for a tab

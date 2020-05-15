@@ -25,6 +25,24 @@ define([], function () {
                 disabled: false
             },
             {
+                id: "newETLFlow",
+                label: "New ETL Flow",
+                command: {
+                    id: "create-new-etl-flow",
+                    shortcuts: {
+                        mac: {
+                            key: "command+option+t",
+                            label: "\u2318\u2325T"
+                        },
+                        other: {
+                            key: "ctrl+alt+t",
+                            label: "Ctrl+Alt+T"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
                 id: "open",
                 label: "Open File",
                 command: {

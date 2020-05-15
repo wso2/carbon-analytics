@@ -82,7 +82,8 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                     partitions.resizable();
                 }
                 var activeTab = self.options.application.tabController.activeTab;
-                if (activeTab !== undefined && activeTab.getTitle() != 'welcome-page') {
+                if (activeTab !== undefined && activeTab.getTitle() != 'welcome-page' && activeTab.getFile().getView()
+                    !== self.options.application.utils.getGlobalConstnts().VIEW_ETL_FLOW_WIZARD) {
                     if (activeTab.getSiddhiFileEditor().isInSourceView()) {
                         activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                     }
@@ -109,7 +110,8 @@ define(['log', 'jquery', 'lodash', 'backbone', 'console'], function (log, $, _, 
                 * */
                 $('.partitionDrop').resizable();
                 var activeTab = self.options.application.tabController.activeTab;
-                if (activeTab.getTitle() != 'welcome-page') {
+                if (activeTab.getTitle() != 'welcome-page' && activeTab.getFile().getView() !==
+                    self.options.application.utils.getGlobalConstnts().VIEW_ETL_FLOW_WIZARD) {
                     if (activeTab.getSiddhiFileEditor().isInSourceView() !== undefined
                         && activeTab.getSiddhiFileEditor().isInSourceView()) {
                         activeTab.getSiddhiFileEditor().getSourceView().editorResize();

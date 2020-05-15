@@ -57,6 +57,15 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
                 //Showing menu bar
 
                 app.tabController.newTab({tabOptions: {isETLTask: true}});
+            }
+            this.createNewETLFlowTab = function createNewETLFlowTab() {
+                var editorId = app.config.container;
+                var options = {};
+                $(editorId).css("display", "block");
+                //Showing menu bar
+
+                _.set(options, "view", app.utils.getGlobalConstnts().VIEW_ETL_FLOW_WIZARD);
+                app.tabController.newTab(options);
                 app.outputController.makeInactiveActivateButton();
             };
 
@@ -740,6 +749,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
 
             app.commandManager.registerHandler('create-new-tab', this.createNewTab);
             app.commandManager.registerHandler('create-new-etl-task-tab', this.createNewETLTaskTab);
+
+            app.commandManager.registerHandler('create-new-etl-flow', this.createNewETLFlowTab);
 
             app.commandManager.registerHandler('save', this.handleSave, this);
 

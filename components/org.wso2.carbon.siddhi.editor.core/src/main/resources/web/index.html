@@ -286,6 +286,10 @@
         <div id="siddhi-editor" class="source-container">
         </div>
         <!-- End Source Container -->
+        <!-- Start: ETL Wizard Container -->
+        <div id="etl-wizard-container" class="etl-wizard-container">
+        </div>
+        <!-- End: ETL Wizard Container -->
         <!-- Start: design view container -->
         <div class="design-view-container" style="display: none">
             <!-- Start: tool-palette -->
@@ -2842,6 +2846,21 @@
         <div class='form-group'>
             <div class='export-dialog-form-scrollable-block-list'>
                 <div id='docker-path-bundles-tree'></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form Dialog -->
+<div id="FormWizard" tabindex="-1">
+    <div class="modal-content form-wizard">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <i class="fw fw-cancel about-dialog-close"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="form-modal" class="clearfix sw-main sw-theme-default">
             </div>
         </div>
     </div>

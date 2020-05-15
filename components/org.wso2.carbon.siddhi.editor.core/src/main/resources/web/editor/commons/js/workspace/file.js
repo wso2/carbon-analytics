@@ -15,6 +15,7 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
                 debugStatus: false,
                 runStatus: false,
                 hashCode: undefined,
+                view: undefined
             },
             initialize: function (attrs, options) {
                 var errMsg;
@@ -103,6 +104,15 @@ define(['jquery', 'lodash', 'backbone', 'log'], function ($, _, Backbone, log) {
             setContent: function(name){
                 this.set('content', name);
                 return this;
+            },
+
+            setView: function(view){
+                this.set('view', view);
+                return this;
+            },
+
+            getView: function () {
+                return this.get('view');
             },
 
             getHash: function () {
