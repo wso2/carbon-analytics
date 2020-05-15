@@ -56,8 +56,7 @@ public class ConfigMapper {
     public static Map<String, ExtensionConfig> loadAllExtensionConfigs(String configFileLocation)
         throws ExtensionsInstallerException {
         Gson gson = new Gson();
-        Type mapType = new TypeToken<Map<String, ExtensionConfig>>() {
-        }.getType();
+        Type mapType = new TypeToken<Map<String, ExtensionConfig>>() {}.getType();
         try (Reader reader = new InputStreamReader(new FileInputStream(configFileLocation), StandardCharsets.UTF_8)) {
             return gson.fromJson(reader, mapType);
         } catch (FileNotFoundException e) {

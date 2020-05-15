@@ -247,9 +247,9 @@ public class DependencyInstallerImpl implements DependencyInstaller {
         boolean allJarsDeleted = false;
         try {
             /*
-			Ideally there will be just one matching jar,
-			unless a jar with a different version (but with the same name) is manually placed in the directory.
-			*/
+            Ideally there will be just one matching jar,
+            unless a jar with a different version (but with the same name) is manually placed in the directory.
+             */
             List<Path> versionedJarFiles = ExtensionsInstallerUtils.listMatchingFiles(lookupRegex, directoryPath);
             if (!versionedJarFiles.isEmpty()) {
                 allJarsDeleted = deleteJarFiles(versionedJarFiles);
@@ -271,10 +271,10 @@ public class DependencyInstallerImpl implements DependencyInstaller {
             try {
                 Files.deleteIfExists(jarFile);
             } catch (IOException e) {
-				/*
-				Where multiple files are present, deletion status will be failure even if there is a single failure.
-				Remaining files are attempted to be deleted, without stopping after the very first failure.
-				 */
+                /*
+                Where multiple files are present, deletion status will be failure even if there is a single failure.
+                Remaining files are attempted to be deleted, without stopping after the very first failure.
+                 */
                 hasFailures = true;
                 LOGGER.error(String.format("Failed to delete the file: %s.", jarFile.getFileName()), e);
             }
