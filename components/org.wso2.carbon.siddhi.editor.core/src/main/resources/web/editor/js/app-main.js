@@ -706,6 +706,9 @@ define(['app/main', 'jquery'],
                                 }
                             }
                         },
+                        etl_task_view: {
+                            container: '.etl-task-wizard-container'
+                        },
                         source_view: {
                             // relative selector within container for a tab
                             container: '.source-view-container',

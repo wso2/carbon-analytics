@@ -55,6 +55,7 @@
     <link rel="stylesheet" type="text/css" href="editor/commons/css/welcome-screen.css"/>
 
     <link rel="stylesheet" type="text/css" href="editor/css/design-view.css"/>
+    <link rel="stylesheet" type="text/css" href="editor/css/etl-task-view.css"/>
     <link rel="stylesheet" type="text/css" href="editor/css/tool-palette.css"/>
 
     <!-- CSS For The Design View -->
@@ -310,6 +311,68 @@
             <!-- End: design-view-grid-container -->
         </div>
         <!-- End: design view container -->
+
+        <!--    Start:  ETL Task View Container    -->
+        <div class="etl-task-wizard-container" style="display: none">
+            <div class="popup-backdrop" style="display: none">
+                <div style="" class="mapping-generation-dialog" >
+                    <div  class="dialog-heading" style="">
+                    </div>
+                    <div class="dialog-body">
+                        <div class="map-generation-content" style="height: 70px">
+                        </div>
+                    </div>
+                    <div class="btn-tray">
+                        <button style="" class="btn btn-primary">Submit</button>
+                        <button style="" class="btn btn-default">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="etl-task-wizard-canvas">
+                <div class="listContainer" style="float: left;">
+                    <div class="heading">
+                        Input Attributes
+                    </div>
+                    <ul class="attributeList input-list-container">
+
+                    </ul>
+                </div>
+
+                <div class="listContainer" style="float: right;">
+                    <div class="heading">
+                        Output Attributes
+                    </div>
+                    <ul class="attributeList output-list-container">
+                        <li>
+<!--                            <div class="attribute output" style="">-->
+<!--                                haha-->
+<!--&lt;!&ndash;                                <div class="action-btn-div">&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <a title="Edit mapping" href="#" class="icon edit" style="">&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <i class="fw fw-edit" style=""></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    </a>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <a title="Delete mapping" href="#" class="icon delete" style="">&ndash;&gt;-->
+<!--&lt;!&ndash;                                        <i class="fw fw-delete" style=""></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    </a>&ndash;&gt;-->
+<!--&lt;!&ndash;                                </div>&ndash;&gt;-->
+<!--                                <div  class="expression">-->
+<!--                                    expression-->
+<!--                                </div>-->
+<!--                            </div>-->
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <a title="Create Direct Mapping" id="btn-gen-direct" href="#" class="float direct-map-btn" style="right: 50%">
+                    <i class="fw fw-right-arrow" style="margin-top: 13px"></i>
+                </a>
+                <a title="Create Complex Mapping" id="btn-gen-complex" href="#" class="float complex-map-btn" style="right: 40%">
+                    <i class="fw fw-function" style="margin-top: 13px"></i>
+                </a>
+            </div>
+        </div>
+        <!--    End:  ETL Task View Container    -->
+
         <!-- Start: Toggle Controls Container -->
         <div class="toggle-controls-container">
             <div class="btn toggle-view-button">

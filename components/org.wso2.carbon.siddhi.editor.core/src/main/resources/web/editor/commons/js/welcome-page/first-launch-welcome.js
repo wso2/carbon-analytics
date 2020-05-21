@@ -48,6 +48,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 var buttonWrap = $('<div></div>');
                 var productNameWrap = $('<div></div>');
                 var newButton = $('<button id="newButton"></button>');
+                var newETLTaskButton = $('<button id="newETLTaskButton"></button>');
                 var openButton = $('<button></button>');
 
                 var contentPane = $('<div></div>');
@@ -63,6 +64,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 buttonWrap.addClass(_.get(this._options, 'cssClass.buttonWrap'));
                 productNameWrap.addClass(_.get(this._options, 'cssClass.productNameWrap'));
                 newButton.addClass(_.get(this._options, 'cssClass.buttonNew'));
+                newETLTaskButton.addClass(_.get(this._options, 'cssClass.buttonNew'));
                 openButton.addClass(_.get(this._options, 'cssClass.buttonOpen'));
                 contentPane.addClass(_.get(this._options, 'cssClass.contentPane'));
                 recentFilesPane.addClass(_.get(this._options, 'cssClass.recentFilesPane'));
@@ -70,8 +72,10 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 quickLinksPane.addClass(_.get(this._options, 'cssClass.quickLinksPane'));
 
                 newButton.text("New");
+                newETLTaskButton.text("New ETL Task");
                 openButton.text("Open");
                 buttonWrap.append(newButton);
+                buttonWrap.append(newETLTaskButton);
                 buttonWrap.append(openButton);
 
                 $('#query-guide-link-container').append('<a href="https://siddhi.io/en/v'+Version.MINOR_VERSION+
@@ -197,6 +201,12 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 $(newButton).on('click', function () {
                     command.dispatch("create-new-tab");
                     browserStorage.put("pref:passedFirstLaunch", true);
+                });
+
+                // When "new-etl-task" is clicked, open up an empty workspace.
+                $(newETLTaskButton).on('click', function () {
+                    command.dispatch("create-new-etl-task-tab");
+                    // browserStorage.put("pref:passedFirstLaunch", true);
                 });
 
                 // Show the open file dialog when "open" is clicked.

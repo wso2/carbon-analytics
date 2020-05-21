@@ -2,10 +2,10 @@
  * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
 define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./source", '../constants',
-        'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils'],
+        'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils', 'etl_task_view'],
 
     function (require, $, Backbone, _, log, DesignView, SourceView, constants, UndoManager, Launcher,
-              DebugManager, DesignViewUtils) {
+              DebugManager, DesignViewUtils, ETLTaskView) {
 
         const ENTER_KEY = 13;
 
@@ -19,6 +19,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                  * @param {Object} options Rendering options for the view
                  */
                 initialize: function (options) {
+                    console.log(options);
                     if (!_.has(options, 'container')) {
                         throw "container is not defined."
                     }
@@ -42,6 +43,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var loadingScreen = this._$parent_el.find(_.get(this.options, 'loading_screen.container'));
                     var sourceContainer = this._$parent_el.find(_.get(this.options, 'source.container'));
                     var designContainer = this._$parent_el.find(_.get(this.options, 'design_view.container'));
+                    var etlTaskViewContainer = this._$parent_el.find(_.get(this.options, 'etl_task_view.container'));
                     var debugContainer = this._$parent_el.find(_.get(this.options, 'debug.container'));
                     var tabContentContainer = $(_.get(this.options, 'tabs_container'));
 
@@ -290,6 +292,15 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     toggleViewButton.focusout(function () {
                         toggleViewButton.removeClass("selected-button");
                     });
+
+                    // for ETL Task view
+                    if(this.options.isETLTask) {
+                        sourceContainer.hide();
+                        designContainer.hide();
+                        etlTaskViewContainer.show();
+                        toggleViewButton.hide();
+                        this._etlTaskView = new ETLTaskView({}, etlTaskViewContainer, function() { console.log('haha') }, self._designView.getDesign(self.getContent()));
+                    }
                 },
 
                 getContent: function () {
@@ -338,6 +349,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                 isInSourceView: function () {
                     return this._sourceView.isVisible();
                 }
+
+
 
             });
 

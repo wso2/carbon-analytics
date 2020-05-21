@@ -1,0 +1,189 @@
+.etl-task-wizard-container {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+}
+
+.etl-task-wizard-container .etl-task-wizard-canvas {
+    position: relative;
+    height: 100%;
+}
+
+.etl-task-wizard-container .popup-backdrop {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    background: rgba(12, 12, 12, 0.5);
+    z-index: 1;
+}
+
+/* Data mapper related styles */
+.etl-task-wizard-canvas {
+    background: white;
+    height: 100%;
+}
+
+.listContainer {
+    width: 25%;
+    height: 96%;
+    float: left;
+    background: white;
+    margin: 2% 1%;
+    border: 1px solid #ccc;
+    color: white;
+}
+
+.listContainer .heading {
+    background: dodgerblue;
+    padding: 10px 0 10px 0;
+    text-align: center;
+}
+
+.attributeList {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    width: inherit;
+}
+
+.attributeList li .attribute {
+    width: 96%;
+    height: 20px;
+    color: #eee;
+    text-align: center;
+    margin: 10px auto auto;
+    border-radius: 10px;
+    box-shadow: 1px 2px #424242;
+}
+
+.attributeList li .attribute.output {
+    background: #5cb85c;
+    height: fit-content;
+    position: relative;
+}
+
+.attributeList li .attribute.output .action-btn-div {
+    float: right;
+    position: absolute;
+    right: 20px;
+    top: 0;
+    display: none;
+}
+
+.attributeList li .attribute.output:hover > .action-btn-div {
+    display: block;
+}
+
+.attributeList li .attribute.output .action-btn-div .icon {
+    color: darkslategray;
+}
+
+.attributeList li .attribute.output .action-btn-div .icon.edit {
+    margin-right: 6px;
+}
+
+.attributeList li .attribute.output .expression {
+    background: white;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    color: black;
+}
+
+.attributeList li .attribute.input {
+    background: #f47b20;
+}
+
+.expressionAttribute {
+    background: #8840a7;
+    color: #fff;
+    text-align: center;
+    width: fit-content;
+    border-radius: 10px;
+    margin-top: 10px;
+    box-shadow: 3px 3px #424242;
+    position: absolute;
+}
+
+.expressionAttribute .expressionContent {
+    background: #fff;
+    color: #000;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.float {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    bottom: 20px;
+    /*right:40px;*/
+    font-size: 24px;
+    background-color: #0C9;
+    color: #FFF;
+    border-radius: 40px;
+    text-align: center;
+    box-shadow: 2px 2px 3px #999;
+}
+
+.my-float {
+    margin-top: 22px;
+}
+
+/* Direct Mapping Dialog */
+.etl-task-wizard-container .popup-backdrop .mapping-generation-dialog {
+    background: #333;
+    height: fit-content;
+    width: 70%;
+    margin-left: 15%;
+    padding-bottom: 30px;
+    position: absolute;
+    box-shadow: 3px 3px #2c2c2c59;
+}
+
+.mapping-generation-dialog {
+    color: white;
+}
+
+.mapping-generation-dialog .dialog-heading {
+    height: 50px;
+    padding-left: 5%;
+    padding-bottom: 7%;
+    padding-top: 1%;
+    font-size: 19px;
+}
+
+.mapping-generation-dialog .dialog-body .map-generation-content {
+    height: 70px;
+}
+
+.mapping-generation-dialog .dialog-body .map-generation-content div {
+    float: left;
+    width: 50%;
+    padding-left: 5%;
+    padding-right: 5%;
+    color: white;
+}
+
+.mapping-generation-dialog .dialog-body .map-generation-content div select {
+    color: #000;
+    width: 100%;
+}
+
+.mapping-generation-dialog .dialog-body .map-generation-content div input {
+    color: #000;
+    width: 100%;
+}
+
+.mapping-generation-dialog .btn-tray .btn-primary {
+    float: right;
+    margin-right: 5%
+}
+
+.mapping-generation-dialog .btn-tray .btn-default {
+    float: right;
+    margin-right: 2%;
+    background: #232323;
+}

@@ -39,6 +39,7 @@ define(['require', 'log', 'jquery', 'lodash', './tab','workspace','toolEditor','
                 _.set(serviceEditorOpts, 'tabs_container', _.get(this.options, 'tabs_container'));
                 _.set(serviceEditorOpts, 'file', self._file);
                 _.set(serviceEditorOpts, 'application', self.app);
+                _.set(serviceEditorOpts, 'isETLTask', _.get(this.options, 'isETLTask') | false);
                 var toolEditor = new ToolEditor.Views.ToolEditor(serviceEditorOpts);
                 this._fileEditor = toolEditor;
                 this.getHeader().addClass('inverse');
