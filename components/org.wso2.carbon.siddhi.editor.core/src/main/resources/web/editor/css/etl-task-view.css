@@ -7,6 +7,7 @@
 .etl-task-wizard-container .etl-task-wizard-canvas {
     position: relative;
     height: 100%;
+    background-color: rgb(24, 26, 27);
 }
 
 .etl-task-wizard-container .popup-backdrop {
@@ -18,100 +19,81 @@
 }
 
 /* Data mapper related styles */
-.etl-task-wizard-canvas {
-    background: white;
-    height: 100%;
-}
-
 .listContainer {
-    width: 25%;
-    height: 96%;
-    float: left;
-    background: white;
-    margin: 2% 1%;
-    border: 1px solid #ccc;
-    color: white;
+    position: absolute;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.1);
 }
 
 .listContainer .heading {
-    background: dodgerblue;
-    padding: 10px 0 10px 0;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 16px;
     text-align: center;
+    background: lightgray;
+    color: #333;
 }
 
-.attributeList {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    position: absolute;
-    width: inherit;
+.listContainer.inputs .heading {
+    font-weight: 600;
 }
 
-.attributeList li .attribute {
-    width: 96%;
-    height: 20px;
-    color: #eee;
-    text-align: center;
-    margin: 10px auto auto;
-    border-radius: 10px;
-    box-shadow: 1px 2px #424242;
+.listContainer.outputs .heading {
+    font-weight: 700;
 }
 
-.attributeList li .attribute.output {
-    background: #5cb85c;
-    height: fit-content;
+.listContainer.inputs {
+    margin-left: 2%;
+    margin-top: 1%;
+}
+
+.listContainer.outputs {
+    right: 5%;
+    top: 1%;
+    height: 96%;
+    width: 45%;
+}
+
+.listContainer .attributeList li .attribute {
+    border-bottom: 1px solid rgba(102, 102, 102, 0.2);;
+    padding-left: 5px;
+    opacity: 0.8;
+    font-weight: 600;
+}
+
+.listContainer.outputs .attributeList li .attribute {
+    padding-bottom: 20px;
+    font-size: 1.8rem;
+    opacity: 1;
+    color: #d6d3cd;
     position: relative;
+    cursor: pointer;
 }
 
-.attributeList li .attribute.output .action-btn-div {
-    float: right;
+.listContainer.outputs .attributeList li .attribute .clear-icon {
     position: absolute;
-    right: 20px;
-    top: 0;
-    display: none;
+    right: 5px;
+    top: 2px;
+    color: #d6d3cd;
 }
 
-.attributeList li .attribute.output:hover > .action-btn-div {
-    display: block;
+.listContainer.inputs .attributeList li .attribute .attrib-type {
+    font-size: 12px;
+    font-weight: 300;
 }
 
-.attributeList li .attribute.output .action-btn-div .icon {
-    color: darkslategray;
-}
-
-.attributeList li .attribute.output .action-btn-div .icon.edit {
-    margin-right: 6px;
-}
-
-.attributeList li .attribute.output .expression {
-    background: white;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    color: black;
-}
-
-.attributeList li .attribute.input {
-    background: #f47b20;
-}
-
-.expressionAttribute {
-    background: #8840a7;
-    color: #fff;
-    text-align: center;
-    width: fit-content;
-    border-radius: 10px;
-    margin-top: 10px;
-    box-shadow: 3px 3px #424242;
+.listContainer.outputs .attributeList li .attribute .attrib-type {
+    font-size: 12px;
+    font-weight: 300;
+    width: 10%;
     position: absolute;
 }
 
-.expressionAttribute .expressionContent {
-    background: #fff;
-    color: #000;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+.listContainer.outputs .attributeList li .attribute .mapped-expression {
+    font-size: 13px;
+    position: absolute;
+    right: 0;
+    padding-right: 5px
 }
 
 .float {
