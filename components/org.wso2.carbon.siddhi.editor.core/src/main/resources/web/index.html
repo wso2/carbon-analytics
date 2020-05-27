@@ -317,9 +317,108 @@
             <div class="popup-backdrop" style="display: none">
                 <div style="" class="mapping-generation-dialog" >
                     <div  class="dialog-heading" style="">
+                        Create Expression for attribute 'TestAttrib'
                     </div>
-                    <div class="dialog-body">
-                        <div class="map-generation-content" style="height: 70px">
+                    <div class="dialog-body" style="">
+                        <div class="expression-container">
+                            <div class="main-exp" style="">
+                                Expression
+                            </div>
+                            <div class="sub-exp" style="text-align: center; font-size: 1.5rem; padding: 10px">
+                                sub expression
+                            </div>
+                        </div>
+                        <div class="generation-content" style="">
+                            <div style="width: 100%">
+                                Select element to add to expression
+                            </div>
+                            <div class="node-container" style="">
+                                <ul class="node-category">
+
+                                </ul>
+                            </div>
+                            <div class="att-fun-op-container" style="">
+                                <div class="select-function-operator-attrib" style="display: none">
+                                    <div class="input-group">
+                                        <input style="background-color: #fff; color: #555; border-color: #c5c5c5" type="text" class="form-control"/>
+                                        <span style="padding: 5px 12px;" class="input-group-addon">
+                                            <i class="fw fw-search"></i>
+                                        </span>
+                                    </div>
+                                    <div class="attrib-selector-containers" style="">
+                                        <a>
+                                            <div class="attribute" style="">
+                                                <div>
+                                                    Test_Attrib
+                                                </div>
+                                                <div class="description" style="">
+                                                    Test_Attrib_Description
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="select-function-format-container" style="display: none">
+                                    <ul>
+                                        <li>
+                                            <a style="">
+                                                <div class="function-syntax" style="">
+                                                    <div class="syntax-expression">
+                                                        syntax expression
+                                                    </div>
+                                                    <div class="description" style="">
+                                                        Test_Attrib_Description
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+<!--                                <div class="parameter-filler">-->
+<!--                                    <div style="text-align: center; padding-top: 6px; padding-bottom: 8px;">-->
+<!--                                        Function syntax-->
+<!--                                    </div>-->
+<!--                                    <div>-->
+<!--                                        <ul>-->
+<!--                                            <li>-->
+<!--                                                <div style="padding-left: 3px; padding-right: 3px; border-bottom: 1px solid #b7b6b6;display: flex">-->
+<!--                                                    <div>-->
+<!--                                                        parameter name-->
+<!--                                                    </div>-->
+<!--                                                    <div>-->
+<!--                                                        <select name="" id="">-->
+<!--                                                            <option value="attribute">attribute</option>-->
+<!--                                                            <option value="custom">custom</option>-->
+<!--                                                        </select>-->
+<!--                                                    </div>-->
+<!--                                                    <div>-->
+<!--                                                        <input type="text"/>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                            </li>-->
+<!--                                            <li>-->
+<!--                                                <div style="padding-left: 3px; padding-right: 3px; border-bottom: 1px solid #b7b6b6;display: flex">-->
+<!--                                                    <div>-->
+<!--                                                        parameter name-->
+<!--                                                    </div>-->
+<!--                                                    <div>-->
+<!--                                                        <select name="" >-->
+<!--                                                            <option value="attribute">attribute</option>-->
+<!--                                                            <option value="custom">custom</option>-->
+<!--                                                        </select>-->
+<!--                                                    </div>-->
+<!--                                                    <div>-->
+<!--                                                        <input type="text"/>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                            </li>-->
+<!--                                        </ul>-->
+<!--                                    </div>-->
+<!--                                    <div style="padding-top: 15px">-->
+<!--                                        <button style="background-color: #0a6aa1; float: right;" class="btn btn-primary">Add to Expression</button>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+                            </div>
                         </div>
                     </div>
                     <div class="btn-tray">
@@ -335,14 +434,6 @@
                     </div>
                     <div>
                         <ul class="attributeList">
-<!--                            <li>-->
-<!--                                <div class="attribute" style="">-->
-<!--                                    Test_Attrib-->
-<!--                                    <div class="attrib-type" style="">-->
-<!--                                        type-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </li>-->
                         </ul>
                     </div>
                 </div>
@@ -352,33 +443,9 @@
                         Output Attributes
                     </div>
                     <ul class="attributeList">
-<!--                        <li>-->
-<!--                            <div class="attribute" style="">-->
-<!--                                Test_Attrib-->
-<!--                                <div class="clear-icon">-->
-<!--                                    <a href="#" title="Clear mapping" href="#" class="icon clear" style="">-->
-<!--                                        <i class="fw fw-clear"></i>-->
-<!--                                    </a>-->
-<!--                                </div>-->
-<!--                                <div class="attrib-type" style="">-->
-<!--                                    type-->
-<!--                                </div>-->
-<!--                                <div class="mapped-expression" style="">-->
-<!--                                    expression-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </li>-->
                     </ul>
                 </div>
             </div>
-<!--            <div>-->
-<!--                <a title="Create Direct Mapping" id="btn-gen-direct" href="#" class="float direct-map-btn" style="right: 50%">-->
-<!--                    <i class="fw fw-right-arrow" style="margin-top: 13px"></i>-->
-<!--                </a>-->
-<!--                <a title="Create Complex Mapping" id="btn-gen-complex" href="#" class="float complex-map-btn" style="right: 40%">-->
-<!--&lt;!&ndash;                    <i class="" style="margin-top: 13px"></i>&ndash;&gt;-->
-<!--                </a>-->
-<!--            </div>-->
         </div>
         <!--    End:  ETL Task View Container    -->
 

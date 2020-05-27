@@ -137,27 +137,97 @@
     font-size: 19px;
 }
 
-.mapping-generation-dialog .dialog-body .map-generation-content {
-    height: 70px;
+.mapping-generation-dialog .dialog-body .expression-container .main-exp {
+    text-align: center;
+    font-size: 2.0rem;
+    padding: 10px;
 }
 
-.mapping-generation-dialog .dialog-body .map-generation-content div {
-    float: left;
-    width: 50%;
-    padding-left: 5%;
-    padding-right: 5%;
-    color: white;
+.mapping-generation-dialog .dialog-body .expression-container .main-exp span:hover {
+    color: #0ade4a;
+    cursor: pointer;
 }
 
-.mapping-generation-dialog .dialog-body .map-generation-content div select {
-    color: #000;
-    width: 100%;
+.mapping-generation-dialog .dialog-body .expression-container .sub-exp {
+    text-align: center;
+    font-size: 1.5rem;
+    padding: 10px;
 }
 
-.mapping-generation-dialog .dialog-body .map-generation-content div input {
-    color: #000;
-    width: 100%;
+.mapping-generation-dialog .dialog-body .generation-content {
+    display: flex;
+    flex-wrap: wrap;
 }
+
+.mapping-generation-dialog .dialog-body .generation-content .node-category {
+    text-align: center;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .node-container {
+    width: 20%;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .node-container ul li a div.selected {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #d3d3d3;
+    border-bottom: 1px #d3d3d33b solid;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .node-container ul li a div {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px #d3d3d33b solid;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container {
+    width: 80%;
+    right: 0;
+    color: #333;
+    background-color: #c5c5c5;
+    padding: 5px;
+    min-height: 250px
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .attrib-selector-containers {
+    padding-top: 5px;
+    max-height: 250px;
+    overflow: auto;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .attrib-selector-containers .attribute {
+    border-top: 1px solid #b7b6b6;
+    padding-left: 3px;
+    padding-right: 3px;
+    border-bottom: 1px solid #b7b6b6;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .attrib-selector-containers .attribute .description {
+    font-size: 1rem;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .select-function-format-container {
+    font-size: 1rem;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .select-function-format-container ul li a {
+    color: #333
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .select-function-format-container .function-syntax {
+    padding-left: 3px;
+    padding-right: 3px;
+    border-bottom: 1px solid #b7b6b6;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .select-function-format-container .syntax-expression {
+    font-size: 1.5rem;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .select-function-format-container .function-syntax .description {
+    font-size: 1rem;
+}
+
 
 .mapping-generation-dialog .btn-tray .btn-primary {
     float: right;
