@@ -277,15 +277,15 @@ metricsLabelMapping:
       db_url: "${2}"
 
   siddhi.io.cdc.source.listening.event.count:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Listening.event.count.*.*.*.*.*.(.*)"
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Listening.event.count.*.(.*).host.*.*.*.(.*)"
     name: "siddhi.cdc.source.listening.mode.event.count"
     labels:
       app_name: "${0}"
-      db_type: "${1}"
-      host: "${2}"
+      A_db_type: "${1}"
+      B_host: "${2}"
       operation_type: "${3}"
-      database: "${4}"
-      tablename: "${5}"
+      C_database: "${4}"
+      D_tablename: "${5}"
       db_url: "${6}"
 
   siddhi.io.cdc.source.listening.metrics.last.update:
@@ -304,14 +304,14 @@ metricsLabelMapping:
       db_url: "${2}"
 
   siddhi.io.cdc.source.polling.event.count:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Polling.event.count.*.*.*.*.(.*)"
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Polling.event.count.*.(.*).host.*.*.(.*)"
     name: "siddhi.cdc.source.polling.mode.event.count"
     labels:
       app_name: "${0}"
-      db_type: "${1}"
-      host: "${2}"
-      database: "${3}"
-      tablename: "${4}"
+      A_db_type: "${1}"
+      B_host: "${2}"
+      C_database: "${3}"
+      D_tablename: "${4}"
       db_url: "${5}"
 
   siddhi.io.cdc.source.polling.details.metrics.:
@@ -327,6 +327,31 @@ metricsLabelMapping:
   siddhi.io.cdc.source.polling.metrics:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Polling.*.(.*)"
     name: "siddhi.cdc.source.polling.mode.${1}"
+    labels:
+      app_name: "${0}"
+      db_url: "${2}"
+
+#siddhi-store-rdbms
+  siddhi.store.rdbms.apps:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Store.RDBMS"
+    name: "siddhi.store.rdbms.apps"
+    labels:
+      app_name: "${0}"
+
+  siddhi.store.rdbms.total.resutls.count:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Store.RDBMS.Write.Count.*.(.*).host.*.*.(.*)"
+    name: "siddhi.store.rdbms.total.writes"
+    labels:
+      app_name: "${0}"
+      A_db_type: "${1}"
+      B_shortenUrl: "${2}"
+      C_database: "${3}"
+      D_tablename: "${4}"
+      db_url: "${5}"
+
+  siddhi.store.rdbms.metrics:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Store.RDBMS.*.(.*)"
+    name: "siddhi.store.rdbms.${1}"
     labels:
       app_name: "${0}"
       db_url: "${2}"
