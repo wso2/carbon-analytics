@@ -75,6 +75,11 @@
     right: 5px;
     top: 2px;
     color: #d6d3cd;
+    display: none;
+}
+
+.listContainer.outputs .attributeList li .attribute:hover .clear-icon {
+    display: block;
 }
 
 .listContainer.inputs .attributeList li .attribute .attrib-type {
@@ -137,21 +142,43 @@
     font-size: 19px;
 }
 
-.mapping-generation-dialog .dialog-body .expression-container .main-exp {
-    text-align: center;
-    font-size: 2.0rem;
-    padding: 10px;
+.mapping-generation-dialog .dialog-body .expression-container {
+    padding-bottom: 10px;
 }
 
-.mapping-generation-dialog .dialog-body .expression-container .main-exp span:hover {
-    color: #0ade4a;
+.mapping-generation-dialog .dialog-body .expression-container .expression {
+    text-align: center;
+    font-size: 1.8rem;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    background-color: #2c2c2c;
+    border-bottom: 1px solid #555;
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression.target {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-size: 2.0rem;
+    background-color: #232323;
+    border-left: 3px solid #fff;
+    box-shadow: 0 2px #77777761;
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression.target .exp-content {
+    width: 95%;
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression.target .exp-content span:hover {
+    color: #00fcaf;
     cursor: pointer;
 }
 
-.mapping-generation-dialog .dialog-body .expression-container .sub-exp {
-    text-align: center;
-    font-size: 1.5rem;
-    padding: 10px;
+.mapping-generation-dialog .dialog-body .expression-container .expression span.selected {
+    color: #00fcaf;
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression.target .expression-merge {
+    margin-top: 1%;
 }
 
 .mapping-generation-dialog .dialog-body .generation-content {
@@ -167,17 +194,25 @@
     width: 20%;
 }
 
+.mapping-generation-dialog .dialog-body .generation-content .node-container ul {
+    border-top: 1px #d3d3d33b solid;
+
+}
+
 .mapping-generation-dialog .dialog-body .generation-content .node-container ul li a div.selected {
     padding-top: 10px;
     padding-bottom: 10px;
     background-color: #d3d3d3;
     border-bottom: 1px #d3d3d33b solid;
+    color: #d9534f;
 }
 
 .mapping-generation-dialog .dialog-body .generation-content .node-container ul li a div {
     padding-top: 10px;
     padding-bottom: 10px;
     border-bottom: 1px #d3d3d33b solid;
+    font-weight: 400;
+    color: white;
 }
 
 .mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container {
@@ -196,7 +231,7 @@
 }
 
 .mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .attrib-selector-containers .attribute {
-    border-top: 1px solid #b7b6b6;
+    /*border-top: 1px solid #b7b6b6;*/
     padding-left: 3px;
     padding-right: 3px;
     border-bottom: 1px solid #b7b6b6;

@@ -17,11 +17,11 @@
  *
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'jsonValidator', 'app/source-editor/completion-engine'],
-    function (require, log, _, $, AppData, InitialiseData, JSONValidator, CompletionEngine) {
+define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'jsonValidator', 'app/source-editor/completion-engine', 'alerts'],
+    function (require, log, _, $, AppData, InitialiseData, JSONValidator, CompletionEngine, alerts) {
         var operatorMap = {
             is_null: {
-                return_types: ['bool'],
+                returnTypes: ['bool'],
                 beforeTypes: ['text'],
                 afterTypes: ['bool'],
                 symbol: 'IS NULL',
@@ -30,7 +30,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 isEnd: true
             },
             not: {
-                return_types: ['bool'],
+                returnTypes: ['bool'],
                 beforeTypes: ['bool'],
                 afterTypes: ['bool'],
                 symbol: 'NOT',
@@ -38,105 +38,105 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 isFirst: true
             },
             multiply: {
-                return_types: ['number'],
-                before_types: ['number'],
+                returnTypes: ['number'],
+                beforeTypes: ['number'],
                 afterTypes: ['number'],
                 symbol: '*',
                 description: 'Multiplication',
                 isFirst: false
             },
             divide: {
-                return_types: ['number'],
-                before_types: ['number'],
+                returnTypes: ['number'],
+                beforeTypes: ['number'],
                 afterTypes: ['number'],
                 symbol: '/',
                 description: 'Division',
                 isFirst: false
             },
             modulo: {
-                return_types: ['number'],
-                before_types: ['number'],
+                returnTypes: ['number'],
+                beforeTypes: ['number'],
                 afterTypes: ['number'],
                 symbol: '%',
                 description: 'Modulus',
                 isFirst: false
             },
             addition: {
-                return_types: ['number'],
-                before_types: ['number'],
+                returnTypes: ['number'],
+                beforeTypes: ['number'],
                 afterTypes: ['number'],
                 symbol: '+',
                 description: 'Addition',
                 isFirst: false
             },
             subtraction: {
-                return_types: ['number'],
-                before_types: ['number'],
+                returnTypes: ['number'],
+                beforeTypes: ['number'],
                 afterTypes: ['number'],
                 symbol: '-',
                 description: 'Subtraction',
                 isFirst: false
             },
             less_than: {
-                return_types: ['bool'],
-                before_types: ['number'],
+                returnTypes: ['bool'],
+                beforeTypes: ['number'],
                 afterTypes: ['number'],
                 symbol: '<',
                 description: 'Less than',
                 isFirst: false
             },
             less_than_equal: {
-                return_types: ['bool'],
-                before_types: ['number'],
+                returnTypes: ['bool'],
+                beforeTypes: ['number'],
                 afterTypes: ['number'],
                 symbol: '<=',
                 description: 'Less than or equal',
                 isFirst: false
             },
             greater_than: {
-                return_types: ['bool'],
-                before_types: ['number'],
+                returnTypes: ['bool'],
+                beforeTypes: ['number'],
                 afterTypes: ['number'],
                 symbol: '>',
                 description: 'Greater than',
                 isFirst: false
             },
             greater_than_equal: {
-                return_types: ['bool'],
-                before_types: ['number'],
+                returnTypes: ['bool'],
+                beforeTypes: ['number'],
                 afterTypes: ['number'],
                 symbol: '>=',
                 description: 'Greater than or equal',
                 isFirst: false
             },
             equal: {
-                return_types: ['bool'],
-                before_types: ['text', 'number'],
+                returnTypes: ['bool'],
+                beforeTypes: ['text', 'number'],
                 afterTypes: ['text', 'number'],
                 symbol: '==',
                 description: 'Equal comparison',
                 isFirst: false
             },
             not_equal: {
-                return_types: ['bool'],
-                before_types: ['text', 'number'],
+                returnTypes: ['bool'],
+                beforeTypes: ['text', 'number'],
                 afterTypes: ['text', 'number'],
                 symbol: '!=',
                 description: 'Not equal comparison',
                 isFirst: false
             },
             and: {
-                return_types: ['bool'],
-                before_types: ['bool'],
-                afterTypes: ['bool'],
+                returnTypes: ['bool'],
+                beforeTypes: ['text', 'number', 'bool'],
+                afterTypes: ['text', 'number', 'bool'],
                 symbol: 'AND',
                 description: 'Logical AND',
                 isFirst: false
             },
             or: {
-                return_types: ['bool'],
-                before_types: ['bool'],
-                afterTypes: ['bool'],
+                returnTypes: ['bool'],
+                beforeTypes: ['text', 'number', 'bool'],
+                afterTypes: ['text', 'number', 'bool'],
                 symbol: 'OR',
                 description: 'Logical OR',
                 isFirst: false
@@ -144,8 +144,6 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
         };
 
         var ETLTaskView = function (options, container, callback, appObject) {
-            console.log(this);
-            // var self = this;
             this.inputAttributes = [
                 {
                     name: 'id',
@@ -194,6 +192,8 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.connectionMapRef = {};
             this.expressionMap = {};
             this.coordinate = [];
+            this.focusNode = [];
+            this.currenOutputElement = null;
             this.expressionGenerationDialog = $(container).find('.popup-backdrop').clone();
             $(container).prepend(this.expressionGenerationDialog);
 
@@ -204,19 +204,39 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.showExpressionDialog = this.showExpressionDialog.bind(this);
             this.renderAttributes = this.renderAttributes.bind(this);
             this.renderFunctionAttributeSelector = this.renderFunctionAttributeSelector.bind(this);
-            this.renderExpressionGeneratorComponents = this.renderExpressionGeneratorComponents.bind(this);
             this.hideExpressionGenerationDialog = this.hideExpressionGenerationDialog.bind(this);
             this.addNodeToExpression = this.addNodeToExpression.bind(this);
             this.displayExpression = this.displayExpression.bind(this);
+            this.renderGenerator = this.renderGenerator.bind(this);
+            this.updateExpression = this.updateExpression.bind(this);
+            this.addCoordinate = this.addCoordinate.bind(this);
+            this.removeCoordinate = this.removeCoordinate.bind(this);
+            this.updateConnections = this.updateConnections.bind(this);
 
             this.renderAttributes(this.inputAttributes, this.outputAttributes);
             this.functionDataMap = this.generateExpressionMap(this.inputAttributes, CompletionEngine.getRawMetadata());
+        }
 
-            console.log(this.functionDataMap);
-            // Regex for stuff inside bracket: \((.*?)\)
-            // Regex for breaking parameters inside bracket: [a-zA-Z .<>]+
-            var regExp = /\(([^)]+)\)/;
-            // regexp.exec(syntax.syntax)[1].split(',')[0].match('[a-zA-Z0-9.]+$')
+        ETLTaskView.prototype.updateConnections = function (outputAttribute) {
+            var jsPlumbInstance = this.jsPlumbInstance;
+            var inputAttributeEndpoints = this.inputAttributeEndpoints;
+            var outputAttributeEndpoints = this.outputAttributeEndpoints;
+            var generatedExpression = this.expressionMap[outputAttribute] ?
+                generateExpressionHTML(null, this.expressionMap[outputAttribute]) : '';
+
+            $(outputAttributeEndpoints[outputAttribute].element).find('.mapped-expression').empty();
+            $(outputAttributeEndpoints[outputAttribute].element).find('.mapped-expression').append(`
+               ${generatedExpression}
+            `);
+
+            this.inputAttributes.forEach(function (inputAttribute) {
+                if (generatedExpression.indexOf(inputAttribute.name) > -1) {
+                    jsPlumbInstance.connect({
+                        source: inputAttributeEndpoints[inputAttribute.name],
+                        target: outputAttributeEndpoints[outputAttribute]
+                    })
+                }
+            })
 
         }
 
@@ -227,6 +247,8 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             var inputEndpointMap = {};
             var outputEndpointMap = {};
             var showExpressionDialog = this.showExpressionDialog;
+            var expressionMap = this.expressionMap;
+            var updateConnections = this.updateConnections;
 
             inputAttributes.forEach(function (element) {
                 var inputAttribElement = inputListContainer.append(`
@@ -240,7 +262,10 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     </li>
                 `);
 
-                inputEndpointMap[element.name] = jsPlumbInstance.addEndpoint($(inputAttribElement).children().last(), {anchor: 'Right'}, {isSource: true});
+                inputEndpointMap[element.name] = jsPlumbInstance.addEndpoint($(inputAttribElement).children().last(), {anchor: 'Right'}, {
+                    isSource: true,
+                    maxConnections: -1
+                });
             });
 
             outputAttributes.forEach(function (element) {
@@ -266,7 +291,18 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     evt.stopPropagation()
                     showExpressionDialog(element);
                 });
-                outputEndpointMap[element.name] = jsPlumbInstance.addEndpoint($(outputAttribElement).children().last(), {anchor: 'Left'}, {isTarget: true});
+
+                outputAttribElement.children().last().find('.clear-icon').on('click', function (evt) {
+                    evt.stopPropagation();
+                    delete expressionMap[element.name];
+                    jsPlumbInstance.deleteConnectionsForElement(outputEndpointMap[element.name].element);
+                    updateConnections(element.name);
+                });
+
+                outputEndpointMap[element.name] = jsPlumbInstance.addEndpoint($(outputAttribElement).children().last(), {anchor: 'Left'}, {
+                    isTarget: true,
+                    maxConnections: -1
+                });
 
             });
 
@@ -275,18 +311,412 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
         }
 
         ETLTaskView.prototype.showExpressionDialog = function (output_attribute) {
-            this.expressionMap[output_attribute.name] = new ScopeNode([output_attribute.type]);
-            var expressionGeneratorContainer = this.expressionGenerationDialog.show();
+            this.currenOutputElement = output_attribute.name;
+            this.expressionMap[output_attribute.name] = this.expressionMap[output_attribute.name] ?
+                this.expressionMap[output_attribute.name] : new ScopeNode([output_attribute.type]);
             var container = this.container;
-            this.renderExpressionGeneratorComponents(output_attribute.name, this.expressionMap[output_attribute.name]);
             var hideExpressionGenerationDialog = this.hideExpressionGenerationDialog;
-            this.displayExpression(output_attribute.name);
+            var expressionGeneratorContainer = this.expressionGenerationDialog.show();
+            var coordinates = this.coordinate;
+            var expressionMap = this.expressionMap;
+            var expression = this.expressionMap[output_attribute.name];
+            var initialExpression = _.cloneDeep(this.expressionMap[output_attribute.name])
+            var updateConnections = this.updateConnections;
+
+            this.renderGenerator();
 
             $(expressionGeneratorContainer).find('.btn-default').on('click', function () {
+                expressionMap[output_attribute.name] = initialExpression;
                 hideExpressionGenerationDialog(container, expressionGeneratorContainer);
             });
 
+            $(expressionGeneratorContainer).find('.btn-primary').on('click', function () {
+                if (coordinates.length > 0) {
+                    alerts.error('Please complete the expression creation process to submit');
+                } else {
+                    var isExpressionValid = validateExpressionTree(expression);
 
+                    if (isExpressionValid) {
+                        updateConnections(output_attribute.name);
+                        hideExpressionGenerationDialog(container, expressionGeneratorContainer);
+                    } else {
+                        alerts.error('Please complete the expression creation process to submit');
+                    }
+                }
+            });
+        }
+
+        ETLTaskView.prototype.addCoordinate = function (index) {
+            this.coordinate.push(index);
+        }
+
+        ETLTaskView.prototype.removeCoordinate = function () {
+            this.coordinate.pop();
+        }
+
+        ETLTaskView.prototype.renderGenerator = function () {
+            var container = this.container;
+            var expressionContainer = $(container).find('.expression-container');
+            var expression = this.expressionMap[this.currenOutputElement];
+            var coordinates = this.coordinate;
+            var focusNodes = this.focusNode;
+            var functionDataMap = this.functionDataMap;
+            var updateExpression = this.updateExpression;
+            var addToCoordinates = this.addCoordinate;
+            var renderExpression = this.renderGenerator;
+            $(this.container).find('.dialog-heading').text('');
+            $(this.container).find('.dialog-heading')
+                .append(`Create expression for attribute '<b>${this.currenOutputElement}</b>'`);
+
+            // render the main Expression
+            expressionContainer.empty();
+            var tempExp = expression;
+
+            if (coordinates.length === 0) {
+                // render the expression if none of the expression nodes are selected
+                expressionContainer.append(`
+                    <div class="expression target" style="display: flex">
+                        <div class="exp-content" style="width: 100%;">
+                            ${generateExpressionHTML(null, expression)}
+                        </div>
+                    </div>
+                `);
+            } else {
+                expressionContainer.append(`
+                    <div class="expression" style="">
+                        ${generateExpressionHTML(coordinates[0], expression)}
+                    </div>
+                `);
+            }
+
+            // render expression when one attribute/function/scope is selected in drill down form
+            coordinates.forEach(function (index, i) {
+                tempExp = focusNodes[i];
+
+                if (i === (coordinates.length - 1)) {
+                    expressionContainer.append(`
+                        <div class="expression target" style="display: flex">
+                            <div class="exp-content">
+                                ${generateExpressionHTML(null, tempExp)}
+                            </div>
+                            <div class="expression-merge">
+                                <a href="#">
+                                    <i class="fw fw-up"></i>
+                                </a>
+                            </div>
+                        </div>
+                    `);
+                } else {
+                    expressionContainer.append(`
+                        <div class="expression" style="">
+                            ${generateExpressionHTML(coordinates[i + 1], tempExp)}
+                        </div>
+                    `);
+                }
+            });
+
+            $(expressionContainer).find('.expression.target>.exp-content>span').on('click', function (evt) {
+                coordinates.push(Number(evt.currentTarget.classList[0].split('-')[1]));
+                focusNodes.push(tempExp.children ? _.cloneDeep(tempExp.children[coordinates[coordinates.length - 1]]) :
+                    _.cloneDeep(tempExp.parameters[coordinates[coordinates.length - 1]]));
+                renderExpression();
+            })
+
+            $(expressionContainer).find('.expression.target>.expression-merge').on('click', function (evt) {
+                if (coordinates.length === 1) {
+                    expression.children[coordinates[0]] = focusNodes[0];
+                } else {
+                    var childNode = focusNodes[focusNodes.length - 1];
+                    var parentNode = focusNodes[focusNodes.length - 2];
+                    var replacingIndex = coordinates[coordinates.length - 1];
+
+                    if (parentNode.children) {
+                        parentNode.children[replacingIndex] = childNode;
+                    } else {
+                        parentNode.parameters[replacingIndex] = childNode;
+                    }
+                }
+                focusNodes.pop();
+                coordinates.pop();
+                renderExpression();
+            });
+
+
+            // render supported attributes based off expression context
+
+            //generate the supported attributes
+            var supportedInputAttributes = {};
+            var supportedFunctions = {};
+            var supportedOperators = {};
+
+            console.log(functionDataMap)
+
+            if (tempExp.children) {
+                if (tempExp.children.length > 0) {
+                    switch (tempExp.children[tempExp.children.length - 1].nodeType) {
+                        case 'attribute':
+                            var attributeGenericDataType = tempExp.children[tempExp.children.length - 1].genericDataType;
+
+                            Object.keys(operatorMap).forEach(function (key) {
+                                if (operatorMap[key].beforeTypes.indexOf(attributeGenericDataType) > -1
+                                    && _.intersection(operatorMap[key].returnTypes, tempExp.supportedGenericDataTypes).length > 0) {
+                                    supportedOperators[key] = operatorMap[key];
+                                }
+                            })
+                            break;
+                        case 'function':
+                        case 'scope':
+                            Object.keys(operatorMap).forEach(function (key) {
+                                if (_.intersection(operatorMap[key].beforeTypes, tempExp.children[tempExp.children.length - 1].supportedGenericDataTypes).length > 0 &&
+                                    _.intersection(operatorMap[key].returnTypes, tempExp.supportedGenericDataTypes).length > 0) {
+                                    supportedOperators[key] = operatorMap[key];
+                                }
+                            })
+                            break;
+                        case 'operator':
+                            var dataTypesFollowingOperator = tempExp.children[tempExp.children.length - 1].afterTypes;
+
+                            Object.keys(functionDataMap).forEach(function (key) {
+                                if (dataTypesFollowingOperator.indexOf(getGenericDataType(key)) > -1) {
+                                    supportedInputAttributes = _.merge({}, supportedInputAttributes, functionDataMap[key]['attribute'])
+                                    supportedFunctions = _.merge({}, supportedFunctions, functionDataMap[key]['function'])
+                                }
+                            })
+
+                            supportedOperators = {
+                                bracket: {
+                                    returnTypes: ['bool', 'text', 'number'],
+                                    beforeTypes: ['bool', 'text', 'number'],
+                                    afterTypes: ['bool', 'text', 'number'],
+                                    symbol: '()',
+                                    description: 'Bracket',
+                                    isFirst: true,
+                                    scope: true
+                                }
+                            }
+
+                            break;
+                    }
+
+                } else {
+                    if (tempExp.dataTypes.indexOf('bool') > -1) {
+                        this.inputAttributes.forEach(function (att) {
+                            supportedInputAttributes[att.name] = att;
+                        })
+                    }
+
+                    tempExp.dataTypes.forEach(function (dataType) {
+                        supportedInputAttributes = functionDataMap[dataType]['attribute'] ?
+                            _.merge({}, supportedInputAttributes, functionDataMap[dataType]['attribute']) :
+                            supportedInputAttributes;
+
+                        supportedFunctions = functionDataMap[dataType]['function'] ?
+                            _.merge({}, supportedFunctions, functionDataMap[dataType]['function']) :
+                            supportedFunctions;
+
+                        supportedOperators = {
+                            bracket: {
+                                returnTypes: ['bool', 'text', 'number'],
+                                beforeTypes: ['bool', 'text', 'number'],
+                                afterTypes: ['bool', 'text', 'number'],
+                                symbol: '()',
+                                description: 'Bracket',
+                                isFirst: true,
+                                scope: true
+                            }
+                        }
+
+                        Object.keys(operatorMap).forEach(function (key) {
+                            if ((!supportedOperators[key]) && operatorMap[key].isFirst && operatorMap[key].returnTypes.indexOf(getGenericDataType(dataType)) > -1) {
+                                supportedOperators[key] = operatorMap[key]
+                            }
+                        })
+                    });
+
+
+                }
+            }
+
+            // render attribute selector
+            var nodeCategoryContainer = $(container).find('.node-category');
+            nodeCategoryContainer.empty();
+            var attributeContainer = $(container).find('.att-fun-op-container');
+            var nodeData;
+
+
+            Object.keys(supportedInputAttributes).length > 0 ?
+                nodeCategoryContainer.append(`
+                    <li>
+                        <a>
+                             <div class="attribute-category">
+                                 Attribute
+                             </div>
+                         </a>
+                     </li>
+                `)
+                : null;
+
+            Object.keys(supportedFunctions).length > 0 ?
+                nodeCategoryContainer.append(`
+                    <li>
+                        <a>
+                             <div class="function-category">
+                                 Function
+                             </div>
+                         </a>
+                     </li>
+                `)
+                : null;
+
+            Object.keys(supportedOperators).length > 0 ?
+                nodeCategoryContainer.append(`
+                    <li>
+                        <a>
+                             <div class="operator-category">
+                                 Operators
+                             </div>
+                         </a>
+                     </li>
+                `)
+                : null;
+
+            // setup events for attribute selection
+            $(nodeCategoryContainer).find('.attribute-category').on('click', function (evt) {
+                nodeCategoryContainer.find('li>a>div').removeClass('selected');
+                nodeCategoryContainer.find('.attribute-category').addClass('selected');
+
+                attributeContainer.find('.select-function-operator-attrib').show();
+                attributeContainer.find('.attrib-selector-containers').empty();
+
+                Object.keys(supportedInputAttributes).forEach(function (key) {
+                    attributeContainer.find('.attrib-selector-containers').append(`
+                        <a id="attr-${supportedInputAttributes[key].name}" style="color: #333">
+                            <div class="attribute" style="">
+                                <div>
+                                    ${supportedInputAttributes[key].name}
+                                </div>
+                                <div class="description" style="">
+                                    ${supportedInputAttributes[key].type}
+                                </div>
+                           </div>
+                        </a>
+                    `);
+                });
+
+                attributeContainer.find('.attrib-selector-containers').children().on('click', function (evt) {
+                    nodeData = {
+                        name: supportedInputAttributes[evt.currentTarget.id.split('attr-')[1]].name,
+                        dataType: supportedInputAttributes[evt.currentTarget.id.split('attr-')[1]].type,
+                    }
+
+                    tempExp.addNodeToExpression(new AttributeNode(nodeData));
+                    updateExpression(tempExp);
+                })
+            })
+
+            $(nodeCategoryContainer).find('.function-category').on('click', function (evt) {
+                nodeCategoryContainer.find('li>a>div').removeClass('selected');
+                nodeCategoryContainer.find('.function-category').addClass('selected');
+                attributeContainer.find('.select-function-operator-attrib').show();
+                attributeContainer.find('.attrib-selector-containers').empty();
+
+                Object.keys(supportedFunctions).forEach(function (key) {
+                    attributeContainer.find('.attrib-selector-containers').append(`
+                        <a id="func-${supportedFunctions[key].name}" style="color: #333">
+                            <div class="attribute" style="">
+                                <div>
+                                    ${supportedFunctions[key].displayName}
+                                </div>
+                                <div class="description" style="">
+                                    ${supportedFunctions[key].description}
+                                </div>
+                           </div>
+                        </a>
+                    `);
+                });
+
+                attributeContainer.find('.attrib-selector-containers').children().on('click', function (evt) {
+                    attributeContainer.find('.select-function-operator-attrib').hide();
+                    attributeContainer.find('.select-function-format-container').show();
+
+                    supportedFunctions[evt.currentTarget.id.split('func-')[1]].syntax.forEach(function (syntax, i) {
+                        attributeContainer.find('.select-function-format-container').find('ul').append(`
+                            <li id="syntax-${i}">
+                                <a style="">
+                                    <div class="function-syntax" style="">
+                                        <div class="syntax-expression">
+                                            ${syntax.syntax}
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        `);
+                    });
+
+                    attributeContainer.find('.select-function-format-container').find('ul').children().on('click', function (child_evt) {
+                        nodeData = {
+                            displayName: supportedFunctions[evt.currentTarget.id.split('func-')[1]].displayName,
+                            dataTypes: supportedFunctions[evt.currentTarget.id.split('func-')[1]].returnAttributes[0].type.map(function (dataType) {
+                                return dataType.toLowerCase();
+                            }),
+                            selectedSyntax: supportedFunctions[evt.currentTarget.id.split('func-')[1]].syntax[child_evt.currentTarget.id.split('syntax-')[1]]
+                        };
+
+                        tempExp.addNodeToExpression(new FunctionNode(nodeData));
+                        updateExpression(tempExp);
+                        attributeContainer.find('.select-function-format-container').find('ul').empty();
+                        attributeContainer.find('.select-function-format-container').hide();
+                    })
+                })
+            })
+
+            $(nodeCategoryContainer).find('.operator-category').on('click', function (evt) {
+                nodeCategoryContainer.find('li>a>div').removeClass('selected');
+                nodeCategoryContainer.find('.operator-category').addClass('selected');
+                attributeContainer.find('.select-function-operator-attrib').show();
+                attributeContainer.find('.attrib-selector-containers').empty();
+
+                Object.keys(supportedOperators).forEach(function (key) {
+                    attributeContainer.find('.attrib-selector-containers').append(`
+                        <a id="operator-${key}" style="color: #333">
+                            <div class="attribute" style="">
+                                <div>
+                                    ${supportedOperators[key].symbol} - ${supportedOperators[key].description}
+                                </div>
+                           </div>
+                        </a>
+                    `);
+                });
+
+                attributeContainer.find('.attrib-selector-containers').children().on('click', function (evt) {
+                    if (evt.currentTarget.id.split('operator-')[1] === 'bracket') {
+                        tempExp.addNodeToExpression(new ScopeNode(tempExp.dataTypes));
+                    } else {
+                        nodeData = {
+                            symbol: supportedOperators[evt.currentTarget.id.split('operator-')[1]].symbol,
+                            dataTypes: supportedOperators[evt.currentTarget.id.split('operator-')[1]].returnTypes,
+                            isEnd: supportedOperators[evt.currentTarget.id.split('operator-')[1]].isEnd,
+                            afterTypes: supportedOperators[evt.currentTarget.id.split('operator-')[1]].afterTypes,
+                            beforeTypes: supportedOperators[evt.currentTarget.id.split('operator-')[1]].beforeTypes,
+                        }
+
+                        tempExp.addNodeToExpression(new OperatorNode(nodeData));
+                    }
+
+                    updateExpression(tempExp);
+                })
+
+            })
+
+            $(nodeCategoryContainer).children().first().find('a>div').click();
+        }
+
+        ETLTaskView.prototype.updateExpression = function (expression) {
+            if (this.coordinate.length === 0) {
+                this.expressionMap[this.currenOutputElement] = expression;
+            }
+
+            this.renderGenerator();
         }
 
         ETLTaskView.prototype.hideExpressionGenerationDialog = function (container, expressionGeneratorContainer) {
@@ -294,86 +724,9 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             expressionGeneratorContainer = $(container).find('.popup-backdrop').clone();
             $(container).prepend(expressionGeneratorContainer);
             this.expressionGenerationDialog = expressionGeneratorContainer;
-        }
-
-        ETLTaskView.prototype.renderExpressionGeneratorComponents = function (outputAttributeName, expression) {
-            var coordinates = this.coordinate;
-            var attributes = this.inputAttributes;
-            var functions = this.functionDataMap[expression.dataType];
-            var operators = _.filter(operatorMap, function (operator) {
-                return operator.return_types.indexOf(expression.genericDataType) > -1
-            });
-            var renderAttributeSelector = this.renderFunctionAttributeSelector;
-            var nodeCategoryContainer = this.expressionGenerationDialog.find('.node-category');
-
-
-            expression.dataTypes.forEach(function (dataType) {
-                var test= _.filter(attributes, function(att) {
-                    return att.type.toLowerCase() === dataType;
-                });
-            });
-
-
-            operators.unshift({
-                return_types: ['bool', 'text', 'number'],
-                beforeTypes: ['bool', 'text', 'number'],
-                afterTypes: ['bool', 'text', 'number'],
-                symbol: '()',
-                description: 'Bracket',
-                isFirst: true,
-                scope: true
-            });
-
-            $(nodeCategoryContainer).append(`
-                                <li>
-                                    <a>
-                                        <div style="">
-                                            Attribute
-                                        </div>
-                                    </a>
-                                </li>
-                            `)
-
-            $(nodeCategoryContainer).children().last().on('click', function (evt) {
-                $(nodeCategoryContainer).find('li>a>div').removeClass('selected');
-                $(evt.target).addClass('selected');
-                renderAttributeSelector('attribute', attributes, outputAttributeName);
-            })
-
-            $(nodeCategoryContainer).append(`
-                <li>
-                    <a>
-                        <div class="" style="">
-                            Function
-                        </div>
-                    </a>
-                </li>
-            `);
-
-            $(nodeCategoryContainer).children().last().on('click', function (evt) {
-                $(nodeCategoryContainer).find('li>a>div').removeClass('selected');
-                $(evt.target).addClass('selected');
-                renderAttributeSelector('function', functions['function'], outputAttributeName);
-            })
-
-
-            $(nodeCategoryContainer).append(`
-                <li>
-                    <a>
-                        <div class="" style="">
-                            Operator
-                        </div>
-                    </a>
-                </li>
-            `);
-
-            $(nodeCategoryContainer).children().last().on('click', function (evt) {
-                $(nodeCategoryContainer).find('li>a>div').removeClass('selected');
-                $(evt.target).addClass('selected');
-                renderAttributeSelector('operator', operators, outputAttributeName);
-            });
-
-            $(nodeCategoryContainer).children().first().click();
+            this.currenOutputElement = null;
+            this.coordinate = [];
+            this.focusNode = [];
         }
 
         ETLTaskView.prototype.renderFunctionAttributeSelector = function (type, attributeFunctionArray, outputAttributeName) {
@@ -384,7 +737,6 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
             $(attributeContainer).find('.attrib-selector-containers').children().remove();
 
-            console.log(attributeFunctionArray);
             Object.values(attributeFunctionArray).forEach(function (element) {
                 var displayName = '';
                 var description = '';
@@ -424,8 +776,6 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             addNodeToExpression('scope', element, outputAttributeName);
                         }
                     } else {
-                        console.log(element);
-
                         element.syntax.forEach(function (syntax_obj) {
                             $(syntaxSelectorContainer).find('ul').append(`
                                 <li>
@@ -434,9 +784,6 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                                             <div class="syntax-expression">
                                                 ${syntax_obj.syntax}
                                             </div>
-<!--                                            <div class="description" style="">-->
-<!--                                                Test_Attrib_Description-->
-<!--                                            </div>-->
                                         </div>
                                     </a>
                                 </li>
@@ -573,9 +920,11 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
         var OperatorNode = function (node_data) {
             this.symbol = node_data.symbol;
-            this.dataType = node_data.dataType;
+            this.genericDataTypes = node_data.dataTypes;
             this.nodeType = 'operator';
-            this.genericDataType = getGenericDataType(node_data.dataType);
+            this.afterTypes = node_data.afterTypes;
+            this.beforeTypes = node_data.beforeTypes;
+            // this.genericDataType = getGenericDataType(node_data.dataType);
             this.isEnd = node_data.isEnd;
         }
 
@@ -588,23 +937,43 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
         var FunctionNode = function (node_data) {
             this.displayName = node_data.displayName;
-            this.dataType = node_data.dataType;
+            this.dataTypes = node_data.dataTypes;
+            this.supportedGenericDataTypes = node_data.dataTypes.map(function (data_type) {
+                return getGenericDataType(data_type);
+            });
             this.nodeType = 'function';
-            this.genericDataType = getGenericDataType(node_data.dataType)
             this.parameters = this.generateParameters(node_data.selectedSyntax);
         }
 
         FunctionNode.prototype.generateParameters = function (syntax) {
             var parameters = [];
+            var regExp = /\(([^)]+)\)/;
 
             // TODO : write parameter generation from selected syntax
-            console.log(syntax);
+            regExp.exec(syntax.syntax) ? regExp.exec(syntax.syntax)[1].split(',').forEach(function (param) {
+                var temp = param.trim().split(' ');
 
-            syntax.syntax.match('\((.*?)\)').forEach(function (match) {
-                console.log(match);
-            })
+                var dataTypes = temp[0].match(/<(.*?)>/)[1].split('|').map(function (type) {
+                    return type.toLowerCase();
+                });
 
+                var placeHolder = '<';
+                var isFirst = true;
+                dataTypes.forEach(function (dataType) {
+                    if (!isFirst) {
+                        placeHolder += ' | '
+                    }
+                    placeHolder += dataType;
+                })
+                placeHolder += '>';
+                placeHolder += ' ' + temp[1];
 
+                var paramNode = new ScopeNode(dataTypes);
+                paramNode.placeholder = placeHolder;
+
+                parameters.push(paramNode);
+
+            }) : null;
 
             return parameters;
         }
@@ -617,28 +986,28 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.canBeLast = true;
             this.children = [];
             this.nodeType = 'scope';
+            this.placeholder = null;
         }
 
-        ScopeNode.prototype.addNodeToMainExpression = function (node) {
+        ScopeNode.prototype.addNodeToExpression = function (node) {
             this.children.push(node);
         }
 
-        ScopeNode.prototype.addNodeToChildExpression = function (coordinates, node) {
-            var array = this.children;
-            addValueToArray(coordinates.length, coordinates, node, array);
-            this.children = array;
-        }
+        function addValueToArray(level, coordinates, replacementChildNode, node) {
+            if ((level === 1 && coordinates.length === 1) || level === 1) {
+                if (node.children) {
+                    node.children[coordinates[coordinates.length - level]] = replacementChildNode;
+                } else {
+                    node.parameters[coordinates[coordinates.length] - level] = replacementChildNode;
+                }
 
-        function addValueToArray(level, coordinates, val, array) {
-            if (level === 1 && coordinates.length === 1) {
-                return array[coordinates[0]].push(val);
+                return node;
             }
 
-            if (level === 1) {
-                return array.push(val)
-            }
-
-            return addValueToArray(level - 1, coordinates, val, array[coordinates[coordinates.length - level]]);
+            return addValueToArray(level - 1, coordinates,
+                replacementChildNode, node.children ?
+                    node.children[coordinates[coordinates.length - level]]
+                    : node.parameters[coordinates[coordinates.length - level]]);
         }
 
         function deleteValueFromArray(level, coordinates, array) {
@@ -653,40 +1022,29 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             return deleteValueFromArray(level - 1, coordinates, array[coordinates[coordinates.length - level]]);
         }
 
-        var generateExpressionHTML = function (node) {
+        var generateExpressionHTML = function (highlightIndex, node) {
             var htmlContent = '';
 
             var i = 0;
             if (node.children) {
-                node.children.forEach(function (node) {
-                    switch (node.nodeType) {
+                node.children.forEach(function (childNode) {
+                    switch (childNode.nodeType) {
                         case 'attribute':
-                            htmlContent += node.name;
+                            htmlContent += childNode.name;
                             break;
                         case 'customValue':
-                            htmlContent += node.value;
+                            htmlContent += childNode.value;
                             break;
                         case 'operator':
-                            htmlContent += node.symbol;
+                            htmlContent += ` ${childNode.symbol} `;
                             break;
                         case 'function':
-                            htmlContent += `<span class="item-${i}">`;
-                            var isFirst = true;
-                            node.parameters.forEach(function (parameterNode) {
-                                if (!isFirst) {
-                                    htmlContent += ', '
-                                }
-
-                                if (parameterNode.nodeType === 'scope') {
-                                    htmlContent += generateExpressionHTML(node);
-                                }
-
-                                isFirst = false;
-                            })
+                            htmlContent += `<span class="item-${i} ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''}">`;
+                            htmlContent += generateExpressionHTML(highlightIndex, childNode);
                             htmlContent += '</span>';
                             break;
                         case 'scope':
-                            htmlContent += `<span class="item-${i}">(${generateExpressionHTML(node)})</span>`;
+                            htmlContent += `<span class="item-${i} ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''}">(${generateExpressionHTML(null, childNode)})</span>`;
                             break;
                     }
                     i++;
@@ -694,28 +1052,57 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             } else {
                 if (node.nodeType === 'function') {
                     htmlContent += `${node.displayName.slice(0, -1)}`
-
+                    var isFirst = true;
                     node.parameters.forEach(function (parameterNode) {
                         if (!isFirst) {
                             htmlContent += ', '
                         }
 
                         if (parameterNode.nodeType === 'scope') {
-                            htmlContent += `<span class="fun-param-${i}">${generateExpressionHTML(node)}<span class="item-${i}">`;
+                            htmlContent += `<span title="${parameterNode.placeholder}" class="param-${i} ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''}">${generateExpressionHTML(null, parameterNode)}</span>`;
                         }
-
                         isFirst = false;
+                        i++;
                     })
                     htmlContent += `)`;
-                    i++;
+
                 }
             }
 
-            if (htmlContent.length === 0) {
-                return '...';
-            } else {
-                return htmlContent;
+
+            return htmlContent.length === 0 ? '...' : htmlContent;
+        }
+
+        function validateExpressionTree(expression) {
+            var errorsFound = 0;
+            validateLevel(expression);
+
+            function validateLevel(expression) {
+                if (expression.nodeType === 'scope') {
+
+                    if (expression.children.length === 0) {
+                        errorsFound++;
+                    }
+
+                    if (expression.children.length > 0 &&
+                        expression.children[expression.children.length - 1].nodeType === 'operator' &&
+                        !(expression.children[expression.children.length - 1].isEnd)) {
+
+                        errorsFound++;
+                    }
+
+                    expression.children.forEach(function (childNode) {
+                        validateLevel(childNode);
+                    });
+
+                } else if (expression.nodeType === 'function') {
+                    expression.parameters.forEach(function (parameter) {
+                        validateLevel(parameter);
+                    })
+                }
             }
+
+            return errorsFound === 0;
         }
 
         return ETLTaskView;
