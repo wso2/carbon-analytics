@@ -63,6 +63,7 @@
     <!-- SmartWizard CSS -->
     <link rel="stylesheet" type="text/css" href="editor/commons/lib/smartWizard/css/smart_wizard.css"/>
     <link rel="stylesheet" type="text/css" href="editor/css/export-docker-kubernetes.css"/>
+    <link rel="stylesheet" type="text/css" href="editor/css/cron-generator.css"/>
     <title>Streaming Integrator Tooling</title>
 </head>
 
@@ -1137,6 +1138,8 @@
                     {{/if}}
                 </ul>
             </li>
+        </ul>
+    </li>
 </script>
 
 <script id="predefined-annotation-form-template" type="text/template">
@@ -1206,6 +1209,7 @@
             <option value="{{name}}">{{name}}</option>
             {{/each}}
         </select>
+    </select>
 </script>
 
 <script id="source-sink-store-options-template" type="text/template">
@@ -1228,7 +1232,9 @@
                     </i>
                 </div>
                 <div class="clearfix">
-                    <input class="option-value" type="text" value="{{value}}">
+                    <div class="option-content">
+                        <input class="option-value" type="text" value="{{value}}">
+                    </div>
                 </div>
                 {{else}}
                 <div class="clearfix">
@@ -1240,7 +1246,9 @@
                     </i>
                 </div>
                 <div class="clearfix">
-                    <input class="option-value" type="text" value="{{defaultValue}}" style="display:none">
+                    <div class="option-content" style="display:none">
+                        <input class="option-value" type="text" value="{{defaultValue}}">
+                    </div>
                 </div>
                 {{/if}}
                 <label class="error-message"></label>
@@ -1255,7 +1263,9 @@
                     </i>
                 </div>
                 <div class="clearfix">
-                    <input class="option-value" type="text" value="{{value}}">
+                    <div class="option-content">
+                        <input class="option-value" type="text" value="{{value}}">
+                    </div>
                 </div>
                 <label class="error-message"></label>
                 {{/if}}
@@ -2611,6 +2621,60 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Cron Generator Dialog-->
+<div class='modal fade' id='cronGenerator' tabindex='-1' role='dialog'>
+    <div class='modal-dialog cron-generator' role='document'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                    <i class='fw fw-cancel about-dialog-close'></i>
+                </button>
+                <h4 class='modal-title cron-generator-title' id='initheading'>Schedule Configuration</h4>
+                <hr class='cron-generator-hr'>
+            </div>
+            <div class='modal-body'>
+                <div class="container-fluid">
+                    <div id='corn-form' class="clearfix">
+                        <ul class="nav nav-tabs" style="background: #3c3a3a;" id="cronTabs">
+                            <li id="basicTab" class="active" style = "width:25%;"><a data-toggle="tab" href="#cron-basic">
+                                <strong>Basic</strong></a>
+                            </li>
+                            <li id="regularTab" style = "width:25%;"><a data-toggle="tab" href="#cron-regular">
+                                <strong>Regular Interval</strong></a>
+                            </li>
+                            <li id="predefineTab" style = "width:25%;"><a data-toggle="tab" href="#cron-predefined">
+                                <strong>Predefined Time</strong></a>
+                            </li>
+                            <li id="advancedTab" style = "width:25%;"><a data-toggle="tab" href="#cron-advanced">
+                                <strong>Advanced</strong></a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" style = "margin:15px 0px;">
+                            <div id="cron-basic" class="tab-pane">
+                                <div id="basic-content" class="clearfix"></div>
+                            </div>
+                            <div id="cron-regular" class="tab-pane">
+                                <div id="cronRegular" class="clearfix"></div>
+                            </div>
+                            <div id="cron-predefined" class="tab-pane">
+                                <div id="cronPredefined" class="clearfix"></div>
+                            </div>
+                            <div id="cron-advanced" class="tab-pane">
+                                <div id="advancedCron" class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="footer_btn" id="cronfooter">
+                    <button id="saveButton" type="button" class="btn btn-primary"> Save </button>
                 </div>
             </div>
         </div>

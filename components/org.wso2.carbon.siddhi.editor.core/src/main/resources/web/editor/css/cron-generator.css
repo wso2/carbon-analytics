@@ -1,0 +1,191 @@
+/**
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+/** contains css for export save dialog **/
+.cron-generator-form-scrollable-block {
+    padding: 20px 20px;
+    overflow: auto;
+    height: 50%;
+    width: 90%;
+    background-color: #2C2C2C;
+    margin-left: 30px;
+}
+
+.errors-container {
+    margin: 50px 20px 20px 20px;
+}
+
+hr.style1 {
+    border-top: 1px solid #2C2C2C;
+    width: 100%;
+    padding: 0 0 5px;
+}
+
+.cron-generator {
+    width: 700px;
+}
+
+.cron-generator .form-group {
+    margin: 10px 0;
+}
+
+.cron-generator .modal-body {
+}
+
+.cron-generator .modal-body .sw-container{
+    margin-top: 12px;
+}
+
+.cron-generator-title {
+    padding:0 0 10px 10px;
+}
+
+.cron-generator-label {
+    margin-top: 8px;
+    margin-left: 20px;
+    font-weight: 300;
+}
+
+hr.cron-generator-hr {
+    border-top: 1px solid #2C2C2C;
+    width: 100%;
+}
+
+.cron-generator-form-label {
+    margin-top: 8px;
+    font-weight: 300;
+}
+
+.cron-generator-form-divider {
+    height: 10px;
+}
+
+.cron-generator-container {
+    padding: 10px 0 10px 0;
+    background-color: transparent;
+    color: white;
+    width: 100%;
+}
+
+.cron-generator-form-scrollable-block-list {
+    padding: 0px 10px;
+    overflow: auto;
+    width: 100%;
+    background-color: #2C2C2C;
+}
+
+.sw-theme-default > ul.step-anchor.docker_export_header li {
+    max-width: 16.65%;
+}
+
+.link-disabled {
+    pointer-events: none;
+}
+
+.sw-theme-default > ul.step-anchor > li > a, .sw-theme-default > ul.step-anchor > li > a:hover {
+    height: initial;
+}
+
+.sw-theme-default > ul.step-anchor > li > a::after {
+    bottom: auto;
+    top: 0px;
+}
+
+.label-description {
+    padding-top: 2px;
+    padding-left: 8px;
+}
+
+.btn-circle {
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+  background: #617d8b
+}
+
+.btn-circle:hover {
+  background: #4c626d;
+}
+
+.btn-circle.btn-lg {
+  width: 50px;
+  height: 50px;
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.33;
+  border-radius: 25px;
+}
+
+.btn-circle.btn-xl {
+  width: 70px;
+  height: 70px;
+  padding: 10px 16px;
+  font-size: 24px;
+  line-height: 1.33;
+  border-radius: 35px;
+}
+
+.error-field {
+    border: 1px solid red;
+    color: red;
+}
+
+.cron-generator .error-message {
+    color: red;
+    font-weight:bold;
+    text-align:center;
+}
+
+.cron-generator .fw-info {
+    font-size: 10px;
+    margin-left: 3px;
+    color: #b7f1eb;
+}
+
+.cron-generator .fw-info > span {
+    font-family: Arial;
+    background: rgb(37, 36, 36);
+    width: 250px;
+    color: #eee;
+    text-align: left;
+    border-radius: 6px;
+    padding: 5 5px;
+    position: absolute;
+    z-index: 1;
+}
+
+.cron-generator label {
+    margin: 10px 0px 10px 4px;
+    font-size: 11px;
+    text-align:center;
+}
+
+.cron-generator input {
+    text-align:center;
+}
+
+.nav-tabs > li.active > a{
+    background-color: #757474;
+    border-color: #3d3d3d;
+    color: #f1e9e9;
+}
+

@@ -3,10 +3,10 @@
  */
 define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annotationObject', 'annotationElement',
         'designViewUtils', 'queryWindowOrFunction', 'streamHandler', 'patternOrSequenceQueryCondition', 'queryOutputInsert',
-        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'perfect_scrollbar'],
+        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'perfect_scrollbar', 'cronGenerator'],
     function (require, _, AppData, log, Constants, Handlebars, AnnotationObject, AnnotationElement, DesignViewUtils,
               QueryWindowOrFunction, StreamHandler, PatternOrSequenceQueryCondition, QueryOutputInsert, QueryOutputDelete,
-              QueryOutputUpdate, QueryOutputUpdateOrInsertInto, PerfectScrollbar) {
+              QueryOutputUpdate, QueryOutputUpdateOrInsertInto, PerfectScrollbar, CronGenerator) {
 
         /**
          * @class FormUtils Contains utility methods for forms
@@ -472,6 +472,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
          */
         FormUtils.prototype.renderOptions = function (optionsArray, customizedOptions, id) {
             var self = this;
+
             optionsArray.sort(function (val1, val2) {
                 if (val1.optional && !val2.optional) return 1;
                 else if (!val1.optional && val2.optional) return -1;
@@ -483,6 +484,18 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 customizedOptions: customizedOptions
             });
             $('#' + id + '-options-div').html(optionsTemplate);
+
+            if(id === Constants.SOURCE){
+                var optionParent = $('#source-options-div .option');
+                if($('#define-source #source-type').val() === "file"){
+                    for(var i = 0; i < optionsArray.length; i++){
+                        if(optionParent[i].innerText === " cron.expression "){
+                            new CronGenerator().initialization(optionParent[i]);
+                            break;
+                        }
+                    }
+                }
+            }
             self.changeCustomizedOptDiv(id);
             self.updatePerfectScroller();
         };
@@ -4125,9 +4138,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $('#' + id + '-options-div').on('change', '.option-checkbox', function () {
                 var optionParent = $(this).parents(".option");
                 if ($(this).is(':checked')) {
-                    optionParent.find(".option-value").show();
+                    optionParent.find(".option-content").show();
                 } else {
-                    optionParent.find(".option-value").hide();
+                    optionParent.find(".option-content").hide();
                     optionParent.find(".option-value").removeClass("required-input-field");
                     optionParent.find(".error-message").text("");
                 }

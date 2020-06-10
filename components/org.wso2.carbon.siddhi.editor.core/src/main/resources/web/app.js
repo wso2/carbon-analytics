@@ -38,6 +38,7 @@ requirejs.config({
         datatables_wso2: "commons/lib/theme-wso2-2.0.0/extensions/datatables/js/dataTables.wso2",
         enjoyhint: "commons/lib/enjoyhint/enjoyhint.min",
         smart_wizard: "commons/lib/smartWizard/js/jquery.smartWizard.min",
+        cronstrue: "commons/lib/cronstrue/cronstrue.min",
         //beautify: "commons/lib/beautify",
         ///////////////////////
         // custom modules ////
@@ -153,7 +154,8 @@ requirejs.config({
         dockerConfigDialog: "js/export-deployment-artifacts/docker-config-dialog",
         dockerImageTypeDialog: "js/export-deployment-artifacts/docker-image-type-dialog",
         fillTemplateValueDialog: "js/export-deployment-artifacts/fill-template-value-dialog",
-        kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog"
+        kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog",
+        cronGenerator: "js/design-view/cron-generator/cron-generator"
     },
     map: {
         "*": {
