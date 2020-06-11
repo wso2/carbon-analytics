@@ -4,6 +4,12 @@
     overflow: hidden;
 }
 
+.etl-task-wizard-container .popover {
+    width: fit-content;
+    max-width: 100%;
+    overflow: auto;
+}
+
 .etl-task-wizard-container .etl-task-wizard-canvas {
     position: relative;
     height: 100%;
@@ -171,6 +177,19 @@
 .mapping-generation-dialog .dialog-body .expression-container .expression.target .exp-content span:hover {
     color: #00fcaf;
     cursor: pointer;
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression.target .exp-content span.add-param {
+    color: #ffa500;
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression.target .exp-content span.add-param:hover {
+    color: #00fcaf;
+    cursor: pointer;
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression.target .exp-content span i {
+    display: inline-block;
 }
 
 .mapping-generation-dialog .dialog-body .expression-container .expression span.selected {
