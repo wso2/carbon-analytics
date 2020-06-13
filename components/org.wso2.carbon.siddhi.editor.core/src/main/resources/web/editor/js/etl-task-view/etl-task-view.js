@@ -234,7 +234,10 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             `);
 
         this.inputAttributes.forEach(function (inputAttribute) {
-          if (generatedExpression.indexOf(inputAttribute.name) > -1) {
+          var divElement = document.createElement('div');
+          divElement.innerHTML = generatedExpression;
+
+          if (divElement.innerText.replace('\"','\'').match(`(?<=^([^']|'[^']*')*)${inputAttribute.name}`)) {
             jsPlumbInstance.connect({
               source: inputAttributeEndpoints[inputAttribute.name],
               target: outputAttributeEndpoints[outputAttribute]
@@ -388,36 +391,10 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             <div class="expression target" style="display: flex">
                 <div class="exp-content" style="width: 100%;">
                    <i style="color: #808080">expression : </i>
-                   ${
-                    typeof tempExp === 'string' || tempExp instanceof String ?
-                        tempExp :
-                        generateExpressionHTML(null, expression)
-                    }
+                   ${generateExpressionHTML(null, expression)}
                 </div>
-                ${
-                  !(typeof tempExp === 'string' || tempExp instanceof String) && tempExp.children.length === 0 ? 
-                    `<div class="paste-clipboard" style="padding-left: 10px; padding-right: 10px">
-                      <a href="#">
-                          <i class="fw fw-paste"></i>
-                      </a>
-                    </div>`:''
-                }
-                ${
-                  (typeof tempExp === 'string' || tempExp instanceof String) ?
-                      `<div class="clear-clipboard" style="padding-left: 10px; padding-right: 10px">
-                          <a href="#">
-                              <i class="fw fw-clear"></i>
-                          </a>
-                      </div>`:''
-                }
             </div>
           `);
-
-          $(container).find('.paste-clipboard').on('click', function (evt) {
-              navigator.clipboard.readText().then(function (text) {
-                  console.log(text);
-              }).catch(error => {console.log(error)})
-          })
         } else {
           expressionContainer.append(`
             <div class="expression" style="">
@@ -569,7 +546,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
         var supportedOperators = {};
 
         // Generate the map of supported attributes/functions/operators based on context
-        if ((!(typeof tempExp === 'string' || tempExp instanceof String)) && tempExp.children) { // if the current focus is on a scope node
+        if (tempExp.children) { // if the current focus is on a scope node
           if (tempExp.children.length > 0) { // find the possible attributes if expression contains elements
             switch (tempExp.children[tempExp.children.length - 1].nodeType) {
               case 'customValue':
@@ -762,20 +739,20 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             } else {
               attributeContainer.find('.attrib-selector-containers').append(`
                             <a id="custom_val_input_container" style="color: #333">
-                                <div class="attribute" style="">
-                                    <div class="description" style="">
+                                <div class="attribute" style="display: flex; flex-wrap: wrap;">
+                                    <div class="description" style="width: 100%;">
                                        Add a custom value to the expression 
                                     </div>
-                                    <div>
+                                    <div style="width: 100%;">
                                         Custom Value
                                         <select name="" id="custom_val_type">
                                         </select>
-                                        <input style="display: none" id="custom_value_input_txt" type="text">
-                                        <select style="display: none" id="custom_value_input_bool" >
+                                        <input style="display: none; width: 65%" id="custom_value_input_txt" type="text">
+                                        <select style="display: none; width: 65%" id="custom_value_input_bool" >
                                             <option value="true">True</option>
                                             <option value="false">false</option>
                                         </select>
-                                        <button style="background-color: #007eff; padding: 2px;" class="btn btn-primary btn-custom-val-submit">Add</button>
+                                        <button style="background-color: #007eff; padding: 0 6px 0 6px;" class="btn btn-primary btn-custom-val-submit">Add</button>
                                     </div>
                                 </div>
                             </a>
@@ -795,7 +772,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
               name: supportedInputAttributes[evt.currentTarget.id.split('attr-')[1]].name,
               dataType: supportedInputAttributes[evt.currentTarget.id.split('attr-')[1]].type,
             }
-
+            $(container).find('.att-fun-op-search-box').val('');
             tempExp.addNodeToExpression(new AttributeNode(nodeData));
             updateExpression(tempExp);
           });
@@ -833,7 +810,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
           $(container).find('.att-fun-op-search-box').off('keyup');
           $(container).find('.att-fun-op-search-box').on('keyup', _.debounce(function (evt) {
             updateFilter('Attribute', evt.target.value);
-          }, 250, {}));
+          }, 100, {}));
         })
 
         $(nodeCategoryContainer).find('.function-category').on('click', function (evt) {
@@ -860,6 +837,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
           attributeContainer.find('.attrib-selector-containers').children().on('click', function (evt) {
             attributeContainer.find('.select-function-operator-attrib').hide();
             attributeContainer.find('.select-function-format-container').show();
+            $(container).find('.att-fun-op-search-box').val('');
 
             supportedFunctions[evt.currentTarget.id.split('func-')[1]].syntax.forEach(function (syntax, i) {
               attributeContainer.find('.select-function-format-container').find('ul').append(`
@@ -896,7 +874,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
           $(container).find('.att-fun-op-search-box').off('keyup');
           $(container).find('.att-fun-op-search-box').on('keyup', _.debounce(function (evt) {
             updateFilter('Function', evt.target.value);
-          }, 250, {}));
+          }, 100, {}));
         })
 
         $(nodeCategoryContainer).find('.operator-category').on('click', function (evt) {
@@ -931,6 +909,8 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
               tempExp.addNodeToExpression(new OperatorNode(nodeData));
             }
+
+            $(container).find('.att-fun-op-search-box').val('');
             selectedFilter = '';
             selectedCategory = null;
             updateExpression(tempExp);
@@ -938,7 +918,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
           $(container).find('.att-fun-op-search-box').off('keyup');
           $(container).find('.att-fun-op-search-box').on('keyup', _.debounce(function (evt) {
             updateFilter('Operator', evt.target.value);
-          }, 250, {}));
+          }, 100, {}));
         })
 
         if (selectedCategory) {
@@ -983,8 +963,12 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
         expressionGeneratorContainer.remove();
         expressionGeneratorContainer = $(container).find('.popup-backdrop').clone();
         $(container).prepend(expressionGeneratorContainer);
+        $(container).find('.att-fun-op-search-box').val('');
+        
         this.expressionGenerationDialog = expressionGeneratorContainer;
         this.currenOutputElement = null;
+        this.selectedCategory = null;
+        this.selectedCategoryFilter = '';
         this.coordinate = [];
         this.focusNode = [];
       }
