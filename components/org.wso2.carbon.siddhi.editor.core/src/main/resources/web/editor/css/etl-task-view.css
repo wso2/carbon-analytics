@@ -6,8 +6,6 @@
 
 .etl-task-wizard-container .popover {
     width: fit-content;
-    max-width: 100%;
-    overflow: auto;
 }
 
 .etl-task-wizard-container .etl-task-wizard-canvas {
@@ -134,6 +132,7 @@
     padding-bottom: 30px;
     position: absolute;
     box-shadow: 3px 3px #2c2c2c59;
+    max-width: 900px;
 }
 
 .mapping-generation-dialog {

@@ -409,16 +409,10 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
           tempExp = focusNodes[i];
 
           if (i === (coordinates.length - 1)) {
-            var syntax = '';
-
-            if (tempExp.nodeType === 'function') {
-              syntax = tempExp.selectedSyntax.syntax.replace(/</g, '&lt;').replace(/>/g, '&gt;').toLowerCase();
-            }
-
             expressionContainer.append(`
               <div class="expression target" style="display: flex; flex-wrap: wrap">
                   <div class="exp-content">
-                      ${generateExpressionHTML(null, tempExp)}<a class="${syntax.length > 0 ? '' : 'hide'} function-info" style="font-size: 1.3rem; margin-left: 5px"><i class="fw fw-info"></i></a>
+                      ${generateExpressionHTML(null, tempExp)}
                   </div>
                   <div class="expression-merge">
                       <a href="#">
@@ -427,32 +421,6 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                   </div>
               </div>
             `);
-
-            if (syntax.length > 0) {
-              $(expressionContainer).find('.function-info').popover({
-                html: true,
-                content: `<div style="color: #333; white-space: nowrap">${syntax}</div>`,
-                placement: 'top'
-              });
-
-              $(expressionContainer).find('.function-info')
-                  .on('mouseover', function (evt) {
-                    evt.stopPropagation()
-                    $(evt.target).popover('show');
-                    $(container).find(`#${$(evt.target).attr('aria-describedby')}`).on('mouseleave', function (e) {
-                      e.stopPropagation();
-                      $(evt.target).popover('hide');
-                    })
-                  })
-                  .on('mouseleave', function (evt) {
-                    evt.stopPropagation();
-                    setTimeout(function () {
-                      if (!($(expressionContainer).find('.popover:hover').length > 0)) {
-                        $(evt.target).popover('hide');
-                      }
-                    }, 300);
-                  })
-            }
           } else {
             expressionContainer.append(`
               <div class="expression">
@@ -461,20 +429,15 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             `);
           }
         });
-
-        // TODO : Add popover clear expression icon
+        
         $(expressionContainer).find('.expression.target>.exp-content>span.ok-clear').popover({
           html: true,
           content: function () {
             return $(container).find('.popover-content').html();
           },
-          title: '',
+          template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>',
           placement: 'top',
         });
-
-        // $(expressionContainer).find('.expression.target>.exp-content>span').on('mouseover', function (evt) {
-        //     $(evt.target).popover('show');
-        // });
 
         $(expressionContainer).find('.expression.target>.exp-content>span.ok-clear')
             .on('mouseenter', function (evt) {
@@ -859,8 +822,15 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 dataTypes: supportedFunctions[evt.currentTarget.id.split('func-')[1]].returnAttributes[0].type.map(function (dataType) {
                   return dataType.toLowerCase();
                 }),
-                selectedSyntax: supportedFunctions[evt.currentTarget.id.split('func-')[1]].syntax[child_evt.currentTarget.id.split('syntax-')[1]]
+                selectedSyntax: supportedFunctions[evt.currentTarget.id.split('func-')[1]].syntax[child_evt.currentTarget.id.split('syntax-')[1]],
               };
+
+              var parameterData = supportedFunctions[evt.currentTarget.id.split('func-')[1]].parameters || [];
+
+              nodeData.selectedSyntax['parameterData'] = _.reduce(parameterData, function (obj, param) {
+                obj[param.name] = param.description
+                return obj
+              }, {})
 
               tempExp.addNodeToExpression(new FunctionNode(nodeData));
               selectedFilter = '';
@@ -1199,6 +1169,8 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
         var allowRepetitive = false;
         var repetitiveDataTypes = [];
 
+        console.log(syntax);
+
         regExp.exec(syntax.syntax) ? regExp.exec(syntax.syntax)[1].split(',').forEach(function (param) {
           var temp = param.trim().split(' ');
 
@@ -1206,16 +1178,17 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             return type.toLowerCase();
           });
 
-          var placeHolder = '<';
-          var isFirst = true;
-          dataTypes.forEach(function (dataType) {
-            if (!isFirst) {
-              placeHolder += ' | '
-            }
-            placeHolder += dataType;
-          })
-          placeHolder += '>';
-          placeHolder += ' ' + temp[1];
+          var placeHolder = syntax.parameterData[temp[1]];
+          // var placeHolder = '<';
+          // var isFirst = true;
+          // dataTypes.forEach(function (dataType) {
+          //   if (!isFirst) {
+          //     placeHolder += ' | '
+          //   }
+          //   placeHolder += dataType;
+          // })
+          // placeHolder += '>';
+          // placeHolder += ' ' + temp[1];
 
           if (!(temp[1].indexOf('...') > -1)) {
             var paramNode = new ScopeNode(dataTypes);
@@ -1319,7 +1292,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
               if (parameterNode.nodeType === 'scope') {
                 // title="${parameterNode.placeholder}"
-                htmlContent += `<span class="param-${i} ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''} ${parameterNode.children.length > 0 ? 'ok-clear' : ''}">${generateExpressionHTML(null, parameterNode)}</span>`;
+                htmlContent += `<span title="${parameterNode.placeholder}" class="param-${i} ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''} ${parameterNode.children.length > 0 ? 'ok-clear' : ''}">${generateExpressionHTML(null, parameterNode)}</span>`;
               }
               isFirst = false;
               i++;
