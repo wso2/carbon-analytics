@@ -181,19 +181,34 @@ metricsLabelMapping:
       operationType: "${3}"
       metrics: "${4}"
 
+# Total Reads/Writes
+  siddhi.io.total.reads:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Total.Reads.*"
+    name: "siddhi.total.reads"
+    labels:
+      app: "${0}"
+      type: "${1}"
+
+  siddhi.io.total.writes:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Total.Writes.*"
+    name: "siddhi.total.writes"
+    labels:
+      app: "${0}"
+      type: "${1}"
+
 #Siddhi-io-file Metrics
 
   siddhi.io.file.apps:
     match: "io.siddhi.SiddhiApps.*.Siddhi.File"
     name: "siddhi.file.apps"
     labels:
-      app_name: "${0}"
+      app: "${0}"
 
   siddhi.io.file.sink.event.count:
     match: "io.siddhi.SiddhiApps.*.Siddhi.File.Sinks.event.count.(.*).filename.*.*.(.*)"
     name: "siddhi.file.sink.event.count"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       file_name: "${1}"
       mode: "${2}"
       stream_name: "${3}"
@@ -203,14 +218,14 @@ metricsLabelMapping:
     match: "io.siddhi.SiddhiApps.*.Siddhi.File.Sinks.*.(.*)"
     name: "siddhi.file.sink.${1}"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       file_path: "${2}"
 
   siddhi.io.file.source.event.count:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.File.Source.event.count.(.*).filename.*.*.(.*)"
+    match: "io.siddhi.SiddhiApps.*.Siddhi.File.Source.Total.Reads.(.*).filename.*.*.(.*)"
     name: "siddhi.file.source.event.count"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       file_name: "${1}"
       mode: "${2}"
       stream_name: "${3}"
@@ -220,7 +235,7 @@ metricsLabelMapping:
     match: "io.siddhi.SiddhiApps.*.Siddhi.File.Source.*.(.*)"
     name: "siddhi.file.source.${1}"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       file_path: "${2}"
 
 
@@ -228,7 +243,7 @@ metricsLabelMapping:
     match: "io.siddhi.SiddhiApps.*.Siddhi.File.Operations.Archived.*.(.*).time.(.*).source.(.*).destination"
     name: "siddhi.file.archive"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       type: "${1}"
       time: "${2}"
       _source: "${3}"
@@ -238,7 +253,7 @@ metricsLabelMapping:
     match: "io.siddhi.SiddhiApps.*.Siddhi.File.Operations.Copy.(.*).time.(.*).source.(.*).destination"
     name: "siddhi.file.copy"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       time: "${1}"
       _source: "${2}"
       destination: "${3}"
@@ -247,7 +262,7 @@ metricsLabelMapping:
     match: "io.siddhi.SiddhiApps.*.Siddhi.File.Operations.Delete.(.*).time.(.*).source"
     name: "siddhi.file.delete"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       time: "${1}"
       _source: "${2}"
 
@@ -255,7 +270,7 @@ metricsLabelMapping:
     match: "io.siddhi.SiddhiApps.(.*).Siddhi.File.Operations.Move.(.*).time.(.*).source.(.*).destination"
     name: "siddhi.file.move"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       time: "${1}"
       _source: "${2}"
       destination: "${3}"
@@ -266,13 +281,13 @@ metricsLabelMapping:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc"
     name: "siddhi.cdc.apps"
     labels:
-      app_name: "${0}"
+      app: "${0}"
 
   siddhi.io.cdc.source.listening.metrics.events.per.table:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Listening.events.per.table.*.(.*)"
     name: "siddhi.cdc.source.listening.mode.events.per.table"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       tablename: "${1}"
       db_url: "${2}"
 
@@ -280,7 +295,7 @@ metricsLabelMapping:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Listening.event.count.*.(.*).host.*.*.*.(.*)"
     name: "siddhi.cdc.source.listening.mode.event.count"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       A_db_type: "${1}"
       B_host: "${2}"
       operation_type: "${3}"
@@ -292,7 +307,7 @@ metricsLabelMapping:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Listening.*.*.(.*)"
     name: "siddhi.cdc.source.listening.mode.${1}"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       operation_type: "${2}"
       db_url: "${3}"
 
@@ -300,14 +315,14 @@ metricsLabelMapping:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Listening.*.(.*)"
     name: "siddhi.cdc.source.listening.mode.${1}"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       db_url: "${2}"
 
   siddhi.io.cdc.source.polling.event.count:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Polling.event.count.*.(.*).host.*.*.(.*)"
     name: "siddhi.cdc.source.polling.mode.event.count"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       A_db_type: "${1}"
       B_host: "${2}"
       C_database: "${3}"
@@ -318,7 +333,7 @@ metricsLabelMapping:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Polling.Details.*.*.*.(.*)"
     name: "siddhi.cdc.source.polling.mode.polling.details"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       _started_time: "${1}"
       duration: "${2}"
       status: "${3}"
@@ -328,7 +343,7 @@ metricsLabelMapping:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Cdc.Source.Polling.*.(.*)"
     name: "siddhi.cdc.source.polling.mode.${1}"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       db_url: "${2}"
 
 #siddhi-store-rdbms
@@ -336,13 +351,13 @@ metricsLabelMapping:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Store.RDBMS"
     name: "siddhi.store.rdbms.apps"
     labels:
-      app_name: "${0}"
+      app: "${0}"
 
   siddhi.store.rdbms.total.resutls.count:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Store.RDBMS.Write.Count.*.(.*).host.*.*.(.*)"
     name: "siddhi.store.rdbms.total.writes"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       A_db_type: "${1}"
       B_shortenUrl: "${2}"
       C_database: "${3}"
@@ -353,6 +368,6 @@ metricsLabelMapping:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Store.RDBMS.*.(.*)"
     name: "siddhi.store.rdbms.${1}"
     labels:
-      app_name: "${0}"
+      app: "${0}"
       db_url: "${2}"
 
