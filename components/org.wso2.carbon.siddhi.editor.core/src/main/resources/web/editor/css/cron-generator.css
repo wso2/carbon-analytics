@@ -16,7 +16,7 @@
  * under the License.
  */
 
-/** contains css for export save dialog **/
+/** contains css for cron generator dialog **/
 .cron-generator-form-scrollable-block {
     padding: 20px 20px;
     overflow: auto;
@@ -45,10 +45,6 @@ hr.style1 {
 }
 
 .cron-generator .modal-body {
-}
-
-.cron-generator .modal-body .sw-container{
-    margin-top: 12px;
 }
 
 .cron-generator-title {
@@ -89,59 +85,9 @@ hr.cron-generator-hr {
     background-color: #2C2C2C;
 }
 
-.sw-theme-default > ul.step-anchor.docker_export_header li {
-    max-width: 16.65%;
-}
-
-.link-disabled {
-    pointer-events: none;
-}
-
-.sw-theme-default > ul.step-anchor > li > a, .sw-theme-default > ul.step-anchor > li > a:hover {
-    height: initial;
-}
-
-.sw-theme-default > ul.step-anchor > li > a::after {
-    bottom: auto;
-    top: 0px;
-}
-
 .label-description {
     padding-top: 2px;
     padding-left: 8px;
-}
-
-.btn-circle {
-  width: 30px;
-  height: 30px;
-  text-align: center;
-  padding: 6px 0;
-  font-size: 12px;
-  line-height: 1.428571429;
-  border-radius: 15px;
-  background: #617d8b
-}
-
-.btn-circle:hover {
-  background: #4c626d;
-}
-
-.btn-circle.btn-lg {
-  width: 50px;
-  height: 50px;
-  padding: 10px 16px;
-  font-size: 18px;
-  line-height: 1.33;
-  border-radius: 25px;
-}
-
-.btn-circle.btn-xl {
-  width: 70px;
-  height: 70px;
-  padding: 10px 16px;
-  font-size: 24px;
-  line-height: 1.33;
-  border-radius: 35px;
 }
 
 .error-field {
@@ -183,7 +129,9 @@ hr.cron-generator-hr {
     text-align:center;
 }
 
-.nav-tabs > li.active > a{
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus{
     background-color: #757474;
     border-color: #3d3d3d;
     color: #f1e9e9;

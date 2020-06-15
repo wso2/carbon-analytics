@@ -16,219 +16,284 @@
  * under the License.
  */
 
-define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
-    function (require, _ , $, log, Cronstrue, Timepicker) {
+define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_timepicker'],
+    function (require, _ , $, log, Constants, Cronstrue, Timepicker) {
 
         var CronGenerator = function(){
             var self = this;
-            this._cronGenerator = $('#cronGenerator').clone();
+            this._cronGenerator = $('#cronGenerator');
         };
         var errorMsg;
+        var constants = {
+            EVERY_MINUTE: '0 * * * * ?',
+            EVERY_HOUR: '0 0 * * * ?',
+            EVERYDAY_AT_NOON: '0 0 12 * * ?',
+            EVERYWEEK_ON_SUNDAY_AT_NOON: '0 0 12 ? * SUN',
+            ON_THE_FIRST_OF_EVERYMONTH_AT_NOON: '0 0 12 1 * ?',
+            ON_THE_FIRST_OF_JANUARY_OF_EVERYYEAR_AT_NOON: '0 0 12 1 1 ?',
+            MAX_MINUTE_AND_SECOND_VALUE: 59,
+            MAX_HOUR_VALUE: 23,
+            REGEX_FOR_TIME: /[^\d-,*\/]/ ,
+            REGEX_FOR_DAYOFMONTH: /[^\w-,?*\/]/ ,
+            REGEX_FOR_MONTH: /[^\w-,*\/]/,
+            REGEX_FOR_DAYOFWEEK: /[^\w-,*?\/#]/,
+            REGEX_FOR_SPACE: /\s/g,
+            REGEX_FOR_ALPHA_NUMERIC: /[^\da-zA-Z]/
+        };
 
-        var isValidTimeValue = function(time, val) {
-            if(time === '*') {
-                return true;
-            }
-            if (time.search(/[^\d-,*\/]/) !== -1) {
+        var validateTimeValue = function(time, maxValue) {
+            if (time.search(constants.REGEX_FOR_TIME) !== -1) {
+                errorMsg = " contains the unallowed characters. "
                 return false;
             }
             var list = time.split(",");
             return list.every(function (time){
                 if(time.includes('/')) {
                     var startingTimeOptionArr = time.split('/');
-                    return isValidateTime(startingTimeOptionArr, val) ||
-                            (startingTimeOptionArr[0] === '*' && isValidateTime([startingTimeOptionArr[1]], val));
+                    if(time.endsWith('/')){
+                        errorMsg = " should not end with / "
+                    } else {
+                        errorMsg = " values must lies between 0 and " + maxValue;
+                    }
+                    return validateTimeRange(startingTimeOptionArr, maxValue) ||
+                            (startingTimeOptionArr[0] === '*' && validateTimeRange([startingTimeOptionArr[1]], maxValue));
                 } else if(time.includes('-')) {
                     var timeRangeArr = time.split('-');
-                    return isValidateTime(timeRangeArr, val) && (parseInt(timeRangeArr[0]) < parseInt(timeRangeArr[1]));
-                } else if (parseInt(time) >= 0 && parseInt(time) <= val) {
-                    return true;
+                    if(time.endsWith('-')){
+                        errorMsg = " should not end with - "
+                    } else {
+                        errorMsg = " values must lies between 0 and " + maxValue;
+                    }
+                    return validateTimeRange(timeRangeArr, maxValue) &&
+                                        (parseInt(timeRangeArr[0])<parseInt(timeRangeArr[1]));
                 } else {
-                    return false;
+                    if(time === ""){
+                        errorMsg = " should not end with , "
+                    } else {
+                        errorMsg = " values must lies between 0 and " + maxValue ;
+                    }
+                    return validateTimeRange([time],maxValue) || time === '*';
                 }
             });
         };
 
-        var isValidateTime = function(dataArray, value) {
+        var validateTimeRange = function(dataArray, value) {
             return dataArray.every(element => {
-                if(parseInt(element) < 0 || parseInt(element) > value){
-                    errorMsg = "Numeric values between " + 0 + " and " + value;
-                } else {
-                    errorMsg = "Invalid cron Expression";
-                }
                 return parseInt(element) >= 0  && parseInt(element) <= value;
             });
         };
 
-        var isValidateNumericValue = function(monthArr, val, endVal) {
-            return monthArr.every(month => {
-                if(parseInt(month) < val || parseInt(month) > endVal){
-                    errorMsg = "Numeric values between " + val + " and " + endVal;
-                } else {
-                    errorMsg = "Invalid Cron Expression"
-                }
-                return parseInt(month) >= val && parseInt(month) <= endVal;
+        //this method is used to check the range of dayOfMonth(1-31) ,month(1-12) ,dayOfWeek(1-7)
+        var validateRangeOfDay = function(dataArray, val, endVal) {
+            return dataArray.every(element => {
+                return parseInt(element) >= val && parseInt(element) <= endVal;
             });
         };
 
-        var isValidDayOfMonthValue = function(dayOfMonth, dayOfWeek) {
-            if((dayOfMonth === '*' && dayOfWeek !== '*') || (dayOfMonth === '?' && dayOfWeek !== '?')) {
-                return true;
-            } else if(typeof dayOfMonth === 'string' && dayOfWeek === '?' && (dayOfMonth === 'LW' || dayOfMonth === 'L')){
-                return true;
-            } else if(typeof dayOfMonth === 'string' && dayOfWeek === '?' && dayOfMonth.includes('L')) {
+        var validateDayOfMonthValue = function(dayOfMonth, dayOfWeek) {
+            if(dayOfWeek === '?' && dayOfMonth.includes('L')) {
                 if(dayOfMonth.includes(',') && dayOfWeek === '?'){
                     return false;
-                }
-                if(dayOfMonth.includes('-') && dayOfWeek === '?') {
+                } else if(dayOfMonth.includes('-') && dayOfWeek === '?') {
                     var dayOfMonthRangeArr = dayOfMonth.split('-');
-                    var isLastDayIncludes = dayOfMonthRangeArr[0] === 'L' &&
-                                                        isValidateNumericValue([dayOfMonthRangeArr[1]], 1, 30);
-                    return isValidateNumericValue(dayOfMonthRangeArr, 1, 31) || isLastDayIncludes;
+
+                    return dayOfMonthRangeArr[0] === 'L' && validateRangeOfDay([dayOfMonthRangeArr[1]], 1, 30);
+                }
+            } else if(dayOfMonth.includes('W') && dayOfWeek === '?'){
+                if(dayOfMonth.search(constants.REGEX_FOR_ALPHA_NUMERIC) !== -1 ){
+                    errorMsg = "Invalid Cron Expression";
+                    return false;
+                }
+                if(dayOfMonth.length === 1){
+                    errorMsg = "Invalid Cron Expression";
+                    return false;
+                } else {
+                    errorMsg = "Day of month values must be between 1 and 31";
+                    return validateRangeOfDay([dayOfMonth], 1, 31);
                 }
             }
-            if (dayOfMonth.search(/[^\d-,*\/]/) !== -1) {
+            if (dayOfMonth.search(constants.REGEX_FOR_DAYOFMONTH) !== -1) {
+                errorMsg = "Invalid Cron Expression";
                 return false;
             }
             var list = dayOfMonth.split(",");
             return list.every(function (dayOfMonth){
                 if(dayOfMonth.includes('/') && dayOfWeek === '?') {
+                    if(dayOfMonth.endsWith('/')){
+                        errorMsg = "Day of month values should not end with /";
+                    } else {
+                        errorMsg = "Day of month values must be between 1 and 31";
+                    }
                     var startingDayOfMonthOptionArr = dayOfMonth.split('/');
-                    var isValidElements = (isValidateNumericValue([startingDayOfMonthOptionArr[0]], 1, 31) &&
-                                                        isValidateNumericValue([startingDayOfMonthOptionArr[1]], 1, 31));
+                    var isValidElements = (validateRangeOfDay([startingDayOfMonthOptionArr[0]], 1, 31) &&
+                                                        validateRangeOfDay([startingDayOfMonthOptionArr[1]], 1, 31));
                     var isValidFirstElem = (startingDayOfMonthOptionArr[0] === '*' &&
-                                                        isValidateNumericValue([startingDayOfMonthOptionArr[1]], 1, 31));
+                                                        validateRangeOfDay([startingDayOfMonthOptionArr[1]], 1, 31));
                     return isValidElements || isValidFirstElem;
                 } else if(dayOfMonth.includes('-') && dayOfWeek === '?') {
                     var dayOfMonthRangeArr = dayOfMonth.split('-');
-
-                    return isValidateNumericValue(dayOfMonthRangeArr, 1, 31) &&
+                    if(dayOfMonth.endsWith('-')){
+                        errorMsg = "Day of month values should not end with - ";
+                    } else {
+                        errorMsg = "Day of month values must be between 1 and 31";
+                    }
+                    return validateRangeOfDay(dayOfMonthRangeArr, 1, 31) &&
                                     (parseInt(dayOfMonthRangeArr[0]) < parseInt(dayOfMonthRangeArr[1]));
-
-                } else if(typeof dayOfMonth === 'string' && dayOfWeek === '?') {
-                       return isValidateNumericValue([dayOfMonth], 1, 31);
+                } else {
+                    if(dayOfMonth === ""){
+                        errorMsg = "Day of month values should not end with , ";
+                    } else {
+                        errorMsg = "Day of month values must be between 1 and 31";
+                    }
+                    return validateRangeOfDay([dayOfMonth], 1, 31) ||
+                        (dayOfMonth === '*' && dayOfWeek !== '*') || (dayOfMonth === '?' && dayOfWeek !== '?') ||
+                        (dayOfWeek === '?' && (dayOfMonth === 'LW' || dayOfMonth === 'L'));
                 }
             });
         };
 
-        var MONTH_LIST = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+        var monthArray = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
-        var isValidateStringValue = function(monthArr, dataArr) {
-            errorMsg = "Invalid Cron Expression";
+        var validateStringValue = function(monthArr, dataArr) {
             return monthArr.every(month => {
                 return dataArr.includes(month.toLowerCase());
             })
         };
 
-        var isValidMonthValue = function(month) {
-            if(month === '*') {
-                return true;
-            }
+        var validateMonthValue = function(month) {
             if(month.includes('_')){
+                errorMsg = "Invalid cron expression";
                 return false;
             }
-            if (month.search(/[^\w-,*\/]/) !== -1) {
+            if (month.search(constants.REGEX_FOR_MONTH) !== -1) {
+                errorMsg = "Invalid cron expression";
                 return false;
             }
             var list = month.split(",");
             return list.every(function (month){
                 if(month.includes('/')) {
+                    if(month.endsWith('/')){
+                        errorMsg = "Month values should not end with / ";
+                    } else {
+                        errorMsg = "Month values must be between 1 and 12";
+                    }
                     var startingDayOfMonthOptionArr = month.split('/');
-                    var isValidElements = (isValidateNumericValue([startingDayOfMonthOptionArr[0]], 1, 12) &&
-                                                        isValidateNumericValue([startingDayOfMonthOptionArr[1]], 1, 12));
+                    var isValidElements = (validateRangeOfDay([startingDayOfMonthOptionArr[0]], 1, 12) &&
+                                                        validateRangeOfDay([startingDayOfMonthOptionArr[1]], 1, 12));
                     var isValidFirstElem = (startingDayOfMonthOptionArr[0] === '*' &&
-                                                        isValidateNumericValue([startingDayOfMonthOptionArr[1]], 1, 12));
+                                                        validateRangeOfDay([startingDayOfMonthOptionArr[1]], 1, 12));
                     return isValidElements || isValidFirstElem;
-
                 } else if(month.includes('-')) {
+                    if(month.endsWith('-')){
+                        errorMsg = "Month values should not end with - ";
+                    } else {
+                        errorMsg = "Month values must be between 1 and 12 or Jan - Dec";
+                    }
                     var monthRangeArr = month.split('-');
                     var validMonthRange = parseInt(monthRangeArr[0]) < parseInt(monthRangeArr[1]);
-                    var validMonthStrRange = MONTH_LIST.indexOf(monthRangeArr[0]) < MONTH_LIST.indexOf(monthRangeArr[1]);
+                    var validMonthStrRange = monthArray.indexOf(monthRangeArr[0]) < monthArray.indexOf(monthRangeArr[1]);
 
                     return !isNaN(parseInt(monthRangeArr[0])) && !isNaN(parseInt(monthRangeArr[1])) ?
-                        isValidateNumericValue(monthRangeArr, 1, 12) && validMonthRange :
-                        isValidateStringValue(monthRangeArr, MONTH_LIST) && validMonthStrRange;
-                } else if(typeof month === 'string') {
+                        validateRangeOfDay(monthRangeArr, 1, 12) && validMonthRange :
+                        validateStringValue(monthRangeArr, monthArray) && validMonthStrRange;
+                } else {
+                    if(month === ""){
+                        errorMsg = "Month values should not end with , ";
+                    } else {
+                        errorMsg = "Month values must be between 1 and 12 or Jan - Dec";
+                    }
                     var firstIndexValue = month.charAt(0);
                     var secondIndexValue = month.charAt(1);
                     if(month.length === 1){
-                        return isValidateNumericValue([month], 1, 12)
+                        return validateRangeOfDay([month], 1, 12) || month === '*';
                     } else {
                         return (!isNaN(parseInt(firstIndexValue)) && !isNaN(parseInt(secondIndexValue))) ?
-                                isValidateNumericValue([month], 1, 12) : isValidateStringValue([month], MONTH_LIST);
+                                validateRangeOfDay([month], 1, 12) : validateStringValue([month], monthArray);
                     }
-                } else {
-                    return false;
                 }
             });
         };
 
-        var WEEK_ARRRAY = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat','sun'];
+        var weekArray = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat','sun'];
 
-        var isValidDayOfWeekValue = function(dayOfWeek, dayOfMonth) {
-            if((dayOfWeek === '*' && dayOfMonth !== '*') || (dayOfWeek === '?' && dayOfMonth !== '?')) {
-                return true;
-            }
-            if(dayOfWeek === 'L') {
-                return true;
-            }
-            if(typeof dayOfWeek === 'string' && dayOfMonth === '?' && dayOfWeek.includes('L')) {
+        var validateDayOfWeekValue = function(dayOfWeek, dayOfMonth) {
+            if(dayOfMonth === '?' && dayOfWeek.includes('L')) {
                 if(dayOfWeek.includes(',') && dayOfMonth === '?'){
+                    errorMsg = "Invalid cron expression";
                     return false;
-                }
-                if (!isNaN(parseInt(dayOfWeek))){
-                    return isValidateNumericValue([dayOfWeek], 1, 7);
+                } else if(dayOfWeek.includes('-') && dayOfMonth === '?'){
+                    errorMsg = "Invalid cron expression";
+                    return false;
+                } else if (!isNaN(parseInt(dayOfWeek))){
+                    errorMsg = "Day-of-Week values must be between 1 and 7";
+                    return validateRangeOfDay([dayOfWeek], 1, 7);
                 }
             }
             if(dayOfWeek.includes('_')){
+                errorMsg = "Invalid cron expression";
                 return false;
             }
-            if (dayOfWeek.search(/[^\w-,*\/#]/) !== -1) {
+            if (dayOfWeek.search(constants.REGEX_FOR_DAYOFWEEK) !== -1) {
+                errorMsg = "Invalid cron expression";
                 return false;
             }
             var list = dayOfWeek.split(",");
             return list.every(function (dayOfWeek){
                 if(dayOfWeek.includes('/') && dayOfMonth === '?') {
                     var startingDayOfWeekOptionArr = dayOfWeek.split('/');
-
-                    var isValidElements = (isValidateNumericValue([startingDayOfWeekOptionArr[0]], 1, 7) &&
-                                                        isValidateNumericValue([startingDayOfWeekOptionArr[1]], 1, 7));
+                    if(dayOfWeek.endsWith('/')){
+                        errorMsg = "Day-of-week values should not end with / ";
+                    } else {
+                        errorMsg = "Day-of-Week values must be between 1 and 7";
+                    }
+                    var isValidElements = (validateRangeOfDay([startingDayOfWeekOptionArr[0]], 1, 7) &&
+                                                        validateRangeOfDay([startingDayOfWeekOptionArr[1]], 1, 7));
                     var isValidFirstElem = (startingDayOfWeekOptionArr[0] === '*' &&
-                                                        isValidateNumericValue([startingDayOfWeekOptionArr[1]], 1, 7));
+                                                        validateRangeOfDay([startingDayOfWeekOptionArr[1]], 1, 7));
                     return isValidElements || isValidFirstElem;
-
                 } else if(dayOfWeek.includes('-') && dayOfMonth === '?') {
                     var dayOfWeekRangeArr = dayOfWeek.split('-');
+                    if(dayOfWeek.endsWith('-')){
+                        errorMsg = "Day-of-week values should not end with - ";
+                    } else {
+                        errorMsg = "Day-of-Week values must be between 1 and 7";
+                    }
                     var validWeekRange = parseInt(dayOfWeekRangeArr[0]) < parseInt(dayOfWeekRangeArr[1]);
-                    var validWeekStrRange = WEEK_ARRRAY.indexOf(dayOfWeekRangeArr[0]) < WEEK_ARRRAY.indexOf(dayOfWeekRangeArr[1]);
+                    var validWeekStrRange = weekArray.indexOf(dayOfWeekRangeArr[0]) < weekArray.indexOf(dayOfWeekRangeArr[1]);
                     return !isNaN(parseInt(dayOfWeekRangeArr[0])) && !isNaN(parseInt(dayOfWeekRangeArr[1])) ?
-                        isValidateNumericValue(dayOfWeekRangeArr, 1, 7) && validWeekRange :
-                        isValidateStringValue(dayOfWeekRangeArr, WEEK_ARRRAY) && validWeekStrRange;
-
+                                        validateRangeOfDay(dayOfWeekRangeArr, 1, 7) && validWeekRange :
+                                        validateStringValue(dayOfWeekRangeArr, weekArray) && validWeekStrRange;
                 } else if(dayOfWeek.includes('#') && dayOfMonth === '?') {
                     var weekdayOfMonthArr = dayOfWeek.split('#');
-                        return (isValidateStringValue([weekdayOfMonthArr[0]], WEEK_ARRRAY) &&
-                                isValidateNumericValue([weekdayOfMonthArr[1]], 1, 5)) ||
-                                 (isValidateNumericValue([weekdayOfMonthArr[0]], 1, 7) &&
-                                 isValidateNumericValue([weekdayOfMonthArr[1]], 1, 5));
-
-                } else if(typeof dayOfWeek === 'string' && dayOfMonth === '?') {
+                    if(dayOfWeek.endsWith('#')){
+                        errorMsg = "Day-of-week values should not end with # "
+                    } else {
+                        errorMsg = "Day-of-Week values must be between 1 and 7";
+                    }
+                    return (validateStringValue([weekdayOfMonthArr[0]], weekArray) &&
+                                validateRangeOfDay([weekdayOfMonthArr[1]], 1, 5)) ||
+                                 (validateRangeOfDay([weekdayOfMonthArr[0]], 1, 7) &&
+                                 validateRangeOfDay([weekdayOfMonthArr[1]], 1, 5));
+                } else {
+                    if(dayOfWeek === ""){
+                        errorMsg = "Day-of-week values should not end with , "
+                    } else {
+                        errorMsg = "Day-of-Week values must be between 1 and 7";
+                    }
                     var firstIndexValue = dayOfWeek.charAt(0);
                     var secondIndexValue = dayOfWeek.charAt(1);
                     if(dayOfWeek.length === 1){
-                        return isValidateNumericValue([dayOfWeek], 1, 7)
+                        return validateRangeOfDay([dayOfWeek], 1, 7) || dayOfWeek === 'L' ||
+                            (dayOfWeek === '*' && dayOfMonth !== '*') || (dayOfWeek === '?' && dayOfMonth !== '?');
                     } else {
                         return (!isNaN(parseInt(firstIndexValue)) && !isNaN(parseInt(secondIndexValue))) ?
-                                isValidateNumericValue([dayOfWeek], 1, 7) : isValidateStringValue([dayOfWeek], WEEK_ARRRAY);
+                                validateRangeOfDay([dayOfWeek], 1, 7) : validateStringValue([dayOfWeek], weekArray);
                     }
-                } else {
-                    return false;
                 }
             });
         };
-
-        var isValidCronExpression = function(cronExpression) {
-            if(!/\s/g.test(cronExpression)) {
+        var validateCronExpression = function(cronExpression) {
+            if(!constants.REGEX_FOR_SPACE.test(cronExpression)) {
                 return false;
             }
             var cronArray = cronExpression.split(" ");
@@ -242,22 +307,20 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
             var month = cronArray[4];
             var dayOfWeek = cronArray[5];
 
-            var isValidSeconds = isValidTimeValue(seconds, 59);
-            var isValidMinutes = isValidTimeValue(minutes, 59);
-            var isValidHour = isValidTimeValue(hours, 23);
-            var isValidDayOfMonth = isValidDayOfMonthValue(dayOfMonth, dayOfWeek);
-            var isValidMonth = isValidMonthValue(month);
-            var isValidDayOfWeek = isValidDayOfWeekValue(dayOfWeek, dayOfMonth);
+            var isValidSeconds = validateTimeValue(seconds, constants.MAX_MINUTE_AND_SECOND_VALUE);
+            var isValidMinutes = validateTimeValue(minutes, constants.MAX_MINUTE_AND_SECOND_VALUE);
+            var isValidHour = validateTimeValue(hours, constants.MAX_HOUR_VALUE);
+            var isValidDayOfMonth = validateDayOfMonthValue(dayOfMonth, dayOfWeek);
+            var isValidMonth = validateMonthValue(month);
+            var isValidDayOfWeek = validateDayOfWeekValue(dayOfWeek, dayOfMonth);
 
             var isValidCron = isValidSeconds && isValidMinutes && isValidHour && isValidDayOfMonth &&
-                                                                            isValidMonth && isValidDayOfWeek;
+                                                                    isValidMonth && isValidDayOfWeek;
 
-            if(isValidCron) {
-                return isValidCron;
-            }
+            return isValidCron;
         };
 
-        CronGenerator.prototype.initialization = function(optionParent){
+        CronGenerator.prototype.init = function(optionParent){
             var self = this;
             var generate = $('<div id = "generate" class = "col-xs-2" style="margin:10px 5px;">'+
                     '<button type = "button" class = "btn btn-primary" '+
@@ -270,31 +333,32 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
             var description = Cronstrue.toString(expression, { throwExceptionOnParseError: false });
             $('#source-options #crondescription').text(description);
             $('#source-options #generate-btn').on('click',function(){
-                 new CronGenerator().render(optionParent);
+                 self.render(optionParent);
             });
         };
 
         CronGenerator.prototype.render = function(optionParent){
             var self = this;
+            this._cronGenerator = $('#cronGenerator').clone();
             self._cronGenerator.modal('show');
             self.renderBasicCronExpression();
             self.renderRegularCronExpression();
             self.renderPredefinedCronExpression();
             self.renderAdvancedCronExpression();
             self._cronGenerator.find("#saveButton").on('click', function(){
-                var selectedValue; var inputValue;
+                var inputValue;
+                var selectedValue = self._cronGenerator.find('#basic-cron-list :selected').val();
                if(self._cronGenerator.find('#basicTab').hasClass('active')){
-                   selectedValue = self._cronGenerator.find('#basic-cron-list :selected').val();
-                  $(optionParent).find('.option-value').val(selectedValue);
-               }else if(self._cronGenerator.find('#regularTab').hasClass('active')){
+                   $(optionParent).find('.option-value').val(selectedValue);
+               } else if(self._cronGenerator.find('#regularTab').hasClass('active')){
                     selectedValue = self._cronGenerator.find('#selectListValues :selected').val();
                     if(self._cronGenerator.find('#everySecond').is(':checked')){
                         inputValue = "*/" + selectedValue + " * * * * ?";
-                    }else if(self._cronGenerator.find('#everyMinute').is(':checked')){
+                    } else if(self._cronGenerator.find('#everyMinute').is(':checked')){
                         inputValue = "0 */" + selectedValue + " * * * ?";
-                    }else if(self._cronGenerator.find('#everyHour').is(':checked')){
+                    } else if(self._cronGenerator.find('#everyHour').is(':checked')){
                         inputValue = "0 0 */" + selectedValue + " * * ?";
-                    }else if(self._cronGenerator.find('#everyDay').is(':checked')){
+                    } else if(self._cronGenerator.find('#everyDay').is(':checked')){
                         var timeValue = self._cronGenerator.find("#timeForEveryDay").val();
                         var time = timeValue.split(":");
                         var hour = time[0];
@@ -302,7 +366,7 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
                         inputValue = "0 " + minute + " " + hour + " */" + selectedValue + " * ?";
                     }
                     $(optionParent).find('.option-value').val(inputValue);
-               }else if(self._cronGenerator.find('#predefineTab').hasClass('active')){
+               } else if(self._cronGenerator.find('#predefineTab').hasClass('active')){
                     var selectedDays = [];
                     selectedValue = self._cronGenerator.find("#predefinedtime").val();
                     var time = selectedValue.split(":");
@@ -318,7 +382,7 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
                          inputValue = "0 " + minute + " " + hour + " * * ?";
                     }
                     $(optionParent).find('.option-value').val(inputValue);
-               }else if(self._cronGenerator.find('#advancedTab').hasClass('active')){
+               } else if(self._cronGenerator.find('#advancedTab').hasClass('active')){
                     selectedValue = self._cronGenerator.find('#expression').val();
                     $(optionParent).find('.option-value').val(selectedValue);
                }
@@ -332,21 +396,22 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
         CronGenerator.prototype.renderBasicCronExpression = function(){
             var self = this;
             var cronBasic = $('<select id="basic-cron-list" class="form-control" style="width:50%;">'+
-                     '<option value = "0 0 * * * ?">Every minute</option>'+
-                     '<option value = "0 0 * * * ?">Every hour</option>'+
-                     '<option value = "0 0 12 * * ?">Every day at noon</option>'+
-                     '<option value = "0 0 12 ? * sun">Every week on Sunday at noon</option>'+
-                     '<option value = "0 0 12 1 * ?">On the First of every month at noon</option>'+
-                     '<option value = "0 0 12 1 1 ?">On the First of January of every year at noon</option>'+
-                     '</select>');
+                     '<option value="'+constants.EVERY_MINUTE+'">Every minute</option>'+
+                     '<option value="'+constants.EVERY_HOUR+'">Every hour</option>'+
+                     '<option value="'+constants.EVERYDAY_AT_NOON+'">Every day at noon</option>'+
+                     '<option value="'+constants.EVERYWEEK_ON_SUNDAY_AT_NOON+'">Every week on Sunday at noon</option>'+
+                     '<option value="'+constants.ON_THE_FIRST_OF_EVERYMONTH_AT_NOON+'">On the First of every month'+
+                     ' at noon</option><option value="'+constants.ON_THE_FIRST_OF_JANUARY_OF_EVERYYEAR_AT_NOON+'">'+
+                     'On the First of January of every year at noon</option></select>');
             self._cronGenerator.find("#basic-content").html(cronBasic);
             self._cronGenerator.find("#cron-basic").addClass('active');
+
             self._cronGenerator.find('a[href="#cron-basic"]').click(function () {
                   self._cronGenerator.find("#cron-basic").addClass('active');
                   self._cronGenerator.find("#cron-regular").removeClass('active');
                   self._cronGenerator.find("#cron-predefined").removeClass('active');
                   self._cronGenerator.find("#cron-advanced").removeClass('active');
-                  self._cronGenerator.find("#basic-content option[value='0 * * * * ?']").attr('selected',true);
+                  self._cronGenerator.find("#basic-content option[value='"+constants.EVERY_MINUTE+"']").attr('selected',true);
                   self._cronGenerator.find('#saveButton').removeAttr("disabled");
             });
         };
@@ -366,7 +431,7 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
                     '<div id="TimeForRegularDay" class="col-xs-4">'+
                     '</div></div>');
             var selectListValues = $('<select id="selectListValues" class="form-control" onfocus="this.size=4;" '+
-                    'onblur="this.size=1;" onchange="this.size=1; this.blur();"></select>');
+                    'onblur="this.size=1;" onchange="this.size=1; this.blur();" style="margin: 2px 0px;"></select>');
             self._cronGenerator.find('a[href="#cron-regular"]').click(function () {
                    self._cronGenerator.find("#cronRegular").html(cronRegular);
                    self._cronGenerator.find("#cron-regular").addClass('active');
@@ -543,14 +608,14 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
                         self._cronGenerator.find("#dayMonth").val()+ " " +self._cronGenerator.find("#month").val() + " "
                         + self._cronGenerator.find("#dayWeek").val());
                 var expression = self._cronGenerator.find("#expression").val();
-                var description = Cronstrue.toString(expression, { throwExceptionOnParseError: false});
-                if(isValidTimeValue(secValue, 59)){
+                var description = Cronstrue.toString(expression, {throwExceptionOnParseError:false});
+                if(validateTimeValue(secValue, constants.MAX_MINUTE_AND_SECOND_VALUE)){
                     self._cronGenerator.find('#second').removeClass("error-field");
                     self._cronGenerator.find("#output").text(description);
                     self._cronGenerator.find('#errorMsg').hide();
                 } else {
                     self._cronGenerator.find('#second').addClass("error-field");
-                    self._cronGenerator.find('#errorMsg').text(errorMsg);
+                    self._cronGenerator.find('#errorMsg').text("Second" + errorMsg);
                     self._cronGenerator.find('#errorMsg').show();
                 }
                 self.isErrorOccured();
@@ -562,14 +627,14 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
                     self._cronGenerator.find("#dayMonth").val() + " " + self._cronGenerator.find("#month").val() + " " +
                     self._cronGenerator.find("#dayWeek").val());
                 var expression = self._cronGenerator.find("#expression").val();
-                var description = Cronstrue.toString(expression, { throwExceptionOnParseError: false });
-                if(isValidTimeValue(minValue, 59)){
+                var description = Cronstrue.toString(expression, {throwExceptionOnParseError:false});
+                if(validateTimeValue(minValue, constants.MAX_MINUTE_AND_SECOND_VALUE)){
                    self._cronGenerator.find('#minute').removeClass("error-field");
                    self._cronGenerator.find("#output").text(description);
                    self._cronGenerator.find('#errorMsg').hide();
                 } else {
                    self._cronGenerator.find('#minute').addClass("error-field");
-                   self._cronGenerator.find('#errorMsg').text(errorMsg);
+                   self._cronGenerator.find('#errorMsg').text("Minute" + errorMsg);
                    self._cronGenerator.find('#errorMsg').show();
                 }
                 self.isErrorOccured();
@@ -580,15 +645,15 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
                     self._cronGenerator.find("#dayMonth").val() + " " + self._cronGenerator.find("#month").val() + " " +
                     self._cronGenerator.find("#dayWeek").val());
                 var expression = self._cronGenerator.find("#expression").val();
-                var description = Cronstrue.toString(expression, { throwExceptionOnParseError: false });
+                var description = Cronstrue.toString(expression, {throwExceptionOnParseError:false});
                 var hourValue = self._cronGenerator.find('#hour').val();
-                if(isValidTimeValue(hourValue, 23)){
+                if(validateTimeValue(hourValue, constants.MAX_HOUR_VALUE)){
                     self._cronGenerator.find('#hour').removeClass("error-field");
                     self._cronGenerator.find("#output").text(description);
                     self._cronGenerator.find('#errorMsg').hide();
                 } else {
                     self._cronGenerator.find('#hour').addClass("error-field");
-                    self._cronGenerator.find('#errorMsg').text(errorMsg);
+                    self._cronGenerator.find('#errorMsg').text("Hour" + errorMsg);
                     self._cronGenerator.find('#errorMsg').show();
                 }
                 self.isErrorOccured();
@@ -602,7 +667,7 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
                 var description = Cronstrue.toString(expression, { throwExceptionOnParseError: false });
                 var dayMonValue = self._cronGenerator.find('#dayMonth').val();
                 var dayWeekValue = self._cronGenerator.find('#dayWeek').val();
-                if(isValidDayOfMonthValue(dayMonValue, dayWeekValue)){
+                if(validateDayOfMonthValue(dayMonValue, dayWeekValue)){
                      self._cronGenerator.find('#dayMonth').removeClass("error-field");
                      self._cronGenerator.find("#output").text(description);
                      self._cronGenerator.find('#errorMsg').hide();
@@ -619,9 +684,9 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
                     self._cronGenerator.find("#dayMonth").val() + " " + self._cronGenerator.find("#month").val() + " " +
                     self._cronGenerator.find("#dayWeek").val());
                 var expression = self._cronGenerator.find("#expression").val();
-                var description = Cronstrue.toString(expression, { throwExceptionOnParseError: false });
+                var description = Cronstrue.toString(expression,{throwExceptionOnParseError:false});
                 var monValue = self._cronGenerator.find('#month').val();
-                if(isValidMonthValue(monValue)){
+                if(validateMonthValue(monValue)){
                      self._cronGenerator.find('#month').removeClass("error-field");
                      self._cronGenerator.find("#output").text(description);
                      self._cronGenerator.find('#errorMsg').hide();
@@ -638,11 +703,11 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
                      self._cronGenerator.find("#dayMonth").val() + " " +self._cronGenerator.find("#month").val() + " " +
                      self._cronGenerator.find("#dayWeek").val());
                  var expression = self._cronGenerator.find("#expression").val();
-                 var description = Cronstrue.toString(expression, { throwExceptionOnParseError: false });
+                 var description = Cronstrue.toString(expression, { throwExceptionOnParseError:false, dayOfWeekStartIndexZero: false });
 
                  var weekValue = self._cronGenerator.find('#dayWeek').val();
                  var dayMonValue = self._cronGenerator.find('#dayMonth').val();
-                 if(isValidDayOfWeekValue(weekValue, dayMonValue)){
+                 if(validateDayOfWeekValue(weekValue, dayMonValue)){
                       self._cronGenerator.find('#dayWeek').removeClass("error-field");
                       self._cronGenerator.find("#output").text(description);
                       self._cronGenerator.find('#errorMsg').hide();
@@ -655,7 +720,7 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
             });
             self._cronGenerator.find("#expression").on("input",function(){
                  var expression = self._cronGenerator.find("#expression").val();
-                 var description = Cronstrue.toString(expression, { throwExceptionOnParseError: false });
+                 var description = Cronstrue.toString(expression, { throwExceptionOnParseError:false, dayOfWeekStartIndexZero: false });
                  var splitValues = expression.split(" ");
                  var second = splitValues[0];
                  var minute = splitValues[1];
@@ -663,7 +728,7 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
                  var dayMonth = splitValues[3];
                  var month = splitValues[4];
                  var dayWeek = splitValues[5];
-                 if(isValidCronExpression(expression) === true){
+                 if(validateCronExpression(expression)){
                      self._cronGenerator.find('#expression').removeClass("error-field");
                      self._cronGenerator.find("#output").text(description);
                      self._cronGenerator.find('#output').removeClass("error-message");
@@ -680,42 +745,42 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
                     self._cronGenerator.find('#output').addClass("error-message");
                     self._cronGenerator.find('#saveButton').attr("disabled","disabled");
                  }
-                 if(isValidTimeValue(second, 59)){
+                 if(validateTimeValue(second, constants.MAX_MINUTE_AND_SECOND_VALUE)){
                     self._cronGenerator.find('#second').removeClass("error-field");
                     self._cronGenerator.find("#second").val(splitValues[0]);
                     self._cronGenerator.find('#errorMsg').hide();
                  } else {
                     self._cronGenerator.find('#second').addClass("error-field");
                  }
-                 if(isValidTimeValue(minute, 59)){
+                 if(validateTimeValue(minute, constants.MAX_MINUTE_AND_SECOND_VALUE)){
                     self._cronGenerator.find('#minute').removeClass("error-field");
                     self._cronGenerator.find("#minute").val(splitValues[1]);
                     self._cronGenerator.find('#errorMsg').hide();
                  } else {
                     self._cronGenerator.find('#minute').addClass("error-field");
                  }
-                 if(isValidTimeValue(hour, 23)){
+                 if(validateTimeValue(hour, constants.MAX_HOUR_VALUE)){
                      self._cronGenerator.find('#hour').removeClass("error-field");
                      self._cronGenerator.find("#hour").val(splitValues[2]);
                      self._cronGenerator.find('#errorMsg').hide();
                  } else {
                      self._cronGenerator.find('#hour').addClass("error-field");
                  }
-                 if(isValidDayOfMonthValue(dayMonth, dayWeek)){
+                 if(validateDayOfMonthValue(dayMonth, dayWeek)){
                      self._cronGenerator.find('#dayMonth').removeClass("error-field");
                      self._cronGenerator.find("#dayMonth").val(splitValues[3]);
                      self._cronGenerator.find('#errorMsg').hide();
                  } else {
                      self._cronGenerator.find('#dayMonth').addClass("error-field");
                  }
-                 if(isValidMonthValue(month)){
+                 if(validateMonthValue(month)){
                      self._cronGenerator.find('#month').removeClass("error-field");
                      self._cronGenerator.find("#month").val(splitValues[4]);
                      self._cronGenerator.find('#errorMsg').hide();
                  } else {
                      self._cronGenerator.find('#month').addClass("error-field");
                  }
-                 if(isValidDayOfWeekValue(dayWeek, dayMonth)){
+                 if(validateDayOfWeekValue(dayWeek, dayMonth)){
                      self._cronGenerator.find('#dayWeek').removeClass("error-field");
                      self._cronGenerator.find("#dayWeek").val(splitValues[5]);
                      self._cronGenerator.find('#errorMsg').hide();
@@ -762,7 +827,7 @@ define(['require', 'lodash', 'jquery', 'log', 'cronstrue', 'jquery_timepicker'],
                 i = 1; length = 31;
                 self._cronGenerator.find('#selectListValues').empty();
             }
-            for(i; i <= length; i++){
+            for(i; i<=length; i++){
                 optionValues = '<option value = ' + i + '>' + i + '</option>';
                 selectBoxObject.append(optionValues);
             }
