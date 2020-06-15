@@ -8,6 +8,21 @@
     width: fit-content;
 }
 
+.etl-task-wizard-container .etl-task-wizard-canvas .btn-select-all {
+    cursor: pointer;
+    background-color: #f47b20;
+    color: #fefefe;
+    width: 10%;
+    position: absolute;
+    top: 1%;
+    left: 30%;
+    text-align: center;
+    padding: 6px;
+    font-weight: 600;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    font-size: 1.5rem;
+}
+
 .etl-task-wizard-container .etl-task-wizard-canvas {
     position: relative;
     height: 100%;
@@ -86,9 +101,14 @@
     display: block;
 }
 
+.listContainer.inputs .attributeList li .attribute {
+    padding: 4% 5px 4% 5px;
+}
+
 .listContainer.inputs .attributeList li .attribute .attrib-type {
     font-size: 12px;
     font-weight: 300;
+    float: right;
 }
 
 .listContainer.outputs .attributeList li .attribute .attrib-type {
@@ -142,13 +162,13 @@
 .mapping-generation-dialog .dialog-heading {
     height: 50px;
     padding-left: 5%;
-    padding-bottom: 7%;
+    padding-bottom: 2%;
     padding-top: 1%;
     font-size: 19px;
 }
 
 .mapping-generation-dialog .dialog-body .expression-container {
-    padding-bottom: 10px;
+    padding-bottom: 2%;
 }
 
 .mapping-generation-dialog .dialog-body .expression-container .expression {
@@ -249,9 +269,9 @@
 }
 
 .mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .attrib-selector-containers .attribute {
-    /*border-top: 1px solid #b7b6b6;*/
     padding-left: 3px;
     padding-right: 3px;
+    padding-bottom: 1%;
     border-bottom: 1px solid #b7b6b6;
 }
 
