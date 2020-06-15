@@ -18,7 +18,7 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'jsonValidator', 'app/source-editor/completion-engine', 'alerts'],
-    function (require, log, _, $, AppData, InitialiseData, JSONValidator, CompletionEngine, alerts) {
+    function(require, log, _, $, AppData, InitialiseData, JSONValidator, CompletionEngine, alerts) {
         var operatorMap = {
             is_null: {
                 returnTypes: ['bool'],
@@ -143,9 +143,8 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             }
         };
 
-        var ETLTaskView = function (options, container, callback, appObject) {
-            this.inputAttributes = [
-                {
+        var ETLTaskView = function(options, container, callback, appObject) {
+            this.inputAttributes = [{
                     name: 'id',
                     type: 'string',
                 },
@@ -174,8 +173,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             //   }
             // ];
 
-            this.outputAttributes = [
-                {
+            this.outputAttributes = [{
                     name: 'id',
                     type: 'string',
                 },
@@ -192,13 +190,13 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             var color = 'gray';
 
             this.jsPlumbInstance = window.j = jsPlumb.getInstance({
-                Connector: ["Straight", {curviness: 50}],
-                DragOptions: {cursor: "pointer", zIndex: 2000},
-                PaintStyle: {stroke: color, strokeWidth: 2},
-                EndpointStyle: {radius: 3, fill: 'rgba(0, 0, 0, 0)'},
-                endpointHoverStyle: {fill: 'rgba(0, 0, 0, 0)'},
-                HoverPaintStyle: {stroke: "#ec9f2e"},
-                EndpointHoverStyle: {fill: "#ec9f2e"},
+                Connector: ["Straight", { curviness: 50 }],
+                DragOptions: { cursor: "pointer", zIndex: 2000 },
+                PaintStyle: { stroke: color, strokeWidth: 2 },
+                EndpointStyle: { radius: 3, fill: 'rgba(0, 0, 0, 0)' },
+                endpointHoverStyle: { fill: 'rgba(0, 0, 0, 0)' },
+                HoverPaintStyle: { stroke: "#ec9f2e" },
+                EndpointHoverStyle: { fill: "#ec9f2e" },
                 Container: $(container).find('.etl-task-wizard-canvas')
             })
             this.container = container;
@@ -238,19 +236,19 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.functionDataMap = this.generateExpressionMap(this.inputAttributes, CompletionEngine.getRawMetadata());
         }
 
-        ETLTaskView.prototype.updateConnections = function (outputAttribute) {
+        ETLTaskView.prototype.updateConnections = function(outputAttribute) {
             var jsPlumbInstance = this.jsPlumbInstance;
             var inputAttributeEndpoints = this.inputAttributeEndpoints;
             var outputAttributeEndpoints = this.outputAttributeEndpoints;
             var generatedExpression = this.expressionMap[outputAttribute] ?
-                generateExpressionHTML(null, this.expressionMap[outputAttribute]) : '';
+                '= ' + generateExpressionHTML(null, this.expressionMap[outputAttribute]) : '';
 
             $(outputAttributeEndpoints[outputAttribute].element).find('.mapped-expression').empty();
             $(outputAttributeEndpoints[outputAttribute].element).find('.mapped-expression').append(`
-               ${generatedExpression}
+                ${generatedExpression}
             `);
 
-            this.inputAttributes.forEach(function (inputAttribute) {
+            this.inputAttributes.forEach(function(inputAttribute) {
                 var divElement = document.createElement('div');
                 divElement.innerHTML = generatedExpression;
 
@@ -264,7 +262,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
         }
 
-        ETLTaskView.prototype.renderAttributes = function (inputAttributes, outputAttributes) {
+        ETLTaskView.prototype.renderAttributes = function(inputAttributes, outputAttributes) {
             var container = this.container;
             var inputListContainer = this.inputListContainer;
             var outputListContainer = this.outputListContainer;
@@ -274,72 +272,76 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             var showExpressionDialog = this.showExpressionDialog;
             var expressionMap = this.expressionMap;
             var updateConnections = this.updateConnections;
-            var selectedCategory = this.selectedCategory;
 
-            inputAttributes.forEach(function (element) {
+            inputAttributes.forEach(function(element) {
                 var inputAttribElement = inputListContainer.append(`
                     <li>
                         <div class="attribute" style="">
-                            ${element.name}
+                            <div>
+                                ${element.name}
+                            </div>
                             <div class="attrib-type" style="">
-                                ${element.type}
+                                (${element.type})
                             </div>
                         </div>
                     </li>
                 `);
 
                 inputEndpointMap[element.name] = jsPlumbInstance.addEndpoint(
-                    $(inputAttribElement).children().last(),
-                    {anchor: 'Right'},
-                    {isSource: true, maxConnections: -1}
+                    $(inputAttribElement).children().last(), { anchor: 'Right' }, { isSource: true, maxConnections: -1 }
                 );
             });
 
-            outputAttributes.forEach(function (element) {
+            outputAttributes.forEach(function(element) {
                 var outputAttribElement = outputListContainer.append(`
                     <li>
                         <div class="attribute" style="">
-                            ${element.name}
+                            <div style="display: flex; flex-wrap: wrap; width: 90%;">
+                                <div style="display: flex; width: 100%;">
+                                    <div>
+                                        ${element.name}                                
+                                    </div>
+                                    <div class="attrib-type" style="opacity: 0.8">
+                                        (${element.type})
+                                    </div>
+                                </div>
+                                <div class="mapped-expression" style="">
+                                    <!--     Generated expression goes here     -->
+                                </div>
+                            </div>
                             <div class="clear-icon">
                                 <a href="#" title="Clear mapping" href="#" class="icon clear" style="">
                                     <i class="fw fw-clear"></i>
                                 </a>
                             </div>
-                            <div class="attrib-type" style="">
-                                ${element.type}
-                            </div>
-                            <div class="mapped-expression" style="">
-                            </div>
                         </div>
                     </li>
                 `);
 
-                outputAttribElement.children().last().on('click', function (evt) {
+                outputAttribElement.children().last().on('click', function(evt) {
                     evt.stopPropagation()
                     showExpressionDialog(element);
                 });
 
-                outputAttribElement.children().last().find('.clear-icon').on('click', function (evt) {
+                outputAttribElement.children().last().find('.clear-icon').on('click', function(evt) {
                     evt.stopPropagation();
                     delete expressionMap[element.name];
                     jsPlumbInstance.deleteConnectionsForElement(outputEndpointMap[element.name].element);
                     updateConnections(element.name);
                 });
 
-                outputEndpointMap[element.name] = jsPlumbInstance.addEndpoint($(outputAttribElement).children().last(), {anchor: 'Left'}, {
+                outputEndpointMap[element.name] = jsPlumbInstance.addEndpoint($(outputAttribElement).children().last(), { anchor: 'Left' }, {
                     isTarget: true,
                     maxConnections: -1
                 });
             });
 
-            console.log('identical input output', this.isInputOutputIdentical)
-
             if (this.isInputOutputIdentical) {
                 var select_all = $(container).find('.btn-select-all');
 
                 select_all.show();
-                select_all.on('click', function (evt) {
-                    outputAttributes.forEach(function (attr) {
+                select_all.on('click', function(evt) {
+                    outputAttributes.forEach(function(attr) {
                         expressionMap[attr.name] = new ScopeNode([attr.type]);
                         expressionMap[attr.name].addNodeToExpression(new AttributeNode({
                             name: attr.name,
@@ -356,7 +358,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.outputAttributeEndpoints = outputEndpointMap;
         }
 
-        ETLTaskView.prototype.showExpressionDialog = function (output_attribute) {
+        ETLTaskView.prototype.showExpressionDialog = function(output_attribute) {
             this.currenOutputElement = output_attribute.name;
             this.expressionMap[output_attribute.name] = this.expressionMap[output_attribute.name] ?
                 this.expressionMap[output_attribute.name] : new ScopeNode([output_attribute.type]);
@@ -371,12 +373,12 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
             this.renderGenerator();
 
-            $(expressionGeneratorContainer).find('.btn-default').on('click', function () {
+            $(expressionGeneratorContainer).find('.btn-default').on('click', function() {
                 expressionMap[output_attribute.name] = initialExpression;
                 hideExpressionGenerationDialog(container, expressionGeneratorContainer);
             });
 
-            $(expressionGeneratorContainer).find('.btn-expression-submit').on('click', function () {
+            $(expressionGeneratorContainer).find('.btn-expression-submit').on('click', function() {
                 if (coordinates.length > 0) {
                     alerts.error('Please complete the expression creation process to submit');
                 } else {
@@ -393,15 +395,15 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             });
         }
 
-        ETLTaskView.prototype.addCoordinate = function (index) {
+        ETLTaskView.prototype.addCoordinate = function(index) {
             this.coordinate.push(index);
         }
 
-        ETLTaskView.prototype.removeCoordinate = function () {
+        ETLTaskView.prototype.removeCoordinate = function() {
             this.coordinate.pop();
         }
 
-        ETLTaskView.prototype.renderGenerator = function () {
+        ETLTaskView.prototype.renderGenerator = function() {
             var container = this.container;
             var expressionContainer = $(container).find('.expression-container');
             var expression = this.expressionMap[this.currenOutputElement];
@@ -417,7 +419,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
             $(this.container).find('.dialog-heading').text('');
             $(this.container).find('.dialog-heading')
-                .append(`Create expression for attribute '<b>${this.currenOutputElement}</b>'`);
+                .append(`Create expression for: <b>${this.currenOutputElement}</b>`);
 
             // render the main Expression
             expressionContainer.empty();
@@ -426,24 +428,24 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             if (coordinates.length === 0) {
                 // render the expression if none of the expression nodes are selected
                 expressionContainer.append(`
-            <div class="expression target" style="display: flex">
-                <div class="exp-content" style="width: 100%;">
-                   <i style="color: #808080">expression : </i>
-                   ${generateExpressionHTML(null, expression)}
-                </div>
-            </div>
-          `);
+                    <div class="expression target" style="display: flex">
+                        <div class="exp-content" style="width: 100%;">
+                        <i style="color: #808080">expression: </i>
+                        ${generateExpressionHTML(null, expression)}
+                        </div>
+                    </div>
+                `);
             } else {
                 expressionContainer.append(`
-            <div class="expression" style="">
-                <i style="color: #808080">expression : </i>${generateExpressionHTML(coordinates[0], expression)}
-            </div>
-           `);
+                    <div class="expression" style="">
+                        <i style="color: #808080">expression: </i>${generateExpressionHTML(coordinates[0], expression)}
+                    </div>
+                `);
             }
 
 
             // render expression when one attribute/function/scope is selected in drill down form
-            coordinates.forEach(function (index, i) {
+            coordinates.forEach(function(index, i) {
                 tempExp = focusNodes[i];
 
                 if (i === (coordinates.length - 1)) {
@@ -470,7 +472,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
             $(expressionContainer).find('.expression.target>.exp-content>span.ok-clear').popover({
                 html: true,
-                content: function () {
+                content: function() {
                     return $(container).find('.popover-content').html();
                 },
                 template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>',
@@ -478,31 +480,33 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             });
 
             $(expressionContainer).find('.expression.target>.exp-content>span.ok-clear')
-                .on('mouseenter', function (evt) {
+                .on('mouseenter', function(evt) {
                     $(evt.currentTarget).popover('show');
-                    $(container).find(`#${$(evt.currentTarget).attr('aria-describedby')}`).on('click', function (e) {
+                    $(container).find(`#${$(evt.currentTarget).attr('aria-describedby')}`).on('click', function(e) {
                         e.stopPropagation();
                         var index = evt.currentTarget.classList[0].split('-')[1];
                         if (tempExp.nodeType === 'function') {
-                            tempExp.parameters[index] = new ScopeNode(tempExp.parameters[index].dataTypes)
+                            var node = new ScopeNode(tempExp.parameters[index].dataTypes);
+                            node.placeholder = tempExp.parameters[index].placeholder;
+                            tempExp.parameters[index] = node;
                         } else {
-                            tempExp.children[index] = new ScopeNode(tempExp.children[index].dataTypes)
+                            tempExp.children[index] = new ScopeNode(tempExp.children[index].dataTypes);
                         }
                         updateExpression(tempExp);
                     })
-                    $(container).find('.popover').on('mouseleave', function () {
+                    $(container).find('.popover').on('mouseleave', function() {
                         $(evt.currentTarget).popover('hide');
                     });
                 })
-                .on('mouseleave', function (evt) {
-                    setTimeout(function () {
+                .on('mouseleave', function(evt) {
+                    setTimeout(function() {
                         if (!($(expressionContainer).find('.popover:hover').length > 0)) {
                             $(evt.currentTarget).popover('hide');
                         }
                     }, 300);
                 });
 
-            $(expressionContainer).find('.expression.target>.exp-content>span').on('click', function (evt) {
+            $(expressionContainer).find('.expression.target>.exp-content>span').on('click', function(evt) {
                 coordinates.push(Number(evt.currentTarget.classList[0].split('-')[1]));
                 focusNodes.push(tempExp.children ? _.cloneDeep(tempExp.children[coordinates[coordinates.length - 1]]) :
                     _.cloneDeep(tempExp.parameters[coordinates[coordinates.length - 1]]));
@@ -512,14 +516,14 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             if (coordinates.length > 0 && tempExp.nodeType === 'function') {
                 $(expressionContainer).find('.target .add-param').show();
                 $(expressionContainer).find('.target .add-param').off('click');
-                $(expressionContainer).find('.target .add-param').on('click', function (evt) {
+                $(expressionContainer).find('.target .add-param').on('click', function(evt) {
                     evt.stopPropagation();
                     tempExp.parameters.push(new ScopeNode(tempExp.repetitiveParameterTypes));
                     renderExpression();
                 });
             }
 
-            $(expressionContainer).find('.expression.target>.expression-merge').on('click', function (evt) {
+            $(expressionContainer).find('.expression.target>.expression-merge').on('click', function(evt) {
                 if (coordinates.length === 1) {
                     expression.children[coordinates[0]] = focusNodes[0];
                 } else {
@@ -555,7 +559,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             var attributeGenericDataType = tempExp
                                 .children[tempExp.children.length - 1].genericDataType;
 
-                            Object.keys(operatorMap).forEach(function (key) {
+                            Object.keys(operatorMap).forEach(function(key) {
                                 if (operatorMap[key].beforeTypes.indexOf(attributeGenericDataType) > -1 &&
                                     _.intersection(operatorMap[key].returnTypes, tempExp.supportedGenericDataTypes).length > 0) {
                                     supportedOperators[key] = operatorMap[key];
@@ -565,7 +569,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             break;
                         case 'function':
                         case 'scope':
-                            Object.keys(operatorMap).forEach(function (key) {
+                            Object.keys(operatorMap).forEach(function(key) {
                                 if (_.intersection(operatorMap[key].beforeTypes, tempExp.children[tempExp.children.length - 1].supportedGenericDataTypes).length > 0 &&
                                     _.intersection(operatorMap[key].returnTypes, tempExp.supportedGenericDataTypes).length > 0) {
                                     supportedOperators[key] = operatorMap[key];
@@ -575,14 +579,14 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                         case 'operator':
                             var dataTypesFollowingOperator = tempExp.children[tempExp.children.length - 1].afterTypes;
                             var dataTypes = [];
-                            Object.keys(functionDataMap).forEach(function (key) {
+                            Object.keys(functionDataMap).forEach(function(key) {
                                 if (dataTypesFollowingOperator.indexOf(getGenericDataType(key)) > -1) {
                                     dataTypes.push(key);
                                     supportedInputAttributes = _.merge({}, supportedInputAttributes, functionDataMap[key]['attribute'])
                                     supportedFunctions = _.merge({}, supportedFunctions, functionDataMap[key]['function'])
                                 }
                             })
-                            supportedInputAttributes['$custom_val_properties'] = {dataTypes};
+                            supportedInputAttributes['$custom_val_properties'] = { dataTypes };
 
                             supportedOperators = {
                                 bracket: {
@@ -597,14 +601,14 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             }
                             break;
                     }
-                } else {// if the expression is empty
+                } else { // if the expression is empty
                     if (tempExp.dataTypes.indexOf('bool') > -1) {
-                        this.inputAttributes.forEach(function (att) {
+                        this.inputAttributes.forEach(function(att) {
                             supportedInputAttributes[att.name] = att;
                         })
                     }
                     var customDataTypes = []
-                    tempExp.dataTypes.forEach(function (dataType) {
+                    tempExp.dataTypes.forEach(function(dataType) {
                         supportedInputAttributes = functionDataMap[dataType]['attribute'] ?
                             _.merge({}, supportedInputAttributes, functionDataMap[dataType]['attribute']) :
                             supportedInputAttributes;
@@ -628,7 +632,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             }
                         }
 
-                        Object.keys(operatorMap).forEach(function (key) {
+                        Object.keys(operatorMap).forEach(function(key) {
                             if ((!supportedOperators[key]) && operatorMap[key].isFirst && operatorMap[key].returnTypes.indexOf(getGenericDataType(dataType)) > -1) {
                                 supportedOperators[key] = operatorMap[key]
                             }
@@ -637,7 +641,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
 
                     if (selectedCategory === 'Attribute') {
-                        Object.keys(supportedInputAttributes).forEach(function (key) {
+                        Object.keys(supportedInputAttributes).forEach(function(key) {
                             if (!(supportedInputAttributes[key].name.toLowerCase().indexOf(selectedFilter) > -1)) {
                                 delete supportedInputAttributes[key];
                             }
@@ -645,7 +649,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     }
 
                     if (selectedCategory === 'Function') {
-                        Object.keys(supportedFunctions).forEach(function (key) {
+                        Object.keys(supportedFunctions).forEach(function(key) {
                             if (!(supportedFunctions[key].displayName.toLowerCase().indexOf(selectedFilter) > -1)) {
                                 delete supportedFunctions[key];
                             }
@@ -653,7 +657,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     }
 
                     if (selectedCategory === 'Operator') {
-                        Object.keys(supportedOperators).forEach(function (key) {
+                        Object.keys(supportedOperators).forEach(function(key) {
                             if (!(supportedOperators[key].description.toLowerCase().indexOf(selectedFilter) > -1)) {
                                 delete supportedOperators[key];
                             }
@@ -716,14 +720,14 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             }
 
             // setup events for attribute selection
-            $(nodeCategoryContainer).find('.attribute-category').on('click', function (evt) {
+            $(nodeCategoryContainer).find('.attribute-category').on('click', function(evt) {
                 nodeCategoryContainer.find('li>a>div').removeClass('selected');
                 nodeCategoryContainer.find('.attribute-category').addClass('selected');
 
                 attributeContainer.find('.select-function-operator-attrib').show();
                 attributeContainer.find('.attrib-selector-containers').empty();
 
-                Object.keys(supportedInputAttributes).forEach(function (key) {
+                Object.keys(supportedInputAttributes).forEach(function(key) {
                     if (key !== '$custom_val_properties') {
                         attributeContainer.find('.attrib-selector-containers').append(`
                             <a id="attr-${supportedInputAttributes[key].name}" style="color: #333">
@@ -759,7 +763,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             </a>
                         `);
 
-                        supportedInputAttributes[key].dataTypes.forEach(function (dataType) {
+                        supportedInputAttributes[key].dataTypes.forEach(function(dataType) {
                             attributeContainer.find('.attrib-selector-containers').find('#custom_val_type').append(`
                                 <option>${dataType}</option>
                             `);
@@ -768,7 +772,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
                 });
 
-                attributeContainer.find('.attrib-selector-containers').children().on('click', function (evt) {
+                attributeContainer.find('.attrib-selector-containers').children().on('click', function(evt) {
                     nodeData = {
                         name: supportedInputAttributes[evt.currentTarget.id.split('attr-')[1]].name,
                         dataType: supportedInputAttributes[evt.currentTarget.id.split('attr-')[1]].type,
@@ -782,11 +786,11 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
                 displayCustomValueInput($(container).find('#custom_val_type').val());
 
-                attributeContainer.find('.attrib-selector-containers').find('#custom_val_type').on('change', function (evt) {
+                attributeContainer.find('.attrib-selector-containers').find('#custom_val_type').on('change', function(evt) {
                     displayCustomValueInput($(container).find('#custom_val_type').val());
                 });
 
-                $(container).find('.btn-custom-val-submit').on('click', function (evt) {
+                $(container).find('.btn-custom-val-submit').on('click', function(evt) {
                     var customNode = null;
                     var nodeData = {}
                     if ($(container).find('#custom_val_type').val() === 'bool') {
@@ -809,18 +813,18 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 });
 
                 $(container).find('.att-fun-op-search-box').off('keyup');
-                $(container).find('.att-fun-op-search-box').on('keyup', _.debounce(function (evt) {
+                $(container).find('.att-fun-op-search-box').on('keyup', _.debounce(function(evt) {
                     updateFilter('Attribute', evt.target.value);
                 }, 100, {}));
             })
 
-            $(nodeCategoryContainer).find('.function-category').on('click', function (evt) {
+            $(nodeCategoryContainer).find('.function-category').on('click', function(evt) {
                 nodeCategoryContainer.find('li>a>div').removeClass('selected');
                 nodeCategoryContainer.find('.function-category').addClass('selected');
                 attributeContainer.find('.select-function-operator-attrib').show();
                 attributeContainer.find('.attrib-selector-containers').empty();
 
-                Object.keys(supportedFunctions).forEach(function (key) {
+                Object.keys(supportedFunctions).forEach(function(key) {
                     attributeContainer.find('.attrib-selector-containers').append(`
                         <a id="func-${supportedFunctions[key].name}" style="color: #333">
                             <div class="attribute" style="">
@@ -835,12 +839,12 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     `);
                 });
 
-                attributeContainer.find('.attrib-selector-containers').children().on('click', function (evt) {
+                attributeContainer.find('.attrib-selector-containers').children().on('click', function(evt) {
                     attributeContainer.find('.select-function-operator-attrib').hide();
                     attributeContainer.find('.select-function-format-container').show();
                     $(container).find('.att-fun-op-search-box').val('');
 
-                    supportedFunctions[evt.currentTarget.id.split('func-')[1]].syntax.forEach(function (syntax, i) {
+                    supportedFunctions[evt.currentTarget.id.split('func-')[1]].syntax.forEach(function(syntax, i) {
                         attributeContainer.find('.select-function-format-container').find('ul').append(`
                             <li id="syntax-${i}">
                                 <a style="">
@@ -854,10 +858,10 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                         `);
                     });
 
-                    attributeContainer.find('.select-function-format-container').find('ul').children().on('click', function (child_evt) {
+                    attributeContainer.find('.select-function-format-container').find('ul').children().on('click', function(child_evt) {
                         nodeData = {
                             displayName: supportedFunctions[evt.currentTarget.id.split('func-')[1]].displayName,
-                            dataTypes: supportedFunctions[evt.currentTarget.id.split('func-')[1]].returnAttributes[0].type.map(function (dataType) {
+                            dataTypes: supportedFunctions[evt.currentTarget.id.split('func-')[1]].returnAttributes[0].type.map(function(dataType) {
                                 return dataType.toLowerCase();
                             }),
                             selectedSyntax: supportedFunctions[evt.currentTarget.id.split('func-')[1]].syntax[child_evt.currentTarget.id.split('syntax-')[1]],
@@ -865,7 +869,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
                         var parameterData = supportedFunctions[evt.currentTarget.id.split('func-')[1]].parameters || [];
 
-                        nodeData.selectedSyntax['parameterData'] = _.reduce(parameterData, function (obj, param) {
+                        nodeData.selectedSyntax['parameterData'] = _.reduce(parameterData, function(obj, param) {
                             obj[param.name] = param.description
                             return obj
                         }, {})
@@ -880,18 +884,18 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     })
                 });
                 $(container).find('.att-fun-op-search-box').off('keyup');
-                $(container).find('.att-fun-op-search-box').on('keyup', _.debounce(function (evt) {
+                $(container).find('.att-fun-op-search-box').on('keyup', _.debounce(function(evt) {
                     updateFilter('Function', evt.target.value);
                 }, 100, {}));
             })
 
-            $(nodeCategoryContainer).find('.operator-category').on('click', function (evt) {
+            $(nodeCategoryContainer).find('.operator-category').on('click', function(evt) {
                 nodeCategoryContainer.find('li>a>div').removeClass('selected');
                 nodeCategoryContainer.find('.operator-category').addClass('selected');
                 attributeContainer.find('.select-function-operator-attrib').show();
                 attributeContainer.find('.attrib-selector-containers').empty();
 
-                Object.keys(supportedOperators).forEach(function (key) {
+                Object.keys(supportedOperators).forEach(function(key) {
                     attributeContainer.find('.attrib-selector-containers').append(`
                         <a id="operator-${key}" style="color: #333">
                             <div class="attribute" style="">
@@ -903,7 +907,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     `);
                 });
 
-                attributeContainer.find('.attrib-selector-containers').children().on('click', function (evt) {
+                attributeContainer.find('.attrib-selector-containers').children().on('click', function(evt) {
                     if (evt.currentTarget.id.split('operator-')[1] === 'bracket') {
                         tempExp.addNodeToExpression(new ScopeNode(tempExp.dataTypes));
                     } else {
@@ -924,7 +928,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     updateExpression(tempExp);
                 })
                 $(container).find('.att-fun-op-search-box').off('keyup');
-                $(container).find('.att-fun-op-search-box').on('keyup', _.debounce(function (evt) {
+                $(container).find('.att-fun-op-search-box').on('keyup', _.debounce(function(evt) {
                     updateFilter('Operator', evt.target.value);
                 }, 100, {}));
             })
@@ -936,13 +940,13 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             }
         }
 
-        ETLTaskView.prototype.updateFilter = function (filterCategory, filterValue) {
+        ETLTaskView.prototype.updateFilter = function(filterCategory, filterValue) {
             this.selectedCategory = filterCategory;
             this.selectedCategoryFilter = filterValue;
             this.renderGenerator();
         }
 
-        ETLTaskView.prototype.displayCustomValueInput = function (type) {
+        ETLTaskView.prototype.displayCustomValueInput = function(type) {
             $(this.container).find('#custom_value_input_txt').hide();
             $(this.container).find('#custom_value_input_txt').val('');
             $(this.container).find('#custom_value_input_bool').hide();
@@ -958,7 +962,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             }
         }
 
-        ETLTaskView.prototype.updateExpression = function (expression) {
+        ETLTaskView.prototype.updateExpression = function(expression) {
             if (this.coordinate.length === 0) {
                 this.expressionMap[this.currenOutputElement] = expression;
             }
@@ -967,7 +971,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.renderGenerator();
         }
 
-        ETLTaskView.prototype.hideExpressionGenerationDialog = function (container, expressionGeneratorContainer) {
+        ETLTaskView.prototype.hideExpressionGenerationDialog = function(container, expressionGeneratorContainer) {
             expressionGeneratorContainer.remove();
             expressionGeneratorContainer = $(container).find('.popup-backdrop').clone();
             $(container).prepend(expressionGeneratorContainer);
@@ -981,7 +985,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.focusNode = [];
         }
 
-        ETLTaskView.prototype.renderFunctionAttributeSelector = function (type, attributeFunctionArray, outputAttributeName) {
+        ETLTaskView.prototype.renderFunctionAttributeSelector = function(type, attributeFunctionArray, outputAttributeName) {
             var nodeCategoryContainer = this.expressionGenerationDialog.find('.att-fun-op-container');
             var addNodeToExpression = this.addNodeToExpression;
             var attributeContainer = $(nodeCategoryContainer).find('.select-function-operator-attrib');
@@ -989,7 +993,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
             $(attributeContainer).find('.attrib-selector-containers').children().remove();
 
-            Object.values(attributeFunctionArray).forEach(function (element) {
+            Object.values(attributeFunctionArray).forEach(function(element) {
                 var displayName = '';
                 var description = '';
                 var elementData = '';
@@ -1020,7 +1024,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     </a>
                 `);
 
-                $(attributeContainer).find('.attrib-selector-containers').children().last().on('click', function () {
+                $(attributeContainer).find('.attrib-selector-containers').children().last().on('click', function() {
                     if (type !== 'function') {
                         if (!element.scope) {
                             addNodeToExpression(type, element, outputAttributeName);
@@ -1028,7 +1032,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             addNodeToExpression('scope', element, outputAttributeName);
                         }
                     } else {
-                        element.syntax.forEach(function (syntax_obj) {
+                        element.syntax.forEach(function(syntax_obj) {
                             $(syntaxSelectorContainer).find('ul').append(`
                                 <li>
                                     <a style="">
@@ -1041,7 +1045,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                                 </li>
                             `);
 
-                            $(syntaxSelectorContainer).find('ul').children().last().on('click', function () {
+                            $(syntaxSelectorContainer).find('ul').children().last().on('click', function() {
                                 element['syntax_selected'] = syntax_obj;
                                 addNodeToExpression(type, element, outputAttributeName);
                             });
@@ -1056,7 +1060,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             $(nodeCategoryContainer).find('.select-function-operator-attrib').show();
         }
 
-        ETLTaskView.prototype.addNodeToExpression = function (type, node_data, outputAttributeName) {
+        ETLTaskView.prototype.addNodeToExpression = function(type, node_data, outputAttributeName) {
             var coordinates = this.coordinate;
             var node = null;
             var data = null;
@@ -1097,29 +1101,35 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.displayExpression(outputAttributeName);
         }
 
-        ETLTaskView.prototype.displayExpression = function (outputAttrName) {
+        ETLTaskView.prototype.displayExpression = function(outputAttrName) {
             var htmlContent = generateExpressionHTML(this.expressionMap[outputAttrName]);
             $(this.container).find('.main-exp').empty()
             $(this.container).find('.main-exp').append(htmlContent);
         }
 
-        ETLTaskView.prototype.generateExpressionMap = function (inputAttributes, expressionFunctions) {
+        ETLTaskView.prototype.generateExpressionMap = function(inputAttributes, expressionFunctions) {
             var supportedExtensionTypes = ['time', 'env', 'geo', 'math', 'str'];
             var expressionMap = {
-                string: {}, int: {}, long: {}, double: {}, float: {}, bool: {}, object: {}
+                string: {},
+                int: {},
+                long: {},
+                double: {},
+                float: {},
+                bool: {},
+                object: {}
             }
 
-            inputAttributes.forEach(function (attrib) {
+            inputAttributes.forEach(function(attrib) {
                 if (!expressionMap[attrib.type.toLowerCase()]['attribute']) {
                     expressionMap[attrib.type.toLowerCase()]['attribute'] = {}
                 }
                 expressionMap[attrib.type.toLowerCase()]['attribute'][attrib.name] = attrib;
             });
 
-            supportedExtensionTypes.forEach(function (extensionType) {
-                expressionFunctions['extensions'][extensionType].functions.forEach(function (func) {
+            supportedExtensionTypes.forEach(function(extensionType) {
+                expressionFunctions['extensions'][extensionType].functions.forEach(function(func) {
                     if (func.returnAttributes) {
-                        func.returnAttributes[0].type.forEach(function (type) {
+                        func.returnAttributes[0].type.forEach(function(type) {
                             if (!expressionMap[type.toLowerCase()]['function']) {
                                 expressionMap[type.toLowerCase()]['function'] = {}
                             }
@@ -1131,9 +1141,9 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 });
             })
 
-            expressionFunctions['inBuilt'].functions.forEach(function (func) {
+            expressionFunctions['inBuilt'].functions.forEach(function(func) {
                 if (func.returnAttributes) {
-                    func.returnAttributes[0].type.forEach(function (type) {
+                    func.returnAttributes[0].type.forEach(function(type) {
                         if (!expressionMap[type.toLowerCase()]['function']) {
                             expressionMap[type.toLowerCase()]['function'] = {}
                         }
@@ -1147,7 +1157,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             return expressionMap;
         }
 
-        var getGenericDataType = function (data_type) {
+        var getGenericDataType = function(data_type) {
             switch (data_type) {
                 case 'string':
                     return 'text';
@@ -1161,16 +1171,16 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             }
         }
 
-// Function node for Expression structure
+        // Function node for Expression structure
 
-        var AttributeNode = function (node_data) {
+        var AttributeNode = function(node_data) {
             this.name = node_data.name;
             this.dataType = node_data.dataType;
             this.nodeType = 'attribute';
             this.genericDataType = getGenericDataType(node_data.dataType);
         }
 
-        var OperatorNode = function (node_data) {
+        var OperatorNode = function(node_data) {
             this.symbol = node_data.symbol;
             this.genericDataTypes = node_data.dataTypes;
             this.nodeType = 'operator';
@@ -1180,17 +1190,17 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.isEnd = node_data.isEnd;
         }
 
-        var CustomValueNode = function (node_data) {
+        var CustomValueNode = function(node_data) {
             this.value = node_data.value;
             this.dataType = node_data.dataType;
             this.nodeType = 'customValue';
             this.genericDataType = getGenericDataType(node_data.dataType);
         }
 
-        var FunctionNode = function (node_data) {
+        var FunctionNode = function(node_data) {
             this.displayName = node_data.displayName;
             this.dataTypes = node_data.dataTypes;
-            this.supportedGenericDataTypes = node_data.dataTypes.map(function (data_type) {
+            this.supportedGenericDataTypes = node_data.dataTypes.map(function(data_type) {
                 return getGenericDataType(data_type);
             });
             this.nodeType = 'function';
@@ -1201,32 +1211,20 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.parameters = this.generateParameters(node_data.selectedSyntax);
         }
 
-        FunctionNode.prototype.generateParameters = function (syntax) {
+        FunctionNode.prototype.generateParameters = function(syntax) {
             var parameters = [];
             var regExp = /\(([^)]+)\)/;
             var allowRepetitive = false;
             var repetitiveDataTypes = [];
 
-            console.log(syntax);
-
-            regExp.exec(syntax.syntax) ? regExp.exec(syntax.syntax)[1].split(',').forEach(function (param) {
+            regExp.exec(syntax.syntax) ? regExp.exec(syntax.syntax)[1].split(',').forEach(function(param) {
                 var temp = param.trim().split(' ');
 
-                var dataTypes = temp[0].match(/<(.*?)>/)[1].split('|').map(function (type) {
+                var dataTypes = temp[0].match(/<(.*?)>/)[1].split('|').map(function(type) {
                     return type.toLowerCase();
                 });
 
                 var placeHolder = syntax.parameterData[temp[1]];
-                // var placeHolder = '<';
-                // var isFirst = true;
-                // dataTypes.forEach(function (dataType) {
-                //   if (!isFirst) {
-                //     placeHolder += ' | '
-                //   }
-                //   placeHolder += dataType;
-                // })
-                // placeHolder += '>';
-                // placeHolder += ' ' + temp[1];
 
                 if (!(temp[1].indexOf('...') > -1)) {
                     var paramNode = new ScopeNode(dataTypes);
@@ -1244,9 +1242,9 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             return parameters;
         }
 
-        var ScopeNode = function (data_types) {
+        var ScopeNode = function(data_types) {
             this.dataTypes = data_types;
-            this.supportedGenericDataTypes = data_types.map(function (data_type) {
+            this.supportedGenericDataTypes = data_types.map(function(data_type) {
                 return getGenericDataType(data_type);
             });
             this.canBeLast = true;
@@ -1255,7 +1253,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.placeholder = null;
         }
 
-        ScopeNode.prototype.addNodeToExpression = function (node) {
+        ScopeNode.prototype.addNodeToExpression = function(node) {
             this.children.push(node);
         }
 
@@ -1272,8 +1270,8 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
             return addValueToArray(level - 1, coordinates,
                 replacementChildNode, node.children ?
-                    node.children[coordinates[coordinates.length - level]]
-                    : node.parameters[coordinates[coordinates.length - level]]);
+                node.children[coordinates[coordinates.length - level]] :
+                node.parameters[coordinates[coordinates.length - level]]);
         }
 
         function deleteValueFromArray(level, coordinates, array) {
@@ -1288,12 +1286,12 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             return deleteValueFromArray(level - 1, coordinates, array[coordinates[coordinates.length - level]]);
         }
 
-        var generateExpressionHTML = function (highlightIndex, node) {
+        var generateExpressionHTML = function(highlightIndex, node) {
             var htmlContent = '';
 
             var i = 0;
             if (node.children) {
-                node.children.forEach(function (childNode) {
+                node.children.forEach(function(childNode) {
                     switch (childNode.nodeType) {
                         case 'attribute':
                             htmlContent += childNode.name;
@@ -1323,7 +1321,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 if (node.nodeType === 'function') {
                     htmlContent += `${node.displayName.slice(0, -1)}`
                     var isFirst = true;
-                    node.parameters.forEach(function (parameterNode) {
+                    node.parameters.forEach(function(parameterNode) {
                         if (!isFirst) {
                             htmlContent += ', '
                         }
@@ -1365,12 +1363,12 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                         errorsFound++;
                     }
 
-                    expression.children.forEach(function (childNode) {
+                    expression.children.forEach(function(childNode) {
                         validateLevel(childNode);
                     });
 
                 } else if (expression.nodeType === 'function') {
-                    expression.parameters.forEach(function (parameter) {
+                    expression.parameters.forEach(function(parameter) {
                         validateLevel(parameter);
                     })
                 }
@@ -1380,5 +1378,4 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
         }
 
         return ETLTaskView;
-    })
-;
+    });

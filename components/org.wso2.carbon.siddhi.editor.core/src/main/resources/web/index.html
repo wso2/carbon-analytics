@@ -344,8 +344,8 @@
 
                         </div>
                         <div class="generation-content" style="">
-                            <div style="width: 100%">
-                                Select element to add to expression
+                            <div style="width: 100%; margin-bottom: 10px;">
+                                Select operand to add to expression
                             </div>
                             <div class="node-container" style="">
                                 <ul class="node-category">
@@ -354,9 +354,9 @@
                             </div>
                             <div class="att-fun-op-container" style="">
                                 <div class="select-function-operator-attrib" style="display: none">
-                                    <div class="input-group">
-                                        <input class="att-fun-op-search-box" style="background-color: #fff; color: #555; border-color: #c5c5c5; width: 100%" type="text" class="form-control"/>
-                                        <span style="padding: 3px 12px;" class="input-group-addon">
+                                    <div style="border-bottom: 1px solid #333;" class="input-group">
+                                        <input placeholder="Type here to search" class="att-fun-op-search-box" style="background-color: #fff; color: #555; border-color: #c5c5c5; width: 100%; border: none; outline: none; background-color: transparent; line-height: 30px;" type="text" class="form-control"/>
+                                        <span style="background: transparent; padding: 3px 12px; border: none;" class="input-group-addon">
                                             <i class="fw fw-search"></i>
                                         </span>
                                     </div>
@@ -370,9 +370,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="btn-tray">
-                        <button style="" class="btn btn-primary btn-expression-submit">Submit</button>
+                    <div style="text-align: right" class="btn-tray">
                         <button style="" class="btn btn-default">Cancel</button>
+                        <button style="" class="btn btn-primary btn-expression-submit">Submit</button>
                     </div>
                 </div>
             </div>
@@ -386,12 +386,14 @@
                         </ul>
                     </div>
                 </div>
-                <div class="btn-select-all" style="display: none">
-                    Select *
-                </div>
                 <div class="listContainer outputs" style="">
                     <div class="heading" style="">
-                        Output Attributes
+                        <div style="width: 100%">
+                            Output Attributes
+                        </div>
+                        <div class="btn-select-all" style="display: none">
+                            Select *
+                        </div>
                     </div>
                     <ul class="attributeList">
                     </ul>
