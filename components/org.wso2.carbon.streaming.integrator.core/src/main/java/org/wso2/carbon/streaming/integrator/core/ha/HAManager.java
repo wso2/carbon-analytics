@@ -197,6 +197,7 @@ public class HAManager {
                     continue;
                 }
             }
+            log.info("Registered source handlers set to active");
             changeSiddhiAppState(true);
             NodeInfo nodeInfo = StreamProcessorDataHolder.getNodeInfo();
             nodeInfo.setActiveNode(isActiveNode);
@@ -212,6 +213,7 @@ public class HAManager {
                     }
                 }
             }
+            log.info("Successfully retrieved all the events from event sync server");
 
             //change the system clock to work with event time
             enableEventTimeClock(true);
@@ -221,6 +223,7 @@ public class HAManager {
             } catch (InterruptedException e) {
                 log.warn("Error in sending events to input handler." + e.getMessage());
             }
+            log.info("Successfully playback all the events");
             for (SourceHandler sourceHandler : sourceHandlerManager.getRegsiteredSourceHandlers().values()) {
                 try {
                     ((HACoordinationSourceHandler) sourceHandler).setPlayBack(false);
@@ -247,6 +250,7 @@ public class HAManager {
                     continue;
                 }
             }
+            log.info("Registered sink handlers set to active");
 
             for (RecordTableHandler recordTableHandler : recordTableHandlerManager.getRegisteredRecordTableHandlers().
                     values()) {
@@ -264,6 +268,7 @@ public class HAManager {
                             backoffRetryCounter.getTimeIntervalMillis(), TimeUnit.MILLISECONDS);
                 }
             }
+            log.info("Registered record table handlers set to active ");
 
             startSiddhiAppRuntimeSources();
 
@@ -279,6 +284,7 @@ public class HAManager {
             for (HAStateChangeListener listener : haStateChangeListeners) {
                 listener.becameActive();
             }
+            log.info("HAStateChangeListener notified as active ");
             log.info("Successfully Changed to Active Mode ");
         }
     }
@@ -305,19 +311,24 @@ public class HAManager {
                 handler.setAsPassive();
             }
         }
+        log.info("Registered sink handlers set to passive");
         for (SourceHandler sourceHandler : registeredSourceHandlers.values()) {
             ((HACoordinationSourceHandler) sourceHandler).setAsPassive();
         }
+        log.info("Registered source handlers set to passive");
         for (RecordTableHandler recordTableHandler : registeredRecordTableHandlers.values()) {
             ((HACoordinationRecordTableHandler) recordTableHandler).setAsPassive();
         }
+        log.info("Registered record table handlers set to passive");
         //stop the databridge servers
         List<ServerEventListener> listeners = StreamProcessorDataHolder.getServerListeners();
         for (ServerEventListener listener : listeners) {
             listener.stop();
         }
         sourceHandlerManager.getRegsiteredSourceHandlers().clear();
+        log.info("Starting to stop siddhi app runtimes");
         stopSiddhiAppRuntimes();
+        log.info("Successfully stopped siddhi app runtimes");
         isActiveNode = false;
         changeSiddhiAppState(false);
         setPassiveNodeAdded(false);
@@ -334,6 +345,7 @@ public class HAManager {
         for (HAStateChangeListener listener : haStateChangeListeners) {
             listener.becamePassive();
         }
+        log.info("HAStateChangeListener notified as passive");
 
         try {
             if (EventSyncConnectionPoolManager.getConnectionPool() != null) {
@@ -344,6 +356,7 @@ public class HAManager {
         } finally {
             EventSyncConnectionPoolManager.uninitializeConnectionPool();
         }
+        log.info("Event sync client connection pool is closed");
         registeredSinkHandlers.clear();
         registeredRecordTableHandlers.clear();
         registeredSourceHandlers.clear();
@@ -387,9 +400,7 @@ public class HAManager {
                 log.error("Error in restoring Siddhi Application: " + siddhiAppRuntime.getName(), e);
             }
         });
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully Synced the state ");
-        }
+        log.info("Successfully Synced the state");
     }
 
     private void enableEventTimeClock(boolean enablePlayBack) {

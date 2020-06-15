@@ -108,7 +108,7 @@ public class PersistenceManager implements Runnable {
                     }
                 } catch (Throwable e) {
                     log.error("Active Node: Persisting of Siddhi app is not successful. " +
-                            "Check if app deployed properly", e);
+                            "Check if app deployed properly." + e.getMessage(), e);
                 }
                 siddhiRevisionArray[siddhiAppCount] = sequenceIDGenerator.incrementAndGet() + HAConstants
                         .PERSISTED_APP_SPLIT_DELIMITER + persistenceReference.getRevision();
@@ -144,6 +144,7 @@ public class PersistenceManager implements Runnable {
                 } else {
                     connection.send(HAConstants.CHANNEL_ID_CONTROL_MESSAGE,
                             siddhiAppRevisions.getBytes(HAConstants.DEFAULT_CHARSET));
+                    log.info("Control message sent to passive node.");
                 }
             } else {
                 log.error("TCP connection pool is not initialized. " +

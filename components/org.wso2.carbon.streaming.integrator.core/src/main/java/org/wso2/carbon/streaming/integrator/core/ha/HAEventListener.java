@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.streaming.integrator.core.ha;
 
+import io.siddhi.core.stream.input.source.SourceHandler;
+import io.siddhi.core.stream.input.source.SourceHandlerManager;
+import io.siddhi.core.util.transport.BackoffRetryCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
@@ -27,20 +30,9 @@ import org.wso2.carbon.streaming.integrator.core.ha.transport.EventSyncConnectio
 import org.wso2.carbon.streaming.integrator.core.ha.util.HAConstants;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.streaming.integrator.core.persistence.PersistenceManager;
-import io.siddhi.core.stream.input.source.SourceHandler;
-import io.siddhi.core.stream.input.source.SourceHandlerManager;
-import io.siddhi.core.stream.output.sink.SinkHandler;
-import io.siddhi.core.stream.output.sink.SinkHandlerManager;
-import io.siddhi.core.table.record.RecordTableHandler;
-import io.siddhi.core.table.record.RecordTableHandlerManager;
-import io.siddhi.core.util.transport.BackoffRetryCounter;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Event listener implementation that listens for changes that happen within the cluster used for 2 node minimum HA
@@ -149,6 +141,7 @@ public class HAEventListener extends MemberEventListener {
                 try {
                     if (null != EventSyncConnectionPoolManager.getConnectionPool()) {
                         EventSyncConnectionPoolManager.getConnectionPool().close();
+                        log.info("Successfully closed Event Sync Connection pool manager");
                     }
                 } catch (Exception e) {
                     log.error("Error closing tcp client connection pool. " + e.getMessage(), e);
@@ -156,6 +149,8 @@ public class HAEventListener extends MemberEventListener {
                     EventSyncConnectionPoolManager.uninitializeConnectionPool();
                 }
             }
+        } else {
+            log.info(StreamProcessorDataHolder.getHAManager().getNodeId() + " is not the coordinator node");
         }
     }
 
@@ -169,10 +164,13 @@ public class HAEventListener extends MemberEventListener {
                 if (clusterCoordinator.isLeaderNode()) {
                     StreamProcessorDataHolder.getHAManager().changeToActive();
                 } else {
+                    log.info(StreamProcessorDataHolder.getHAManager().getNodeId() + " is not the coordinator node");
                     //Allow only to become passive if and only if node was active before - this could happen if both
                     // nodes become unresponsive and already passive node could become passive again
                     if (StreamProcessorDataHolder.getHAManager().isActiveNode()) {
                         StreamProcessorDataHolder.getHAManager().changeToPassive();
+                    } else {
+                        log.info(StreamProcessorDataHolder.getHAManager().getNodeId() + " is already in passive mode");
                     }
                 }
             }
@@ -184,6 +182,8 @@ public class HAEventListener extends MemberEventListener {
         log.info("becameUnresponsive event received for node id : " + nodeId);
         if (StreamProcessorDataHolder.getHAManager().isActiveNode()) {
             StreamProcessorDataHolder.getHAManager().changeToPassive();
+        } else {
+            log.info(StreamProcessorDataHolder.getHAManager().getNodeId() + " is already in passive mode");
         }
 
     }
