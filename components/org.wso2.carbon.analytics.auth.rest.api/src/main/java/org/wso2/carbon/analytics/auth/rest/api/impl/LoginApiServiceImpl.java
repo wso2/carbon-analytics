@@ -264,7 +264,7 @@ public class LoginApiServiceImpl extends LoginApiService {
             errorDTO.setDescription("Error in login to the uri '" + appName + "'. Error: " + e.getMessage());
             return Response.serverError().entity(errorDTO).build();
         } catch (ConfigurationException e) {
-            LOG.debug("Error occurred while reading configs from deployment.yaml. " + e.getMessage()) ;
+            LOG.error("Error occurred while reading configs from deployment.yaml. " + e.getMessage()) ;
             ErrorDTO errorDTO = new ErrorDTO();
             errorDTO.setError(IdPClientConstants.Error.INTERNAL_SERVER_ERROR);
             errorDTO.setDescription("Error occurred while reading configs from deployment.yaml. " + e.getMessage());

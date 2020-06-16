@@ -142,13 +142,13 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
             } else {
                 authoringClassName = DEFAULT_WEBSOCKET_AUTHORIZING_CLASS;
             }
-            DataProviderAuthorizer dataProviderAuthorizer;
-            try {
-                dataProviderAuthorizer = getDataProviderHelper().getDataProviderAuthorizer(authoringClassName);
-            } catch (NullPointerException e) {
+            if (getDataProviderHelper() == null
+                    || getDataProviderHelper().getDataProviderAuthorizer(authoringClassName) == null) {
                 throw new Exception("Cannot find the Data Provider Authorizer class for the given class name: "
                         + authoringClassName + ".");
             }
+            DataProviderAuthorizer dataProviderAuthorizer
+                    = getDataProviderHelper().getDataProviderAuthorizer(authoringClassName);
             boolean authorizerResult = dataProviderAuthorizer.authorize(dataProviderConfigRoot);
             if (!authorizerResult) {
                 throw new Exception("Access denied to data provider.");
