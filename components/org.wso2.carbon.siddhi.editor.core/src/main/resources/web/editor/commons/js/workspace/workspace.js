@@ -14,7 +14,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
             this._serviceClient = new ServiceClient({application: app});
 
             if (_.isUndefined(app.commandManager)) {
-                var error = "CommandManager is not initialized.";
+                var error = 'CommandManager is not initialized.';
                 log.error(error);
                 throw error;
             }
@@ -45,7 +45,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
 
             this.createNewTab = function createNewTab(options) {
                 var editorId = app.config.container;
-                $(editorId).css("display", "block");
+                $(editorId).css('display', 'block');
                 //Showing menu bar
                 app.tabController.newTab(options);
                 app.outputController.makeInactiveActivateButton();
@@ -72,37 +72,37 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
             this.saveFileBrowserBased = function saveFile() {
                 var editor = ace.edit('siddhi-editor');
                 var code = editor.getValue();
-                var filename = "untitled";
+                var filename = 'untitled';
                 var match = plan_regex.exec(code);
                 if (match && match[1]) {
-                    filename = match[1].replace(/ /g, "_");
+                    filename = match[1].replace(/ /g, '_');
                 }
-                var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
-                saveAs(blob, filename + ".siddhi");
+                var blob = new Blob([code], {type: 'text/plain;charset=utf-8'});
+                saveAs(blob, filename + '.siddhi');
             };
 
             this.saveFile = function saveFile() {
                 var editor = ace.edit('siddhi-editor');
                 var code = editor.getValue();
-                var filename = "untitled";
+                var filename = 'untitled';
                 var match = plan_regex.exec(code);
                 if (match && match[1]) {
-                    filename = match[1].replace(/ /g, "_") + ".siddhi";
+                    filename = match[1].replace(/ /g, '_') + '.siddhi';
                 }
-                var filePath = prompt("Enter a directory (absolute path) to save the siddhi app : ");
+                var filePath = prompt('Enter a directory (absolute path) to save the siddhi app : ');
                 filePath = (filePath.slice(-1) === '/') ? filePath + filename : filePath + '/' + filename;
                 $.ajax({
-                    type: "POST",
-                    url: window.location.protocol + "//" + window.location.host + "/editor/save",
+                    type: 'POST',
+                    url: window.location.protocol + '//' + window.location.host + '/editor/save',
                     data: JSON.stringify({
                         siddhiApp: code,
                         filePath: filePath
                     }),
                     success: function (e) {
-                        alert("file successfully saved.");
+                        alert('file successfully saved.');
                     },
                     error: function (e) {
-                        alert("failed to save file.");
+                        alert('failed to save file.');
                     }
                 });
             };
@@ -117,9 +117,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
                 }
                 var file = undefined;
                 var siddhiFileEditor;
-                var config = "";
-                var providedAppName = "";
-                var fileName = "";
+                var config = '';
+                var providedAppName = '';
+                var fileName = '';
                 var options = {};
 
                 if (saveFileTab.getTitle() != "welcome-page") {
@@ -187,7 +187,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
 
                 if (activeTab.getTitle() != "welcome-page") {
                     var aceEditor = app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().getEditor();
-                    aceEditor.execCommand("find");
+                    aceEditor.execCommand('find');
                 }
             };
 
@@ -196,7 +196,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
 
                 if (activeTab.getTitle() != "welcome-page") {
                     var aceEditor = app.tabController.getActiveTab().getSiddhiFileEditor().getSourceView().getEditor();
-                    aceEditor.execCommand("replace");
+                    aceEditor.execCommand('replace');
                 }
             };
 
@@ -218,7 +218,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
             this.handleSampleEvent = function (options) {
                 if (_.isNil(this._sample_event_dialog)) {
                     var opts = _.cloneDeep(_.get(app.config, 'sample_event_dialog'));
-                    _.set(opts, "application", app);
+                    _.set(opts, 'application', app);
                     this._sample_event_dialog = new Dialogs.sample_event_dialog(opts);
                 }
                 // This dialog need to be re-rendered so that it comes on top of save file dialog.
@@ -314,7 +314,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
                         if (fileEditor.isInSourceView()) {
                             findMenuItem.enable();
                             findAndReplaceMenuItem.enable();
-                            formatMenuItem.updateLabel("Reformat Code");
+                            formatMenuItem.updateLabel('Reformat Code');
                             formatMenuItem.enable();
 
                             var undoManager = fileEditor.getUndoManager();
@@ -339,7 +339,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
                             redoMenuItem.disable();
                             findMenuItem.disable();
                             findAndReplaceMenuItem.disable();
-                            formatMenuItem.updateLabel("Auto-Align");
+                            formatMenuItem.updateLabel('Auto-Align');
                             formatMenuItem.enable();
                         }
                     }
@@ -527,10 +527,10 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
 
                 this._saveFileDialog.show();
                 var activeTab = app.tabController.getActiveTab();
-//                if(!_.isNil(activeTab) && _.isFunction(activeTab.getFile)){
+//                if (!_.isNil(activeTab) && _.isFunction(activeTab.getFile)) {
 //                    var activeFile = activeTab.getFile();
-//                    if(activeFile.isPersisted()){
-//                        this._saveFileDialog.once('loaded', function(){
+//                    if (activeFile.isPersisted()) {
+//                        this._saveFileDialog.once('loaded', function() {
 //                            this._saveFileDialog.setSelectedFile(activeFile.getPath(), activeFile.getName());
 //                        }, this);
 //                    }
@@ -659,7 +659,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
             this.openQueryStore = function openQueryStore(options) {
                 if (_.isNil(this._queryStoreApi)) {
                     var opts = _.cloneDeep(_.get(app.config, 'query_store_api'));
-                    _.set(opts, "application", app);
+                    _.set(opts, 'application', app);
                     this._queryStoreApi = new Dialogs.query_store_api(opts);
                 }
                 this._queryStoreApi.render();
@@ -687,7 +687,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
             this.openSettingsDialog = function openSettingsDialog(options) {
                 if (_.isNil(this._openSettingsDialog)) {
                     var opts = _.cloneDeep(_.get(app.config, 'settings_dialog'));
-                    _.set(opts, "application", app);
+                    _.set(opts, 'application', app);
                     this._openSettingsDialog = new Dialogs.settings_dialog(opts);
                 }
                 this._openSettingsDialog.render();
@@ -731,20 +731,20 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
                 var file = tab.getFile();
                 if (file !== undefined && file.isDirty()) {
                     var toolBar = app.toolBar;
-                    app.commandManager.dispatch("reload-file", tab.getTitle());
+                    app.commandManager.dispatch('reload-file', tab.getTitle());
                     toolBar.disableRevertButton();
                     self.updateRunMenuItem();
                 }
             };
 
             function checkEndsWithSiddhi(string) {
-                return string.endsWith(".siddhi");
+                return string.endsWith('.siddhi');
             }
 
             this.runGuide = function runGuide() {
                 log.debug("start: rendering hint guide");
                 app.guide.startGuide();
-                log.debug("end: rendering hint guide");
+                log.debug('end: rendering hint guide');
             };
 
             app.commandManager.registerHandler('create-new-tab', this.createNewTab);
