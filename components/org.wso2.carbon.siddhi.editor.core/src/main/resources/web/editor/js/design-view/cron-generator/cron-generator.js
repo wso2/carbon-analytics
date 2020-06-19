@@ -29,47 +29,65 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
             MAX_MINUTE_AND_SECOND_VALUE: 59,
             MAX_HOUR_VALUE: 23,
             REGEX_FOR_TIME: /[^\d-,*\/]/ ,
-            REGEX_FOR_DAYOFMONTH: /[^\w-,?*\/]/ ,
+            REGEX_FOR_DAYOFMONTH: /[^\d-,?*\/]/ ,
             REGEX_FOR_MONTH: /[^\w-,*\/]/,
             REGEX_FOR_DAYOFWEEK: /[^\w-,*?\/#]/,
             REGEX_FOR_SPACE: /\s/g,
-            REGEX_FOR_ALPHA_NUMERIC: /[^\da-zA-Z]/
+            REGEX_FOR_ALPHA_NUMERIC: /[^\dA-Z]/,
+            REGEX_FOR_NUMEBERS: /[^\d]/
         };
 
         var validateTimeValue = function(time, maxValue) {
+            var error;
             if (time.search(constants.REGEX_FOR_TIME) !== -1) {
-                errorMsg = "Error : Invalid characters used. See tooltip for allowed characters.";
-                return false;
+                return {
+                    status: false,
+                    error: "Error : Invalid characters used. See tooltip for allowed characters."
+                };
             }
             var list = time.split(",");
-            return list.every(function (time){
-                if(time.includes('/')) {
-                    var startingTimeOptionArr = time.split('/');
-                    if(time.endsWith('/')){
-                        errorMsg = "Error : Expression should not end with / ";
-                    } else {
-                        errorMsg = "Error : Expression values must lies between 0 and " + maxValue;
-                    }
-                    return validateTimeRange(startingTimeOptionArr, maxValue) ||
-                        (startingTimeOptionArr[0] === '*' && validateTimeRange([startingTimeOptionArr[1]], maxValue));
-                } else if(time.includes('-')) {
-                    var timeRangeArr = time.split('-');
-                    if(time.endsWith('-')){
-                        errorMsg = "Error : Expression should not end with - "
-                    } else {
-                        errorMsg = "Error : Expression values must lies between 0 and " + maxValue;
-                    }
-                    return validateTimeRange(timeRangeArr, maxValue) &&
-                                        (parseInt(timeRangeArr[0])<parseInt(timeRangeArr[1]));
-                } else {
-                    if(isNaN(parseInt(time))){
-                        errorMsg = "Error : Expression should not end with , "
-                    } else {
-                        errorMsg = "Error : Expression values must lies between 0 and " + maxValue ;
-                    }
-                    return validateTimeRange([time],maxValue) || time === '*';
+            var status = list.every(function (time){
+                if(time === '*' && list.length > 1){
+                    error : "Error : The '*' character should not be used with other values";
+                    return false;
                 }
+                if(time.includes('/')) {
+                    if(time.endsWith('/')){
+                        error = "Error : Expression should not end with / ";
+                        return false;
+                    }
+                    var startingTimeOptionArr = time.split('/');
+                    if (startingTimeOptionArr.length > 2) {
+                        error = "Error : Unsupported value";
+                        return false;
+                    } else {
+                          error = "Error : Expression values must lie between 0 and " + maxValue;
+                          return validateTimeRange(startingTimeOptionArr, maxValue) ||
+                          (startingTimeOptionArr[0] === '*' && validateTimeRange([startingTimeOptionArr[1]], maxValue));
+                    }
+                } else if(time.includes('-')) {
+                    if(time.endsWith('-')){
+                        error = "Error : Expression should not end with - ";
+                        return false;
+                    }
+                    var timeRangeArr = time.split('-');
+                    if(timeRangeArr.length > 2){
+                        error =  "Error : Unsupported value";
+                        return false;
+                    } else {
+                        return validateTimeRange(timeRangeArr, maxValue) &&
+                                (parseInt(timeRangeArr[0]) < parseInt(timeRangeArr[1]));
+                    }
+                } else {
+                     error = "Error : Expression values must lie between 0 and " + maxValue;
+                     return validateTimeRange([time],maxValue) || time === '*';
+                }
+                return true;
             });
+            if(status){
+                return {status:true};
+            }
+            return {status:false,error:error};
         };
 
         var validateTimeRange = function(dataArray, value) {
@@ -86,72 +104,104 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
         };
 
         var validateDayOfMonthValue = function(dayOfMonth, dayOfWeek) {
+            var error;
             if(dayOfWeek === '?' && dayOfMonth.includes('L')) {
-                if(dayOfMonth.includes(',') && dayOfWeek === '?'){
-                    errorMsg = "Error : Support for specifying 'L' and 'LW' with other days of the month"
-                                                                                + " is not implemented.";
-                    return false;
-                } else if(dayOfMonth.includes('-') && dayOfWeek === '?') {
-                    errorMsg = "Error : Day of month values should not end with - ";
+                if(dayOfMonth.includes('-')) {
                     var dayOfMonthRangeArr = dayOfMonth.split('-');
-                    return dayOfMonthRangeArr[0] === 'L' && validateRangeOfDay([dayOfMonthRangeArr[1]], 1, 30);
+                    if(dayOfMonthRangeArr[1].search(constants.REGEX_FOR_NUMEBERS) !== -1 ){
+                        return {
+                            status : false,
+                            error : "Error: Invalid Cron Expression, Expression can contain numeric values."
+                        };
+                    } else {
+                        return {
+                           status : dayOfMonthRangeArr[0] === 'L' && validateRangeOfDay([dayOfMonthRangeArr[1]], 1, 30),
+                           error :  "Error : Day of month values must be between 1 and 31"
+                        };
+                    }
                 } else {
-                    errorMsg = "Error: Invalid Cron Expression, 'L' option is not valid here.";
-                    return dayOfMonth === 'L' || dayOfMonth === 'LW';
+                    return {
+                        status : dayOfMonth === 'L' || dayOfMonth === 'LW',
+                        error : "Error: Invalid Cron Expression, 'L' option is not valid here."
+                    };
                 }
             } else if(dayOfMonth.includes('W') && dayOfWeek === '?'){
                 if(dayOfMonth.search(constants.REGEX_FOR_ALPHA_NUMERIC) !== -1 ){
-                    errorMsg = "Error: Invalid Cron Expression, Expression cannot contain alpha numeric values.";
-                    return false;
+                    return {
+                        status : false,
+                        error : "Error: Invalid Cron Expression, Expression can contain alpha numeric values."
+                    };
                 }
                 if(dayOfMonth.length === 1){
-                    errorMsg = "Error : Invalid Cron Expression";
-                    return false;
+                    return {
+                        status : false,
+                        error : "Error : Invalid Cron Expression"
+                    };
                 } else {
-                    errorMsg = "Error : Day of month values must be between 1 and 31";
-                    return validateRangeOfDay([dayOfMonth], 1, 31);
+                    return {
+                        status : validateRangeOfDay([dayOfMonth], 1, 31),
+                        error : "Error : Day of month values must be between 1 and 31"
+                    };
                 }
             }
             if (dayOfMonth.search(constants.REGEX_FOR_DAYOFMONTH) !== -1) {
-                errorMsg = "Error : Invalid characters used. See tooltip for allowed characters.";
-                return false;
+                return {
+                    status : false,
+                    error : "Error : Invalid characters used. See tooltip for allowed characters."
+                };
             }
             var list = dayOfMonth.split(",");
-            return list.every(function (dayOfMonth){
+            var status = list.every(function (dayOfMonth){
+                if(((dayOfMonth === '*' && dayOfWeek !== '*') || (dayOfMonth === '?' && dayOfWeek !== '?')) && list.length > 1){
+                    error = "Error : The '*' character should not be used with other values";
+                    return false;
+                }
                 if(dayOfMonth.includes('/') && dayOfWeek === '?') {
                     if(dayOfMonth.endsWith('/')){
-                        errorMsg = "Error : Day of month values should not end with /";
-                    } else {
-                        errorMsg = "Error : Day of month values must be between 1 and 31";
+                        error = "Error : Day of month values should not end with /";
+                        return false;
                     }
                     var startingDayOfMonthOptionArr = dayOfMonth.split('/');
-                    var isValidElements = (validateRangeOfDay([startingDayOfMonthOptionArr[0]], 1, 31) &&
-                                                        validateRangeOfDay([startingDayOfMonthOptionArr[1]], 1, 31));
-                    var isValidFirstElem = (startingDayOfMonthOptionArr[0] === '*' &&
-                                                        validateRangeOfDay([startingDayOfMonthOptionArr[1]], 1, 31));
-                    return isValidElements || isValidFirstElem;
+                    if(startingDayOfMonthOptionArr.length > 2 ){
+                        error = "Error : Unsupported values";
+                        return false;
+                    } else {
+                        var isValidElements = validateRangeOfDay(startingDayOfMonthOptionArr, 1, 31) ;
+                        var isValidFirstElem = (startingDayOfMonthOptionArr[0] === '*' &&
+                                                validateRangeOfDay([startingDayOfMonthOptionArr[1]], 1, 31));
+                        error = "Error : Day of month values must be between 1 and 31";
+                        return isValidElements || isValidFirstElem;
+                    }
+
                 } else if(dayOfMonth.includes('-') && dayOfWeek === '?') {
-                    var dayOfMonthRangeArr = dayOfMonth.split('-');
                     if(dayOfMonth.endsWith('-')){
-                        errorMsg = "Error : Day of month values should not end with - ";
-                    } else {
-                        errorMsg = "Error : Day of month values must be between 1 and 31";
+                        error = "Error : Day of month values should not end with - ";
+                        return false;
                     }
-                    return validateRangeOfDay(dayOfMonthRangeArr, 1, 31) &&
-                                    (parseInt(dayOfMonthRangeArr[0]) < parseInt(dayOfMonthRangeArr[1]));
+                    var dayOfMonthRangeArr = dayOfMonth.split('-');
+                    if(dayOfMonthRangeArr.length > 2){
+                        error = "Error : Unsupported value";
+                        return false;
+                    }
+                    else {
+                        error = "Error : Day of month values must be between 1 and 31";
+                        return validateRangeOfDay(dayOfMonthRangeArr, 1, 31) &&
+                                            (parseInt(dayOfMonthRangeArr[0]) < parseInt(dayOfMonthRangeArr[1]));
+                    }
                 } else if(dayOfWeek === '?'){
-                    if(isNaN(parseInt(dayOfMonth))){
-                        errorMsg = "Error : Day of month values should not end with , ";
-                    } else {
-                        errorMsg = "Error : Day of month values must be between 1 and 31";
-                    }
+                    error = "Error : Day of month values must be between 1 and 31";
                     return validateRangeOfDay([dayOfMonth], 1, 31) ||
-                        (dayOfMonth === '*' && dayOfWeek !== '*') || (dayOfMonth === '?' && dayOfWeek !== '?');
+                            (dayOfMonth === '*' && dayOfWeek !== '*') || (dayOfMonth === '?' && dayOfWeek !== '?');
                 } else {
-                    errorMsg = "Error: Invalid Cron Expression, Expression cannot contain any values except ? ";
+                    error = "Error: Invalid Cron Expression, Expression cannot contain any values except ? ";
                     return dayOfMonth === '?';
                 }
+                return true;
             });
+            if(status){
+                return {status:true};
+            }
+            return {status:false,error:error};
         };
 
         var monthArray = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
@@ -164,142 +214,192 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
         };
 
         var validateMonthValue = function(month) {
+            var error;
             if(month.includes('_')){
-                errorMsg = "Error : Invalid characters used. See tooltip for allowed characters.";
-                return false;
-            }
-            if (month.search(constants.REGEX_FOR_MONTH) !== -1) {
-                errorMsg = "Error : Invalid characters used. See tooltip for allowed characters.";
-                return false;
+                return {
+                    status : false,
+                    error : "Error : Invalid characters used. See tooltip for allowed characters."
+                };
+            } else if (month.search(constants.REGEX_FOR_MONTH) !== -1) {
+                return {
+                    status : false,
+                    error : "Error : Invalid characters used. See tooltip for allowed characters."
+                };
             }
             var list = month.split(",");
-            return list.every(function (month){
+            var status = list.every(function (month){
+                if(month === '*' && list.lenght > 1){
+                    error = "Error : The '*' character should not be used with other values";
+                    return false;
+                }
                 if(month.includes('/')) {
                     if(month.endsWith('/')){
-                        errorMsg = "Error : Month values should not end with / ";
-                    } else {
-                        errorMsg = "Error : Month values must be between 1 and 12.";
+                        error = "Error : Month values should not end with / ";
+                        return false;
                     }
-                    var startingDayOfMonthOptionArr = month.split('/');
-                    var isValidElements = (validateRangeOfDay([startingDayOfMonthOptionArr[0]], 1, 12) &&
-                                                        validateRangeOfDay([startingDayOfMonthOptionArr[1]], 1, 12));
-                    var isValidFirstElem = (startingDayOfMonthOptionArr[0] === '*' &&
-                                                        validateRangeOfDay([startingDayOfMonthOptionArr[1]], 1, 12));
-                    return isValidElements || isValidFirstElem;
+                    var startingMonthOptionArr = month.split('/');
+                    if(startingMonthOptionArr.length  > 2){
+                        error = "Error : Unsupported values ";
+                        return false;
+                    }
+                    else {
+                        var isValidElements = validateRangeOfDay(startingMonthOptionArr, 1, 12);
+                        var isValidFirstElem = (startingMonthOptionArr[0] === '*' &&
+                                                        validateRangeOfDay([startingMonthOptionArr[1]], 1, 12));
+                        error = "Error : Month values must be between 1 and 12.";
+                        return isValidElements || isValidFirstElem;
+                    }
                 } else if(month.includes('-')) {
                     if(month.endsWith('-')){
-                        errorMsg = "Error : Month values should not end with - ";
-                    } else {
-                        errorMsg = "Error : Month values must be between 1 and 12 or Jan - Dec";
+                        error = "Error : Month values should not end with - ";
+                        return false;
                     }
                     var monthRangeArr = month.split('-');
-                    var validMonthRange = parseInt(monthRangeArr[0]) < parseInt(monthRangeArr[1]);
-                    var validMonthStrRange = monthArray.indexOf(monthRangeArr[0]) <
-                                                                                monthArray.indexOf(monthRangeArr[1]);
-                    return !isNaN(parseInt(monthRangeArr[0])) && !isNaN(parseInt(monthRangeArr[1])) ?
-                        validateRangeOfDay(monthRangeArr, 1, 12) && validMonthRange :
-                        validateAbbreviationValue(monthRangeArr, monthArray) && validMonthStrRange;
-                } else {
-                    if(isNaN(parseInt(month))){
-                        errorMsg = "Error : Month values should not end with , ";
+                    if(monthRangeArr.length > 2){
+                        error = "Error : Unsupported values ";
+                        return false;
                     } else {
-                        errorMsg = "Error : Month values must be between 1 and 12 or Jan - Dec";
+                        var validMonthRange = parseInt(monthRangeArr[0]) < parseInt(monthRangeArr[1]);
+                        var validMonthStrRange = monthArray.indexOf(monthRangeArr[0].toLowerCase()) <
+                                                                    monthArray.indexOf(monthRangeArr[1].toLowerCase());
+                        error = "Error : Month values must be between 1 and 12 or Jan - Dec";
+                        return !isNaN(parseInt(monthRangeArr[0])) && !isNaN(parseInt(monthRangeArr[1])) ?
+                            validateRangeOfDay(monthRangeArr, 1, 12) && validMonthRange :
+                            validateAbbreviationValue(monthRangeArr, monthArray) && validMonthStrRange;
                     }
+                } else {
                     var firstIndexValue = month.charAt(0);
                     var secondIndexValue = month.charAt(1);
                     if(month.length === 1){
-                        return validateRangeOfDay([month], 1, 12) || month === '*';
+                        error = "Error : Month values must be between 1 and 12";
+                        return validateRangeOfDay([month], 1, 12) || month === "*";
                     } else {
+                         error = "Error : Month values must be between 1 and 12 or Jan - Dec";
                         return (!isNaN(parseInt(firstIndexValue)) && !isNaN(parseInt(secondIndexValue))) ?
                                 validateRangeOfDay([month], 1, 12) : validateAbbreviationValue([month], monthArray);
                     }
                 }
+                return true;
             });
+            if(status){
+                return {status:true};
+            }
+            return {status:false,error:error};
         };
 
-        var weekArray = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat','sun'];
+        var weekArray = ['sun','mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
         var validateDayOfWeekValue = function(dayOfWeek, dayOfMonth) {
+            var error;
             if(dayOfMonth === '?' && dayOfWeek.includes('L')) {
-                if(dayOfWeek.includes(',') && dayOfMonth === '?'){
-                    errorMsg = "Error : Day-of-week values should not end with , ";
-                    return false;
-                } else if(dayOfWeek.includes('-') && dayOfMonth === '?'){
-                    errorMsg = "Error : Day-of-week values should not end with - ";
-                    return false;
-                } else if (!isNaN(parseInt(dayOfWeek))){
-                    errorMsg = "Error : Day-of-Week values must be between 1 and 7";
-                    return validateRangeOfDay([dayOfWeek], 1, 7) && dayOfMonth === '?';
+                if(dayOfWeek.includes(',')){
+                    return {
+                        status : false,
+                        error : "Error : Support for specifying 'L' with other days of the month is not implemented."
+                    };
+                } else if(dayOfWeek.includes('-')){
+                    return {
+                        status : false,
+                        error : "Error : Day-of-week values should not end with - "
+                    };
+                } else {
+                    return {
+                        status : validateRangeOfDay([dayOfWeek], 1, 7) || dayOfWeek === 'L',
+                        error : "Error : Day-of-Week values must be between 1 and 7"
+                    };
                 }
-            }
-            if(dayOfWeek.includes('_')){
-                errorMsg = "Error : Invalid characters used. See tooltip for allowed characters.";
-                return false;
-            }
-            if (dayOfWeek.search(constants.REGEX_FOR_DAYOFWEEK) !== -1) {
-                errorMsg = "Error : Invalid characters used. See tooltip for allowed characters.";
-                return false;
+            }else if(dayOfWeek.includes('_')){
+                return {
+                    status : false,
+                    error : "Error : Invalid characters used. See tooltip for allowed characters."
+                };
+            } else if (dayOfWeek.search(constants.REGEX_FOR_DAYOFWEEK) !== -1) {
+                return {
+                    status : false,
+                    error : "Error : Invalid characters used. See tooltip for allowed characters."
+                };
             }
             var list = dayOfWeek.split(",");
-            return list.every(function (dayOfWeek){
+            var status = list.every(function (dayOfWeek){
+                if(((dayOfWeek === '*' && dayOfMonth !== '*') || (dayOfWeek === '?' && dayOfMonth !== '?')) && list.length > 1){
+                    error : "Error : The '*' character should not be used with other values";
+                    return false;
+                }
                 if(dayOfWeek.includes('/') && dayOfMonth === '?') {
-                    var startingDayOfWeekOptionArr = dayOfWeek.split('/');
                     if(dayOfWeek.endsWith('/')){
-                        errorMsg = "Error : Day-of-week values should not end with / ";
-                    } else {
-                        errorMsg = "Error : Day-of-Week values must be between 1 and 7";
+                        error = "Error : Day-of-week values should not end with / ";
+                        return false;
                     }
-                    var isValidElements = (validateRangeOfDay([startingDayOfWeekOptionArr[0]], 1, 7) &&
-                            validateRangeOfDay([startingDayOfWeekOptionArr[1]], 1, 7));
-                    var isValidFirstElem = (startingDayOfWeekOptionArr[0] === '*' &&
-                                    validateRangeOfDay([startingDayOfWeekOptionArr[1]], 1, 7));
-                    return isValidElements || isValidFirstElem;
+                    var startingDayOfWeekOptionArr = dayOfWeek.split('/');
+                    if(startingDayOfWeekOptionArr.lenght > 2){
+                        error = "Error : Unsupported value ";
+                        return false;
+                    } else {
+                        var isValidElements = validateRangeOfDay(startingDayOfWeekOptionArr, 1, 7);
+                        var isValidFirstElem = (startingDayOfWeekOptionArr[0] === '*' &&
+                                        validateRangeOfDay([startingDayOfWeekOptionArr[1]], 1, 7));
+                        error = "Error : Day-of-Week values must be between 1 and 7";
+                        return isValidElements || isValidFirstElem;
+                    }
                 } else if(dayOfWeek.includes('-') && dayOfMonth === '?') {
-                    var dayOfWeekRangeArr = dayOfWeek.split('-');
                     if(dayOfWeek.endsWith('-')){
-                        errorMsg = "Error : Day-of-week values should not end with - ";
-                    } else {
-                        errorMsg = "Error : Day-of-Week values must be between 1 and 7";
+                        error = "Error : Day-of-week values should not end with - ";
+                        return false;
                     }
-                    var validWeekRange = parseInt(dayOfWeekRangeArr[0]) < parseInt(dayOfWeekRangeArr[1]);
-                    var validWeekStrRange = weekArray.indexOf(dayOfWeekRangeArr[0]) <
-                                                                            weekArray.indexOf(dayOfWeekRangeArr[1]);
-                    return !isNaN(parseInt(dayOfWeekRangeArr[0])) && !isNaN(parseInt(dayOfWeekRangeArr[1])) ?
-                                                validateRangeOfDay(dayOfWeekRangeArr, 1, 7) && validWeekRange :
-                                        validateAbbreviationValue(dayOfWeekRangeArr, weekArray) && validWeekStrRange;
+                    var dayOfWeekRangeArr = dayOfWeek.split('-');
+                    if(dayOfWeekRangeArr.length > 2){
+                        error = "Error : Unsupported value";
+                        return false;
+                    } else {
+                        var validWeekRange = parseInt(dayOfWeekRangeArr[0]) < parseInt(dayOfWeekRangeArr[1]);
+                        var validWeekStrRange = weekArray.indexOf(dayOfWeekRangeArr[0].toLowerCase()) <
+                                                                weekArray.indexOf(dayOfWeekRangeArr[1].toLowerCase());
+                        error = "Error : Day-of-Week values must be between 1 and 7";
+                        return !isNaN(parseInt(dayOfWeekRangeArr[0])) && !isNaN(parseInt(dayOfWeekRangeArr[1])) ?
+                                validateRangeOfDay(dayOfWeekRangeArr, 1, 7) && validWeekRange :
+                                validateAbbreviationValue(dayOfWeekRangeArr, weekArray) && validWeekStrRange;
+                    }
                 } else if(dayOfWeek.includes('#') && dayOfMonth === '?') {
-                    var weekdayOfMonthArr = dayOfWeek.split('#');
                     if(dayOfWeek.endsWith('#')){
-                        errorMsg = "Error : Day-of-week values should not end with # "
-                    } else {
-                        errorMsg = "Error : Day-of-Week values must be between 1 and 7";
+                        error = "Error : Day-of-week values should not end with # ";
+                        return false;
                     }
-                    return (validateAbbreviationValue([weekdayOfMonthArr[0]], weekArray) &&
-                                validateRangeOfDay([weekdayOfMonthArr[1]], 1, 5)) ||
-                                 (validateRangeOfDay([weekdayOfMonthArr[0]], 1, 7) &&
-                                 validateRangeOfDay([weekdayOfMonthArr[1]], 1, 5));
+                    var weekdayOfMonthArr = dayOfWeek.split('#');
+                    if(weekdayOfMonthArr.lenght > 2){
+                        error = "Error : Unsupported value";
+                        return false;
+                    } else {
+                        error = "Error : Day-of-Week values must be between 1 and 7";
+                        return (validateAbbreviationValue([weekdayOfMonthArr[0]], weekArray) &&
+                                    validateRangeOfDay([weekdayOfMonthArr[1]], 1, 5)) ||
+                                     (validateRangeOfDay([weekdayOfMonthArr[0]], 1, 7) &&
+                                     validateRangeOfDay([weekdayOfMonthArr[1]], 1, 5));
+                    }
                 } else if(dayOfMonth === '?'){
-                    if(isNaN(parseInt(dayOfWeek))){
-                        errorMsg = "Error : Day-of-week values should not end with , "
-                    } else {
-                        errorMsg = "Error : Day-of-Week values must be between 1 and 7";
-                    }
                     var firstIndexValue = dayOfWeek.charAt(0);
                     var secondIndexValue = dayOfWeek.charAt(1);
                     if(dayOfWeek.length === 1){
-                        return validateRangeOfDay([dayOfWeek], 1, 7) ||dayOfWeek === 'L' ||
+                        error = "Error : Day-of-Week values must be between 1 and 7";
+                        return validateRangeOfDay([dayOfWeek], 1, 7) ||
                             (dayOfWeek === '*' && dayOfMonth !== '*') || (dayOfWeek === '?' && dayOfMonth !== '?');
                     } else {
+                        error = "Error : Day-of-Week values must be between 1 and 7";
                         return (!isNaN(parseInt(firstIndexValue)) && !isNaN(parseInt(secondIndexValue))) ?
-                            validateRangeOfDay([dayOfWeek], 1, 7) : validateAbbreviationValue([dayOfWeek], weekArray);
+                                validateRangeOfDay([dayOfWeek], 1, 7) :
+                                validateAbbreviationValue([dayOfWeek], weekArray);
                     }
                 } else {
-                    errorMsg = "Error: Invalid Cron Expression, Expression cannot contain any values except ? ";
+                    error = "Error: Invalid Cron Expression, Expression cannot contain any values except ? ";
                     return dayOfWeek === '?';
                 }
+                return true;
             });
+            if(status){
+                return {status:true};
+            }
+            return {status:false,error:error};
         };
-        var errorMsgForCron = "";
+
         var validateCronExpression = function(cronExpression) {
             if(!constants.REGEX_FOR_SPACE.test(cronExpression)) {
                 return false;
@@ -315,27 +415,25 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
             var month = cronArray[4];
             var dayOfWeek = cronArray[5];
 
-            if(!validateTimeValue(seconds, constants.MAX_MINUTE_AND_SECOND_VALUE)){
-                errorMsgForCron = "Error occured while generating SECOND value";
-                return false;
-            } else if(!validateTimeValue(minutes, constants.MAX_MINUTE_AND_SECOND_VALUE)){
-                errorMsgForCron = "Error occured while generating MINUTE value";
-                return false;
-            } else if(!validateTimeValue(hours, constants.MAX_MINUTE_AND_SECOND_VALUE)){
-                errorMsgForCron = "Error occured while generating HOUR value";
-                return false;
-            } else if(!validateDayOfMonthValue(dayOfMonth, dayOfWeek)){
-                errorMsgForCron = "Error occured while generating DAY_OF_MONTH value";
-                return false;
-            } else if(!validateMonthValue(month)){
-                errorMsgForCron = "Error occured while generating MONTH value";
-                return false;
-            } else if(!validateDayOfWeekValue(dayOfWeek, dayOfMonth)){
-                errorMsgForCron = "Error occured while generating DAY_OF_WEEK value";
-                return false;
-            } else {
-                return true;
-            }
+            var statusSecond = validateTimeValue(seconds, constants.MAX_MINUTE_AND_SECOND_VALUE);
+            var statusMinute = validateTimeValue(minutes, constants.MAX_MINUTE_AND_SECOND_VALUE);
+            var statusHour = validateTimeValue(hours, constants.MAX_HOUR_VALUE);
+            var statusDayOfMonth = validateDayOfMonthValue(dayOfMonth, dayOfWeek);
+            var statusMonth = validateMonthValue(month);
+            var statusDayOfWeek = validateDayOfWeekValue(dayOfWeek, dayOfMonth);
+
+            return {
+                status: statusSecond.status && statusMinute.status && statusHour.status &&
+                               statusDayOfMonth.status && statusMonth.status && statusDayOfWeek.status,
+                error: {
+                    errorForsecond: statusSecond.error,
+                    errorForminute: statusMinute.error,
+                    errorForhour: statusHour.error,
+                    errorFordayOfMonth : statusDayOfMonth.error,
+                    errorFormonth: statusMonth.error,
+                    errorFordayOfWeek: statusDayOfWeek.error
+                }
+            };
         };
 
         CronGenerator.prototype.init = function(optionParent){
@@ -545,126 +643,82 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
             var self = this;
             self._cronGenerator.find("#second").on("input", function(){
                 var secValue = self._cronGenerator.find('#second').val();
-                self._cronGenerator.find("#expression").val(self._cronGenerator.find("#second").val() + " " +
-                        self._cronGenerator.find("#minute").val()+ " " +self._cronGenerator.find("#hour").val() + " " +
-                        self._cronGenerator.find("#dayMonth").val()+ " " +self._cronGenerator.find("#month").val() + " "
-                        + self._cronGenerator.find("#dayWeek").val());
-                var expression = self._cronGenerator.find("#expression").val();
-                var description = Cronstrue.toString(expression, {throwExceptionOnParseError:false});
-                if(validateTimeValue(secValue, constants.MAX_MINUTE_AND_SECOND_VALUE)){
+                var statusSecond = validateTimeValue(secValue, constants.MAX_MINUTE_AND_SECOND_VALUE);
+                if(statusSecond.status){
                     self._cronGenerator.find('#second').removeClass("error-field");
-                    self._cronGenerator.find("#output").text(description);
-                    self._cronGenerator.find('#errorMsg').hide();
+                    self.buildCronExpression();
                 } else {
                     self._cronGenerator.find('#second').addClass("error-field");
-                    self._cronGenerator.find('#errorMsg').text(errorMsg);
-                    self._cronGenerator.find('#errorMsg').show();
                 }
+                self.listOfErrorMessage();
                 self.isErrorOccured();
             });
             self._cronGenerator.find("#minute").on("input", function(){
                 var minValue = self._cronGenerator.find('#minute').val();
-                self._cronGenerator.find("#expression").val(self._cronGenerator.find("#second").val() + " " +
-                    self._cronGenerator.find("#minute").val()+ " " + self._cronGenerator.find("#hour").val() + " " +
-                    self._cronGenerator.find("#dayMonth").val() + " " + self._cronGenerator.find("#month").val() + " " +
-                    self._cronGenerator.find("#dayWeek").val());
-                var expression = self._cronGenerator.find("#expression").val();
-                var description = Cronstrue.toString(expression, {throwExceptionOnParseError:false});
-                if(validateTimeValue(minValue, constants.MAX_MINUTE_AND_SECOND_VALUE)){
+                var statusMinute = validateTimeValue(minValue, constants.MAX_MINUTE_AND_SECOND_VALUE);
+                if(statusMinute.status){
                    self._cronGenerator.find('#minute').removeClass("error-field");
-                   self._cronGenerator.find("#output").text(description);
-                   self._cronGenerator.find('#errorMsg').hide();
+                   self.buildCronExpression();
                 } else {
                    self._cronGenerator.find('#minute').addClass("error-field");
-                   self._cronGenerator.find('#errorMsg').text(errorMsg);
-                   self._cronGenerator.find('#errorMsg').show();
                 }
+                self.listOfErrorMessage();
                 self.isErrorOccured();
             });
             self._cronGenerator.find("#hour").on("input", function(){
-                self._cronGenerator.find("#expression").val(self._cronGenerator.find("#second").val() + " " +
-                    self._cronGenerator.find("#minute").val()+ " " + self._cronGenerator.find("#hour").val() + " " +
-                    self._cronGenerator.find("#dayMonth").val() + " " + self._cronGenerator.find("#month").val() + " " +
-                    self._cronGenerator.find("#dayWeek").val());
-                var expression = self._cronGenerator.find("#expression").val();
-                var description = Cronstrue.toString(expression, {throwExceptionOnParseError:false});
                 var hourValue = self._cronGenerator.find('#hour').val();
-                if(validateTimeValue(hourValue, constants.MAX_HOUR_VALUE)){
+                var statusHour = validateTimeValue(hourValue, constants.MAX_HOUR_VALUE);
+                if(statusHour.status){
                     self._cronGenerator.find('#hour').removeClass("error-field");
-                    self._cronGenerator.find("#output").text(description);
-                    self._cronGenerator.find('#errorMsg').hide();
+                    self.buildCronExpression();
                 } else {
                     self._cronGenerator.find('#hour').addClass("error-field");
-                    self._cronGenerator.find('#errorMsg').text(errorMsg);
-                    self._cronGenerator.find('#errorMsg').show();
                 }
+                self.listOfErrorMessage();
                 self.isErrorOccured();
             });
             self._cronGenerator.find("#dayMonth").on("input", function(){
-                self._cronGenerator.find("#expression").val(self._cronGenerator.find("#second").val() + " " +
-                    self._cronGenerator.find("#minute").val()+ " " + self._cronGenerator.find("#hour").val() + " " +
-                    self._cronGenerator.find("#dayMonth").val() + " " + self._cronGenerator.find("#month").val() + " " +
-                    self._cronGenerator.find("#dayWeek").val());
-                var expression = self._cronGenerator.find("#expression").val();
-                var description = Cronstrue.toString(expression, { throwExceptionOnParseError: false });
                 var dayMonValue = self._cronGenerator.find('#dayMonth').val();
                 var dayWeekValue = self._cronGenerator.find('#dayWeek').val();
-                if(validateDayOfMonthValue(dayMonValue, dayWeekValue)){
+                var statusDayOfMonth = validateDayOfMonthValue(dayMonValue, dayWeekValue);
+                if(statusDayOfMonth.status){
                      self._cronGenerator.find('#dayMonth').removeClass("error-field");
-                     self._cronGenerator.find("#output").text(description);
-                     self._cronGenerator.find('#errorMsg').hide();
+                     self.buildCronExpression();
                 } else {
-                     self._cronGenerator.find('#dayMonth').addClass("error-field");
-                     self._cronGenerator.find('#errorMsg').text(errorMsg);
-                     self._cronGenerator.find('#errorMsg').show();
+                     self._cronGenerator.find('#dayMonth').addClass("error-field");;
                 }
+                self.listOfErrorMessage();
                 self.isErrorOccured();
             });
             self._cronGenerator.find("#month").on("input", function(){
-                self._cronGenerator.find("#expression").val(self._cronGenerator.find("#second").val() + " " +
-                    self._cronGenerator.find("#minute").val()+ " " + self._cronGenerator.find("#hour").val() + " " +
-                    self._cronGenerator.find("#dayMonth").val() + " " + self._cronGenerator.find("#month").val() + " " +
-                    self._cronGenerator.find("#dayWeek").val());
-                var expression = self._cronGenerator.find("#expression").val();
-                var description = Cronstrue.toString(expression,{throwExceptionOnParseError:false});
                 var monValue = self._cronGenerator.find('#month').val();
-                if(validateMonthValue(monValue)){
+                var statusMonth = validateMonthValue(monValue);
+                if(statusMonth.status){
                      self._cronGenerator.find('#month').removeClass("error-field");
-                     self._cronGenerator.find("#output").text(description);
-                     self._cronGenerator.find('#errorMsg').hide();
+                     self.buildCronExpression();
                 } else {
                      self._cronGenerator.find('#month').addClass("error-field");
-                     self._cronGenerator.find('#errorMsg').text(errorMsg);
-                     self._cronGenerator.find('#errorMsg').show();
                 }
+                self.listOfErrorMessage();
                 self.isErrorOccured();
             });
             self._cronGenerator.find("#dayWeek").on("input", function(){
-                 self._cronGenerator.find("#expression").val(self._cronGenerator.find("#second").val() + " " +
-                     self._cronGenerator.find("#minute").val()+ " " + self._cronGenerator.find("#hour").val() + " " +
-                     self._cronGenerator.find("#dayMonth").val() + " " +self._cronGenerator.find("#month").val() + " " +
-                     self._cronGenerator.find("#dayWeek").val());
-                 var expression = self._cronGenerator.find("#expression").val();
-                 var description = Cronstrue.toString(expression, { throwExceptionOnParseError: false,
-                                                                    dayOfWeekStartIndexZero: false });
-
                  var weekValue = self._cronGenerator.find('#dayWeek').val();
                  var dayMonValue = self._cronGenerator.find('#dayMonth').val();
-                 if(validateDayOfWeekValue(weekValue, dayMonValue)){
+                 var statusDayOfWeek = validateDayOfWeekValue(weekValue, dayMonValue);
+                 if(statusDayOfWeek.status){
                       self._cronGenerator.find('#dayWeek').removeClass("error-field");
-                      self._cronGenerator.find("#output").text(description);
-                      self._cronGenerator.find('#errorMsg').hide();
+                      self.buildCronExpression();
                  } else {
-                      self._cronGenerator.find('#dayWeek').addClass("error-field");
-                      self._cronGenerator.find('#errorMsg').text(errorMsg);
-                      self._cronGenerator.find('#errorMsg').show();
+                      self._cronGenerator.find('#dayWeek').addClass("error-field");;
                  }
+                 self.listOfErrorMessage();
                  self.isErrorOccured();
             });
             self._cronGenerator.find("#expression").on("input",function(){
                  var expression = self._cronGenerator.find("#expression").val();
-                 var description = Cronstrue.toString(expression, { throwExceptionOnParseError: false,
-                                                                    dayOfWeekStartIndexZero: false });
+                 var description = Cronstrue.toString(expression, { throwExceptionOnParseError:false,
+                                                                        dayOfWeekStartIndexZero: false });
                  var splitValues = expression.split(" ");
                  var second = splitValues[0];
                  var minute = splitValues[1];
@@ -672,7 +726,8 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                  var dayMonth = splitValues[3];
                  var month = splitValues[4];
                  var dayWeek = splitValues[5];
-                 if(validateCronExpression(expression)){
+                 var statusExpression = validateCronExpression(expression);
+                 if(statusExpression.status){
                      self._cronGenerator.find('#expression').removeClass("error-field");
                      self._cronGenerator.find("#output").text(description);
                      self._cronGenerator.find('#output').removeClass("error-message");
@@ -685,53 +740,59 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                      self._cronGenerator.find("#dayWeek").val(splitValues[5]);
                  } else{
                     self._cronGenerator.find('#expression').addClass("error-field");
-                    self._cronGenerator.find('#output').html(errorMsgForCron);
+                    self._cronGenerator.find('#output').html("Invalid Cron Expression");
                     self._cronGenerator.find('#output').addClass("error-message");
                     self._cronGenerator.find('#saveButton').attr("disabled","disabled");
                  }
-                 if(validateTimeValue(second, constants.MAX_MINUTE_AND_SECOND_VALUE)){
+                 if(validateTimeValue(second, constants.MAX_MINUTE_AND_SECOND_VALUE).status){
                     self._cronGenerator.find('#second').removeClass("error-field");
                     self._cronGenerator.find("#second").val(splitValues[0]);
-                    self._cronGenerator.find('#errorMsg').hide();
                  } else {
                     self._cronGenerator.find('#second').addClass("error-field");
                  }
-                 if(validateTimeValue(minute, constants.MAX_MINUTE_AND_SECOND_VALUE)){
+                 if(validateTimeValue(minute, constants.MAX_MINUTE_AND_SECOND_VALUE).status){
                     self._cronGenerator.find('#minute').removeClass("error-field");
                     self._cronGenerator.find("#minute").val(splitValues[1]);
-                    self._cronGenerator.find('#errorMsg').hide();
                  } else {
                     self._cronGenerator.find('#minute').addClass("error-field");
                  }
-                 if(validateTimeValue(hour, constants.MAX_HOUR_VALUE)){
+                 if(validateTimeValue(hour, constants.MAX_HOUR_VALUE).status){
                      self._cronGenerator.find('#hour').removeClass("error-field");
                      self._cronGenerator.find("#hour").val(splitValues[2]);
-                     self._cronGenerator.find('#errorMsg').hide();
                  } else {
                      self._cronGenerator.find('#hour').addClass("error-field");
                  }
-                 if(validateDayOfMonthValue(dayMonth, dayWeek)){
+                 if(validateDayOfMonthValue(dayMonth, dayWeek).status){
                      self._cronGenerator.find('#dayMonth').removeClass("error-field");
                      self._cronGenerator.find("#dayMonth").val(splitValues[3]);
-                     self._cronGenerator.find('#errorMsg').hide();
                  } else {
                      self._cronGenerator.find('#dayMonth').addClass("error-field");
                  }
-                 if(validateMonthValue(month)){
+                 if(validateMonthValue(month).status){
                      self._cronGenerator.find('#month').removeClass("error-field");
                      self._cronGenerator.find("#month").val(splitValues[4]);
-                     self._cronGenerator.find('#errorMsg').hide();
                  } else {
                      self._cronGenerator.find('#month').addClass("error-field");
                  }
-                 if(validateDayOfWeekValue(dayWeek, dayMonth)){
+                 if(validateDayOfWeekValue(dayWeek, dayMonth).status){
                      self._cronGenerator.find('#dayWeek').removeClass("error-field");
                      self._cronGenerator.find("#dayWeek").val(splitValues[5]);
-                     self._cronGenerator.find('#errorMsg').hide();
                  } else {
                      self._cronGenerator.find('#dayWeek').addClass("error-field");
                  }
             });
+        };
+
+        CronGenerator.prototype.buildCronExpression = function(){
+            var self = this;
+            self._cronGenerator.find("#expression").val(self._cronGenerator.find("#second").val() + " " +
+                    self._cronGenerator.find("#minute").val()+ " " +self._cronGenerator.find("#hour").val() + " " +
+                    self._cronGenerator.find("#dayMonth").val()+ " " +self._cronGenerator.find("#month").val() + " "
+                    + self._cronGenerator.find("#dayWeek").val());
+            var expression = self._cronGenerator.find("#expression").val();
+            var description = Cronstrue.toString(expression, { throwExceptionOnParseError: false,
+                                                                    dayOfWeekStartIndexZero: false });
+            self._cronGenerator.find("#output").text(description);
         };
 
         CronGenerator.prototype.isErrorOccured = function(){
@@ -753,7 +814,27 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                 self._cronGenerator.find('#saveButton').removeAttr("disabled");
             }
         };
-
+        CronGenerator.prototype.listOfErrorMessage = function(){
+            var self = this;
+            self._cronGenerator.find("#expression").val(self._cronGenerator.find("#second").val() + " " +
+                    self._cronGenerator.find("#minute").val()+ " " +self._cronGenerator.find("#hour").val() + " " +
+                    self._cronGenerator.find("#dayMonth").val()+ " " +self._cronGenerator.find("#month").val() + " "
+                    + self._cronGenerator.find("#dayWeek").val());
+            var expression = self._cronGenerator.find("#expression").val();
+            var list = self._cronGenerator.find('#errorMsg');
+            self._cronGenerator.find('#errorMsg').empty();
+            var statusExpression = validateCronExpression(expression);
+            var error = "";
+            if(!statusExpression.status){
+                var errorMsg = statusExpression.error;
+                for(var x in errorMsg){
+                    if(errorMsg[x] !== undefined){
+                        errorList = '<li>' + errorMsg[x] + '</li>';
+                        list.append(errorList);
+                    }
+                }
+            }
+        };
         CronGenerator.prototype.selectListOfValues = function(){
             var self = this;
             var i; var length;
