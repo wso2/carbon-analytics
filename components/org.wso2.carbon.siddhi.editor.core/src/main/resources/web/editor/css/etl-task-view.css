@@ -187,7 +187,7 @@
     padding-bottom: 12px;
     font-size: 2.0rem;
     background-color: #232323;
-    border-left: 3px solid #d9534f;
+    border-left: 3px solid #ee6719;
     box-shadow: 0 2px #77777761;
 }
 
@@ -196,7 +196,7 @@
 }
 
 .mapping-generation-dialog .dialog-body .expression-container .expression.target .exp-content span:hover {
-    color: #d9534f;
+    color: #ee6719;
     cursor: pointer;
 }
 
@@ -205,7 +205,7 @@
 }
 
 .mapping-generation-dialog .dialog-body .expression-container .expression.target .exp-content span.add-param:hover {
-    color: #d9534f;
+    color: #ee6719;
     cursor: pointer;
 }
 
@@ -214,7 +214,7 @@
 }
 
 .mapping-generation-dialog .dialog-body .expression-container .expression span.selected {
-    color: #d9534f;
+    color: #ee6719;
 }
 
 .mapping-generation-dialog .dialog-body .expression-container .expression.target .expression-merge {
@@ -243,7 +243,7 @@
 .mapping-generation-dialog .dialog-body .generation-content .node-container ul li a div.selected {
     background-color: #d3d3d3;
     border-bottom: 1px #d3d3d33b solid;
-    color: #d9534f;
+    color: #ee6719;
 }
 
 .mapping-generation-dialog .dialog-body .generation-content .node-container ul li a div {
@@ -307,4 +307,90 @@
 .mapping-generation-dialog .btn-tray .btn-default {
     background: #232323;
     margin-right: 15px;
+}
+
+
+/* ETL Wizard flow container styles */
+#ETLWizardForm {
+    background: #222;
+    height: 100%;
+}
+
+#ETLWizardForm .wizard-form-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+}
+
+.wizard-form-content .header-content {
+    color: white;
+    height: fit-content;
+}
+
+.wizard-form-content .header-content h4 {
+    font-weight: 600;
+}
+
+.wizard-form-content .header-content .header-steps {
+    display: flex;
+    background-color: #2a2a2a
+}
+
+.wizard-form-content .header-content .header-steps .step-item {
+    width: 30%;
+    opacity: 0.6;
+    border-top: 2px solid #fff;
+    padding: 5px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.wizard-form-content .header-content .header-steps .step-item.selected {
+    color: #ee6719;
+    border-top: 2px solid #ee6719;
+    width: 100%;
+    opacity: 1;
+    background-color: #3a3a3a;
+}
+
+.wizard-form-content .body-content {
+    height: 100%;
+    background-color: #c5c5c5;
+    display: flex;
+}
+
+.wizard-form-content .body-content .content-section {
+    width: 100%;
+    margin: 15px;
+}
+
+.wizard-form-content .footer-content {
+    height: 50px;
+}
+
+.visible {
+    visibility: visible;
+}
+
+.not-visible {
+    visibility: hidden;
+}
+
+.dropdown-menu-style {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background-color: #3a3a3a;
+    max-height: 50%;
+    overflow: auto;
+}
+
+.dropdown-menu-style .dropdown-item {
+    padding: 15px;
+    color: white;
+}
+
+.dropdown-menu-style .dropdown-item:hover {
+    background-color: #4a4a4a;
 }
