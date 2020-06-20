@@ -206,25 +206,29 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             wizardBodyContent.append(`
                 <div style="" class="content-section">
                     <div style="font-size: 1.8rem">
-                        Configure Source
+                        Transport Properties<br/>
+                        <small style="font-size: 1.3rem">Configure ${type === constants.SOURCE_TYPE ? 'Source' : 'Sink'} extension</small>
                     </div>
-                    <div style="padding-top: 5px">
+                    <div style="padding-top: 10px">
                         <div>
-                            <label for="source-type">Source type</label>
-                            <select name="source-type" id="source-type">
+                            <label for="extension-type">${type === constants.SOURCE_TYPE ? 'Source' : 'Sink'} type</label>
+                            <select name="extension-type" id="extension-type">
                                 <option disabled selected value> -- select an option -- </option>
                             </select>
                         </div>
                         ${
                             config.type.length > 0 ?
                                 `
-                                    <div style="padding-top: 15px" class="source-properties">
+                                    <div style="padding-top: 15px" class="extension-properties">
                                         <div>
-                                            Source properties: 
-                                          <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-source-property" type="button" data-toggle="dropdown">
-                                             <i class="fw fw-add"></i>
-                                          </button>
-                                          <div id="source-options-dropdown" style="left: 150px" class="dropdown-menu-style hidden" aria-labelledby="">
+                                          ${type === constants.SOURCE_TYPE ? 'Source' : 'Sink'} properties: 
+                                          ${
+                                                Object.keys(config.properties).length !== Object.keys(config.possibleOptions).length ? 
+                                                    `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-property" type="button" data-toggle="dropdown">
+                                                        <i class="fw fw-add"></i>
+                                                     </button>` : ''
+                                           }
+                                          <div id="extension-options-dropdown" style="left: 150px" class="dropdown-menu-style hidden" aria-labelledby="">
                                           </div>
                                         </div>
                                         <div class="options">
@@ -237,7 +241,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             `);
             
             extensionData.forEach(function (extension) {
-                wizardBodyContent.find('#source-type').append(`
+                wizardBodyContent.find('#extension-type').append(`
                     <option value="${extension.name}">${extension.name}</option>
                 `);
             });
@@ -245,13 +249,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             if(config.type.length > 0) {
                 Object.keys(config.possibleOptions).forEach(function (key) {
                     if(!config.properties[key]) {
-                        wizardBodyContent.find('#source-options-dropdown').append(`
+                        wizardBodyContent.find('#extension-options-dropdown').append(`
                             <a title="${config.possibleOptions[key].description.replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('`','')}" class="dropdown-item" href="#">${key}</a>
                         `)
                     }
                 })
 
-                wizardBodyContent.find('#btn-add-source-property')
+                wizardBodyContent.find('#btn-add-property')
                     .on('mouseover', function (evt) {
                         var leftOffset = evt.currentTarget.offsetLeft;
                         var elementObj = wizardBodyContent.find('.dropdown-menu-style');
@@ -270,40 +274,40 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             }
                         }, 300);
                     });
-                wizardBodyContent.find('#source-type').val(config.type);
-                wizardBodyContent.find('.source-properties>.options').empty();
+                wizardBodyContent.find('#extension-type').val(config.type);
+                wizardBodyContent.find('.extension-properties>.options').empty();
                 Object.keys(config.properties).forEach(function (key) {
                     var optionData = config.properties[key];
                     var name = key.replaceAll(/\./g,'-');
-                    wizardBodyContent.find('.source-properties>.options').append(`
+                    wizardBodyContent.find('.extension-properties>.options').append(`
                         <div style="display: flex; margin-bottom: 15px" class="property-option">
                             <div style="width: 100%" class="input-section">
-                                <label style="margin-bottom: 0" class="${optionData.value.length > 0 ? '' : 'not-visible'}" id="label-source-op-${name}" for="source-op-${name}">${key}</label>
-                                <input id="source-op-${name}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="${key}" type="text" value="${optionData.value}">
+                                <label style="margin-bottom: 0" class="${optionData.value.length > 0 ? '' : 'not-visible'}" id="label-extension-op-${name}" for="extension-op-${name}">${key}</label>
+                                <input id="extension-op-${name}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="${key}" type="text" value="${optionData.value}">
                             </div>
                             <div style="display: flex;padding-top: 20px; padding-left: 5px;" class="delete-section">
                                 <a style="margin-right: 5px; color: #333" title="${optionData.description.replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('`','')}">
                                     <i class="fw fw-info"></i>    
                                 </a>  
                                 ${
-                        optionData.optional ?
-                            `<a style="color: #333">
-                                            <i class="fw fw-delete"></i>    
+                                    optionData.optional ?
+                                        `<a style="color: #333">
+                                            <i id="extension-op-del-${name}" class="fw fw-delete"></i>    
                                          </a>`: ''
-                    }                              
+                                }                              
                             </div>
                         </div>
                     `);
                 });
 
-                wizardBodyContent.find('#source-options-dropdown>a').on('click', function (evt) {
+                wizardBodyContent.find('#extension-options-dropdown>a').on('click', function (evt) {
                     config.properties[$(evt.currentTarget).text()] = config.possibleOptions[$(evt.currentTarget).text()];
                     config.properties[$(evt.currentTarget).text()].value = config.properties[$(evt.currentTarget).text()].defaultValue.replaceAll('`','');
                     self.render();
                 });
             }
 
-            wizardBodyContent.find('#source-type').on('change', function (evt) {
+            wizardBodyContent.find('#extension-type').on('change', function (evt) {
                 config.type = $(evt.currentTarget).val();
                 var sourceData = extensionData.find(function (el) {
                     return el.name === config.type;
@@ -335,8 +339,22 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         wizardBodyContent.find(`#label-${inputId}`).addClass('not-visible');
                         $(evt.currentTarget).attr('placeholder', wizardBodyContent.find(`#label-${inputId}`).text());
                     }
-                });
+                })
+                .on('keyup', _.debounce(function (evt) {
+                    var optionName = evt.currentTarget.id.match('extension-op-([a-zA-Z-]+)')[1].replaceAll(/-/g, '.');
+                    config.properties[optionName].value = $(evt.currentTarget).val();
+                }));
+
+            wizardBodyContent.find('.property-option>.delete-section>a>.fw-delete').on('click', function (evt) {
+                var optionName = evt.currentTarget.id.match('extension-op-del-([a-zA-Z-]+)')[1].replaceAll(/-/g, '.');
+                delete config.properties[optionName];
+                self.render();
+            });
         }
-        
+
+        ETLWizard.prototype.renderSchemaConfigurator = function (type) {
+
+        }
+
         return ETLWizard;
     });
