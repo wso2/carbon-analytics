@@ -34,7 +34,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
             REGEX_FOR_DAYOFWEEK: /[^\w-,*?\/#]/,
             REGEX_FOR_SPACE: /\s/g,
             REGEX_FOR_ALPHA_NUMERIC: /[^\dA-Z]/,
-            REGEX_FOR_NUMEBERS: /[^\d]/
+            REGEX_FOR_NUMBERS: /[^\d]/
         };
 
         var validateTimeValue = function(time, maxValue) {
@@ -48,7 +48,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
             var list = time.split(",");
             var status = list.every(function (time){
                 if(time === '*' && list.length > 1){
-                    error : "Error : The '*' character should not be used with other values";
+                    error = "Error : The '*' character should not be used with other values";
                     return false;
                 }
                 if(time.includes('/')) {
@@ -108,7 +108,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
             if(dayOfWeek === '?' && dayOfMonth.includes('L')) {
                 if(dayOfMonth.includes('-')) {
                     var dayOfMonthRangeArr = dayOfMonth.split('-');
-                    if(dayOfMonthRangeArr[1].search(constants.REGEX_FOR_NUMEBERS) !== -1 ){
+                    if(dayOfMonthRangeArr[1].search(constants.REGEX_FOR_NUMBERS) !== -1 ){
                         return {
                             status : false,
                             error : "Error: Invalid Cron Expression, Expression can contain numeric values."
@@ -228,7 +228,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
             }
             var list = month.split(",");
             var status = list.every(function (month){
-                if(month === '*' && list.lenght > 1){
+                if(month === '*' && list.length > 1){
                     error = "Error : The '*' character should not be used with other values";
                     return false;
                 }
@@ -322,7 +322,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
             var list = dayOfWeek.split(",");
             var status = list.every(function (dayOfWeek){
                 if(((dayOfWeek === '*' && dayOfMonth !== '*') || (dayOfWeek === '?' && dayOfMonth !== '?')) && list.length > 1){
-                    error : "Error : The '*' character should not be used with other values";
+                    error = "Error : The '*' character should not be used with other values";
                     return false;
                 }
                 if(dayOfWeek.includes('/') && dayOfMonth === '?') {
@@ -331,7 +331,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                         return false;
                     }
                     var startingDayOfWeekOptionArr = dayOfWeek.split('/');
-                    if(startingDayOfWeekOptionArr.lenght > 2){
+                    if(startingDayOfWeekOptionArr.length > 2){
                         error = "Error : Unsupported value ";
                         return false;
                     } else {
@@ -365,7 +365,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                         return false;
                     }
                     var weekdayOfMonthArr = dayOfWeek.split('#');
-                    if(weekdayOfMonthArr.lenght > 2){
+                    if(weekdayOfMonthArr.length > 2){
                         error = "Error : Unsupported value";
                         return false;
                     } else {
@@ -426,12 +426,12 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                 status: statusSecond.status && statusMinute.status && statusHour.status &&
                                statusDayOfMonth.status && statusMonth.status && statusDayOfWeek.status,
                 error: {
-                    errorForsecond: statusSecond.error,
-                    errorForminute: statusMinute.error,
-                    errorForhour: statusHour.error,
-                    errorFordayOfMonth : statusDayOfMonth.error,
-                    errorFormonth: statusMonth.error,
-                    errorFordayOfWeek: statusDayOfWeek.error
+                    errorForSecond: statusSecond.error,
+                    errorForMinute: statusMinute.error,
+                    errorForHour: statusHour.error,
+                    errorForDayOfMonth : statusDayOfMonth.error,
+                    errorForMonth: statusMonth.error,
+                    errorForDayOfWeek: statusDayOfWeek.error
                 }
             };
         };
@@ -641,7 +641,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
 
         CronGenerator.prototype.onChangeInput = function(){
             var self = this;
-            self._cronGenerator.find("#second").on("input", function(){
+            self._cronGenerator.find("#second").on("input", debounce(function(){
                 var secValue = self._cronGenerator.find('#second').val();
                 var statusSecond = validateTimeValue(secValue, constants.MAX_MINUTE_AND_SECOND_VALUE);
                 if(statusSecond.status){
@@ -651,9 +651,9 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                     self._cronGenerator.find('#second').addClass("error-field");
                 }
                 self.listOfErrorMessage();
-                self.isErrorOccured();
-            });
-            self._cronGenerator.find("#minute").on("input", function(){
+                self.isErrorOccurred();
+            },250));
+            self._cronGenerator.find("#minute").on("input", debounce(function(){
                 var minValue = self._cronGenerator.find('#minute').val();
                 var statusMinute = validateTimeValue(minValue, constants.MAX_MINUTE_AND_SECOND_VALUE);
                 if(statusMinute.status){
@@ -663,9 +663,9 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                    self._cronGenerator.find('#minute').addClass("error-field");
                 }
                 self.listOfErrorMessage();
-                self.isErrorOccured();
-            });
-            self._cronGenerator.find("#hour").on("input", function(){
+                self.isErrorOccurred();
+            },250));
+            self._cronGenerator.find("#hour").on("input", debounce(function(){
                 var hourValue = self._cronGenerator.find('#hour').val();
                 var statusHour = validateTimeValue(hourValue, constants.MAX_HOUR_VALUE);
                 if(statusHour.status){
@@ -675,9 +675,9 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                     self._cronGenerator.find('#hour').addClass("error-field");
                 }
                 self.listOfErrorMessage();
-                self.isErrorOccured();
-            });
-            self._cronGenerator.find("#dayMonth").on("input", function(){
+                self.isErrorOccurred();
+            },250));
+            self._cronGenerator.find("#dayMonth").on("input", debounce(function(){
                 var dayMonValue = self._cronGenerator.find('#dayMonth').val();
                 var dayWeekValue = self._cronGenerator.find('#dayWeek').val();
                 var statusDayOfMonth = validateDayOfMonthValue(dayMonValue, dayWeekValue);
@@ -688,9 +688,9 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                      self._cronGenerator.find('#dayMonth').addClass("error-field");;
                 }
                 self.listOfErrorMessage();
-                self.isErrorOccured();
-            });
-            self._cronGenerator.find("#month").on("input", function(){
+                self.isErrorOccurred();
+            },250));
+            self._cronGenerator.find("#month").on("input", debounce(function(){
                 var monValue = self._cronGenerator.find('#month').val();
                 var statusMonth = validateMonthValue(monValue);
                 if(statusMonth.status){
@@ -700,9 +700,9 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                      self._cronGenerator.find('#month').addClass("error-field");
                 }
                 self.listOfErrorMessage();
-                self.isErrorOccured();
-            });
-            self._cronGenerator.find("#dayWeek").on("input", function(){
+                self.isErrorOccurred();
+            },250));
+            self._cronGenerator.find("#dayWeek").on("input", debounce(function(){
                  var weekValue = self._cronGenerator.find('#dayWeek').val();
                  var dayMonValue = self._cronGenerator.find('#dayMonth').val();
                  var statusDayOfWeek = validateDayOfWeekValue(weekValue, dayMonValue);
@@ -713,9 +713,9 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                       self._cronGenerator.find('#dayWeek').addClass("error-field");;
                  }
                  self.listOfErrorMessage();
-                 self.isErrorOccured();
-            });
-            self._cronGenerator.find("#expression").on("input",function(){
+                 self.isErrorOccurred();
+            },250));
+            self._cronGenerator.find("#expression").on("input",debounce(function(){
                  var expression = self._cronGenerator.find("#expression").val();
                  var description = Cronstrue.toString(expression, { throwExceptionOnParseError:false,
                                                                         dayOfWeekStartIndexZero: false });
@@ -780,7 +780,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                  } else {
                      self._cronGenerator.find('#dayWeek').addClass("error-field");
                  }
-            });
+            },250));
         };
 
         CronGenerator.prototype.buildCronExpression = function(){
@@ -795,7 +795,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
             self._cronGenerator.find("#output").text(description);
         };
 
-        CronGenerator.prototype.isErrorOccured = function(){
+        CronGenerator.prototype.isErrorOccurred = function(){
             var self = this;
             var value = self._cronGenerator.find('#second').hasClass("error-field") ||
                         self._cronGenerator.find('#minute').hasClass("error-field") ||
@@ -857,5 +857,21 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                 selectBoxObject.append(optionValues);
             }
         };
+
+        function debounce(func, wait, immediate) {
+        	var timeout;
+        	return function() {
+        		var context = this, args = arguments;
+        		var later = function() {
+        			timeout = null;
+        			if (!immediate) func.apply(context, args);
+        		};
+        		var callNow = immediate && !timeout;
+        		clearTimeout(timeout);
+        		timeout = setTimeout(later, wait);
+        		if (callNow) func.apply(context, args);
+        	};
+        };
+
         return CronGenerator;
     });
