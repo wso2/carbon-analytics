@@ -32,6 +32,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             SERVER_URL: window.location.protocol + "//" + window.location.host + "/editor/",
             SOURCE_TYPE: 'source',
             SINK_TYPE: 'sink',
+            SUPPORTED_DATA_TYPES: ['INT', 'LONG', 'FLOAT', 'DOUBLE', 'STRING', 'BOOL']
         };
 
         var ETLWizard = function (initOpts) {
@@ -52,7 +53,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         name: "",
                         attributes: []
                     },
-                    mapping: {}
+                    mapping: {
+                        type: '',
+                        properties: {},
+                        possibleProperties: {},
+                    }
                 },
                 output: {
                     sink: {
@@ -64,7 +69,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         name: "",
                         attributes: []
                     },
-                    mapping: {}
+                    mapping: {
+                        type: '',
+                        properties: {},
+                        possibleProperties: {},
+                        payload: {}
+                    }
                 },
                 query: {
                     window: {},
@@ -83,6 +93,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
         //Construct and return wizard skeleton
         ETLWizard.prototype.constructWizardHTMLElements = function (wizardObj) {
+            var self = this;
             var wizardFormContainer = wizardObj.find(constants.ID_ETL_WIZARD_BODY);
             var wizardHeaderContent = wizardObj.find(constants.CLASS_WIZARD_MODAL_HEADER);
             var wizardFooterContent = wizardObj.find(constants.CLASS_WIZARD_MODAL_FOOTER);
@@ -138,6 +149,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 if (stepIndex < 5) {
                     wizardObj.find(`#step-${stepIndex++}`).removeClass('selected');
                     wizardObj.find(`#step-${stepIndex}`).addClass('selected');
+                    self.__stepIndex = stepIndex;
+                    self.render();
                 }
             });
 
@@ -145,6 +158,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 if (stepIndex > 1) {
                     wizardObj.find(`#step-${stepIndex--}`).removeClass('selected');
                     wizardObj.find(`#step-${stepIndex}`).addClass('selected');
+                    self.__stepIndex = stepIndex;
+                    self.render();
                 }
             });
 
@@ -179,9 +194,15 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     //ToDo : Configure input
                     wizardBodyContent.empty();
                     this.renderSourceSinkConfigurator(constants.SOURCE_TYPE);
+                    this.renderSchemaConfigurator(constants.SOURCE_TYPE);
+                    this.renderInputOutputMapper(constants.SOURCE_TYPE);
                     break;
                 case 2:
                     // TODO: Configure output
+                    wizardBodyContent.empty();
+                    this.renderSourceSinkConfigurator(constants.SINK_TYPE);
+                    this.renderSchemaConfigurator(constants.SINK_TYPE);
+                    this.renderInputOutputMapper(constants.SINK_TYPE);
                     break;
                 case 3:
                     // TODO: Configure input options
@@ -197,14 +218,14 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         ETLWizard.prototype.renderSourceSinkConfigurator = function (type) {
             var self = this;
             var config = type === constants.SOURCE_TYPE ?
-                                    this.__propertyMap.input.source : this.__propertyMap.output.sink;
+                this.__propertyMap.input.source : this.__propertyMap.output.sink;
             var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY);
-            var extensionData = constants.SOURCE_TYPE ? 
-                                    this.__expressionData.extensions.source.sources :
-                                    this.__expressionData.extensions.sink.sinks;
+            var extensionData = constants.SOURCE_TYPE === type ?
+                this.__expressionData.extensions.source.sources :
+                this.__expressionData.extensions.sink.sinks;
 
             wizardBodyContent.append(`
-                <div style="" class="content-section">
+                <div style="max-height: ${wizardBodyContent[0].offsetHeight}; overflow: auto" class="content-section">
                     <div style="font-size: 1.8rem">
                         Transport Properties<br/>
                         <small style="font-size: 1.3rem">Configure ${type === constants.SOURCE_TYPE ? 'Source' : 'Sink'} extension</small>
@@ -223,15 +244,15 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                         <div>
                                           ${type === constants.SOURCE_TYPE ? 'Source' : 'Sink'} properties: 
                                           ${
-                                                Object.keys(config.properties).length !== Object.keys(config.possibleOptions).length ? 
-                                                    `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-property" type="button" data-toggle="dropdown">
-                                                        <i class="fw fw-add"></i>
-                                                     </button>` : ''
-                                           }
+                                            Object.keys(config.properties).length !== Object.keys(config.possibleOptions).length ?
+                                                `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-transport-property" type="button" data-toggle="dropdown">
+                                                    <i class="fw fw-add"></i>
+                                                 </button>` : ''
+                                          }
                                           <div id="extension-options-dropdown" style="left: 150px" class="dropdown-menu-style hidden" aria-labelledby="">
                                           </div>
                                         </div>
-                                        <div class="options">
+                                        <div style="" class="options">
                                         </div>
                                     </div>
                                 ` : ''
@@ -239,26 +260,26 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     </div>
                 </div>
             `);
-            
+
             extensionData.forEach(function (extension) {
                 wizardBodyContent.find('#extension-type').append(`
                     <option value="${extension.name}">${extension.name}</option>
                 `);
             });
 
-            if(config.type.length > 0) {
+            if (config.type.length > 0) {
                 Object.keys(config.possibleOptions).forEach(function (key) {
-                    if(!config.properties[key]) {
+                    if (!config.properties[key]) {
                         wizardBodyContent.find('#extension-options-dropdown').append(`
-                            <a title="${config.possibleOptions[key].description.replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('`','')}" class="dropdown-item" href="#">${key}</a>
+                            <a title="${config.possibleOptions[key].description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}" class="dropdown-item" href="#">${key}</a>
                         `)
                     }
                 })
 
-                wizardBodyContent.find('#btn-add-property')
+                wizardBodyContent.find('#btn-add-transport-property')
                     .on('mouseover', function (evt) {
                         var leftOffset = evt.currentTarget.offsetLeft;
-                        var elementObj = wizardBodyContent.find('.dropdown-menu-style');
+                        var elementObj = wizardBodyContent.find('#extension-options-dropdown');
                         elementObj.css({"left": `${leftOffset}px`})
                         elementObj
                             .removeClass('hidden')
@@ -266,10 +287,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 elementObj.addClass('hidden');
                             });
                     })
-                    .on('mouseleave',function () {
+                    .on('mouseleave', function () {
                         setTimeout(function () {
-                            var elementObj = wizardBodyContent.find('.dropdown-menu-style');
-                            if(!(wizardBodyContent.find('.dropdown-menu-style:hover').length > 0)) {
+                            var elementObj = wizardBodyContent.find('#extension-options-dropdown');
+                            if (!(wizardBodyContent.find('#extension-options-dropdown:hover').length > 0)) {
                                 elementObj.addClass('hidden');
                             }
                         }, 300);
@@ -278,7 +299,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 wizardBodyContent.find('.extension-properties>.options').empty();
                 Object.keys(config.properties).forEach(function (key) {
                     var optionData = config.properties[key];
-                    var name = key.replaceAll(/\./g,'-');
+                    var name = key.replaceAll(/\./g, '-');
                     wizardBodyContent.find('.extension-properties>.options').append(`
                         <div style="display: flex; margin-bottom: 15px" class="property-option">
                             <div style="width: 100%" class="input-section">
@@ -286,14 +307,14 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 <input id="extension-op-${name}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="${key}" type="text" value="${optionData.value}">
                             </div>
                             <div style="display: flex;padding-top: 20px; padding-left: 5px;" class="delete-section">
-                                <a style="margin-right: 5px; color: #333" title="${optionData.description.replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('`','')}">
+                                <a style="margin-right: 5px; color: #333" title="${optionData.description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}">
                                     <i class="fw fw-info"></i>    
                                 </a>  
                                 ${
                                     optionData.optional ?
                                         `<a style="color: #333">
                                             <i id="extension-op-del-${name}" class="fw fw-delete"></i>    
-                                         </a>`: ''
+                                         </a>` : ''
                                 }                              
                             </div>
                         </div>
@@ -302,7 +323,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
                 wizardBodyContent.find('#extension-options-dropdown>a').on('click', function (evt) {
                     config.properties[$(evt.currentTarget).text()] = config.possibleOptions[$(evt.currentTarget).text()];
-                    config.properties[$(evt.currentTarget).text()].value = config.properties[$(evt.currentTarget).text()].defaultValue.replaceAll('`','');
+                    config.properties[$(evt.currentTarget).text()].value = config.properties[$(evt.currentTarget).text()].defaultValue.replaceAll('`', '');
                     self.render();
                 });
             }
@@ -320,7 +341,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         return !el.optional;
                     })
                     .forEach(function (param) {
-                        param['value'] = param.defaultValue.replaceAll('`','');
+                        param['value'] = param.defaultValue.replaceAll('`', '');
                         config.properties[param.name] = param;
                     });
 
@@ -343,7 +364,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 .on('keyup', _.debounce(function (evt) {
                     var optionName = evt.currentTarget.id.match('extension-op-([a-zA-Z-]+)')[1].replaceAll(/-/g, '.');
                     config.properties[optionName].value = $(evt.currentTarget).val();
-                }));
+                }, 100, {}));
 
             wizardBodyContent.find('.property-option>.delete-section>a>.fw-delete').on('click', function (evt) {
                 var optionName = evt.currentTarget.id.match('extension-op-del-([a-zA-Z-]+)')[1].replaceAll(/-/g, '.');
@@ -353,7 +374,145 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         }
 
         ETLWizard.prototype.renderSchemaConfigurator = function (type) {
+            var self = this;
+            var config = type === constants.SOURCE_TYPE ?
+                this.__propertyMap.input.stream : this.__propertyMap.output.stream;
+            var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY);
 
+            wizardBodyContent.append(`
+                <div style="max-height: ${wizardBodyContent[0].offsetHeight}; overflow: auto" class="content-section">
+                    <div style="font-size: 1.8rem">
+                        Configure Schema<br/>
+                        <small style="font-size: 1.3rem">Configure ${type === constants.SOURCE_TYPE ? 'input' : 'output'} stream definition</small>
+                    </div>
+                    <div style="padding-top: 10px">
+                        <div>
+                            <label for="stream-name-txt">Enter ${type === constants.SOURCE_TYPE ? 'input' : 'output'} stream name</label>
+                            <input id="stream-name-txt" type="text" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" value="${type === constants.SOURCE_TYPE ? 'input_stream' : 'output_stream'}">
+                        </div>
+                        <div style="padding-top: 10px">
+                            <div style="padding-top: 15px" class="attribute-list">
+                                <div>
+                                  ${type === constants.SOURCE_TYPE ? 'input' : 'output'} stream attributes: 
+                                  <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-stream-attrib" type="button" data-toggle="dropdown">
+                                    <i class="fw fw-add"></i>
+                                  </button> 
+                                  <div id="stream-attribute-type-dropdown" style="left: 150px" class="dropdown-menu-style hidden" aria-labelledby="">
+                                  </div>
+                                </div>
+                                <div style="" class="attributes">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
+
+            var attributeTypeDiv = wizardBodyContent.find('#stream-attribute-type-dropdown');
+
+            constants.SUPPORTED_DATA_TYPES.forEach(function (dataType) {
+                attributeTypeDiv.append(`
+                    <a id="attrib-option-${dataType.toLowerCase()}" title="Attribute of type ${dataType}" class="dropdown-item" href="#">${dataType}</a>
+                `);
+            });
+
+            config.attributes.forEach(function (attribute, i) {
+                wizardBodyContent.find('.attribute-list>.attributes').append(`
+                    <div style="display: flex;">
+                        <div class="stream-attrib-sort-div" style="display: flex;flex-direction: column;padding: 5px;">
+                            <a id="move-attrib-up-${i}" title="Move attribute up the schema" style="color: #333">
+                                <i class="fw fw-up"></i>
+                            </a>
+                            <a id="move-attrib-down-${i}" title="Move attribute down the schema" style="color: #333">
+                                <i class="fw fw-down"></i>
+                            </a>
+                        </div>
+                        <div style="width: 100%; padding-bottom: 15px" class="attribute-input-section">
+                            <label style="margin-bottom: 0" for="attribute-input-${i}">${attribute.type.toUpperCase()}</label>
+                            <input id="attribute-name-input-${i}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type Attribute name here" type="text" value="${attribute.name}">
+                        </div>
+                        <div style="padding: 20px 5px;">
+                            <a title="Delete attribute from schema" style="color: #333">
+                                <i id="delete-attribute-${i}" class="fw fw-delete attrib-del"></i>
+                            </a>
+                        </div>
+                    </div>
+                `);
+            });
+
+            wizardBodyContent.find('#btn-add-stream-attrib').on('mouseover', function (evt) {
+                var attributeTypeDiv = wizardBodyContent.find('#stream-attribute-type-dropdown');
+                var leftOffset = evt.currentTarget.offsetLeft;
+                attributeTypeDiv.css({"left": `${leftOffset}px`})
+                attributeTypeDiv.removeClass('hidden');
+
+                attributeTypeDiv.on('mouseleave', function () {
+                    attributeTypeDiv.addClass('hidden');
+                })
+            }).on('mouseleave', function (evt) {
+                setTimeout(function () {
+                    var attributeTypeDiv = wizardBodyContent.find('#stream-attribute-type-dropdown');
+                    if (!(wizardBodyContent.find('#stream-attribute-type-dropdown:hover').length > 0)) {
+                        attributeTypeDiv.addClass('hidden');
+                    }
+                }, 300)
+            });
+
+            wizardBodyContent.find("#stream-attribute-type-dropdown>a").on('click', function (evt) {
+                var attributeType = evt.currentTarget.id.match('attrib-option-([a-zA-Z-]+)')[1];
+                config.attributes.push({name: '', type: attributeType});
+                self.render();
+            });
+
+            wizardBodyContent.find('.attrib-del').on('click', function (evt) {
+                var index = evt.currentTarget.id.match('delete-attribute-([0-9]+)')[1];
+                config.attributes.splice(index, 1);
+                self.render();
+            });
+
+            wizardBodyContent.find('.stream-attrib-sort-div>a').on('click', function (evt) {
+                var arrowIndex = evt.currentTarget.id.match('move-attrib-([a-zA-Z0-9-]+)')[1].split('-');
+                var index = Number(arrowIndex[1]);
+                var temp = _.cloneDeep(config.attributes[index]);
+
+                if (arrowIndex[0] === 'up' && index !== 0) {
+                    config.attributes[index] = config.attributes[index - 1];
+                    config.attributes[index - 1] = temp;
+                } else if (index !== (config.attributes.length - 1)) {
+                    config.attributes[index] = config.attributes[index + 1];
+                    config.attributes[index + 1] = temp;
+                }
+                self.render();
+            });
+
+            wizardBodyContent.find('.attribute-input-section>input').on('keyup', _.debounce(function (evt) {
+                var attributeIndex = Number(evt.currentTarget.id.match('attribute-name-input-([0-9]+)')[1]);
+
+                config.attributes[attributeIndex].name = $(evt.currentTarget).val();
+            }, 100, {}));
+
+            wizardBodyContent.find('#stream-name-txt').on('keyup', _.debounce(function (evt) {
+                config.name = $(evt.currentTarget).val();
+            }, 100, {}));
+        }
+
+        ETLWizard.prototype.renderInputOutputMapper = function (type) {
+            var self = this;
+            var config = type === constants.SOURCE_TYPE ?
+                this.__propertyMap.input.mapping : this.__propertyMap.output.mapping;
+            var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY);
+            var extensionData = constants.SOURCE_TYPE === type ?
+                this.__expressionData.extensions.source.sources :
+                this.__expressionData.extensions.sink.sinks;
+
+            wizardBodyContent.append(`
+                <div style="max-height: ${wizardBodyContent[0].offsetHeight}; overflow: auto" class="content-section">
+                    <div style="font-size: 1.8rem">
+                        Configure ${type === constants.SOURCE_TYPE ? 'Input' : 'Output'} Mapping<br/>
+                        <small style="font-size: 1.3rem">Configure ${type === constants.SOURCE_TYPE ? 'source' : 'sink'} extension mapping</small>
+                    </div>
+                </div>
+            `);
         }
 
         return ETLWizard;
