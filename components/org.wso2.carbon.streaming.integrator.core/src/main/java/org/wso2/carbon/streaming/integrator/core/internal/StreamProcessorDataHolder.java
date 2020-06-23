@@ -64,6 +64,8 @@ public class StreamProcessorDataHolder {
     private static StatisticsConfiguration statisticsConfiguration;
     private static StatisticsManager statisticsManager;
     private static boolean isStatisticsEnabled;
+    private static boolean isErrorPreservingEnabled;
+
     /**
      * List used to hold all the registered hs state change listeners.
      */
@@ -280,5 +282,13 @@ public class StreamProcessorDataHolder {
 
     public static void setIsStatisticsEnabled(boolean isStatisticsEnabled) {
         StreamProcessorDataHolder.isStatisticsEnabled = isStatisticsEnabled;
+    }
+
+    public static boolean isIsErrorPreservingEnabled() {
+        return isErrorPreservingEnabled;
+    }
+
+    public static void setIsErrorPreservingEnabled(boolean isErrorPreservingEnabled) {
+        StreamProcessorDataHolder.isErrorPreservingEnabled = isErrorPreservingEnabled;
     }
 }

@@ -23,6 +23,7 @@ import io.siddhi.core.config.StatisticsConfiguration;
 import io.siddhi.core.util.SiddhiComponentActivator;
 import io.siddhi.core.util.persistence.IncrementalPersistenceStore;
 import io.siddhi.core.util.persistence.PersistenceStore;
+import io.siddhi.core.util.preservation.PreservationStore;
 import io.siddhi.core.util.statistics.StatisticsManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -50,6 +51,7 @@ import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.streaming.integrator.common.utils.config.FileConfigManager;
 import org.wso2.carbon.streaming.integrator.core.DeploymentMode;
 import org.wso2.carbon.streaming.integrator.core.NodeInfo;
+import org.wso2.carbon.streaming.integrator.core.dropped.events.preservation.beans.ErrorPreservationConfigurations;
 import org.wso2.carbon.streaming.integrator.core.ha.HAManager;
 import org.wso2.carbon.streaming.integrator.core.ha.exception.HAModeException;
 import org.wso2.carbon.streaming.integrator.core.ha.util.CoordinationConstants;
@@ -154,6 +156,22 @@ public class ServiceComponent {
                 log.debug("Periodic persistence is disabled");
             }
         }
+
+        // Error preservation TODO senthuran added this
+        ErrorPreservationConfigurations errorPreservationConfigurations =
+            configProvider.getConfigurationObject(ErrorPreservationConfigurations.class);
+        if (errorPreservationConfigurations != null && errorPreservationConfigurations.isEnabled()) {
+            String errorPreservationStoreClassName = errorPreservationConfigurations.getPreservationStore();
+            if (Class.forName(errorPreservationStoreClassName).newInstance() instanceof PreservationStore) {
+                PreservationStore errorPreservationStore =
+                    (PreservationStore) Class.forName(errorPreservationStoreClassName).newInstance();
+                // TODO maybe rename to errorPreservationStore in Siddhi interface as well
+                siddhiManager.setPreservationStore(errorPreservationStore);
+            } else {
+                System.out.println("Persistence Store Configuration is wrong"); // TODO implement
+            }
+        }
+
 
         StatisticsConfiguration statisticsConfiguration = new StatisticsConfiguration(new MetricsFactory());
         siddhiManager.setStatisticsConfiguration(statisticsConfiguration);
