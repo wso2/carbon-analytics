@@ -53,7 +53,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                 }
                 if(time.includes('/')) {
                     if(time.endsWith('/')){
-                        error = "Error : Expression should not end with / ";
+                        error = "Error : Expression should not end with \" / \" ";
                         return false;
                     }
                     var startingTimeOptionArr = time.split('/');
@@ -67,7 +67,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                     }
                 } else if(time.includes('-')) {
                     if(time.endsWith('-')){
-                        error = "Error : Expression should not end with - ";
+                        error = "Error : Expression should not end with \" - \" ";
                         return false;
                     }
                     var timeRangeArr = time.split('-');
@@ -111,7 +111,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                     if(dayOfMonthRangeArr[1].search(constants.REGEX_FOR_NUMBERS) !== -1 ){
                         return {
                             status : false,
-                            error : "Error: Invalid Cron Expression, Expression can contain numeric values."
+                            error : "Error : Invalid Cron Expression, Expression can contain numeric values."
                         };
                     } else {
                         return {
@@ -122,14 +122,14 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                 } else {
                     return {
                         status : dayOfMonth === 'L' || dayOfMonth === 'LW',
-                        error : "Error: Invalid Cron Expression, 'L' option is not valid here."
+                        error : "Error : Invalid Cron Expression, 'L' option is not valid here."
                     };
                 }
             } else if(dayOfMonth.includes('W') && dayOfWeek === '?'){
                 if(dayOfMonth.search(constants.REGEX_FOR_ALPHA_NUMERIC) !== -1 ){
                     return {
                         status : false,
-                        error : "Error: Invalid Cron Expression, Expression can contain alpha numeric values."
+                        error : "Error : Invalid Cron Expression, Expression can contain alpha numeric values."
                     };
                 }
                 if(dayOfMonth.length === 1){
@@ -158,7 +158,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                 }
                 if(dayOfMonth.includes('/') && dayOfWeek === '?') {
                     if(dayOfMonth.endsWith('/')){
-                        error = "Error : Day of month values should not end with /";
+                        error = "Error : Day of month values should not end with \" / \"";
                         return false;
                     }
                     var startingDayOfMonthOptionArr = dayOfMonth.split('/');
@@ -175,12 +175,12 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
 
                 } else if(dayOfMonth.includes('-') && dayOfWeek === '?') {
                     if(dayOfMonth.endsWith('-')){
-                        error = "Error : Day of month values should not end with - ";
+                        error = "Error : Day of month values should not end with \" - \" ";
                         return false;
                     }
                     var dayOfMonthRangeArr = dayOfMonth.split('-');
                     if(dayOfMonthRangeArr.length > 2){
-                        error = "Error : Unsupported value";
+                        error = "Error : Unsupported value ";
                         return false;
                     }
                     else {
@@ -193,7 +193,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                     return validateRangeOfDay([dayOfMonth], 1, 31) ||
                             (dayOfMonth === '*' && dayOfWeek !== '*') || (dayOfMonth === '?' && dayOfWeek !== '?');
                 } else {
-                    error = "Error: Invalid Cron Expression, Expression cannot contain any values except ? ";
+                    error = "Error : Invalid Cron Expression, Expression cannot contain any values except \" ? \" ";
                     return dayOfMonth === '?';
                 }
                 return true;
@@ -234,7 +234,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                 }
                 if(month.includes('/')) {
                     if(month.endsWith('/')){
-                        error = "Error : Month values should not end with / ";
+                        error = "Error : Month values should not end with \" / \" ";
                         return false;
                     }
                     var startingMonthOptionArr = month.split('/');
@@ -251,7 +251,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                     }
                 } else if(month.includes('-')) {
                     if(month.endsWith('-')){
-                        error = "Error : Month values should not end with - ";
+                        error = "Error : Month values should not end with \" - \" ";
                         return false;
                     }
                     var monthRangeArr = month.split('-');
@@ -271,10 +271,10 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                     var firstIndexValue = month.charAt(0);
                     var secondIndexValue = month.charAt(1);
                     if(month.length === 1){
-                        error = "Error : Month values must be between 1 and 12";
+                        error = "Error : Month values must be between 1 and 12 ";
                         return validateRangeOfDay([month], 1, 12) || month === "*";
                     } else {
-                         error = "Error : Month values must be between 1 and 12 or Jan - Dec";
+                         error = "Error : Month values must be between 1 and 12 or Jan - Dec ";
                         return (!isNaN(parseInt(firstIndexValue)) && !isNaN(parseInt(secondIndexValue))) ?
                                 validateRangeOfDay([month], 1, 12) : validateAbbreviationValue([month], monthArray);
                     }
@@ -300,7 +300,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                 } else if(dayOfWeek.includes('-')){
                     return {
                         status : false,
-                        error : "Error : Day-of-week values should not end with - "
+                        error : "Error : Day-of-week values should not end with \" - \" "
                     };
                 } else {
                     return {
@@ -327,7 +327,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                 }
                 if(dayOfWeek.includes('/') && dayOfMonth === '?') {
                     if(dayOfWeek.endsWith('/')){
-                        error = "Error : Day-of-week values should not end with / ";
+                        error = "Error : Day-of-week values should not end with \" / \" ";
                         return false;
                     }
                     var startingDayOfWeekOptionArr = dayOfWeek.split('/');
@@ -343,12 +343,12 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                     }
                 } else if(dayOfWeek.includes('-') && dayOfMonth === '?') {
                     if(dayOfWeek.endsWith('-')){
-                        error = "Error : Day-of-week values should not end with - ";
+                        error = "Error : Day-of-week values should not end with \" - \" ";
                         return false;
                     }
                     var dayOfWeekRangeArr = dayOfWeek.split('-');
                     if(dayOfWeekRangeArr.length > 2){
-                        error = "Error : Unsupported value";
+                        error = "Error : Unsupported value ";
                         return false;
                     } else {
                         var validWeekRange = parseInt(dayOfWeekRangeArr[0]) < parseInt(dayOfWeekRangeArr[1]);
@@ -361,7 +361,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                     }
                 } else if(dayOfWeek.includes('#') && dayOfMonth === '?') {
                     if(dayOfWeek.endsWith('#')){
-                        error = "Error : Day-of-week values should not end with # ";
+                        error = "Error : Day-of-week values should not end with \" # \" ";
                         return false;
                     }
                     var weekdayOfMonthArr = dayOfWeek.split('#');
@@ -389,7 +389,7 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
                                 validateAbbreviationValue([dayOfWeek], weekArray);
                     }
                 } else {
-                    error = "Error: Invalid Cron Expression, Expression cannot contain any values except ? ";
+                    error = "Error : Invalid Cron Expression, Expression cannot contain any values except \" ? \" ";
                     return dayOfWeek === '?';
                 }
                 return true;
