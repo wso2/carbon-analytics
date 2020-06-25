@@ -120,13 +120,19 @@ hr.cron-generator-hr {
 }
 
 .cron-generator label {
-    margin: 10px 0px 10px 4px;
+    margin: 10px 0px;
     font-size: 11px;
     text-align:center;
 }
 
 .cron-generator input {
     text-align:center;
+}
+
+.cron-generator input[type="checkbox"],
+.cron-generator input[type="radio"] {
+    margin: 4px 4px 0px 0px;
+    vertical-align: text-bottom;
 }
 
 .nav-tabs > li.active > a,

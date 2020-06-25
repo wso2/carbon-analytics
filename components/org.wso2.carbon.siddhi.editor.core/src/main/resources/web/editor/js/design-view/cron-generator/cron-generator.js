@@ -588,9 +588,9 @@ define(['require', 'lodash', 'jquery', 'log', 'constants', 'cronstrue', 'jquery_
         CronGenerator.prototype.onChangePredefinedTime = function(){
             var self = this;
             var defineTime = $('<div id="defineTime">'+
-                  '<label style="margin:15px 5px 15px 0px;"> Time </label>'+
-                  '<i class="fw fw-info" title = " Time in 24hour format "></i>'+
-                  '<input type="text" id="predefinedtime" value="12:30" class="form-control" style="margin:15px 15px;'+
+                  '<label> Time </label>'+
+                  '<i class="fw fw-info" title=" Time in 24hour format "></i>'+
+                  '<input type="text" id="predefinedtime" value="12:30" class="form-control" style="margin:0px 15px;'+
                   'width:15%;" readonly/>'+
                   '<input id="predefineEveryDay" type="checkbox" name="predefineEveryDay" value="">&nbsp;&nbsp;'+
                   '<label for="predefineEveryDay"> Everyday </label>'+
