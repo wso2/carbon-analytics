@@ -155,7 +155,10 @@ requirejs.config({
         dockerImageTypeDialog: "js/export-deployment-artifacts/docker-image-type-dialog",
         fillTemplateValueDialog: "js/export-deployment-artifacts/fill-template-value-dialog",
         kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog",
-        etlWizard: "js/etl-wizard/etl-wizard"
+        etlWizard: "js/etl-wizard/etl-wizard",
+        csvMapper: "js/etl-wizard/source-sink-mappers/csv-mapper",
+        xmlMapper: "js/etl-wizard/source-sink-mappers/xml-mapper",
+        inputOutputMapper: "js/etl-wizard/source-sink-mappers/source-sink-mapper"
     },
     map: {
         "*": {

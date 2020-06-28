@@ -383,14 +383,34 @@
     flex-direction: column;
     background-color: #3a3a3a;
     max-height: 50%;
-    overflow: auto;
+    overflow-y: auto;
+    max-width: 400px;
 }
 
 .dropdown-menu-style .dropdown-item {
     padding: 15px;
     color: white;
+    border-bottom: 1px solid #4a4a4a;
 }
 
 .dropdown-menu-style .dropdown-item:hover {
     background-color: #4a4a4a;
+}
+
+.etl-flow-name {
+    border: 1px solid #fff0;
+    background: transparent;
+    border-radius: 5px;
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.etl-flow-name:hover {
+    border: 1px solid #fff8;
+}
+
+.custom-mapper-val {
+    color: #ee6719;
+    cursor: pointer;
+    padding: 0 5px;
 }

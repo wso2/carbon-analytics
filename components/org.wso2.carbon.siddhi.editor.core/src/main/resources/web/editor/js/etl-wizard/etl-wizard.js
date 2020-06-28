@@ -17,9 +17,9 @@
  *  * under the License.
  *
  */
-define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor/completion-engine', 'alerts'],
+define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor/completion-engine', 'alerts', 'inputOutputMapper'],
 
-    function (require, $, _, log, smartWizard, CompletionEngine, Alerts) {
+    function (require, $, _, log, smartWizard, CompletionEngine, Alerts, InputOutputMapper) {
 
         /**
          * Constants used by the wizard
@@ -43,6 +43,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             //object structure used to store data
             this.__propertyMap = {
+                appName: '',
                 input: {
                     source: {
                         type: '',
@@ -57,6 +58,9 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         type: '',
                         properties: {},
                         possibleProperties: {},
+                        attributes: {},
+                        customEnabled: false,
+                        samplePayload: "",
                     }
                 },
                 output: {
@@ -98,12 +102,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var wizardHeaderContent = wizardObj.find(constants.CLASS_WIZARD_MODAL_HEADER);
             var wizardFooterContent = wizardObj.find(constants.CLASS_WIZARD_MODAL_FOOTER);
             var stepIndex = this.__stepIndex;
+            var config = this.__propertyMap;
 
             // Define header for the wizard
             wizardHeaderContent.append(`
-                <h4 class="modal-title form-wizard-title" id="idHeaderTitle"> 
-                    ETL Flow Creation Wizard 
-                </h4>
+                <input class="etl-flow-name" id="" type="text" value="UntitledETLTaskFlow"/>
             `);
 
             wizardHeaderContent.append(`
@@ -163,6 +166,18 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 }
             });
 
+            wizardHeaderContent.find('.etl-flow-name')
+                .on('keyup', _.debounce(function (evt) {
+                    config.appName = $(evt.currentTarget).val();
+                }, 100, {}))
+                .on('focusout', function (evt) {
+                    var appName = $(evt.currentTarget).val();
+                    if (!appName.length > 0 && config.appName.length > 0) {
+                        config.appName = 'UntitledETLTaskFlow';
+                        $(evt.currentTarget).val(config.appName);
+                    }
+                });
+
             return wizardObj;
         };
 
@@ -196,6 +211,16 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     this.renderSourceSinkConfigurator(constants.SOURCE_TYPE);
                     this.renderSchemaConfigurator(constants.SOURCE_TYPE);
                     this.renderInputOutputMapper(constants.SOURCE_TYPE);
+
+                    // TODO : Code for Overlay when clicking next
+
+                    // var offsetLeft = wizardBodyContent.find('.content-section')[0].offsetLeft;
+                    // var offsetTop = wizardBodyContent.find('.content-section')[0].offsetTop;
+                    // var minWidth = $(wizardBodyContent.find('.content-section')[0]).width();
+                    // var minHeight = $(wizardBodyContent.find('.content-section')[0]).height();
+                    //
+                    // wizardBodyContent.append(`<div style="position: absolute; top: ${offsetTop-15}; left: ${offsetLeft-15}; width: ${minWidth+30}; height: ${minHeight+30}; background-color: rgb(0,0,0,0.5)"></div>`);
+
                     break;
                 case 2:
                     // TODO: Configure output
@@ -248,8 +273,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                                 `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-transport-property" type="button" data-toggle="dropdown">
                                                     <i class="fw fw-add"></i>
                                                  </button>` : ''
-                                          }
-                                          <div id="extension-options-dropdown" style="left: 150px" class="dropdown-menu-style hidden" aria-labelledby="">
+                                            }
+                                          <div id="extension-options-dropdown" class="dropdown-menu-style hidden" aria-labelledby="">
                                           </div>
                                         </div>
                                         <div style="" class="options">
@@ -271,7 +296,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 Object.keys(config.possibleOptions).forEach(function (key) {
                     if (!config.properties[key]) {
                         wizardBodyContent.find('#extension-options-dropdown').append(`
-                            <a title="${config.possibleOptions[key].description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}" class="dropdown-item" href="#">${key}</a>
+                            <a title="" class="dropdown-item" href="#">
+                                <div>
+                                    <div class="option-title">${key}</div><br/>
+                                    <small style="opacity: 0.8">${config.possibleOptions[key].description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}</small><br/>
+                                    <small style="opacity: 0.8"><b>Default Value</b>: ${config.possibleOptions[key].defaultValue}</small>
+                                </div>
+                            </a>
                         `)
                     }
                 })
@@ -322,8 +353,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 });
 
                 wizardBodyContent.find('#extension-options-dropdown>a').on('click', function (evt) {
-                    config.properties[$(evt.currentTarget).text()] = config.possibleOptions[$(evt.currentTarget).text()];
-                    config.properties[$(evt.currentTarget).text()].value = config.properties[$(evt.currentTarget).text()].defaultValue.replaceAll('`', '');
+                    var optionName = $(evt.currentTarget).find('.option-title').text();
+
+                    config.properties[optionName] = config.possibleOptions[optionName];
+                    config.properties[optionName].value = config.properties[optionName].defaultValue.replaceAll('`', '');
                     self.render();
                 });
             }
@@ -428,7 +461,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             </a>
                         </div>
                         <div style="width: 100%; padding-bottom: 15px" class="attribute-input-section">
-                            <label style="margin-bottom: 0" for="attribute-input-${i}">${attribute.type.toUpperCase()}</label>
+                            <label style="margin-bottom: 0; font-size: 1.2rem;" for="attribute-input-${i}">${attribute.type.toUpperCase()}</label>
                             <input id="attribute-name-input-${i}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type Attribute name here" type="text" value="${attribute.name}">
                         </div>
                         <div style="padding: 20px 5px;">
@@ -500,10 +533,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var self = this;
             var config = type === constants.SOURCE_TYPE ?
                 this.__propertyMap.input.mapping : this.__propertyMap.output.mapping;
+            var extensionConfig = type === constants.SOURCE_TYPE ?
+                this.__propertyMap.input : this.__propertyMap.output;
             var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY);
-            var extensionData = constants.SOURCE_TYPE === type ?
-                this.__expressionData.extensions.source.sources :
-                this.__expressionData.extensions.sink.sinks;
+            var mapperData = constants.SOURCE_TYPE === type ?
+                this.__expressionData.extensions.sourceMapper.sourceMaps :
+                this.__expressionData.extensions.sinkMapper.sinkMaps;
 
             wizardBodyContent.append(`
                 <div style="max-height: ${wizardBodyContent[0].offsetHeight}; overflow: auto" class="content-section">
@@ -511,8 +546,57 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         Configure ${type === constants.SOURCE_TYPE ? 'Input' : 'Output'} Mapping<br/>
                         <small style="font-size: 1.3rem">Configure ${type === constants.SOURCE_TYPE ? 'source' : 'sink'} extension mapping</small>
                     </div>
+                    <div style="padding-top: 10px">
+                        <div>
+                            <label for="mapper-type">${type === constants.SOURCE_TYPE ? 'Source' : 'Sink'} Mapper type</label>
+                            <select name="mapper-type" id="mapper-type">
+                                <option disabled selected value> -- select an option -- </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="mapper-container">
+                    </div>
                 </div>
             `);
+
+            var mapperContainer = wizardBodyContent.find('#mapper-container');
+            mapperContainer.empty();
+
+            mapperData.forEach(function (map) {
+                wizardBodyContent.find('#mapper-type').append(`
+                    <option value="${map.name}">${map.name}</option>
+                `);
+            });
+
+            wizardBodyContent.find('#mapper-type').on('change', function (evt) {
+                var mapper = mapperData.find(function (map) {
+                    return map.name === $(evt.currentTarget).val();
+                });
+
+                config.type = $(evt.currentTarget).val();
+                config.properties = {};
+                config.possibleProperties = {};
+
+                mapper.parameters
+                    .filter(function (el) {
+                        config.possibleProperties[el.name] = el;
+                        return !el.optional;
+                    })
+                    .forEach(function (el) {
+                        el['value'] = el.defaultValue;
+                        config.properties[el.name] = el;
+                    });
+
+                var inputOutputMapper = new InputOutputMapper(type, mapperContainer, extensionConfig);
+                inputOutputMapper.render();
+            });
+
+            if (config.type.length > 0) {
+                wizardBodyContent.find('#mapper-type').val(config.type);
+                var inputOutputMapper = new InputOutputMapper(type, mapperContainer, extensionConfig);
+                inputOutputMapper.render();
+            }
+
         }
 
         return ETLWizard;
