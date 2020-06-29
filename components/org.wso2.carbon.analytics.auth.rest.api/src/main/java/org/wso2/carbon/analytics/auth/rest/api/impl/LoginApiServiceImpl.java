@@ -189,10 +189,9 @@ public class LoginApiServiceImpl extends LoginApiService {
                                         AuthRESTAPIConstants.LOGOUT_CONTEXT + AuthRESTAPIConstants.LOGOUT_SSO_CONTEXT +
                                                 appContext , true, true, -1);
                     } else {
-                        logoutContextAccessToken = AuthUtil
-                                .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, accessTokenSecondHalf,
-                                        AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true,
-                                        -1);
+                        logoutContextAccessToken =
+                                AuthUtil.cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, accessTokenSecondHalf,
+                                        AuthRESTAPIConstants.LOGOUT_CONTEXT + appContext, true, true, -1);
                     }
 
                     if (refreshToken != null) {
@@ -415,9 +414,8 @@ public class LoginApiServiceImpl extends LoginApiService {
     @Override
     public Response getAuthType() {
         try {
-            IdPClientConfiguration authConfigurations = DataHolder.getInstance()
-                    .getConfigProvider()
-                    .getConfigurationObject(IdPClientConfiguration.class);
+            IdPClientConfiguration authConfigurations =
+                    DataHolder.getInstance().getConfigProvider().getConfigurationObject(IdPClientConfiguration.class);
             Map<String, String> responseMap = new HashMap<>();
             responseMap.put("authType", authConfigurations.isSsoEnabled() ? "sso" : "default");
             return Response.ok().entity(responseMap).build();
