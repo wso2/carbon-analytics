@@ -46,11 +46,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                             <div>
                               Source Mapper configuration
                               ${
-                                    Object.keys(config.possibleProperties).length !== Object.keys(config.properties).length ?
-                                        `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-source-mapper-property" type="button" data-toggle="dropdown">
+                Object.keys(config.possibleProperties).length !== Object.keys(config.properties).length ?
+                    `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-source-mapper-property" type="button" data-toggle="dropdown">
                                             <i class="fw fw-add"></i>
                                         </button>`: ''
-                                }
+            }
                               <div id="source-mapper-option-dropdown" style="left: 150px" class="dropdown-menu-style hidden" aria-labelledby="">
                               </div>
                             </div>
@@ -101,11 +101,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                                     <i class="fw fw-info"></i>    
                                 </a>  
                                 ${
-                                    optionData.optional ?
-                                        `<a style="color: #333">
+                    optionData.optional ?
+                        `<a style="color: #333">
                                             <i id="mapper-op-del-${name}" class="fw fw-delete"></i>    
                                         </a>` : ''
-                                }                              
+                }                              
                             </div>
                         </div>
                 `);
@@ -374,6 +374,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
             return content;
         }
-        
+
         return XMLMapper;
     });
