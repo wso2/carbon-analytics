@@ -63,6 +63,7 @@
     <!-- SmartWizard CSS -->
     <link rel="stylesheet" type="text/css" href="editor/commons/lib/smartWizard/css/smart_wizard.css"/>
     <link rel="stylesheet" type="text/css" href="editor/css/export-docker-kubernetes.css"/>
+    <link rel="stylesheet" type="text/css" href="editor/css/cron-generator.css"/>
     <title>Streaming Integrator Tooling</title>
 </head>
 
@@ -1137,6 +1138,8 @@
                     {{/if}}
                 </ul>
             </li>
+        </ul>
+    </li>
 </script>
 
 <script id="predefined-annotation-form-template" type="text/template">
@@ -1206,6 +1209,7 @@
             <option value="{{name}}">{{name}}</option>
             {{/each}}
         </select>
+    </select>
 </script>
 
 <script id="source-sink-store-options-template" type="text/template">
@@ -1228,7 +1232,9 @@
                     </i>
                 </div>
                 <div class="clearfix">
-                    <input class="option-value" type="text" value="{{value}}">
+                    <div class="option-content">
+                        <input class="option-value" type="text" value="{{value}}">
+                    </div>
                 </div>
                 {{else}}
                 <div class="clearfix">
@@ -1240,7 +1246,9 @@
                     </i>
                 </div>
                 <div class="clearfix">
-                    <input class="option-value" type="text" value="{{defaultValue}}" style="display:none">
+                    <div class="option-content" style="display:none">
+                        <input class="option-value" type="text" value="{{defaultValue}}">
+                    </div>
                 </div>
                 {{/if}}
                 <label class="error-message"></label>
@@ -1255,7 +1263,9 @@
                     </i>
                 </div>
                 <div class="clearfix">
-                    <input class="option-value" type="text" value="{{value}}">
+                    <div class="option-content">
+                        <input class="option-value" type="text" value="{{value}}">
+                    </div>
                 </div>
                 <label class="error-message"></label>
                 {{/if}}
@@ -2611,6 +2621,204 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Cron Generator Dialog-->
+<div class='modal fade' id='cronGenerator' tabindex='-1' role='dialog'>
+    <div class='modal-dialog cron-generator' role='document'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                    <i class='fw fw-cancel about-dialog-close'></i>
+                </button>
+                <h4 class='modal-title cron-generator-title' id='initheading'>Schedule Configuration</h4>
+                <hr class='cron-generator-hr'>
+            </div>
+            <div class='modal-body'>
+                <div class="container-fluid">
+                    <div id='corn-form' class="clearfix">
+                        <ul class="nav nav-tabs" style="background:#3c3a3a;" id="cronTabs">
+                            <li id="basicTab" class="active" style="width:25%;"><a data-toggle="tab" href="#cron-basic">
+                                <strong>Basic</strong></a>
+                            </li>
+                            <li id="regularTab" style = "width:25%;"><a data-toggle="tab" href="#cron-regular">
+                                <strong>Regular Interval</strong></a>
+                            </li>
+                            <li id="predefineTab" style = "width:25%;"><a data-toggle="tab" href="#cron-predefined">
+                                <strong>Predefined Time</strong></a>
+                            </li>
+                            <li id="advancedTab" style = "width:25%;"><a data-toggle="tab" href="#cron-advanced">
+                                <strong>Advanced</strong></a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="cron-basic" class="tab-pane" style="margin:20px 0px;">
+                                <div id="basic-content" class="clearfix">
+                                    <select id="basic-cron-list" class="form-control" style="width:50%;">
+                                        <option value="0 * * * * ?">Every minute</option>
+                                        <option value="0 0 * * * ?">Every hour</option>
+                                        <option value="0 0 12 * * ?">Every day at noon</option>
+                                        <option value="0 0 12 ? * SUN">Every week on Sunday at noon</option>
+                                        <option value="0 0 12 1 * ?">On the First of every month at noon</option>
+                                        <option value="0 0 12 1 1 ?">On the First of January of every year at noon
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="cron-regular" class="tab-pane" style="margin:10px 0px;">
+                                <div id="cronRegular" class="clearfix">
+                                    <div class="col-xs-12">
+                                        <div id="cronEverySecond" class="col-xs-2" style="padding:0px;width:12%">
+                                            <input id="everySecond" type="radio" name="cronRegularButton">
+                                            <label for="everySecond"> Second </label>
+                                        </div>
+                                        <div id="cronEveryMinute" class="col-xs-2" style="padding:0px;width:12%">
+                                            <input id="everyMinute" type="radio" name="cronRegularButton">
+                                            <label for="everyMinute"> Minute </label>
+                                        </div>
+                                        <div id="cronEveryHour" class="col-xs-2" style="padding:0px;width:12%">
+                                            <input id="everyHour" type="radio" name="cronRegularButton">
+                                            <label for="everyHour"> Hour </label>
+                                        </div>
+                                        <div id="cronEveryDay" class="col-xs-2" style="padding:0px;width:12%">
+                                            <input id="everyDay" type="radio" name="cronRegularButton">
+                                            <label for="everyDay"> Day </label>
+                                        </div>
+                                    </div>
+                                    <div class = "col-xs-12">
+                                        <div id="everySelectValues" class="col-xs-2" style="padding:0px;width:12%;">
+                                            <select id="selectListValues" class="form-control" onfocus="this.size=4;"
+                                                    onblur="this.size=1;" onchange="this.size=1; this.blur();"
+                                                    style="margin:5px 0px;">
+                                            </select>
+                                        </div>
+                                        <div id="TimeForRegularDay" class="col-xs-4">
+                                            <div id="timeForDayOption">
+                                                <label> Time </label>
+                                                <i class="fw fw-info" title=" Time in 24hour format "></i>
+                                                <input type="text" id="timeForEveryDay" value="12:00" class="form-control"
+                                                       style="margin:0px 15px;width:40%;" readonly/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="cron-predefined" class="tab-pane" style="margin:20px 0px;">
+                                <div id="cronPredefined" class="clearfix">
+                                    <div id="timeForPredefineTab" class="col-xs-12">
+                                        <div id="defineTime">
+                                            <label> Time </label>
+                                            <i class="fw fw-info" title=" Time in 24hour format "></i>
+                                            <input type="text" id="predefinedtime" value="12:30" class="form-control"
+                                                   style="margin:0px 15px;width:15%" readonly/>
+                                            <input id="predefineEveryDay" type="checkbox" name="predefineEveryDay"
+                                                   style="margin:15px 5px;">&nbsp;&nbsp;
+                                            <label for="predefineEveryDay" > Everyday </label>
+                                        </div>
+                                    </div>
+                                    <div id="valuesOfDays" class="col-xs-12" style="margin:10px 0px;">
+                                        <div class="col-xs-3" style="width:11%;padding-left:0px;">
+                                            <input id="sunday" type="checkbox" name="weekDays" value="SUN">
+                                            <label for="sunday"> Sunday </label>
+                                        </div>
+                                        <div class="col-xs-3" style="width:13.8%;">
+                                            <input id="monday" type="checkbox" name="weekDays" value="MON">
+                                            <label for="monday"> Monday </label>
+                                        </div>
+                                        <div class="col-xs-3" style="width:13.8%;">
+                                            <input id="tuesday" type="checkbox" name="weekDays" value="TUE">
+                                            <label for="tuesday"> Tuesday </label>
+                                        </div>
+                                        <div class="col-xs-3" style="width:16.5%;">
+                                            <input id="wednesday" type="checkbox" name="weekDays" value="WED">
+                                            <label for="wednesday"> Wednesday </label>
+                                        </div>
+                                        <div class="col-xs-3" style="width:14.5%;">
+                                            <input id="thursday" type="checkbox" name="weekDays" value="THU">
+                                            <label for="thursday"> Thursday </label>
+                                        </div>
+                                        <div class="col-xs-3" style="width:12.5%;">
+                                            <input id="friday" type="checkbox" name="weekDays" value="FRI">
+                                            <label for="friday"> Friday </label>
+                                        </div>
+                                        <div class="col-xs-3" style="width:14.5%;">
+                                            <input id="saturday" type="checkbox" name="weekDays" value="SAT">
+                                            <label for="saturday"> Saturday </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="cron-advanced" class="tab-pane" style="margin:20px 0px;">
+                                <div id="advancedCron" class="clearfix">
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-2" style="text-align:center;padding-left:0px;width:15%;">
+                                            <input id="second" class="form-control" type="text" value="*">
+                                            <label for="second"> Second </label>
+                                            <i class="fw fw-info"
+                                               title="Allowed characters : 0-59, Special characters : ,/*- "></i>
+                                        </div>
+                                        <div class="col-xs-2" style="text-align:center">
+                                            <input  id="minute" class="form-control" type="text" value="*" >
+                                            <label for="minute"> Minute </label>
+                                            <i class="fw fw-info"
+                                               title="Allowed characters : 0-59, Special characters : ,/*- "></i>
+                                        </div>
+                                        <div class="col-xs-2" style="text-align:center">
+                                            <input id="hour" class="form-control" type="text" value="*">
+                                            <label for="hour"> Hour </label>
+                                            <i class="fw fw-info"
+                                               title="Allowed characters : 0-23, Special characters : ,/*- "></i>
+                                        </div>
+                                        <div class="col-xs-2" style="text-align:center">
+                                            <input id="dayMonth" class="form-control" type="text" value="*">
+                                            <label for="dayMonth">Day (month)</label>
+                                            <i class="fw fw-info"
+                                               title="Allowed characters : 1-31,L,W,LW,Special characters : ,/*?- "></i>
+                                        </div>
+                                        <div class="col-xs-2" style="text-align:center">
+                                            <input id="month" class="form-control" type="text" value="*">
+                                            <label for="month"> Month </label>
+                                            <i class="fw fw-info"
+                                               title=" Allowed characters : 1-12 or JAN-DEC, Special characters : ,/*- "></i>
+                                        </div>
+                                        <div class="col-xs-2" style="text-align:center">
+                                            <input id="dayWeek" class="form-control" type="text" value="?">
+                                            <label for="dayWeek">Day (week)</label>
+                                            <i class="fw fw-info"
+                                               title=" Allowed characters: 1-7 or SUN-SAT, Special characters : ,?/*- "></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-10">
+                                        <ul class="error-message" id="errorMsg" style="margin:2px 0px;"></ul>
+                                    </div>
+                                    <div class = col-xs-12">
+                                        <div class="col-xs-3" style="padding:0px;width:16.8%;">
+                                            <label for="expression"> Expression in Quartz </label>
+                                        </div>
+                                        <div class="col-xs-8">
+                                            <input id="expression" value="* * * * * ?" class="form-control"
+                                                   style="margin:10px 0px;width:50%;text-align:left;" />
+                                        </div>
+                                        <div class="col-xs-3" style="padding:0px;width:16.8%;">
+                                            <label for="output"> Expression in English </label>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <label id="output"> Every second </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="footer_btn" id="cronfooter">
+                    <button id="saveButton" type="button" class="btn btn-primary"> Save </button>
                 </div>
             </div>
         </div>
