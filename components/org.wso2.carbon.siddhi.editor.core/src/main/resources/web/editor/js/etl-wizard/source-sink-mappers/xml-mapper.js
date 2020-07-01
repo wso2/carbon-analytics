@@ -34,10 +34,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             var container = this.__mapperContainer;
             var config = this.__extensionConfig.mapping;
 
-            if(config.payload) {
-                console.log(config.payload);
-            }
-
             container.empty();
             container.append(`
                 <div id="source-mapper-configurator">
@@ -151,12 +147,12 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     }
                 })
                 .on('keyup', _.debounce(function (evt) {
-                    var propertyName = evt.currentTarget.id.match('mapper-op-([a-zA-Z-]+)')[1].replaceAll(/-/g, '.');
+                    var propertyName = evt.currentTarget.id.match('mapper-op-([a-zA-Z0-9\-]+)')[1].replaceAll(/-/g, '.');
                     config.properties[propertyName].value = $(evt.currentTarget).val();
                 }, 100, {}));
 
             container.find('.mapper-option>.delete-section>a>.fw-delete').on('click', function (evt) {
-                var attribName = evt.currentTarget.id.match('mapper-op-del-([a-zA-Z-]+)')[1].replaceAll(/-/g, '.');
+                var attribName = evt.currentTarget.id.match('mapper-op-del-([a-zA-Z0-9\-]+)')[1].replaceAll(/-/g, '.');
                 delete config.properties[attribName];
                 self.render();
             });
@@ -184,7 +180,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
             var parsedXML = new DOMParser().parseFromString(config.mapping.samplePayload, 'text/xml');
             config.mapping.payload = self.generateSinkPayload(parsedXML, '');
-            console.log(config.mapping.payload)
         }
 
         XMLMapper.prototype.renderCustomMapper = function () {
@@ -216,6 +211,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
             container.find('.btn-add-sample-payload').on('click', function (evt) {
                 config.mapping.samplePayload = container.find('#sample-payload-submit-input').val();
+                config.mapping.attributes = {};
                 self.render();
             });
 
@@ -237,22 +233,35 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             container.find('#source-mapper-attribute-dropdown>.dropdown-item')
                 .on('click', function (evt) {
                     evt.stopPropagation();
-                    var attribName = evt.currentTarget.id.match('custom-source-attrib-([a-zA-Z_]+)')[1];
+                    var attribName = evt.currentTarget.id.match('custom-source-attrib-([a-zA-Z0-9_]+)')[1];
                     var pathArray = hoveredEl.split('\/');
                     var name = ''
+                    var enclosedElementPath = [];
 
-                    if(config.mapping.properties['enclosing.element']) {
-                        var index = pathArray.indexOf(config.mapping.properties['enclosing.element'].value.split('\/\/')[1]);
-                        if(index > -1) {
-                            pathArray.splice(index, 1);
-                        }
-                        pathArray.forEach(function (path, i) {
-                            if(i !== 0) {
-                                name += '/';
-                            }
-                            name += path;
-                        });
+                    if (config.mapping.properties['enclosing.element'] && config.mapping.properties['enclosing.element'].value.startsWith('\/\/')) {
+                        enclosedElementPath = config.mapping.properties['enclosing.element'].value.substr(2).split('/');
+                    } else if(config.mapping.properties['enclosing.element'] && config.mapping.properties['enclosing.element'].value.startsWith('\/')) {
+                        enclosedElementPath = config.mapping.properties['enclosing.element'].value.substr(1).split('/');
+                    }  else if (config.mapping.properties['enclosing.element']) {
+                        enclosedElementPath = config.mapping.properties['enclosing.element'].value.replaceAll(/\/\//g, '\/').split('/');
                     }
+
+                    var index = enclosedElementPath.length > 0 ? pathArray.indexOf(enclosedElementPath[0]) : -1;
+                    if(index > -1) {
+                        pathArray.splice(0, (++index));
+
+                        for (let i = 1; i < enclosedElementPath.length ; i++) {
+                            pathArray = pathArray.splice(0,1);
+                        }
+                        pathArray.splice(0,1);
+                    }
+
+                    pathArray.forEach(function (path, i) {
+                        if(i !== 0) {
+                            name += '/';
+                        }
+                        name += path;
+                    });
 
                     config.mapping.attributes[hoveredEl] = {attributeName: attribName, value: name};
                     if(self.__mapperType === 'sink') {
@@ -263,7 +272,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
             container.find('.parsed-representation-container>span.no-clear')
                 .on('mouseover', function (evt) {
-                    hoveredEl = evt.currentTarget.id.match('custom-map-val-([a-zA-Z-]+)')[1].replaceAll(/-/g, '\/').substr(1);
+                    hoveredEl = evt.currentTarget.id.match('custom-map-val-([a-zA-Z0-9\-]+)')[1].replaceAll(/-/g, '\/').substr(1);
                     var elementObj = container.find('#source-mapper-attribute-dropdown');
                     var leftOffset =  evt.currentTarget.offsetLeft;
                     var topOffset = evt.currentTarget.offsetTop + 20;
@@ -303,7 +312,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             container.find('.parsed-representation-container>span.ok-to-clear')
                 .on('mouseover', function (evt) {
                     $(evt.currentTarget).popover('show');
-                    hoveredEl = evt.currentTarget.id.match('custom-map-val-([a-zA-Z-]+)')[1].replaceAll(/-/g, '\/').substr(1);
+                    hoveredEl = evt.currentTarget.id.match('custom-map-val-([a-zA-Z0-9\-]+)')[1].replaceAll(/-/g, '\/').substr(1);
                     $(container).find(`#${$(evt.currentTarget).attr('aria-describedby')}`).on('click', function(e) {
                         e.stopPropagation();
                         delete config.mapping.attributes[hoveredEl];

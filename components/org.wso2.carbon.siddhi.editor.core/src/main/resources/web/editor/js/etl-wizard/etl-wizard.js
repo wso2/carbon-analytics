@@ -80,7 +80,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         attributes: {},
                         payload: '',
                         customEnabled: false,
-                        samplePayload: ""
+                        samplePayload: ''
                     }
                 },
                 query: {
@@ -579,6 +579,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 config.type = $(evt.currentTarget).val();
                 config.properties = {};
                 config.possibleProperties = {};
+                config.attributes = {};
+                config.payload = '';
+                config.customEnabled = false;
+                config.samplePayload = '';
 
                 mapper.parameters
                     .filter(function (el) {

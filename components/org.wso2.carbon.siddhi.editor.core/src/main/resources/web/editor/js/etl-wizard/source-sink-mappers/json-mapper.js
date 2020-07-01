@@ -20,23 +20,19 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
     function (require, $, _, log, Alerts) {
 
-        var XMLMapper = function (type, container, mapConfig) {
+        var JSONMapper = function (type, container, mapConfig) {
             this.__mapperContainer = container;
             this.__mapperType = type;
             this.__extensionConfig = mapConfig;
             this.__hoveredEl = '';
         }
 
-        XMLMapper.prototype.constructor = XMLMapper;
+        JSONMapper.prototype.constructor = JSONMapper;
 
-        XMLMapper.prototype.render = function () {
+        JSONMapper.prototype.render = function () {
             var self = this;
             var container = this.__mapperContainer;
             var config = this.__extensionConfig.mapping;
-
-            if(config.payload) {
-                console.log(config.payload);
-            }
 
             container.empty();
             container.append(`
@@ -101,11 +97,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                                     <i class="fw fw-info"></i>    
                                 </a>  
                                 ${
-                    optionData.optional ?
-                        `<a style="color: #333">
+                                    optionData.optional ?
+                                        `<a style="color: #333">
                                             <i id="mapper-op-del-${name}" class="fw fw-delete"></i>    
                                         </a>` : ''
-                }                              
+                                }                              
                             </div>
                         </div>
                 `);
@@ -151,23 +147,21 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     }
                 })
                 .on('keyup', _.debounce(function (evt) {
-                    var propertyName = evt.currentTarget.id.match('mapper-op-([a-zA-Z-]+)')[1].replaceAll(/-/g, '.');
+                    var propertyName = evt.currentTarget.id.match('mapper-op-([a-zA-Z0-9\-]+)')[1].replaceAll(/-/g, '.');
                     config.properties[propertyName].value = $(evt.currentTarget).val();
                 }, 100, {}));
 
             container.find('.mapper-option>.delete-section>a>.fw-delete').on('click', function (evt) {
-                var attribName = evt.currentTarget.id.match('mapper-op-del-([a-zA-Z-]+)')[1].replaceAll(/-/g, '.');
+                var attribName = evt.currentTarget.id.match('mapper-op-del-([a-zA-Z0-9\-]+)')[1].replaceAll(/-/g, '.');
                 delete config.properties[attribName];
                 self.render();
             });
 
             container.find('#btn-enable-custom-map').on('click', function (evt) {
                 config.customEnabled = !config.customEnabled;
-
                 if (!config.customEnabled) {
                     config.attributes = {};
                 }
-
                 self.render();
             });
 
@@ -176,18 +170,15 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             }
         }
 
-
-
-        XMLMapper.prototype.updateConfigPayload = function () {
+        JSONMapper.prototype.updateConfigPayload = function () {
             var self = this;
             var config = this.__extensionConfig;
 
-            var parsedXML = new DOMParser().parseFromString(config.mapping.samplePayload, 'text/xml');
-            config.mapping.payload = self.generateSinkPayload(parsedXML, '');
-            console.log(config.mapping.payload)
+            var parsedJSON = JSON.parse(config.mapping.samplePayload);
+            config.mapping.payload = self.generateSinkPayload(parsedJSON, '');
         }
 
-        XMLMapper.prototype.renderCustomMapper = function () {
+        JSONMapper.prototype.renderCustomMapper = function () {
             var self = this;
             var container = this.__mapperContainer;
             var config = this.__extensionConfig;
@@ -201,11 +192,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             `);
 
             if (config.mapping.samplePayload.length > 0) {
-                var parsedXml = new DOMParser().parseFromString(config.mapping.samplePayload, 'text/xml');
+                var jsonObject = JSON.parse(config.mapping.samplePayload);
 
                 container.append(`
                     <div style="border: 1px solid #333; padding: 5px; margin-top: 5px;" class="parsed-representation-container">
-                        ${self.generateHTMLFromXML(parsedXml, '', '')}
+                        ${self.generateHTMLFromJSON(jsonObject, '', '')}
                     </div>
                     <small>Hover over the attributes to assign attributes</small>
                     <div id="source-mapper-attribute-dropdown" style="left: 150px" class="dropdown-menu-style hidden" aria-labelledby="">
@@ -216,6 +207,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
             container.find('.btn-add-sample-payload').on('click', function (evt) {
                 config.mapping.samplePayload = container.find('#sample-payload-submit-input').val();
+                config.mapping.attributes = {};
                 self.render();
             });
 
@@ -237,22 +229,27 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             container.find('#source-mapper-attribute-dropdown>.dropdown-item')
                 .on('click', function (evt) {
                     evt.stopPropagation();
-                    var attribName = evt.currentTarget.id.match('custom-source-attrib-([a-zA-Z_]+)')[1];
-                    var pathArray = hoveredEl.split('\/');
-                    var name = ''
+                    var attribName = evt.currentTarget.id.match('custom-source-attrib-([a-zA-Z0-9_]+)')[1];
+                    var pathArray = hoveredEl.split('-');
+                    var name = '';
+                    var jsonPathArray = [];
 
-                    if(config.mapping.properties['enclosing.element']) {
-                        var index = pathArray.indexOf(config.mapping.properties['enclosing.element'].value.split('\/\/')[1]);
-                        if(index > -1) {
-                            pathArray.splice(index, 1);
-                        }
-                        pathArray.forEach(function (path, i) {
-                            if(i !== 0) {
-                                name += '/';
+                    if (config.mapping.properties['enclosing.element'] && config.mapping.properties['enclosing.element'].value.startsWith('\$')) {
+                        jsonPathArray = config.mapping.properties['enclosing.element'].value.split('.');
+                        for (let i = 1; i < jsonPathArray.length; i++) {
+                            var index = pathArray.indexOf(jsonPathArray[i]);
+                            if (index === 0) {
+                                pathArray.splice(0, 1);
                             }
-                            name += path;
-                        });
+                        }
                     }
+
+                    pathArray.forEach(function (path, i) {
+                        if(i !== 0) {
+                            name += '.';
+                        }
+                        name += path;
+                    });
 
                     config.mapping.attributes[hoveredEl] = {attributeName: attribName, value: name};
                     if(self.__mapperType === 'sink') {
@@ -263,7 +260,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
             container.find('.parsed-representation-container>span.no-clear')
                 .on('mouseover', function (evt) {
-                    hoveredEl = evt.currentTarget.id.match('custom-map-val-([a-zA-Z-]+)')[1].replaceAll(/-/g, '\/').substr(1);
+                    hoveredEl = evt.currentTarget.id.match('custom-map-val-([a-zA-Z0-9\-]+)')[1];
                     var elementObj = container.find('#source-mapper-attribute-dropdown');
                     var leftOffset =  evt.currentTarget.offsetLeft;
                     var topOffset = evt.currentTarget.offsetTop + 20;
@@ -303,7 +300,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             container.find('.parsed-representation-container>span.ok-to-clear')
                 .on('mouseover', function (evt) {
                     $(evt.currentTarget).popover('show');
-                    hoveredEl = evt.currentTarget.id.match('custom-map-val-([a-zA-Z-]+)')[1].replaceAll(/-/g, '\/').substr(1);
+                    hoveredEl = evt.currentTarget.id.match('custom-map-val-([a-zA-Z0-9\-]+)')[1];
                     $(container).find(`#${$(evt.currentTarget).attr('aria-describedby')}`).on('click', function(e) {
                         e.stopPropagation();
                         delete config.mapping.attributes[hoveredEl];
@@ -327,53 +324,89 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
 
 
-        XMLMapper.prototype.generateHTMLFromXML = function(xmlObject, indent, id) {
+        JSONMapper.prototype.generateHTMLFromJSON = function(jsonObject, indent, id) {
+            var self = this;
             var content = '';
             var config = this.__extensionConfig;
 
-            for (var i = 0; i < xmlObject.childElementCount; i++) {
-                content += `${indent}&lt;${xmlObject.children[i].tagName}`;
-                Object.keys(xmlObject.children[i].attributes).forEach(function (key) {
-                    content += ` ${xmlObject.children[i].attributes[key].name}="${xmlObject.children[i].attributes[key].nodeValue}" `
-                });
-                content += '&gt;';
-                if(xmlObject.children[i].childElementCount > 0) {
-                    content += `<br/>${this.generateHTMLFromXML(xmlObject.children[i], indent+'&nbsp;&nbsp;&nbsp;&nbsp;', `${id}-${xmlObject.children[i].tagName}`)}`;
-                } else {
-                    var key = `${id}-${xmlObject.children[i].tagName}`;
-                    var attrib_key = key.replaceAll(/-/g, '\/').substr(1);
+            switch (typeof jsonObject) {
+                case 'object':
+                    if ( Array.isArray(jsonObject)) {
+                        content += '[<br/>';
 
-                    content += `<span id="custom-map-val-${key}" class="custom-mapper-val ${config.mapping.attributes[attrib_key] ? 'ok-to-clear': 'no-clear'}" id="attrib-val-${i}">${config.mapping.attributes[attrib_key] ? `{{  ${config.mapping.attributes[attrib_key].attributeName}  }}` : this.__mapperType === 'source' ? '{{value}}' : xmlObject.children[i].textContent }</span>`;
-                }
-                content += `${xmlObject.children[i].childElementCount > 0 ? indent : ''}&lt;/${xmlObject.children[i].tagName}&gt;<br/>`;
+                        Object.keys(jsonObject).forEach(function (key) {
+                            content += `${indent+'&nbsp;&nbsp;&nbsp;&nbsp;'}`;
+                            content+= self.generateHTMLFromJSON(jsonObject[key], indent+'&nbsp;&nbsp;&nbsp;&nbsp;', `${id}`);
+                        });
+                        content += `${indent}]<br/>`;
+                    } else {
+                        content += `{<br/>`;
+                        Object.keys(jsonObject).forEach(function (key) {
+                            content += `${indent+'&nbsp;&nbsp;&nbsp;&nbsp;'}${key} : `
+                            content+= self.generateHTMLFromJSON(jsonObject[key], indent+'&nbsp;&nbsp;&nbsp;&nbsp;', `${id}-${key}`);
+                        });
+                        content += `${indent}}<br/>`;
+                    }
+                    break;
+                case "number":
+                    content += `<span id="custom-map-val${id}" class="custom-mapper-val ${config.mapping.attributes[id.substr(1)] ? 'ok-to-clear': 'no-clear'}" >${config.mapping.attributes[id.substr(1)] ? `{{ ${config.mapping.attributes[id.substr(1)].attributeName} }}` : jsonObject}</span>,<br/>`
+                    break;
+                case "string":
+                    content += `<span id="custom-map-val${id}" class="custom-mapper-val ${config.mapping.attributes[id.substr(1)] ? 'ok-to-clear': 'no-clear'}" >${config.mapping.attributes[id.substr(1)] ? `{{ ${config.mapping.attributes[id.substr(1)].attributeName} }}` : `"${jsonObject}"`}</span>,<br/>`
+                    break;
+            }
+            return content;
+        }
+
+        JSONMapper.prototype.generateSinkPayload = function (jsonObject, id) {
+            var self = this;
+            var content = '';
+            var config = this.__extensionConfig;
+
+            if(id.length === 0) {
+                content += '"""';
+            }
+
+            switch (typeof jsonObject) {
+                case 'object':
+                    if ( Array.isArray(jsonObject)) {
+                        content += '[';
+
+                        Object.keys(jsonObject).forEach(function (key, index) {
+                            content+= self.generateSinkPayload(jsonObject[key], `${id}`);
+
+                            if(Object.keys(jsonObject).length > (index+1)) {
+                                content+=',';
+                            }
+                        });
+                        content += `]`;
+                    } else {
+                        content += `{`;
+                        Object.keys(jsonObject).forEach(function (key, index) {
+                            content += `"${key}":`
+                            content += self.generateSinkPayload(jsonObject[key], `${id}-${key}`);
+
+                            if(Object.keys(jsonObject).length > (index+1)) {
+                                content+=',';
+                            }
+                        });
+                        content += `}`;
+                    }
+                    break;
+                case "number":
+                    content += `${config.mapping.attributes[id.substr(1)] ? config.mapping.attributes[id.substr(1)].attributeName : jsonObject }`
+                    break;
+                case "string":
+                    content += `"${config.mapping.attributes[id.substr(1)] ? `{{${config.mapping.attributes[id.substr(1)].attributeName}}` : jsonObject }"`
+                    break;
+            }
+
+            if(id.length === 0) {
+                content += '"""';
             }
 
             return content;
         }
 
-        XMLMapper.prototype.generateSinkPayload = function (xmlObject, id) {
-            var content = '';
-            var config = this.__extensionConfig;
-
-            for (var i = 0; i < xmlObject.childElementCount; i++) {
-                content += `<${xmlObject.children[i].tagName}`;
-                Object.keys(xmlObject.children[i].attributes).forEach(function (key) {
-                    content += ` ${xmlObject.children[i].attributes[key].name}="${xmlObject.children[i].attributes[key].nodeValue}" `
-                });
-                content += '>';
-                if(xmlObject.children[i].childElementCount > 0) {
-                    content += `${this.generateSinkPayload(xmlObject.children[i], `${id}-${xmlObject.children[i].tagName}`)}`;
-                } else {
-                    var key = `${id}-${xmlObject.children[i].tagName}`;
-                    var attrib_key = key.replaceAll(/-/g, '\/').substr(1);
-
-                    content += `${config.mapping.attributes[attrib_key] ? `{{${config.mapping.attributes[attrib_key].attributeName}}}` : xmlObject.children[i].textContent }`;
-                }
-                content += `</${xmlObject.children[i].tagName}>`;
-            }
-
-            return content;
-        }
-
-        return XMLMapper;
+        return JSONMapper;
     });

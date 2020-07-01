@@ -16,14 +16,15 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'lodash', 'log', 'alerts', 'csvMapper', 'xmlMapper'],
+define(['require', 'jquery', 'lodash', 'log', 'alerts', 'csvMapper', 'xmlMapper', 'jsonMapper'],
 
-    function (require, $, _, log, Alerts, CSVMapper, XMLMapper ) {
+    function (require, $, _, log, Alerts, CSVMapper, XMLMapper, JSONMapper ) {
 
         var SourceSinkMapper = function (sourceOrSinkType, container, config) {
             this.__sourceOrSinkType = sourceOrSinkType;
             this.__container = container;
             this.__config = config;
+
         }
 
         SourceSinkMapper.prototype.constructor = SourceSinkMapper;
@@ -37,6 +38,9 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'csvMapper', 'xmlMapper'
                     break;
                 case 'xml':
                     mapper = new XMLMapper(this.__sourceOrSinkType, this.__container, this.__config);
+                    break;
+                case 'json':
+                    mapper = new JSONMapper(this.__sourceOrSinkType, this.__container, this.__config);
                     break;
             }
 
