@@ -159,6 +159,7 @@ requirejs.config({
         csvMapper: "js/etl-wizard/source-sink-mappers/csv-mapper",
         xmlMapper: "js/etl-wizard/source-sink-mappers/xml-mapper",
         jsonMapper: "js/etl-wizard/source-sink-mappers/json-mapper",
+        textMapper: "js/etl-wizard/source-sink-mappers/text-mapper",
         inputOutputMapper: "js/etl-wizard/source-sink-mappers/source-sink-mapper"
     },
     map: {
