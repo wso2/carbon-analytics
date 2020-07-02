@@ -37,6 +37,10 @@ public interface SiddhiAppDeployerServiceStub {
     @Headers("Content-Type: text/plain; charset=utf-8")
     Response doPutRequest(String payload) throws SiddhiAppDeployerServiceStubException;
 
+    @RequestLine("GET /siddhi-apps/{appName}")
+    @Headers("Content-Type: application/json; charset=utf-8")
+    Response doGetSiddhiApp(@Param("appName") String appName) throws SiddhiAppDeployerServiceStubException;
+
     @RequestLine("DELETE /siddhi-apps/{appName}")
     @Headers("Content-Type: text/plain; charset=utf-8")
     Response doDeleteRequest(@Param("appName") String appName) throws SiddhiAppDeployerServiceStubException;
@@ -44,4 +48,16 @@ public interface SiddhiAppDeployerServiceStub {
     @RequestLine("GET /siddhi-apps/{appName}/status")
     @Headers("Content-Type: text/plain; charset=utf-8")
     Response doGetRequest(@Param("appName") String appName) throws SiddhiAppDeployerServiceStubException;
+
+    @RequestLine("GET /siddhi-apps")
+    @Headers("Content-Type: application/json; charset=utf-8")
+    Response doGetSiddhiAppList() throws SiddhiAppDeployerServiceStubException;
+
+    @RequestLine("GET /siddhi-apps/count")
+    @Headers("Content-Type: application/json; charset=utf-8")
+    Response doGetSiddhiAppCount() throws SiddhiAppDeployerServiceStubException;
+
+    @RequestLine("GET /siddhi-apps/{appName}/isExists")
+    @Headers("Content-Type: application/json; charset=utf-8")
+    Response doGetSiddhiAppAvailability(@Param("appName") String appName) throws SiddhiAppDeployerServiceStubException;
 }

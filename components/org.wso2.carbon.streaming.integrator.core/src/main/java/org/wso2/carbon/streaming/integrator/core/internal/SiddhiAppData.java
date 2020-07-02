@@ -33,6 +33,7 @@ public class SiddhiAppData {
     private Map<String, InputHandler> inputHandlerMap;
     private SiddhiAppRuntime siddhiAppRuntime;
     private long deploymentTimeInMillis;
+    private boolean isRunning;
 
     public SiddhiAppData(String siddhiApp) {
         SiddhiApp = siddhiApp;

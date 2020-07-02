@@ -178,7 +178,8 @@
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
         <private.package>
             org.wso2.carbon.database.query.manager.*,
-            org.wso2.carbon.database.query.manager.exception.*
+            org.wso2.carbon.database.query.manager.exception.*,
+            org.apache.commons.codec.*
         </private.package>
         <export.package>
             org.wso2.carbon.business.rules.core.*

@@ -1393,6 +1393,15 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     /**
+     * @param nodeURL   : URL of the node on which artifacts are going to be deployed
+     * @param siddhiApp : siddhiApp which is going to be deployed
+     */
+    public void deploySiddhiApp(String nodeURL, String siddhiApp)
+            throws SiddhiAppsApiHelperException {
+        siddhiAppApiHelper.deploySiddhiApp(nodeURL, siddhiApp);
+    }
+
+    /**
      * @param businessRuleUUID         : UUID of the businessRule
      * @param businessRuleFromTemplate : businessRule derived from a template
      * @param deploymentStatus         : status of the businessRule
@@ -1451,6 +1460,16 @@ public class TemplateManagerService implements BusinessRulesService {
      */
     private void updateDeployedSiddhiApp(String nodeURL, Artifact siddhiApp) throws SiddhiAppsApiHelperException {
         siddhiAppApiHelper.update(nodeURL, siddhiApp.getContent());
+
+    }
+
+    /**
+     * @param nodeURL   : URL of the node on which artifacts are going to be deployed
+     * @param siddhiApp : siddhiApp to be updated.
+     * @throws SiddhiAppsApiHelperException : occurs when dealing with SiddhiAppsApi
+     */
+    public void updateDeployedSiddhiApp(String nodeURL, String siddhiApp) throws SiddhiAppsApiHelperException {
+        siddhiAppApiHelper.update(nodeURL, siddhiApp);
 
     }
 
@@ -1601,6 +1620,31 @@ public class TemplateManagerService implements BusinessRulesService {
                 Map.Entry::getKey, e -> e.getValue().getDefaultValue()));
         return new BusinessRuleFromTemplate(ruleTemplate.getUuid(), ruleTemplate.getName(), templateGroupUUID,
                 ruleTemplate.getType(), ruleTemplate.getUuid(), properties);
+    }
+
+    public long getSiddhiAppCount(String nodeUrl) throws SiddhiAppsApiHelperException {
+        return siddhiAppApiHelper.getSiddhiAppCount(nodeUrl);
+    }
+
+    public boolean checkSiddhiAppAvailability(String nodeUrl, String siddhiAppName)
+            throws SiddhiAppsApiHelperException {
+        return siddhiAppApiHelper.getSiddhiAppAvailability(nodeUrl, siddhiAppName);
+    }
+
+    public boolean deleteSiddhiApp(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException {
+        return siddhiAppApiHelper.delete(nodeUrl, siddhiAppName);
+    }
+
+    public List getSiddhiAppList(String nodeUrl) throws SiddhiAppsApiHelperException {
+        return siddhiAppApiHelper.getSiddhiAppList(nodeUrl);
+    }
+
+    public String getSiddhiApp(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException {
+        return siddhiAppApiHelper.getSiddhiApp(nodeUrl, siddhiAppName);
+    }
+
+    public Map getNodes() {
+        return nodes;
     }
 
 }

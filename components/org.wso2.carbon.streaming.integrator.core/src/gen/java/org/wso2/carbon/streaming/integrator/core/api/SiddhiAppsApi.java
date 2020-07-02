@@ -17,7 +17,6 @@
 package org.wso2.carbon.streaming.integrator.core.api;
 
 import io.swagger.annotations.ApiParam;
-import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.streaming.integrator.core.factories.SiddhiAppsApiServiceFactory;
@@ -28,7 +27,6 @@ import org.wso2.carbon.streaming.integrator.core.util.StatsEnable;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
-import io.siddhi.core.util.statistics.metrics.Level;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -57,7 +55,7 @@ import javax.ws.rs.core.Response;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-05-31T15:43:24.557Z")
 public class SiddhiAppsApi implements Microservice {
-    private final SiddhiAppsApiService delegate = SiddhiAppsApiServiceFactory.getSiddhiAppsApi();
+    private final org.wso2.carbon.streaming.integrator.core.api.SiddhiAppsApiService delegate = SiddhiAppsApiServiceFactory.getSiddhiAppsApi();
 
     @POST
     @Consumes({"text/plain"})
@@ -117,6 +115,21 @@ public class SiddhiAppsApi implements Microservice {
         return delegate.siddhiAppsGet(isActive, request);
     }
 
+    @GET
+    @Path("/count")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Lists Siddhi Applications", notes = "Provides the name list of " +
+            "Siddhi Applications that exist.", response = InlineResponse200.class, tags = {"Artifact",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Applications are successfully " +
+                    "retrieved.", response = InlineResponse200.class)})
+    public Response siddhiAppsCountGet(
+            @Context Request request,
+            @ApiParam(value = "Retrieves count of files deployed in deployment directory.", required = false)
+            @QueryParam("isActive") String isActive) throws NotFoundException {
+        return delegate.siddhiAppsCountGet(request);
+    }
+
     @DELETE
     @Path("/{appName}")
     @Produces({"application/json"})
@@ -171,6 +184,23 @@ public class SiddhiAppsApi implements Microservice {
             @ApiParam(value = "The name of the Siddhi Application.", required = true)
             @PathParam("appName") String appName) throws NotFoundException {
         return delegate.siddhiAppsAppNameStatusGet(appName, request);
+    }
+
+    @GET
+    @Path("/{appName}/isExists")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Check siddhi app is deployed in server.", notes = "Check siddhi " +
+            "app is deployed in server.", response = InlineResponse200.class, tags = {"Artifact",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The state of the Siddhi Application is " +
+                    "successfully retrieved.", response = InlineResponse200.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application specified is not found.",
+                    response = InlineResponse400.class)})
+    public Response siddhiAppExistsGet(
+            @Context Request request,
+            @ApiParam(value = "The Siddhi Application.", required = true)
+            @PathParam("appName") String siddhiAppName) throws NotFoundException {
+        return delegate.siddhiAppExistsGet(siddhiAppName, request);
     }
 
     @POST
@@ -239,12 +269,12 @@ public class SiddhiAppsApi implements Microservice {
     @Path("/revisions")
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Deletes all revisions of the periodic state of all Siddhi Applications.",
-            notes = "Deletes all revisions of the periodic state of all Siddhi Applications. ", response = InlineResponse400.class, tags={ "State",})
+            notes = "Deletes all revisions of the periodic state of all Siddhi Applications. ", response = InlineResponse400.class, tags = {"State",})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "All revisions of the periodic state of all the siddhi applicationa " +
                     "are deleted succussfully.", response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
-                    response = InlineResponse400.class) })
+                    response = InlineResponse400.class)})
     public Response siddhiAppsRevisionsDelete(
             @Context Request request,
             @ApiParam(value = "Whether the redeployment enable or not", required = false)

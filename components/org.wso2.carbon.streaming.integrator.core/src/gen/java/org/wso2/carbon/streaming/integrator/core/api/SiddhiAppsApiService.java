@@ -17,9 +17,9 @@
 package org.wso2.carbon.streaming.integrator.core.api;
 
 
+import io.siddhi.core.util.statistics.metrics.Level;
 import org.wso2.carbon.streaming.integrator.core.util.StatsEnable;
 import org.wso2.msf4j.Request;
-import io.siddhi.core.util.statistics.metrics.Level;
 
 import javax.ws.rs.core.Response;
 
@@ -31,7 +31,7 @@ import javax.ws.rs.core.Response;
         date = "2017-05-31T15:43:24.557Z")
 public abstract class SiddhiAppsApiService {
 
-    public abstract Response siddhiAppsAppNameDelete(String appName, Request request) throws NotFoundException;
+    public abstract Response siddhiAppsAppNameDelete(String appName, Request request) throws org.wso2.carbon.streaming.integrator.core.api.NotFoundException;
 
     public abstract Response siddhiAppsAppNameGet(String appName, Request request) throws NotFoundException;
 
@@ -61,4 +61,8 @@ public abstract class SiddhiAppsApiService {
             NotFoundException;
 
     public abstract Response siddhiAppsElementsGet(String appName, Request request) throws NotFoundException;
+
+    public abstract Response siddhiAppExistsGet(String siddhiApp, Request request) throws NotFoundException;
+
+    public abstract Response siddhiAppsCountGet(Request request) throws NotFoundException;
 }
