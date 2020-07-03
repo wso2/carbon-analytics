@@ -33,8 +33,12 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
-public class RoundRobbinDeployer implements SiddhiAppDeployer {
-    private static final Logger log = LoggerFactory.getLogger(RoundRobbinDeployer.class);
+/****
+ * This deployer will deploy siddhi app in load balancing manner. So the provided siddhi app will be deployed in the
+ * node which has the lowest number of siddhi apps
+ */
+public class LoadBalancingDeployer implements SiddhiAppDeployer {
+    private static final Logger log = LoggerFactory.getLogger(LoadBalancingDeployer.class);
 
     @Override
     public Response deploySiddhiApp(TemplateManagerService templateManagerService, Object siddhiApp) {

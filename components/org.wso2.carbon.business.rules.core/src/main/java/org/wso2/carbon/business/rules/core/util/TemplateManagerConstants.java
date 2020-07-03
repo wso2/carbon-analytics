@@ -90,5 +90,5 @@ public class TemplateManagerConstants {
     public static final String ONE = "one";
     public static final String MANY = "many";
 
-    public static final String DEPLOYMENT_PATTERN_ROUND_ROBBIN = "round_robbin";
+    public static final String DEPLOYMENT_PATTERN_LOAD_BALANCING = "load_balance";
 }

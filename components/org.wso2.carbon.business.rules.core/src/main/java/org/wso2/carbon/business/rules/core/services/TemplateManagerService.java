@@ -40,7 +40,7 @@ import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperExcepti
 import org.wso2.carbon.business.rules.core.exceptions.TemplateInstanceCountViolationException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerHelperException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
-import org.wso2.carbon.business.rules.core.manager.RoundRobbinDeployer;
+import org.wso2.carbon.business.rules.core.manager.LoadBalancingDeployer;
 import org.wso2.carbon.business.rules.core.manager.SiddhiAppDeployer;
 import org.wso2.carbon.business.rules.core.manager.util.UpdateSindhiAppCountScheduler;
 import org.wso2.carbon.business.rules.core.util.LogEncoder;
@@ -60,7 +60,7 @@ import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static org.wso2.carbon.business.rules.core.util.TemplateManagerConstants.DEPLOYMENT_PATTERN_ROUND_ROBBIN;
+import static org.wso2.carbon.business.rules.core.util.TemplateManagerConstants.DEPLOYMENT_PATTERN_LOAD_BALANCING;
 
 /**
  * The exposed Template Manager service, which contains methods related to Business Rules from template, and Business
@@ -93,8 +93,8 @@ public class TemplateManagerService implements BusinessRulesService {
             Timer timer = new Timer();
             timer.schedule(new UpdateSindhiAppCountScheduler(), TimeUnit.MINUTES.toMillis(15),
                     TimeUnit.MINUTES.toMillis(15));
-            if (siddhiAppManagerDeploymentPattern.equals(DEPLOYMENT_PATTERN_ROUND_ROBBIN)) {
-                deployer = new RoundRobbinDeployer();
+            if (siddhiAppManagerDeploymentPattern.equals(DEPLOYMENT_PATTERN_LOAD_BALANCING)) {
+                deployer = new LoadBalancingDeployer();
             } else {
                 throw new TemplateManagerServiceException("Provided siddhi manager deploy pattern" +
                         siddhiAppManagerDeploymentPattern + "doesn't support");
