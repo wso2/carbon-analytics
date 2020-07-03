@@ -16,9 +16,9 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'lodash', 'log', 'alerts', 'csvMapper', 'xmlMapper', 'jsonMapper', 'textMapper'],
+define(['require', 'jquery', 'lodash', 'log', 'alerts', 'csvMapper', 'xmlMapper', 'jsonMapper', 'textMapper', 'avroMapper'],
 
-    function (require, $, _, log, Alerts, CSVMapper, XMLMapper, JSONMapper, TextMapper ) {
+    function (require, $, _, log, Alerts, CSVMapper, XMLMapper, JSONMapper, TextMapper, AvroMapper ) {
 
         var SourceSinkMapper = function (sourceOrSinkType, container, config) {
             this.__sourceOrSinkType = sourceOrSinkType;
@@ -44,6 +44,9 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'csvMapper', 'xmlMapper'
                     break;
                 case 'text':
                     mapper = new TextMapper(this.__sourceOrSinkType, this.__container, this.__config);
+                    break;
+                case 'avro':
+                    mapper = new AvroMapper(this.__sourceOrSinkType, this.__container, this.__config);
                     break;
             }
 
