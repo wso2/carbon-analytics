@@ -40,6 +40,9 @@ import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperExcepti
 import org.wso2.carbon.business.rules.core.exceptions.TemplateInstanceCountViolationException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerHelperException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
+import org.wso2.carbon.business.rules.core.manager.RoundRobbinDeployer;
+import org.wso2.carbon.business.rules.core.manager.SiddhiAppDeployer;
+import org.wso2.carbon.business.rules.core.manager.util.UpdateSindhiAppCountScheduler;
 import org.wso2.carbon.business.rules.core.util.LogEncoder;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
@@ -53,7 +56,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static org.wso2.carbon.business.rules.core.util.TemplateManagerConstants.DEPLOYMENT_PATTERN_ROUND_ROBBIN;
+
 
 /**
  * The exposed Template Manager service, which contains methods related to Business Rules from template, and Business
@@ -63,18 +71,36 @@ public class TemplateManagerService implements BusinessRulesService {
     private static final Logger log = LoggerFactory.getLogger(TemplateManagerService.class);
     private static final int DEFAULT_ARTIFACT_COUNT = 1;
     private static SiddhiAppApiHelper siddhiAppApiHelper = new SiddhiAppApiHelper();
+    Map<String, Long> siddhiAppsCount;
     // Available Template Groups from the directory
     private Map<String, TemplateGroup> availableTemplateGroups;
     private Map<String, BusinessRule> availableBusinessRules;
     private Map nodes = null;
     private Gson gson;
     private QueryExecutor queryExecutor;
+    private String siddhiAppManagerDeploymentPattern = null;
+    private SiddhiAppDeployer deployer;
+    private boolean isSiddhiAppDeployerEnabled = false;
 
     public TemplateManagerService() throws TemplateManagerServiceException, RuleTemplateScriptException {
         this.gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         this.queryExecutor = new QueryExecutor();
         ConfigReader configReader = new ConfigReader();
         this.nodes = configReader.getNodes();
+        if (configReader.isSiddhiAppManagerEnabled()) {
+            isSiddhiAppDeployerEnabled = true;
+            siddhiAppManagerDeploymentPattern = configReader.getSiddhiAppDeploymentPattern();
+            siddhiAppsCount = getSiddhiAppCount();
+            Timer timer = new Timer();
+            timer.schedule(new UpdateSindhiAppCountScheduler(), TimeUnit.MINUTES.toMillis(15),
+                    TimeUnit.MINUTES.toMillis(15));
+            if (siddhiAppManagerDeploymentPattern.equals(DEPLOYMENT_PATTERN_ROUND_ROBBIN)) {
+                deployer = new RoundRobbinDeployer();
+            } else {
+                throw new TemplateManagerServiceException("Provided siddhi manager deploy pattern" +
+                        siddhiAppManagerDeploymentPattern + "doesn't support");
+            }
+        }
         // Load & store available Template Groups & Business Rules at the time of instantiation
         this.availableTemplateGroups = loadTemplateGroups();
         if (!configReader.getSolutionType().equalsIgnoreCase(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_SP)) {
@@ -1614,6 +1640,20 @@ public class TemplateManagerService implements BusinessRulesService {
         }
     }
 
+    public Map<String, Long> getSiddhiAppCount() {
+        Map<String, Long> siddhiAppCounts = new HashMap();
+        long appCount;
+        for (Object node : nodes.keySet()) {
+            try {
+                appCount = getSiddhiAppCount(node.toString());
+                siddhiAppCounts.put(node.toString(), appCount);
+            } catch (SiddhiAppsApiHelperException e) {
+                log.error("Error occured while retrieving the siddhi app count from node " + node.toString(), e);
+            }
+        }
+        return siddhiAppCounts;
+    }
+
     private BusinessRuleFromTemplate replacePropertiesWithDefaultValues(RuleTemplate ruleTemplate,
                                                                         String templateGroupUUID) {
         Map<String, String> properties = ruleTemplate.getProperties().entrySet().stream().collect(Collectors.toMap(
@@ -1647,4 +1687,19 @@ public class TemplateManagerService implements BusinessRulesService {
         return nodes;
     }
 
+    public boolean isSiddhiAppDeployerEnabled() {
+        return isSiddhiAppDeployerEnabled;
+    }
+
+    public SiddhiAppDeployer getSiddhiAppDeployerInstance() {
+        return deployer;
+    }
+
+    public Map<String, Long> getSiddhiAppsCountMap() {
+        return siddhiAppsCount;
+    }
+
+    public void setSiddhiAppsCountMap(Map<String, Long> siddhiAppsCount) {
+        this.siddhiAppsCount = siddhiAppsCount;
+    }
 }

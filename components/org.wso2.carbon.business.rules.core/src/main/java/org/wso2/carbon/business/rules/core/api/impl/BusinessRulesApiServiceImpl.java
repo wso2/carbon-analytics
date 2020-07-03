@@ -36,19 +36,16 @@ import org.wso2.carbon.business.rules.core.datasource.configreader.DataHolder;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleNotFoundException;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
-import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
-import org.wso2.carbon.business.rules.core.exceptions.SiddhiManagerHelperException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateInstanceCountViolationException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
+import org.wso2.carbon.business.rules.core.manager.SiddhiAppDeployer;
 import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
 import org.wso2.carbon.business.rules.core.util.LogEncoder;
-import org.wso2.carbon.business.rules.core.util.SiddhiManagerHelper;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
 import org.wso2.msf4j.Request;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
@@ -534,60 +531,16 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response deploySiddhiApp(Request request, Object siddhiApp)
             throws NotFoundException {
-        //Provide a grouping capability. introduce a table
         if (!hasPermission(request, RequestMethod.DEPLOY_SIDDHI_APP)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
-        //Make it sync
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-        //count
-        Map nodes = templateManagerService.getNodes();
-        Map<String, Long> deployedSiddhiAppCountInEachNode = new HashMap<>();
-        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        List<Object> responseData = new ArrayList<Object>();
-
-        String siddhiAppName;
-        try {
-            siddhiAppName = SiddhiManagerHelper.getSiddhiAppName(siddhiApp);
-        } catch (SiddhiManagerHelperException e) {
-            log.error("Error occured while retrieving the siddhi app name", e);
-            return Response.serverError().entity("Error occured while retrieving the siddhi app name " +
-                    e.getMessage()).build();
+        if (templateManagerService.isSiddhiAppDeployerEnabled()) {
+            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployerInstance();
+            return deployer.deploySiddhiApp(templateManagerService, siddhiApp);
         }
-        for (Object node : nodes.keySet()) {
-            boolean isSiddhiAppAvailable = false;
-            try {
-                isSiddhiAppAvailable = templateManagerService.checkSiddhiAppAvailability(node.toString(),
-                        siddhiAppName);
-            } catch (SiddhiAppsApiHelperException e) {
-                log.error("Error occured while retrieving siddhi app availability from node " + node.toString(), e);
-            }
-            if (isSiddhiAppAvailable) {
-                log.error("Failed to deploy the siddhi app. Siddhi app already exists in node" + node.toString());
-                responseData.add("Failed to deploy the siddhi app. Siddhi app already exists in node " +
-                        node.toString());
-                return Response.status(Response.Status.CONFLICT).entity(gson.toJson(responseData)).build();
-            }
-            try {
-                Long siddhiAppCount = templateManagerService.getSiddhiAppCount(node.toString());
-                deployedSiddhiAppCountInEachNode.put(node.toString(), siddhiAppCount);
-            } catch (SiddhiAppsApiHelperException e) {
-                log.error("Error occured while retrieving siddhi app count from node " + node.toString(), e);
-            }
-
-        }
-        Map.Entry<String, Long> deploybleNode = deployedSiddhiAppCountInEachNode.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue()).findFirst().get();
-
-        try {
-            templateManagerService.deploySiddhiApp(deploybleNode.getKey(), siddhiApp.toString());
-            log.info("Siddhi App " + siddhiAppName + " deployed successfully on " + deploybleNode.getKey());
-        } catch (SiddhiAppsApiHelperException e) {
-            log.error("Error occured while deploying siddhi app on node " + deploybleNode.getKey(), e);
-            return Response.status(e.getStatus()).entity("Error occured while deploying siddhi app on node " +
-                    deploybleNode.getKey()).build();
-        }
-        return Response.accepted().entity("Siddhi App deployed successfully on " + deploybleNode.getKey()).build();
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Siddhi App Deployer is not enabled")
+                .build();
     }
 
     public Response deleteSiddhiApp(Request request, String siddhiAppname) {
@@ -595,30 +548,11 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-        Map nodes = templateManagerService.getNodes();
-        boolean issiddhiAppAvailable = false;
-        for (Object node : nodes.keySet()) {
-            try {
-                issiddhiAppAvailable = templateManagerService.checkSiddhiAppAvailability(node.toString(),
-                        siddhiAppname);
-            } catch (SiddhiAppsApiHelperException e) {
-                log.error("Error Occured while checking the availability of siddhi app " + siddhiAppname + " in node " +
-                        node.toString(), e);
-            }
-            if (issiddhiAppAvailable) {
-                try {
-                    templateManagerService.deleteSiddhiApp(node.toString(), siddhiAppname);
-                    return Response.ok().entity("The Siddhi Application is successfully deleted.")
-                            .build();
-                } catch (SiddhiAppsApiHelperException e) {
-                    log.error("Error occured while deleteing siddhi app " + siddhiAppname + " from node " +
-                            node.toString(), e);
-                    return Response.serverError().entity("Error occured while deleteing siddhi app "
-                            + siddhiAppname + " from node " + node.toString()).build();
-                }
-            }
+        if (templateManagerService.isSiddhiAppDeployerEnabled()) {
+            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployerInstance();
+            return deployer.deleteSiddhiApp(templateManagerService, siddhiAppname);
         }
-        return Response.status(Response.Status.NOT_FOUND).entity("Siddhi app" + siddhiAppname + " does not exists")
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Siddhi App Deployer is not enabled")
                 .build();
     }
 
@@ -627,42 +561,12 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-        Map nodes = templateManagerService.getNodes();
-        long totalSiddhiAppCount = 0;
-        boolean isSiddhiAppAvailable = false;
-        String siddhiAppName = null;
-        try {
-            siddhiAppName = SiddhiManagerHelper.getSiddhiAppName(siddhiApp);
-        } catch (SiddhiManagerHelperException e) {
-            log.error("Error occured while retrievng the siddhi app name. ", e);
-            return Response.serverError().entity("Error occured while retrievng the siddhi app name.").build();
+        if (templateManagerService.isSiddhiAppDeployerEnabled()) {
+            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployerInstance();
+            return deployer.updateSiddhiApp(templateManagerService, siddhiApp);
         }
-
-        for (Object node : nodes.keySet()) {
-            try {
-                isSiddhiAppAvailable = templateManagerService.checkSiddhiAppAvailability(node.toString(),
-                        siddhiAppName);
-            } catch (SiddhiAppsApiHelperException e) {
-                log.error("Error occured while checking the siddhi app availability from node " + node.toString() + "" +
-                        "for siddhi app " + siddhiAppName + " :", e);
-                return Response.status(e.getStatus()).entity("Error occured while checking the siddhi app " +
-                        " availability from node " + node.toString() + " for siddhi app " + siddhiAppName).build();
-            }
-            if (isSiddhiAppAvailable) {
-                try {
-                    templateManagerService.updateDeployedSiddhiApp(node.toString(), siddhiApp.toString());
-                    log.info("Siddhi App " + siddhiAppName + " updated successfully on node " + node.toString());
-                    return Response.status(Response.Status.OK).entity("siddhi App updated successfully").build();
-                } catch (SiddhiAppsApiHelperException e) {
-                    log.error("Error occurred while deploying the siddhi app " + siddhiAppName + " on node "
-                            + node.toString(), e);
-                    return Response.status(e.getStatus()).entity("Error occurred while deploying the siddhi app "
-                            + siddhiAppName + " on node " + node.toString()).build();
-                }
-            }
-        }
-        return Response.status(Response.Status.NOT_FOUND).entity("Siddhi app " + siddhiAppName + "does not " +
-                "exists").build();
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Siddhi App Deployer is not enabled")
+                .build();
     }
 
     public Response reShuffle(Request request) {
@@ -671,65 +575,12 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-        Map nodes = templateManagerService.getNodes();
-        long totalSiddhiAppCount = 0;
-        Map<String, Long> siddhiAppCounts = new HashMap<>();
-        Map<String, Long> siddhiAppCountToBeRemovedFromEachNode = new HashMap();
-        Map<String, String> siddhiAppNamesToBeRemovedFromEachNode = new HashMap<>();
-        for (Object node : nodes.keySet()) {
-            long appCount = 0;
-            try {
-                appCount = templateManagerService.getSiddhiAppCount(node.toString());
-                siddhiAppCounts.put(node.toString(), appCount);
-                totalSiddhiAppCount = totalSiddhiAppCount + appCount;
-            } catch (SiddhiAppsApiHelperException e) {
-                log.error("Error occured while retrieving the siddhi app count from node " + node.toString(), e);
-                return Response.serverError().entity("Error occured while connecting into node " + node.toString() +
-                        ". aborting reshuffle process").build();
-            }
+        if (templateManagerService.isSiddhiAppDeployerEnabled()) {
+            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployerInstance();
+            return deployer.reShuffle(templateManagerService);
         }
-        long avgSiddhiAppCountForEachNode = totalSiddhiAppCount / nodes.size();
-        for (Map.Entry<String, Long> siddhiAppCountForTheNode : siddhiAppCounts.entrySet()) {
-            if (siddhiAppCountForTheNode.getValue() - avgSiddhiAppCountForEachNode > 0) {
-                siddhiAppCountToBeRemovedFromEachNode.put(siddhiAppCountForTheNode.getKey(),
-                        siddhiAppCountForTheNode.getValue() - avgSiddhiAppCountForEachNode);
-            }
-        }
-        for (Map.Entry<String, Long> node : siddhiAppCountToBeRemovedFromEachNode.entrySet()) {
-            List<String> siddhiAppList = null;
-            try {
-                siddhiAppList = templateManagerService.getSiddhiAppList(node.getKey());
-            } catch (SiddhiAppsApiHelperException e) {
-                log.error("Error occured while retrieving the siddhi app list from node  " + node.getKey(), e);
-                return Response.serverError().entity("Error occured while connecting into node " + node.getKey() +
-                        ". aborting reshuffle process").build();
-            }
-            for (int i = 0; i < node.getValue(); i++) {
-                siddhiAppNamesToBeRemovedFromEachNode.put(siddhiAppList.get(i), node.getKey());
-            }
-        }
-        for (Map.Entry<String, String> siddhiAppDetails : siddhiAppNamesToBeRemovedFromEachNode.entrySet()) {
-            Map.Entry<String, Long> deploybleNode = siddhiAppCounts.entrySet().stream()
-                    .sorted(Map.Entry.comparingByValue()).findFirst().get();
-            String nodeUrl = siddhiAppDetails.getValue();
-            try {
-                String siddhiApp = templateManagerService.getSiddhiApp(nodeUrl, siddhiAppDetails.getKey());
-                log.info("Retrieved the Siddhi App " + siddhiAppDetails.getKey() + " from the node " + nodeUrl);
-                templateManagerService.deleteSiddhiApp(nodeUrl, siddhiAppDetails.getKey());
-                log.info("Siddhi App " + siddhiAppDetails.getKey() + " was deleted from the node " + nodeUrl);
-                templateManagerService.deploySiddhiApp(deploybleNode.getKey(), siddhiApp);
-                log.info("Siddhi App " + siddhiAppDetails.getKey() + " successfully deployed on node " +
-                        deploybleNode.getKey());
-                siddhiAppCounts.merge(deploybleNode.getKey(), (long) 1, Long::sum);
-            } catch (SiddhiAppsApiHelperException e) {
-                log.error("Error Occured while deleting the siddhi app " + siddhiAppDetails.getKey() +
-                        " from the node " + nodeUrl, e);
-                return Response.serverError().entity("Error Occured while deleting the siddhi app "
-                        + siddhiAppDetails.getKey() + " from the node " + nodeUrl + ". " + e.getMessage()).build();
-            }
-        }
-        log.info("|----------Reshuffle Process completed successfully----------|");
-        return Response.ok().entity("Reshuffle Process completed successfully").build();
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Siddhi App Deployer is not enabled")
+                .build();
     }
 
     private Role getUserRole(Request request) {

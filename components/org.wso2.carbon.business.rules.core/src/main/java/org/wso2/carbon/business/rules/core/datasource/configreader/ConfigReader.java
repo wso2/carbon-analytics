@@ -39,6 +39,7 @@ public class ConfigReader {
     private static final String USER_NAME = "username";
     private static final String PASSWORD = "password";
     private static final String DEPLOYMENT_CONFIGS = "deployment_configs";
+    private static final String SIDDHI_APP_MANAGER = "siddhiAppManager";
     private static final String COMPONENT_NAMESPACE = "wso2.business.rules.manager";
     private static final String ROLES = "roles";
     private static final String MANAGER = "manager";
@@ -49,6 +50,8 @@ public class ConfigReader {
     private static final String ADMIN = "admin";
     private static final String CARBON_CONFIGS_TYPE = "type";
     private static final String ANALYTICS_SOLUTIONS_NAMESPACE = "analytics.solutions";
+    private static final String SIDDHI_APP_DEPLOYER_ENABLE= "enable";
+    private static final String SIDDHI_APP_DEPLOYMENT_PATTERN = "deployment_pattern";
 
     private static final Permission managerPermission = new Permission("BRM", "businessrules.manager");
     private static final Permission viewerPermission = new Permission("BRM", "businessrules.viewer");
@@ -142,7 +145,23 @@ public class ConfigReader {
         return null;
     }
 
-    /*
+    public boolean isSiddhiAppManagerEnabled() {
+        if (configs != null && configs.get(SIDDHI_APP_MANAGER) != null){
+            Map siddhiAppManagerConfigs = (Map) configs.get(SIDDHI_APP_MANAGER);
+            return (boolean) siddhiAppManagerConfigs.get(SIDDHI_APP_DEPLOYER_ENABLE);
+        }
+        return false;
+    }
+
+    public String getSiddhiAppDeploymentPattern(){
+        if (configs != null && configs.get(SIDDHI_APP_MANAGER) != null){
+            Map siddhiAppManagerConfigs = (Map) configs.get(SIDDHI_APP_MANAGER);
+            return (String) siddhiAppManagerConfigs.get(SIDDHI_APP_DEPLOYMENT_PATTERN);
+        }
+        return null;
+    }
+
+    /**
      * Add roles to the database and grant permissions to roles
      * defined in deployment.yaml
      */
