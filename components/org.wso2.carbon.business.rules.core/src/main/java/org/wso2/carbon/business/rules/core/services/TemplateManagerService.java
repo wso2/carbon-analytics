@@ -62,7 +62,6 @@ import java.util.stream.Collectors;
 
 import static org.wso2.carbon.business.rules.core.util.TemplateManagerConstants.DEPLOYMENT_PATTERN_ROUND_ROBBIN;
 
-
 /**
  * The exposed Template Manager service, which contains methods related to Business Rules from template, and Business
  * Rules from scratch
@@ -1406,6 +1405,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @param nodeURL       : URL of the node on which artifacts are going to be deployed
      * @param siddhiAppName : name of the siddhiApp which is going to be deployed
      * @param siddhiApp     : siddhiApp which is going to be deployed
+     * @throws SiddhiAppsApiHelperException : occurs when dealing with SiddhiAppsApi
      */
     private void deploySiddhiApp(String nodeURL, String siddhiAppName, Artifact siddhiApp)
             throws SiddhiAppsApiHelperException {
@@ -1421,6 +1421,7 @@ public class TemplateManagerService implements BusinessRulesService {
     /**
      * @param nodeURL   : URL of the node on which artifacts are going to be deployed
      * @param siddhiApp : siddhiApp which is going to be deployed
+     * @throws SiddhiAppsApiHelperException : occurs when dealing with SiddhiAppsApi
      */
     public void deploySiddhiApp(String nodeURL, String siddhiApp)
             throws SiddhiAppsApiHelperException {

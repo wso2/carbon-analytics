@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiManagerHelperException;
 import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
-import org.wso2.carbon.business.rules.core.util.SiddhiManagerHelper;
+import org.wso2.carbon.business.rules.core.manager.util.SiddhiManagerHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -142,9 +142,9 @@ public class RoundRobbinDeployer implements SiddhiAppDeployer {
                     return Response.ok().entity("The Siddhi Application is successfully deleted.")
                             .build();
                 } catch (SiddhiAppsApiHelperException e) {
-                    log.error("Error occured while deleteing siddhi app " + siddhiAppName + " from node " +
+                    log.error("Error occurred while deleting siddhi app " + siddhiAppName + " from node " +
                             node.toString(), e);
-                    return Response.serverError().entity("Error occured while deleteing siddhi app "
+                    return Response.serverError().entity("Error occurred while deleting siddhi app "
                             + siddhiAppName + " from node " + node.toString()).build();
                 }
             }

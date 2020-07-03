@@ -207,14 +207,15 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                             asInputStream(), Charsets.UTF_8));
                     return newList.get("content").getAsString();
                 case 404:
-                    throw new SiddhiAppsApiHelperException("The Siddhi Application specified is not found.", status);
+                    throw new SiddhiAppsApiHelperException("The Siddhi Application " + siddhiAppName + " is not found.",
+                            status);
                 default:
                     throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
-                            "trying to receive the deployed siddhi app list from the node '" + hostAndPort + "'",
-                            status);
+                            "trying to receive the siddhi app " + siddhiAppName + " from the node '" + hostAndPort +
+                            "'", status);
             }
         } catch (SiddhiAppDeployerServiceStubException | IOException e) {
-            throw new SiddhiAppsApiHelperException("Failed to retrieve the siddhi app list from node '"
+            throw new SiddhiAppsApiHelperException("Failed to retrieve the siddhi app " + siddhiAppName + " from node '"
                     + hostAndPort + "'. ", e);
         } catch (RetryableException e) {
             throw new SiddhiAppsApiHelperException("Cannot connect to the worker node (" + hostAndPort + ") for " +
@@ -235,15 +236,15 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                     return Long.parseLong(IOUtils.toString(response.body().asInputStream(), Charsets.UTF_8));
                 default:
                     throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
-                            "trying to receive the deployed siddhi app list from the node '" + hostAndPort + "'",
+                            "trying to receive the deployed siddhi apps count from the node '" + hostAndPort + "'",
                             status);
             }
         } catch (SiddhiAppDeployerServiceStubException | IOException e) {
-            throw new SiddhiAppsApiHelperException("Failed to retrieve the siddhi app list from node '"
+            throw new SiddhiAppsApiHelperException("Failed to retrieve the siddhi apps count from node '"
                     + hostAndPort + "'. ", e);
         } catch (RetryableException e) {
             throw new SiddhiAppsApiHelperException("Cannot connect to the worker node (" + hostAndPort + ") for " +
-                    "retrieving deployed siddhi app list.", e);
+                    "retrieving deployed siddhi apps count.", e);
         } finally {
             closeResponse(response);
         }
@@ -260,15 +261,15 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                     return Boolean.parseBoolean(IOUtils.toString(response.body().asInputStream(), Charsets.UTF_8));
                 default:
                     throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
-                            "trying to receive the deployed siddhi app list from the node '" + hostAndPort + "'",
+                            "trying to receive the siddhi app availability from the node '" + hostAndPort + "'",
                             status);
             }
         } catch (SiddhiAppDeployerServiceStubException | IOException e) {
-            throw new SiddhiAppsApiHelperException("Failed to retrieve the siddhi app list from node '"
+            throw new SiddhiAppsApiHelperException("Failed to retrieve the siddhi app availability from node '"
                     + hostAndPort + "'. ", e);
         } catch (RetryableException e) {
             throw new SiddhiAppsApiHelperException("Cannot connect to the worker node (" + hostAndPort + ") for " +
-                    "retrieving deployed siddhi app list.", e);
+                    "retrieving siddhi app availability .", e);
         } finally {
             closeResponse(response);
         }

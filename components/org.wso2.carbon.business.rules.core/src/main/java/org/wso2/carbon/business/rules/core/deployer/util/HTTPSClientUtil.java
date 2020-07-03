@@ -116,7 +116,7 @@ public class HTTPSClientUtil {
     }
 
     /**
-     * Produces a Response after doing a DELETE request
+     * Produces a Response after doing a GET request
      *
      * @param hostAndPort   Host and Port of the Worker node in {Host}:{Port} format
      * @param username      Username
@@ -131,7 +131,7 @@ public class HTTPSClientUtil {
     }
 
     /**
-     * Produces a Response after doing a DELETE request
+     * Produces a Response after doing a GET request
      *
      * @param hostAndPort   Host and Port of the Worker node in {Host}:{Port} format
      * @param username      Username
@@ -146,11 +146,12 @@ public class HTTPSClientUtil {
     }
 
     /**
-     * Produces a Response after doing a DELETE request
+     * Produces a Response after doing a GET request
      *
      * @param hostAndPort   Host and Port of the Worker node in {Host}:{Port} format
      * @param username      Username
      * @param password      Password
+     * @param siddhiAppName Name of the Siddhi App
      * @return Feign Response object
      * @throws SiddhiAppDeployerServiceStubException Error occurred within SiddhiAppDeployerServiceStub
      */

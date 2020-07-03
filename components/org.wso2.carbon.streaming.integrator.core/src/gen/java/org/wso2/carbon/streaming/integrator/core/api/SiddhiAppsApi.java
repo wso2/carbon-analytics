@@ -55,7 +55,7 @@ import javax.ws.rs.core.Response;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-05-31T15:43:24.557Z")
 public class SiddhiAppsApi implements Microservice {
-    private final org.wso2.carbon.streaming.integrator.core.api.SiddhiAppsApiService delegate = SiddhiAppsApiServiceFactory.getSiddhiAppsApi();
+    private final SiddhiAppsApiService delegate = SiddhiAppsApiServiceFactory.getSiddhiAppsApi();
 
     @POST
     @Consumes({"text/plain"})
