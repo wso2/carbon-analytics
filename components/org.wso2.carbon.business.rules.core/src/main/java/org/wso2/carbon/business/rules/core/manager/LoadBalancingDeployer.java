@@ -182,21 +182,25 @@ public class LoadBalancingDeployer implements SiddhiAppDeployer {
             Map.Entry<String, Long> deploybleNode = siddhiAppCountsMap.entrySet().stream().
                     min(Map.Entry.comparingByValue()).get();
             String nodeUrl = siddhiAppDetails.getValue();
-            log.info("Siddhi app '" + siddhiAppDetails.getKey() + "' will be removed from " + nodeUrl +
-                    " and deployed into " + deploybleNode.getKey() + " node");
-            try {
-                String siddhiApp = siddhiAppApiHelper.getSiddhiApp(nodeUrl, siddhiAppDetails.getKey());
-                log.info("Retrieved the Siddhi App '" + siddhiAppDetails.getKey() + "' from the node " + nodeUrl);
-                siddhiAppApiHelper.deploySiddhiApp(deploybleNode.getKey(), siddhiApp);
-                log.info("Siddhi App '" + siddhiAppDetails.getKey() + "' successfully deployed on node " +
-                        deploybleNode.getKey());
-                siddhiAppCountsMap.merge(deploybleNode.getKey(), (long) 1, Long::sum);
-                siddhiAppApiHelper.deleteSiddhiApp(nodeUrl, siddhiAppDetails.getKey());
-                log.info("Siddhi App '" + siddhiAppDetails.getKey() + "' was deleted from the node " + nodeUrl);
-            } catch (SiddhiAppsApiHelperException e) {
-                log.error(e.getMessage(), e);
-                return Response.status(e.getStatus()).entity(e.getLocalizedMessage()).build();
+
+            if (!nodeUrl.equals(deploybleNode.getKey())) {
+                log.info("Siddhi app '" + siddhiAppDetails.getKey() + "' will be removed from " + nodeUrl +
+                        " and deployed into " + deploybleNode.getKey() + " node");
+                try {
+                    String siddhiApp = siddhiAppApiHelper.getSiddhiApp(nodeUrl, siddhiAppDetails.getKey());
+                    log.info("Retrieved the Siddhi App '" + siddhiAppDetails.getKey() + "' from the node " + nodeUrl);
+                    siddhiAppApiHelper.deploySiddhiApp(deploybleNode.getKey(), siddhiApp);
+                    log.info("Siddhi App '" + siddhiAppDetails.getKey() + "' successfully deployed on node " +
+                            deploybleNode.getKey());
+                    siddhiAppCountsMap.merge(deploybleNode.getKey(), (long) 1, Long::sum);
+                    siddhiAppApiHelper.deleteSiddhiApp(nodeUrl, siddhiAppDetails.getKey());
+                    log.info("Siddhi App '" + siddhiAppDetails.getKey() + "' was deleted from the node " + nodeUrl);
+                } catch (SiddhiAppsApiHelperException e) {
+                    log.error(e.getMessage(), e);
+                    return Response.status(e.getStatus()).entity(e.getLocalizedMessage()).build();
+                }
             }
+            log.info("Siddhi app '" + siddhiAppDetails.getKey() + "' deployed location won't be changed");
         }
         log.info("Siddhi app count for each node after reshuffle, " + siddhiAppCountsMap.toString());
         log.info("|----------Reshuffle Process completed successfully----------|");
