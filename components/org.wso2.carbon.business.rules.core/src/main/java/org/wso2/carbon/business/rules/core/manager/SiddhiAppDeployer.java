@@ -18,46 +18,48 @@
 
 package org.wso2.carbon.business.rules.core.manager;
 
-import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
+import org.wso2.carbon.business.rules.core.datasource.configreader.ConfigReader;
+import org.wso2.carbon.business.rules.core.deployer.SiddhiAppApiHelper;
+import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppManagerApiException;
 
+import java.util.List;
 import javax.ws.rs.core.Response;
 
 /**
  * Siddhi app deployer interface
  */
 public interface SiddhiAppDeployer {
+
+    void init(ConfigReader configReader, SiddhiAppApiHelper siddhiAppApiHelper);
+
     /**
      * Deploy siddhi app in nodes
      *
-     * @param templateManagerService template manage service instance
-     * @param siddhiApp              siddhi app to be deployed
+     * @param siddhiApp siddhi app to be deployed
      * @return Response
      */
-    Response deploySiddhiApp(TemplateManagerService templateManagerService, Object siddhiApp);
+    List<String> deploySiddhiApp(Object siddhiApp) throws SiddhiAppManagerApiException;
 
     /**
      * update siddhi app which is already deployed
      *
-     * @param templateManagerService template manage service instance
-     * @param siddhiApp              siddhi app to be deployed
+     * @param siddhiApp siddhi app to be deployed
      * @return Response
      */
-    Response updateSiddhiApp(TemplateManagerService templateManagerService, Object siddhiApp);
+    List<String> updateSiddhiApp(Object siddhiApp) throws SiddhiAppManagerApiException;
 
     /**
      * update siddhi app which is already deployed
      *
-     * @param templateManagerService template manage service instance
-     * @param siddhiAppName          siddhi app name to be deleted
+     * @param siddhiAppName siddhi app name to be deleted
      * @return Response
      */
-    Response deleteSiddhiApp(TemplateManagerService templateManagerService, String siddhiAppName);
+    List<String> deleteSiddhiApp(String siddhiAppName) throws SiddhiAppManagerApiException;
 
     /**
      * update siddhi app which is already deployed
      *
-     * @param templateManagerService template manage service instance
      * @return Response
      */
-    Response reShuffle(TemplateManagerService templateManagerService);
+    Response reShuffle();
 }

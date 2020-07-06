@@ -42,7 +42,6 @@ import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerHelperExcep
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
 import org.wso2.carbon.business.rules.core.manager.LoadBalancingDeployer;
 import org.wso2.carbon.business.rules.core.manager.SiddhiAppDeployer;
-import org.wso2.carbon.business.rules.core.manager.util.UpdateSindhiAppCountScheduler;
 import org.wso2.carbon.business.rules.core.util.LogEncoder;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
@@ -56,8 +55,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.wso2.carbon.business.rules.core.util.TemplateManagerConstants.DEPLOYMENT_PATTERN_LOAD_BALANCING;
@@ -70,36 +67,22 @@ public class TemplateManagerService implements BusinessRulesService {
     private static final Logger log = LoggerFactory.getLogger(TemplateManagerService.class);
     private static final int DEFAULT_ARTIFACT_COUNT = 1;
     private static SiddhiAppApiHelper siddhiAppApiHelper = new SiddhiAppApiHelper();
-    Map<String, Long> siddhiAppsCount;
+    ConfigReader configReader;
     // Available Template Groups from the directory
     private Map<String, TemplateGroup> availableTemplateGroups;
     private Map<String, BusinessRule> availableBusinessRules;
-    private Map nodes = null;
+    private Map nodes;
     private Gson gson;
     private QueryExecutor queryExecutor;
     private String siddhiAppManagerDeploymentPattern = null;
-    private SiddhiAppDeployer deployer;
     private boolean isSiddhiAppDeployerEnabled = false;
+    private SiddhiAppDeployer siddhiAppDeployer;
 
     public TemplateManagerService() throws TemplateManagerServiceException, RuleTemplateScriptException {
         this.gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         this.queryExecutor = new QueryExecutor();
-        ConfigReader configReader = new ConfigReader();
+        configReader = new ConfigReader();
         this.nodes = configReader.getNodes();
-        if (configReader.isSiddhiAppManagerEnabled()) {
-            isSiddhiAppDeployerEnabled = true;
-            siddhiAppManagerDeploymentPattern = configReader.getSiddhiAppDeploymentPattern();
-            siddhiAppsCount = getSiddhiAppCount();
-            Timer timer = new Timer();
-            timer.schedule(new UpdateSindhiAppCountScheduler(), TimeUnit.MINUTES.toMillis(15),
-                    TimeUnit.MINUTES.toMillis(15));
-            if (siddhiAppManagerDeploymentPattern.equals(DEPLOYMENT_PATTERN_LOAD_BALANCING)) {
-                deployer = new LoadBalancingDeployer();
-            } else {
-                throw new TemplateManagerServiceException("Provided siddhi manager deploy pattern" +
-                        siddhiAppManagerDeploymentPattern + "doesn't support");
-            }
-        }
         // Load & store available Template Groups & Business Rules at the time of instantiation
         this.availableTemplateGroups = loadTemplateGroups();
         if (!configReader.getSolutionType().equalsIgnoreCase(SiddhiAppProcessorConstants.WSO2_SERVER_TYPE_SP)) {
@@ -108,6 +91,17 @@ public class TemplateManagerService implements BusinessRulesService {
             List<String> solutionTypesEnabled = configReader.getSolutionTypesEnabled();
             for (String solutionType : solutionTypesEnabled) {
                 loadAndSaveAnalyticsSolutions(solutionType);
+            }
+        }
+        if (configReader.isSiddhiAppManagerEnabled()) {
+            isSiddhiAppDeployerEnabled = true;
+            siddhiAppManagerDeploymentPattern = configReader.getSiddhiAppDeploymentPattern();
+            if (siddhiAppManagerDeploymentPattern.equals(DEPLOYMENT_PATTERN_LOAD_BALANCING)) {
+                siddhiAppDeployer = new LoadBalancingDeployer();
+                siddhiAppDeployer.init(configReader, siddhiAppApiHelper);
+            } else {
+                throw new TemplateManagerServiceException("Provided siddhi manager deploy pattern" +
+                        siddhiAppManagerDeploymentPattern + "doesn't support");
             }
         }
         loadBusinessRules();
@@ -1506,7 +1500,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @return : true or false
      */
     private boolean undeploySiddhiApp(String nodeURL, String businessRuleUUID) throws SiddhiAppsApiHelperException {
-        return siddhiAppApiHelper.delete(nodeURL, businessRuleUUID);
+        return siddhiAppApiHelper.deleteSiddhiApp(nodeURL, businessRuleUUID);
     }
 
     /**
@@ -1641,20 +1635,6 @@ public class TemplateManagerService implements BusinessRulesService {
         }
     }
 
-    public Map<String, Long> getSiddhiAppCount() {
-        Map<String, Long> siddhiAppCounts = new HashMap();
-        long appCount;
-        for (Object node : nodes.keySet()) {
-            try {
-                appCount = getSiddhiAppCount(node.toString());
-                siddhiAppCounts.put(node.toString(), appCount);
-            } catch (SiddhiAppsApiHelperException e) {
-                log.error("Error occured while retrieving the siddhi app count from node " + node.toString(), e);
-            }
-        }
-        return siddhiAppCounts;
-    }
-
     private BusinessRuleFromTemplate replacePropertiesWithDefaultValues(RuleTemplate ruleTemplate,
                                                                         String templateGroupUUID) {
         Map<String, String> properties = ruleTemplate.getProperties().entrySet().stream().collect(Collectors.toMap(
@@ -1663,44 +1643,15 @@ public class TemplateManagerService implements BusinessRulesService {
                 ruleTemplate.getType(), ruleTemplate.getUuid(), properties);
     }
 
-    public long getSiddhiAppCount(String nodeUrl) throws SiddhiAppsApiHelperException {
-        return siddhiAppApiHelper.getSiddhiAppCount(nodeUrl);
-    }
-
-    public boolean checkSiddhiAppAvailability(String nodeUrl, String siddhiAppName)
-            throws SiddhiAppsApiHelperException {
-        return siddhiAppApiHelper.getSiddhiAppAvailability(nodeUrl, siddhiAppName);
-    }
-
     public boolean deleteSiddhiApp(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException {
-        return siddhiAppApiHelper.delete(nodeUrl, siddhiAppName);
-    }
-
-    public List getSiddhiAppList(String nodeUrl) throws SiddhiAppsApiHelperException {
-        return siddhiAppApiHelper.getSiddhiAppList(nodeUrl);
-    }
-
-    public String getSiddhiApp(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException {
-        return siddhiAppApiHelper.getSiddhiApp(nodeUrl, siddhiAppName);
-    }
-
-    public Map getNodes() {
-        return nodes;
+        return siddhiAppApiHelper.deleteSiddhiApp(nodeUrl, siddhiAppName);
     }
 
     public boolean isSiddhiAppDeployerEnabled() {
         return isSiddhiAppDeployerEnabled;
     }
 
-    public SiddhiAppDeployer getSiddhiAppDeployerInstance() {
-        return deployer;
-    }
-
-    public Map<String, Long> getSiddhiAppsCountMap() {
-        return siddhiAppsCount;
-    }
-
-    public void setSiddhiAppsCountMap(Map<String, Long> siddhiAppsCount) {
-        this.siddhiAppsCount = siddhiAppsCount;
+    public SiddhiAppDeployer getSiddhiAppDeployer() {
+        return siddhiAppDeployer;
     }
 }

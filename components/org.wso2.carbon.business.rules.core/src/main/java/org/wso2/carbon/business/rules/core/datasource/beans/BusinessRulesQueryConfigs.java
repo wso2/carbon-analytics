@@ -33,7 +33,7 @@ import java.util.Map;
 public class BusinessRulesQueryConfigs {
     @Element(description = "Database query map")
     private List<Queries> queries;
-    private Map siddhiAppManager;
+    private Map siddhiAppDeployer;
     private String datasource;
     private String username;
     private String password;
@@ -88,11 +88,11 @@ public class BusinessRulesQueryConfigs {
         this.roles = roles;
     }
 
-    public void setSiddhiAppManager(Map siddhiAppManager) {
-        this.siddhiAppManager = siddhiAppManager;
+    public void setSiddhiAppDeployer(Map siddhiAppDeployer) {
+        this.siddhiAppDeployer = siddhiAppDeployer;
     }
 
-    public Map getSiddhiAppManager() {
-        return siddhiAppManager;
+    public Map getSiddhiAppDeployer() {
+        return siddhiAppDeployer;
     }
 }

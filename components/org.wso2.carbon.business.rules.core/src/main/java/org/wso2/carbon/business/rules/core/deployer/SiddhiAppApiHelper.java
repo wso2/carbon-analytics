@@ -113,7 +113,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
     }
 
     @Override
-    public boolean delete(String hostAndPort, String siddhiAppName) throws SiddhiAppsApiHelperException {
+    public boolean deleteSiddhiApp(String hostAndPort, String siddhiAppName) throws SiddhiAppsApiHelperException {
         Response response = null;
         try {
             response = HTTPSClientUtil.doDeleteRequest(hostAndPort, username, password, siddhiAppName);

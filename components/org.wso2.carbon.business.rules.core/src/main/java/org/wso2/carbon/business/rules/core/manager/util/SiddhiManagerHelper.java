@@ -18,11 +18,12 @@
 
 package org.wso2.carbon.business.rules.core.manager.util;
 
-import org.wso2.carbon.business.rules.core.exceptions.SiddhiManagerHelperException;
+import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppManagerApiException;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.ws.rs.core.Response;
 
 public class SiddhiManagerHelper {
     /**
@@ -37,9 +38,9 @@ public class SiddhiManagerHelper {
      *
      * @param siddhiApp : siddhi app
      * @return String   : siddhi app name
-     * @throws SiddhiManagerHelperException
+     * @throws SiddhiAppManagerApiException
      */
-    public static String getSiddhiAppName(Object siddhiApp) throws SiddhiManagerHelperException {
+    public static String getSiddhiAppName(Object siddhiApp) throws SiddhiAppManagerApiException {
 
         // Regex match and find name
         Pattern siddhiAppNamePattern = Pattern.compile(TemplateManagerConstants.SIDDHI_APP_NAME_REGEX_PATTERN);
@@ -47,6 +48,7 @@ public class SiddhiManagerHelper {
         if (siddhiAppNameMatcher.find()) {
             return siddhiAppNameMatcher.group(2);
         }
-        throw new SiddhiManagerHelperException("Invalid SiddhiApp Name Found");
+        throw new SiddhiAppManagerApiException("Invalid SiddhiApp Name Found for siddhi app "+ siddhiApp +" ",
+                Response.Status.INTERNAL_SERVER_ERROR);
     }
 }

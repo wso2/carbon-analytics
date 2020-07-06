@@ -19,6 +19,7 @@
 package org.wso2.carbon.business.rules.core.manager.util;
 
 import org.wso2.carbon.business.rules.core.bean.TemplateManagerInstance;
+import org.wso2.carbon.business.rules.core.manager.LoadBalancingDeployer;
 import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
 
 import java.util.Map;
@@ -26,13 +27,14 @@ import java.util.TimerTask;
 
 /**
  * Scheduler task to update siddhi app count map
- * **/
-public class UpdateSindhiAppCountScheduler extends TimerTask {
+ **/
+public class UpdateSiddhiAppCountScheduler extends TimerTask {
 
     @Override
     public void run() {
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
-        Map<String, Long> siddhiAppsCount = templateManagerService.getSiddhiAppCount();
-        templateManagerService.setSiddhiAppsCountMap(siddhiAppsCount);
+        LoadBalancingDeployer siddhiAppDeployer = (LoadBalancingDeployer) templateManagerService.getSiddhiAppDeployer();
+        Map<String, Long> siddhiAppsCount = siddhiAppDeployer.genarateSiddhiAppsCountMap();
+        siddhiAppDeployer.setSiddhiAppsCountMap(siddhiAppsCount);
     }
 }

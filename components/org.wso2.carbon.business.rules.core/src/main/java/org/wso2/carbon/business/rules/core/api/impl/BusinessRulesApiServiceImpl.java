@@ -36,9 +36,13 @@ import org.wso2.carbon.business.rules.core.datasource.configreader.DataHolder;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleNotFoundException;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
+import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppManagerApiException;
+import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateInstanceCountViolationException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
+import org.wso2.carbon.business.rules.core.manager.LoadBalancingDeployer;
 import org.wso2.carbon.business.rules.core.manager.SiddhiAppDeployer;
+import org.wso2.carbon.business.rules.core.manager.util.SiddhiManagerHelper;
 import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
 import org.wso2.carbon.business.rules.core.util.LogEncoder;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
@@ -531,54 +535,112 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     @Override
     public Response deploySiddhiApp(Request request, Object siddhiApp)
             throws NotFoundException {
+        List<String> deployableNodeList = null;
         if (!hasPermission(request, RequestMethod.DEPLOY_SIDDHI_APP)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         if (templateManagerService.isSiddhiAppDeployerEnabled()) {
-            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployerInstance();
-            return deployer.deploySiddhiApp(templateManagerService, siddhiApp);
+            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployer();
+            try {
+                deployableNodeList = deployer.deploySiddhiApp(siddhiApp);
+            } catch (SiddhiAppManagerApiException e) {
+                return Response.status(e.getStatus()).entity(e.getMessage()).build();
+            }
+            for (String node : deployableNodeList) {
+                try {
+                    templateManagerService.deploySiddhiApp(node, siddhiApp.toString());
+                    log.info("Siddhi app '" + SiddhiManagerHelper.getSiddhiAppName(siddhiApp) + "'deployed on node "
+                            + node + " successfully");
+                    if (deployer instanceof LoadBalancingDeployer) {
+                        ((LoadBalancingDeployer) deployer).increaseSiddhiAppCout(node);
+                    }
+                } catch (SiddhiAppsApiHelperException e) {
+                    return Response.status(e.getStatus()).entity(e.getMessage()).build();
+                } catch (SiddhiAppManagerApiException e) {
+                    log.error("Error occured while retrieving the siddhi app name, '", e);
+                }
+            }
+            return Response.status(Response.Status.OK).entity("siddhi app deployed succesfully").build();
         }
+        log.error("Siddhi App Deployer is not enabled");
         return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Siddhi App Deployer is not enabled")
                 .build();
     }
+
 
     public Response deleteSiddhiApp(Request request, String siddhiAppname) {
         if (!hasPermission(request, RequestMethod.DEPLOY_SIDDHI_APP)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
+        List<String> nodeList = null;
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         if (templateManagerService.isSiddhiAppDeployerEnabled()) {
-            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployerInstance();
-            return deployer.deleteSiddhiApp(templateManagerService, siddhiAppname);
+            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployer();
+            try {
+                nodeList = deployer.deleteSiddhiApp(siddhiAppname);
+            } catch (SiddhiAppManagerApiException e) {
+                return Response.status(e.getStatus()).entity(e.getMessage()).build();
+            }
+            for (String node : nodeList) {
+                try {
+                    templateManagerService.deleteSiddhiApp(node, siddhiAppname);
+                    log.info("Siddhi app '" + siddhiAppname + "' deleted from node " + node + " successfully ");
+                    if (deployer instanceof LoadBalancingDeployer) {
+                        ((LoadBalancingDeployer) deployer).reduceSiddhiAppCout(node);
+                    }
+                } catch (SiddhiAppsApiHelperException e) {
+                    return Response.status(e.getStatus()).entity(e.getMessage()).build();
+                }
+            }
+            return Response.status(Response.Status.OK).entity("Siddhi App deleted successfully").build();
         }
+        log.error("Siddhi App Deployer is not enabled");
         return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Siddhi App Deployer is not enabled")
                 .build();
     }
+
 
     public Response updateSiddhiApp(Request request, Object siddhiApp) {
         if (!hasPermission(request, RequestMethod.DEPLOY_SIDDHI_APP)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
+        List<String> nodeList = null;
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         if (templateManagerService.isSiddhiAppDeployerEnabled()) {
-            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployerInstance();
-            return deployer.updateSiddhiApp(templateManagerService, siddhiApp);
+            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployer();
+            try {
+                nodeList = deployer.updateSiddhiApp(siddhiApp);
+                for (String node : nodeList) {
+                    templateManagerService.updateDeployedSiddhiApp(node, siddhiApp.toString());
+                    log.info("siddhi app '" + SiddhiManagerHelper.getSiddhiAppName(siddhiApp) + "' updated on node " +
+                            node + " successfully");
+                }
+                return Response.status(Response.Status.OK).entity("Siddhi App updated successfully").build();
+            } catch (SiddhiAppManagerApiException e) {
+                return Response.status(e.getStatus()).entity(e.getMessage()).build();
+            } catch (SiddhiAppsApiHelperException e) {
+                return Response.status(e.getStatus()).entity(e.getMessage()).build();
+            }
         }
+        log.error("Siddhi App Deployer is not enabled");
         return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Siddhi App Deployer is not enabled")
                 .build();
     }
 
     public Response reShuffle(Request request) {
-        log.info("|----------Reshuffle Process started----------|");
         if (!hasPermission(request, RequestMethod.DEPLOY_SIDDHI_APP)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
         TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
         if (templateManagerService.isSiddhiAppDeployerEnabled()) {
-            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployerInstance();
-            return deployer.reShuffle(templateManagerService);
+            log.info("|----------Reshuffle Process started----------|");
+            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployer();
+            if (templateManagerService.isSiddhiAppDeployerEnabled()) {
+                return deployer.reShuffle();
+            }
         }
+        log.error("Siddhi App Deployer is not enabled");
         return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Siddhi App Deployer is not enabled")
                 .build();
     }

@@ -32,7 +32,7 @@ public interface SiddhiAppApiHelperService {
 
     String getStatus(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException;
 
-    boolean delete(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException;
+    boolean deleteSiddhiApp(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException;
 
     void update(String nodeUrl, String siddhiApp) throws SiddhiAppsApiHelperException;
 

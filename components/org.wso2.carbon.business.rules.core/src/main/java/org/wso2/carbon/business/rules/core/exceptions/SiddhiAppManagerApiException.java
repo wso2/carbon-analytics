@@ -1,6 +1,13 @@
 package org.wso2.carbon.business.rules.core.exceptions;
 
-public class SiddhiManagerHelperException extends Exception{
+import javax.ws.rs.core.Response;
+
+/**
+ * Exceptions related to SiddhiAppManager related operations
+ */
+public class SiddhiAppManagerApiException extends Exception{
+    private Response.Status status;
+    private String message;
 
     /**
      * Constructs a new exception with the specified detail message.  The
@@ -10,8 +17,10 @@ public class SiddhiManagerHelperException extends Exception{
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
-    public SiddhiManagerHelperException(String message) {
+    public SiddhiAppManagerApiException(String message, Response.Status status) {
         super(message);
+        this.status = status;
+        this.message = message;
     }
 
     /**
@@ -28,7 +37,16 @@ public class SiddhiManagerHelperException extends Exception{
      *                unknown.)
      * @since 1.4
      */
-    public SiddhiManagerHelperException(String message, Throwable cause) {
+    public SiddhiAppManagerApiException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public Response.Status getStatus() {
+        return this.status;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
     }
 }
