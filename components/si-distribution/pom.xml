@@ -156,6 +156,13 @@
             <type>zip</type>
         </dependency>
 
+        <!-- Siddhi Error Handler -->
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.siddhi.error.handler.core.feature</artifactId>
+            <type>zip</type>
+        </dependency>
+
         <dependency>
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.siddhi.store.api.rest.feature</artifactId>
@@ -493,6 +500,12 @@
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
 
+                                <!-- Siddhi Error Handler -->
+                                <feature>
+                                    <id>org.wso2.carbon.siddhi.error.handler.core.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
+
                                 <!-- Authentication feature -->
                                 <feature>
                                     <id>org.wso2.carbon.analytics.msf4j.interceptor.common.feature</id>
@@ -717,6 +730,12 @@
                                 <!-- Extension Installer -->
                                 <feature>
                                     <id>org.wso2.carbon.siddhi.extensions.installer.core.feature</id>
+                                    <version>${carbon.analytics.version}</version>
+                                </feature>
+
+                                <!-- Siddhi Error Handler -->
+                                <feature>
+                                    <id>org.wso2.carbon.siddhi.error.handler.core.feature</id>
                                     <version>${carbon.analytics.version}</version>
                                 </feature>
 

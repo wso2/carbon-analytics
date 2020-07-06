@@ -23,6 +23,7 @@ import io.siddhi.core.config.StatisticsConfiguration;
 import io.siddhi.core.util.SiddhiComponentActivator;
 import io.siddhi.core.util.persistence.IncrementalPersistenceStore;
 import io.siddhi.core.util.persistence.PersistenceStore;
+import io.siddhi.core.util.error.handler.store.ErrorStore;
 import io.siddhi.core.util.statistics.StatisticsManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -44,12 +45,14 @@ import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.si.metrics.core.MetricsFactory;
 import org.wso2.carbon.si.metrics.core.internal.MetricsDataHolder;
+import org.wso2.carbon.streaming.integrator.common.ErrorStoreListener;
 import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 import org.wso2.carbon.streaming.integrator.common.HAStateChangeListener;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.streaming.integrator.common.utils.config.FileConfigManager;
 import org.wso2.carbon.streaming.integrator.core.DeploymentMode;
 import org.wso2.carbon.streaming.integrator.core.NodeInfo;
+import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.beans.ErrorStoreConfigurations;
 import org.wso2.carbon.streaming.integrator.core.ha.HAManager;
 import org.wso2.carbon.streaming.integrator.core.ha.exception.HAModeException;
 import org.wso2.carbon.streaming.integrator.core.ha.util.CoordinationConstants;
@@ -59,6 +62,8 @@ import org.wso2.carbon.streaming.integrator.core.persistence.PersistenceManager;
 import org.wso2.carbon.streaming.integrator.core.persistence.beans.PersistenceConfigurations;
 import org.wso2.carbon.streaming.integrator.core.persistence.exception.PersistenceStoreConfigurationException;
 import org.wso2.carbon.streaming.integrator.core.persistence.util.PersistenceConstants;
+import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.exception.ErrorStoreConfigurationException;
+import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.util.SiddhiErrorHandlerConstants;
 
 import java.io.File;
 import java.util.Map;
@@ -152,6 +157,23 @@ public class ServiceComponent {
         } else {
             if (log.isDebugEnabled()) {
                 log.debug("Periodic persistence is disabled");
+            }
+        }
+
+        // Siddhi Error Handling configurations
+        ErrorStoreConfigurations errorStoreConfigurations =
+            configProvider.getConfigurationObject(ErrorStoreConfigurations.class);
+        if (errorStoreConfigurations != null && errorStoreConfigurations.isEnabled()) {
+            String errorStoreClassName = errorStoreConfigurations.getErrorStore();
+            if (Class.forName(errorStoreClassName).newInstance() instanceof ErrorStore) {
+                ErrorStore errorStore = (ErrorStore) Class.forName(errorStoreClassName).newInstance();
+                errorStore.setProperties((Map) configProvider.getConfigurationObject(
+                    SiddhiErrorHandlerConstants.ERROR_STORE_NS));
+                siddhiManager.setErrorStore(errorStore);
+                notifyErrorStoreInitialization(errorStore);
+            } else {
+                throw new ErrorStoreConfigurationException("Error Store with name " + errorStoreClassName +
+                    " is invalid. The given class must implement io.siddhi.core.util.error.handler.store.ErrorStore.");
             }
         }
 
@@ -444,6 +466,27 @@ public class ServiceComponent {
 
     protected void unregisterHAStateChangeListener(HAStateChangeListener haStateChangeListener) {
         StreamProcessorDataHolder.removeHAStateChangeListener(haStateChangeListener);
+    }
+
+    @Reference(
+        name = "org.wso2.carbon.siddhi.error.handler.core.internal.SiddhiErrorHandlerMicroservice",
+        service = ErrorStoreListener.class,
+        cardinality = ReferenceCardinality.MANDATORY,
+        policy = ReferencePolicy.DYNAMIC,
+        unbind = "unsubscribeSiddhiErrorHandlerListener"
+    )
+    protected void subscribeSiddhiErrorHandlerListener(ErrorStoreListener errorHandlerMicroservice) {
+        StreamProcessorDataHolder.addErrorStoreListener(errorHandlerMicroservice);
+    }
+
+    protected void unsubscribeSiddhiErrorHandlerListener(ErrorStoreListener errorHandlerMicroservice) {
+        StreamProcessorDataHolder.removeErrorStoreListener(errorHandlerMicroservice);
+    }
+
+    private void notifyErrorStoreInitialization(ErrorStore errorStore) {
+        for (ErrorStoreListener errorStoreListener : StreamProcessorDataHolder.getErrorStoreListeners()) {
+            errorStoreListener.onInitialize(errorStore);
+        }
     }
 
 }

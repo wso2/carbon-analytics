@@ -37,6 +37,7 @@
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
         <module>components/org.wso2.carbon.siddhi.extensions.installer.cli</module>
         <module>components/org.wso2.carbon.siddhi.extensions.installer.core</module>
+        <module>components/org.wso2.carbon.siddhi.error.handler.core</module>
         <module>components/org.wso2.carbon.business.rules.templates.editor.core</module>
         <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.business.rules.web</module>
@@ -56,6 +57,7 @@
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.extensions.installer.core.feature</module>
+        <module>features/org.wso2.carbon.siddhi.error.handler.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.templates.editor.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.web.feature</module>
@@ -924,6 +926,19 @@
                 <groupId>commons-io.wso2</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons.io.version}</version>
+            </dependency>
+
+            <!-- Siddhi Error Handler related -->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.siddhi.error.handler.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.siddhi.error.handler.core.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
             </dependency>
 
             <!-- Siddhi Extensions Installer related -->

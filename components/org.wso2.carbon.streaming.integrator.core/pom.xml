@@ -265,6 +265,7 @@
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="2",
             osgi.service; objectClass="javax.ws.rs.ext.ExceptionMapper";serviceCount="5",
             osgi.service; objectClass="org.wso2.carbon.streaming.integrator.common.SiddhiAppDeploymentListener",
+            osgi.service; objectClass="org.wso2.carbon.streaming.integrator.common.ErrorStoreListener",
             osgi.service; objectClass="org.wso2.carbon.deployment.engine.Deployer",
             osgi.service; objectClass="org.wso2.carbon.streaming.integrator.core.SiddhiAppRuntimeService"
         </carbon.component>
