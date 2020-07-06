@@ -96,12 +96,13 @@ public class TemplateManagerService implements BusinessRulesService {
         if (configReader.isSiddhiAppManagerEnabled()) {
             isSiddhiAppDeployerEnabled = true;
             siddhiAppManagerDeploymentPattern = configReader.getSiddhiAppDeploymentPattern();
-            if (siddhiAppManagerDeploymentPattern.equals(DEPLOYMENT_PATTERN_LOAD_BALANCING)) {
+            if (siddhiAppManagerDeploymentPattern == null ||
+                    !siddhiAppManagerDeploymentPattern.equals(DEPLOYMENT_PATTERN_LOAD_BALANCING)) {
+                log.warn("Provided siddhi app manager deployment pattern not recognized using default " +
+                        "'loadBalance' approach ");
+            } else {
                 siddhiAppDeployer = new LoadBalancingDeployer();
                 siddhiAppDeployer.init(configReader, siddhiAppApiHelper);
-            } else {
-                throw new TemplateManagerServiceException("Provided siddhi manager deploy pattern" +
-                        siddhiAppManagerDeploymentPattern + "doesn't support");
             }
         }
         loadBusinessRules();
