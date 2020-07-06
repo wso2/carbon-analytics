@@ -39,6 +39,7 @@ public class ConfigReader {
     private static final String USER_NAME = "username";
     private static final String PASSWORD = "password";
     private static final String DEPLOYMENT_CONFIGS = "deployment_configs";
+    private static final String SIDDHI_APP_DEPLOYER = "siddhiAppDeployer";
     private static final String COMPONENT_NAMESPACE = "wso2.business.rules.manager";
     private static final String ROLES = "roles";
     private static final String MANAGER = "manager";
@@ -49,6 +50,8 @@ public class ConfigReader {
     private static final String ADMIN = "admin";
     private static final String CARBON_CONFIGS_TYPE = "type";
     private static final String ANALYTICS_SOLUTIONS_NAMESPACE = "analytics.solutions";
+    private static final String SIDDHI_APP_DEPLOYER_ENABLE = "enable";
+    private static final String SIDDHI_APP_DEPLOYMENT_PATTERN = "deploymentPattern";
 
     private static final Permission managerPermission = new Permission("BRM", "businessrules.manager");
     private static final Permission viewerPermission = new Permission("BRM", "businessrules.viewer");
@@ -92,6 +95,44 @@ public class ConfigReader {
             log.error("Failed to read analytics solutions namespace from deployment.yml ", e);
         }
         return new HashMap<>();
+    }
+
+    /**
+     * Add roles to the database and grant permissions to roles
+     * defined in deployment.yaml
+     */
+    private static void registerRoles() {
+        if (configs == null) {
+            log.error("Failed to find permission configs for wso2.business.rules.manager in " +
+                    "dashboard deployment.yaml");
+        } else {
+            Map roles = (Map) configs.get(ROLES);
+            if (roles != null) {
+                List<Map<String, List>> managers = (List<Map<String, List>>) roles.get(MANAGER);
+                List<Map<String, List>> viewers = (List<Map<String, List>>) roles.get(VIEWER);
+                PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
+                if (!permissionProvider.isPermissionExists(managerPermission)) {
+                    permissionProvider.addPermission(managerPermission);
+                }
+                if (!permissionProvider.isPermissionExists(viewerPermission)) {
+                    permissionProvider.addPermission(viewerPermission);
+                }
+                for (Map manager : managers) {
+                    String name = manager.get(NAME).toString();
+                    if (!permissionProvider.hasPermission(name, managerPermission)) {
+                        Role role = new Role(manager.get(ID).toString(), manager.get(NAME).toString());
+                        permissionProvider.grantPermission(managerPermission, role);
+                    }
+                }
+                for (Map viewer : viewers) {
+                    String name = viewer.get(NAME).toString();
+                    if (!permissionProvider.hasPermission(name, viewerPermission)) {
+                        Role role = new Role(viewer.get(ID).toString(), viewer.get(NAME).toString());
+                        permissionProvider.grantPermission(viewerPermission, role);
+                    }
+                }
+            }
+        }
     }
 
     public String getSolutionType() {
@@ -142,41 +183,19 @@ public class ConfigReader {
         return null;
     }
 
-    /*
-     * Add roles to the database and grant permissions to roles
-     * defined in deployment.yaml
-     */
-    private static void registerRoles() {
-        if (configs == null) {
-            log.error("Failed to find permission configs for wso2.business.rules.manager in " +
-                    "dashboard deployment.yaml");
-        } else {
-            Map roles = (Map) configs.get(ROLES);
-            if (roles != null) {
-                List<Map<String, List>> managers = (List<Map<String, List>>) roles.get(MANAGER);
-                List<Map<String, List>> viewers = (List<Map<String, List>>) roles.get(VIEWER);
-                PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
-                if (!permissionProvider.isPermissionExists(managerPermission)) {
-                    permissionProvider.addPermission(managerPermission);
-                }
-                if (!permissionProvider.isPermissionExists(viewerPermission)) {
-                    permissionProvider.addPermission(viewerPermission);
-                }
-                for (Map manager : managers) {
-                    String name = manager.get(NAME).toString();
-                    if (!permissionProvider.hasPermission(name, managerPermission)) {
-                        Role role = new Role(manager.get(ID).toString(), manager.get(NAME).toString());
-                        permissionProvider.grantPermission(managerPermission, role);
-                    }
-                }
-                for (Map viewer : viewers) {
-                    String name = viewer.get(NAME).toString();
-                    if (!permissionProvider.hasPermission(name, viewerPermission)) {
-                        Role role = new Role(viewer.get(ID).toString(), viewer.get(NAME).toString());
-                        permissionProvider.grantPermission(viewerPermission, role);
-                    }
-                }
-            }
+    public boolean isSiddhiAppManagerEnabled() {
+        if (configs != null && configs.get(SIDDHI_APP_DEPLOYER) != null) {
+            Map siddhiAppManagerConfigs = (Map) configs.get(SIDDHI_APP_DEPLOYER);
+            return (boolean) siddhiAppManagerConfigs.get(SIDDHI_APP_DEPLOYER_ENABLE);
         }
+        return false;
+    }
+
+    public String getSiddhiAppDeploymentPattern() {
+        if (configs != null && configs.get(SIDDHI_APP_DEPLOYER) != null) {
+            Map siddhiAppManagerConfigs = (Map) configs.get(SIDDHI_APP_DEPLOYER);
+            return (String) siddhiAppManagerConfigs.get(SIDDHI_APP_DEPLOYMENT_PATTERN);
+        }
+        return null;
     }
 }

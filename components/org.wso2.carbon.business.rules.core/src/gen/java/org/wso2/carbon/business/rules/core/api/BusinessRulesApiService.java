@@ -56,6 +56,13 @@ public abstract class BusinessRulesApiService {
                                                           boolean shouldUndeploy) throws NotFoundException;
 
     public abstract Response updateBusinessRule(Request request, Object businessRule
-            , String businessRuleInstanceID, Boolean deploy
-    ) throws NotFoundException;
+            , String businessRuleInstanceID, Boolean deploy) throws NotFoundException;
+
+    public abstract Response deploySiddhiApp(Request request, Object siddhiApp) throws NotFoundException;
+
+    public abstract Response deleteSiddhiApp(Request request, String siddhiAppName) throws NotFoundException;
+
+    public abstract Response updateSiddhiApp(Request request, Object siddhiApp) throws NotFoundException;
+
+    public abstract Response reShuffle(Request request) throws NotFoundException;
 }

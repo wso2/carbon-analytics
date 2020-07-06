@@ -33,6 +33,7 @@ import java.util.Map;
 public class BusinessRulesQueryConfigs {
     @Element(description = "Database query map")
     private List<Queries> queries;
+    private Map siddhiAppDeployer;
     private String datasource;
     private String username;
     private String password;
@@ -85,5 +86,13 @@ public class BusinessRulesQueryConfigs {
 
     public void setRoles(Map<String, Object> roles) {
         this.roles = roles;
+    }
+
+    public void setSiddhiAppDeployer(Map siddhiAppDeployer) {
+        this.siddhiAppDeployer = siddhiAppDeployer;
+    }
+
+    public Map getSiddhiAppDeployer() {
+        return siddhiAppDeployer;
     }
 }

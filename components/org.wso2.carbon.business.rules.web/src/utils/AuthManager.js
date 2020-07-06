@@ -213,7 +213,7 @@ export default class AuthManager {
             AuthenticationAPI
                 .getAccessTokenWithRefreshToken()
                 .then((response) => {
-                    if(response.status != 200) {
+                    if (response.status !== 200) {
                         console.log('Error occurred while refreshing token.');
                         this.discardSession();
                         reject();

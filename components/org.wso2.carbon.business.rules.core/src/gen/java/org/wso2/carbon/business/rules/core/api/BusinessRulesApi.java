@@ -260,4 +260,84 @@ public class BusinessRulesApi implements Microservice {
             throws NotFoundException {
         return delegate.updateBusinessRule(request, businessRule, businessRuleInstanceID, deploy);
     }
+
+    @POST
+    @Path("/manager/deploy")
+    @Consumes({"text/plain"})
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Deploy Siddhi App",
+            notes = "Deploy siddhi application in server node", response = void.class,
+            tags = {"manager",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "successful operation", response = void.class),
+
+            @io.swagger.annotations.ApiResponse(code = 405, message = "siddhi app validation exception",
+                    response = void.class)})
+    public Response deploySiddhiApp(@Context Request request,
+                                       @ApiParam(value = "Updated business rules name", required = true)
+                                               Object siddhiApp)
+            throws NotFoundException {
+        return delegate.deploySiddhiApp(request, siddhiApp);
+    }
+
+    @DELETE
+    @Path("/manager/{siddhiApplication}")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Deletes a siddhi app",
+            notes = "Deletes the siddhi appplication provideed", response = void.class,
+            tags = {"manager",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Siddhi Application is successfully deleted.",
+                    response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Siddhi app not found",
+                    response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error",
+            response = void.class),})
+    public Response deleteBusinessRule(@Context Request request,
+                                       @ApiParam(value = "Name of the siddhi app to be deleted", required = true)
+                                       @PathParam("siddhiApplication") String siddhiAppName)
+            throws NotFoundException {
+        return delegate.deleteSiddhiApp(request, siddhiAppName);
+    }
+
+    @PUT
+    @Path("/manager/deploy")
+    @Consumes({"text/plain"})
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Update deployed Siddhi App",
+            notes = "Update siddhi application in server node", response = void.class,
+            tags = {"manager",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "siddhi App updated successfully",
+                    response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 400, message = "validation error occured",
+                    response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "Siddhi app not found",
+                    response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "internal server error",
+                    response = void.class),})
+    public Response updateSiddhiApp(@Context Request request,
+                                    @ApiParam(value = "Updated siddhi app", required = true) Object siddhiApp)
+            throws NotFoundException {
+        return delegate.updateSiddhiApp(request, siddhiApp);
+    }
+
+    @POST
+    @Path("/manager/reShuffle")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Suffel the deployed siddhi apps",
+            notes = "Shuffle the deployed siddhi app equally accros the nodes", response = void.class,
+            tags = {"manager",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Reshuffle Process completed successfully",
+                    response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 403, message = "forbidden",
+                    response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error",
+                    response = void.class)})
+    public Response reShuffle(@Context Request request)
+            throws NotFoundException {
+        return delegate.reShuffle(request);
+    }
+
 }

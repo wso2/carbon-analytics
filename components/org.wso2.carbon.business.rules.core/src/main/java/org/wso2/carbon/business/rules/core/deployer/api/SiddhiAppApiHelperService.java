@@ -18,7 +18,11 @@
 
 package org.wso2.carbon.business.rules.core.deployer.api;
 
+import com.google.gson.JsonObject;
+import org.json.JSONObject;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
+
+import java.util.List;
 
 /**
  * Interface for services related to deploying siddhi apps of business rules.
@@ -28,7 +32,15 @@ public interface SiddhiAppApiHelperService {
 
     String getStatus(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException;
 
-    boolean delete(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException;
+    boolean deleteSiddhiApp(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException;
 
     void update(String nodeUrl, String siddhiApp) throws SiddhiAppsApiHelperException;
+
+    List getSiddhiAppList(String nodeUrl) throws SiddhiAppsApiHelperException;
+
+    String getSiddhiApp(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException;
+
+    long getSiddhiAppCount(String nodeUrl) throws SiddhiAppsApiHelperException;
+
+    boolean getSiddhiAppAvailability(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException;
 }

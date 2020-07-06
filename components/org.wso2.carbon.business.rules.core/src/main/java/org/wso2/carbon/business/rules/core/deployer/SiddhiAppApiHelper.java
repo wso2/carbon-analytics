@@ -17,14 +17,24 @@
  */
 package org.wso2.carbon.business.rules.core.deployer;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import feign.Response;
 import feign.RetryableException;
+import org.apache.commons.codec.Charsets;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import org.wso2.carbon.business.rules.core.datasource.configreader.ConfigReader;
 import org.wso2.carbon.business.rules.core.deployer.api.SiddhiAppApiHelperService;
 import org.wso2.carbon.business.rules.core.deployer.util.HTTPSClientUtil;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppDeployerServiceStubException;
 import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * Consists of methods for additional features for the exposed Siddhi App Api
@@ -82,7 +92,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
             JSONObject statusMessage;
             switch (status) {
                 case 200:
-                    statusMessage = new JSONObject(response.body().toString());
+                    statusMessage = new JSONObject(IOUtils.toString(response.body().asInputStream(), Charsets.UTF_8));
                     return statusMessage.getString(SiddhiAppApiConstants.STATUS);
                 case 404:
                     throw new SiddhiAppsApiHelperException("Specified siddhi app '" + siddhiAppName + "' " +
@@ -92,7 +102,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
                             "requesting the status of siddhi app '" + siddhiAppName + "' from the node '" +
                             hostAndPort + "'", status);
             }
-        } catch (SiddhiAppDeployerServiceStubException e) {
+        } catch (SiddhiAppDeployerServiceStubException | IOException e) {
             throw new SiddhiAppsApiHelperException("URI generated for node url '" + hostAndPort + "' is invalid.", e);
         } catch (RetryableException e) {
             throw new SiddhiAppsApiHelperException("Cannot connect to the worker node (" + hostAndPort + ") for " +
@@ -103,7 +113,7 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
     }
 
     @Override
-    public boolean delete(String hostAndPort, String siddhiAppName) throws SiddhiAppsApiHelperException {
+    public boolean deleteSiddhiApp(String hostAndPort, String siddhiAppName) throws SiddhiAppsApiHelperException {
         Response response = null;
         try {
             response = HTTPSClientUtil.doDeleteRequest(hostAndPort, username, password, siddhiAppName);
@@ -152,6 +162,114 @@ public class SiddhiAppApiHelper implements SiddhiAppApiHelperService {
         } catch (RetryableException e) {
             throw new SiddhiAppsApiHelperException("Cannot connect to the worker node (" + hostAndPort + ") for " +
                     "retrieving status of the siddhi app " + siddhiApp + ".", e);
+        } finally {
+            closeResponse(response);
+        }
+    }
+
+    @Override
+    public List getSiddhiAppList(String hostAndPort) throws SiddhiAppsApiHelperException {
+        Response response = null;
+        Type listType = new TypeToken<List<String>>() {
+        }.getType();
+        try {
+            response = HTTPSClientUtil.doGetSiddhiAppList(hostAndPort, username, password);
+            int status = response.status();
+            switch (status) {
+                case 200:
+                    return new Gson().fromJson(IOUtils.toString(response.body().asInputStream(), Charsets.UTF_8),
+                            listType);
+                default:
+                    throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
+                            "trying to receive the deployed siddhi app list from the node '" + hostAndPort + "'",
+                            status);
+            }
+        } catch (SiddhiAppDeployerServiceStubException | IOException e) {
+            throw new SiddhiAppsApiHelperException("Failed to retrieve the siddhi app list from node '"
+                    + hostAndPort + "'. ", e);
+        } catch (RetryableException e) {
+            throw new SiddhiAppsApiHelperException("Cannot connect to the worker node (" + hostAndPort + ") for " +
+                    "retrieving deployed siddhi app list.", e);
+        } finally {
+            closeResponse(response);
+        }
+    }
+
+    @Override
+    public String getSiddhiApp(String hostAndPort, String siddhiAppName) throws SiddhiAppsApiHelperException {
+        Response response = null;
+        try {
+            response = HTTPSClientUtil.doGetSiddhiApp(hostAndPort, username, password, siddhiAppName);
+            int status = response.status();
+            switch (status) {
+                case 200:
+                    JsonObject newList = (JsonObject) new JsonParser().parse(IOUtils.toString(response.body().
+                            asInputStream(), Charsets.UTF_8));
+                    return newList.get("content").getAsString();
+                case 404:
+                    throw new SiddhiAppsApiHelperException("The Siddhi Application " + siddhiAppName + " is not found.",
+                            status);
+                default:
+                    throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
+                            "trying to receive the siddhi app " + siddhiAppName + " from the node '" + hostAndPort +
+                            "'", status);
+            }
+        } catch (SiddhiAppDeployerServiceStubException | IOException e) {
+            throw new SiddhiAppsApiHelperException("Failed to retrieve the siddhi app " + siddhiAppName + " from node '"
+                    + hostAndPort + "'. ", e);
+        } catch (RetryableException e) {
+            throw new SiddhiAppsApiHelperException("Cannot connect to the worker node (" + hostAndPort + ") for " +
+                    "retrieving deployed siddhi app list.", e);
+        } finally {
+            closeResponse(response);
+        }
+    }
+
+    @Override
+    public long getSiddhiAppCount(String hostAndPort) throws SiddhiAppsApiHelperException {
+        Response response = null;
+        try {
+            response = HTTPSClientUtil.doGetSiddhiAppsCount(hostAndPort, username, password);
+            int status = response.status();
+            switch (status) {
+                case 200:
+                    return Long.parseLong(IOUtils.toString(response.body().asInputStream(), Charsets.UTF_8));
+                default:
+                    throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
+                            "trying to receive the deployed siddhi apps count from the node '" + hostAndPort + "'",
+                            status);
+            }
+        } catch (SiddhiAppDeployerServiceStubException | IOException e) {
+            throw new SiddhiAppsApiHelperException("Failed to retrieve the siddhi apps count from node '"
+                    + hostAndPort + "'. ", e);
+        } catch (RetryableException e) {
+            throw new SiddhiAppsApiHelperException("Cannot connect to the worker node (" + hostAndPort + ") for " +
+                    "retrieving deployed siddhi apps count.", e);
+        } finally {
+            closeResponse(response);
+        }
+    }
+
+    public boolean getSiddhiAppAvailability(String hostAndPort, String siddhiAppName) throws SiddhiAppsApiHelperException {
+        Response response = null;
+        JSONObject responseArray;
+        try {
+            response = HTTPSClientUtil.doGetSiddhiAppAvailability(hostAndPort, username, password, siddhiAppName);
+            int status = response.status();
+            switch (status) {
+                case 200:
+                    return Boolean.parseBoolean(IOUtils.toString(response.body().asInputStream(), Charsets.UTF_8));
+                default:
+                    throw new SiddhiAppsApiHelperException("Unexpected status code '" + status + "' received when " +
+                            "trying to receive the siddhi app availability from the node '" + hostAndPort + "'",
+                            status);
+            }
+        } catch (SiddhiAppDeployerServiceStubException | IOException e) {
+            throw new SiddhiAppsApiHelperException("Failed to retrieve the siddhi app availability from node '"
+                    + hostAndPort + "'. ", e);
+        } catch (RetryableException e) {
+            throw new SiddhiAppsApiHelperException("Cannot connect to the worker node (" + hostAndPort + ") for " +
+                    "retrieving siddhi app availability .", e);
         } finally {
             closeResponse(response);
         }

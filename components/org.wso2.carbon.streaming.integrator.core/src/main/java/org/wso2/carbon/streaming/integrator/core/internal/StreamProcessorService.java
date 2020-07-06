@@ -19,18 +19,6 @@
 package org.wso2.carbon.streaming.integrator.core.internal;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationRecordTableHandler;
-import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSinkHandler;
-import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSourceHandler;
-import org.wso2.carbon.streaming.integrator.core.ha.HAManager;
-import org.wso2.carbon.streaming.integrator.core.ha.RetryRecordTableConnection;
-import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppAlreadyExistException;
-import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppConfigurationException;
-import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppDeploymentException;
-import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppFilesystemInvoker;
-import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppProcessorConstants;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
@@ -44,6 +32,18 @@ import io.siddhi.query.api.SiddhiApp;
 import io.siddhi.query.api.annotation.Element;
 import io.siddhi.query.api.util.AnnotationHelper;
 import io.siddhi.query.compiler.SiddhiCompiler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationRecordTableHandler;
+import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSinkHandler;
+import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSourceHandler;
+import org.wso2.carbon.streaming.integrator.core.ha.HAManager;
+import org.wso2.carbon.streaming.integrator.core.ha.RetryRecordTableConnection;
+import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppAlreadyExistException;
+import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppConfigurationException;
+import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppDeploymentException;
+import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppFilesystemInvoker;
+import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppProcessorConstants;
 
 import java.util.Collection;
 import java.util.List;
@@ -289,8 +289,8 @@ public class StreamProcessorService {
         }
     }
 
-    public boolean isExists(String siddhiApp) throws SiddhiAppConfigurationException {
-        return siddhiAppMap.containsKey(getSiddhiAppName(siddhiApp));
+    public boolean isExists(String siddhiAppName) throws SiddhiAppConfigurationException {
+        return siddhiAppMap.containsKey(siddhiAppName);
     }
 
     public void addSiddhiAppFile(String siddhiAppName, SiddhiAppData siddhiAppData) {

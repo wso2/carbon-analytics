@@ -40,6 +40,8 @@ import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperExcepti
 import org.wso2.carbon.business.rules.core.exceptions.TemplateInstanceCountViolationException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerHelperException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
+import org.wso2.carbon.business.rules.core.manager.LoadBalancingDeployer;
+import org.wso2.carbon.business.rules.core.manager.SiddhiAppDeployer;
 import org.wso2.carbon.business.rules.core.util.LogEncoder;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerHelper;
@@ -55,6 +57,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static org.wso2.carbon.business.rules.core.util.TemplateManagerConstants.DEPLOYMENT_PATTERN_LOAD_BALANCING;
+
 /**
  * The exposed Template Manager service, which contains methods related to Business Rules from template, and Business
  * Rules from scratch
@@ -63,17 +67,21 @@ public class TemplateManagerService implements BusinessRulesService {
     private static final Logger log = LoggerFactory.getLogger(TemplateManagerService.class);
     private static final int DEFAULT_ARTIFACT_COUNT = 1;
     private static SiddhiAppApiHelper siddhiAppApiHelper = new SiddhiAppApiHelper();
+    ConfigReader configReader;
     // Available Template Groups from the directory
     private Map<String, TemplateGroup> availableTemplateGroups;
     private Map<String, BusinessRule> availableBusinessRules;
-    private Map nodes = null;
+    private Map nodes;
     private Gson gson;
     private QueryExecutor queryExecutor;
+    private String siddhiAppManagerDeploymentPattern = null;
+    private boolean isSiddhiAppDeployerEnabled = false;
+    private SiddhiAppDeployer siddhiAppDeployer;
 
     public TemplateManagerService() throws TemplateManagerServiceException, RuleTemplateScriptException {
         this.gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         this.queryExecutor = new QueryExecutor();
-        ConfigReader configReader = new ConfigReader();
+        configReader = new ConfigReader();
         this.nodes = configReader.getNodes();
         // Load & store available Template Groups & Business Rules at the time of instantiation
         this.availableTemplateGroups = loadTemplateGroups();
@@ -83,6 +91,18 @@ public class TemplateManagerService implements BusinessRulesService {
             List<String> solutionTypesEnabled = configReader.getSolutionTypesEnabled();
             for (String solutionType : solutionTypesEnabled) {
                 loadAndSaveAnalyticsSolutions(solutionType);
+            }
+        }
+        if (configReader.isSiddhiAppManagerEnabled()) {
+            isSiddhiAppDeployerEnabled = true;
+            siddhiAppManagerDeploymentPattern = configReader.getSiddhiAppDeploymentPattern();
+            if (siddhiAppManagerDeploymentPattern == null ||
+                    !siddhiAppManagerDeploymentPattern.equals(DEPLOYMENT_PATTERN_LOAD_BALANCING)) {
+                log.warn("Provided siddhi app manager deployment pattern not recognized using default " +
+                        "'loadBalance' approach ");
+            } else {
+                siddhiAppDeployer = new LoadBalancingDeployer();
+                siddhiAppDeployer.init(configReader, siddhiAppApiHelper);
             }
         }
         loadBusinessRules();
@@ -1380,6 +1400,7 @@ public class TemplateManagerService implements BusinessRulesService {
      * @param nodeURL       : URL of the node on which artifacts are going to be deployed
      * @param siddhiAppName : name of the siddhiApp which is going to be deployed
      * @param siddhiApp     : siddhiApp which is going to be deployed
+     * @throws SiddhiAppsApiHelperException : occurs when dealing with SiddhiAppsApi
      */
     private void deploySiddhiApp(String nodeURL, String siddhiAppName, Artifact siddhiApp)
             throws SiddhiAppsApiHelperException {
@@ -1390,6 +1411,16 @@ public class TemplateManagerService implements BusinessRulesService {
             deployableSiddhiApp = siddhiApp.getContent();
         }
         siddhiAppApiHelper.deploySiddhiApp(nodeURL, deployableSiddhiApp);
+    }
+
+    /**
+     * @param nodeURL   : URL of the node on which artifacts are going to be deployed
+     * @param siddhiApp : siddhiApp which is going to be deployed
+     * @throws SiddhiAppsApiHelperException : occurs when dealing with SiddhiAppsApi
+     */
+    public void deploySiddhiApp(String nodeURL, String siddhiApp)
+            throws SiddhiAppsApiHelperException {
+        siddhiAppApiHelper.deploySiddhiApp(nodeURL, siddhiApp);
     }
 
     /**
@@ -1455,12 +1486,22 @@ public class TemplateManagerService implements BusinessRulesService {
     }
 
     /**
+     * @param nodeURL   : URL of the node on which artifacts are going to be deployed
+     * @param siddhiApp : siddhiApp to be updated.
+     * @throws SiddhiAppsApiHelperException : occurs when dealing with SiddhiAppsApi
+     */
+    public void updateDeployedSiddhiApp(String nodeURL, String siddhiApp) throws SiddhiAppsApiHelperException {
+        siddhiAppApiHelper.update(nodeURL, siddhiApp);
+
+    }
+
+    /**
      * @param nodeURL          : URL of the node from which siddhiApp is going to be un-deployed
      * @param businessRuleUUID : UUID of the businessRule to which the siddhiApp belongs.
      * @return : true or false
      */
     private boolean undeploySiddhiApp(String nodeURL, String businessRuleUUID) throws SiddhiAppsApiHelperException {
-        return siddhiAppApiHelper.delete(nodeURL, businessRuleUUID);
+        return siddhiAppApiHelper.deleteSiddhiApp(nodeURL, businessRuleUUID);
     }
 
     /**
@@ -1603,4 +1644,15 @@ public class TemplateManagerService implements BusinessRulesService {
                 ruleTemplate.getType(), ruleTemplate.getUuid(), properties);
     }
 
+    public boolean deleteSiddhiApp(String nodeUrl, String siddhiAppName) throws SiddhiAppsApiHelperException {
+        return siddhiAppApiHelper.deleteSiddhiApp(nodeUrl, siddhiAppName);
+    }
+
+    public boolean isSiddhiAppDeployerEnabled() {
+        return isSiddhiAppDeployerEnabled;
+    }
+
+    public SiddhiAppDeployer getSiddhiAppDeployer() {
+        return siddhiAppDeployer;
+    }
 }

@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>3.0.37</version>
+        <version>3.0.38-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -243,7 +243,7 @@
             org.wso2.carbon.streaming.integrator.core.internal,
             org.wso2.carbon.streaming.integrator.core.internal.*,
             org.apache.http.*,
-            org.apache.commons.codec.*
+            org.apache.commons.codec.*,
         </private.package>
         <export.package>
             <!--!org.wso2.carbon.streaming.integrator.core.internal,-->
