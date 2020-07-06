@@ -114,4 +114,68 @@ public class HTTPSClientUtil {
         return SiddhiAppDeployerFactory.getSiddhiAppDeployerHttpsClient(generateURL(hostAndPort), username, password)
                 .doDeleteRequest(siddhiAppName);
     }
+
+    /**
+     * Produces a Response after doing a GET request
+     *
+     * @param hostAndPort   Host and Port of the Worker node in {Host}:{Port} format
+     * @param username      Username
+     * @param password      Password
+     * @return Feign Response object
+     * @throws SiddhiAppDeployerServiceStubException Error occurred within SiddhiAppDeployerServiceStub
+     */
+    public static Response doGetSiddhiAppList(String hostAndPort, String username, String password)
+            throws SiddhiAppDeployerServiceStubException {
+        return SiddhiAppDeployerFactory.getSiddhiAppDeployerHttpsClient(generateURL(hostAndPort), username, password)
+                .doGetSiddhiAppList();
+    }
+
+    /**
+     * Produces a Response after doing a GET request
+     *
+     * @param hostAndPort   Host and Port of the Worker node in {Host}:{Port} format
+     * @param username      Username
+     * @param password      Password
+     * @return Feign Response object
+     * @throws SiddhiAppDeployerServiceStubException Error occurred within SiddhiAppDeployerServiceStub
+     */
+    public static Response doGetSiddhiAppsCount(String hostAndPort, String username, String password)
+            throws SiddhiAppDeployerServiceStubException {
+        return SiddhiAppDeployerFactory.getSiddhiAppDeployerHttpsClient(generateURL(hostAndPort), username, password)
+                .doGetSiddhiAppCount();
+    }
+
+    /**
+     * Produces a Response after doing a GET request
+     *
+     * @param hostAndPort   Host and Port of the Worker node in {Host}:{Port} format
+     * @param username      Username
+     * @param password      Password
+     * @param siddhiAppName Name of the Siddhi App
+     * @return Feign Response object
+     * @throws SiddhiAppDeployerServiceStubException Error occurred within SiddhiAppDeployerServiceStub
+     */
+    public static Response doGetSiddhiAppAvailability(String hostAndPort, String username, String password,
+                                                      String siddhiAppName)
+            throws SiddhiAppDeployerServiceStubException {
+        return SiddhiAppDeployerFactory.getSiddhiAppDeployerHttpsClient(generateURL(hostAndPort), username, password)
+                .doGetSiddhiAppAvailability(siddhiAppName);
+    }
+
+    /**
+     * Produces a Response after doing a GET request
+     *
+     * @param hostAndPort   Host and Port of the Worker node in {Host}:{Port} format
+     * @param username      Username
+     * @param password      Password
+     * @param siddhiAppName Name of the Siddhi App
+     * @return Feign Response object
+     * @throws SiddhiAppDeployerServiceStubException Error occurred within SiddhiAppDeployerServiceStub
+     */
+    public static Response doGetSiddhiApp(String hostAndPort, String username, String password,
+                                                      String siddhiAppName)
+            throws SiddhiAppDeployerServiceStubException {
+        return SiddhiAppDeployerFactory.getSiddhiAppDeployerHttpsClient(generateURL(hostAndPort), username, password)
+                .doGetSiddhiApp(siddhiAppName);
+    }
 }

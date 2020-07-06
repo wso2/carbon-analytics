@@ -28,7 +28,6 @@ import org.wso2.carbon.business.rules.core.api.BusinessRulesApiService;
 import org.wso2.carbon.business.rules.core.api.NotFoundException;
 import org.wso2.carbon.business.rules.core.bean.BusinessRule;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
-import org.wso2.carbon.business.rules.core.bean.Template;
 import org.wso2.carbon.business.rules.core.bean.TemplateGroup;
 import org.wso2.carbon.business.rules.core.bean.TemplateManagerInstance;
 import org.wso2.carbon.business.rules.core.bean.scratch.BusinessRuleFromScratch;
@@ -37,8 +36,13 @@ import org.wso2.carbon.business.rules.core.datasource.configreader.DataHolder;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRuleNotFoundException;
 import org.wso2.carbon.business.rules.core.exceptions.BusinessRulesDatasourceException;
 import org.wso2.carbon.business.rules.core.exceptions.RuleTemplateScriptException;
+import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppManagerApiException;
+import org.wso2.carbon.business.rules.core.exceptions.SiddhiAppsApiHelperException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateInstanceCountViolationException;
 import org.wso2.carbon.business.rules.core.exceptions.TemplateManagerServiceException;
+import org.wso2.carbon.business.rules.core.manager.LoadBalancingDeployer;
+import org.wso2.carbon.business.rules.core.manager.SiddhiAppDeployer;
+import org.wso2.carbon.business.rules.core.manager.util.SiddhiManagerHelper;
 import org.wso2.carbon.business.rules.core.services.TemplateManagerService;
 import org.wso2.carbon.business.rules.core.util.LogEncoder;
 import org.wso2.carbon.business.rules.core.util.TemplateManagerConstants;
@@ -60,17 +64,6 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
     private static final Permission managerPermission = new Permission("BRM", "businessrules.manager");
     private static final Permission viewerPermission = new Permission("BRM", "businessrules.viewer");
     private static final String USER_NAME = "username";
-
-    private static enum RequestMethod {
-        CREATE_BUSINESS_RULE, EDIT_BUSINESS_RULE, DELETE_BUSINESS_RULE,
-        REDEPLOY_BUSINESS_RULE, UPDATE_BUSINESS_RULE, GET_RULE_TEMPLATES,
-        GET_TEMPLATE_GROUP, GET_TEMPLATE_GROUPS, GET_RULE_TEMPLATE,
-        LOAD_BUSINESS_RULE, GET_BUSINESS_RULES
-    }
-
-    private static enum Role {
-        MANAGER, VIEWER
-    }
 
     @Override
     public Response createBusinessRule(Request request, String businessRule, Boolean shouldDeploy) throws
@@ -208,7 +201,7 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
                 responseData.add("Could not find any business rule");
                 responseData.add(new String[]{});
                 responseData.add(role);
-                return Response.status(Response.Status.OK).entity(gson.toJson(responseData)).build();
+                return Response.ok().entity(gson.toJson(responseData)).build();
             }
             List list = templateManagerService.loadBusinessRulesWithStatus();
             responseData.add("Found Business Rules");
@@ -539,6 +532,119 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
         }
     }
 
+    @Override
+    public Response deploySiddhiApp(Request request, Object siddhiApp)
+            throws NotFoundException {
+        List<String> deployableNodeList = null;
+        if (!hasPermission(request, RequestMethod.DEPLOY_SIDDHI_APP)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
+        if (templateManagerService.isSiddhiAppDeployerEnabled()) {
+            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployer();
+            try {
+                deployableNodeList = deployer.deploySiddhiApp(siddhiApp);
+            } catch (SiddhiAppManagerApiException e) {
+                return Response.status(e.getStatus()).entity(e.getMessage()).build();
+            }
+            for (String node : deployableNodeList) {
+                try {
+                    templateManagerService.deploySiddhiApp(node, siddhiApp.toString());
+                    log.info("Siddhi app '" + SiddhiManagerHelper.getSiddhiAppName(siddhiApp) + "'deployed on node "
+                            + node + " successfully");
+                    if (deployer instanceof LoadBalancingDeployer) {
+                        ((LoadBalancingDeployer) deployer).increaseSiddhiAppCout(node);
+                    }
+                } catch (SiddhiAppsApiHelperException e) {
+                    return Response.status(e.getStatus()).entity(e.getMessage()).build();
+                } catch (SiddhiAppManagerApiException e) {
+                    log.error("Error occured while retrieving the siddhi app name, '", e);
+                }
+            }
+            return Response.status(Response.Status.OK).entity("siddhi app deployed succesfully").build();
+        }
+        log.error("Siddhi App Deployer is not enabled");
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Siddhi App Deployer is not enabled")
+                .build();
+    }
+
+
+    public Response deleteSiddhiApp(Request request, String siddhiAppname) {
+        if (!hasPermission(request, RequestMethod.DEPLOY_SIDDHI_APP)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        List<String> nodeList = null;
+        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
+        if (templateManagerService.isSiddhiAppDeployerEnabled()) {
+            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployer();
+            try {
+                nodeList = deployer.deleteSiddhiApp(siddhiAppname);
+            } catch (SiddhiAppManagerApiException e) {
+                return Response.status(e.getStatus()).entity(e.getMessage()).build();
+            }
+            for (String node : nodeList) {
+                try {
+                    templateManagerService.deleteSiddhiApp(node, siddhiAppname);
+                    log.info("Siddhi app '" + siddhiAppname + "' deleted from node " + node + " successfully ");
+                    if (deployer instanceof LoadBalancingDeployer) {
+                        ((LoadBalancingDeployer) deployer).reduceSiddhiAppCout(node);
+                    }
+                } catch (SiddhiAppsApiHelperException e) {
+                    return Response.status(e.getStatus()).entity(e.getMessage()).build();
+                }
+            }
+            return Response.status(Response.Status.OK).entity("Siddhi App deleted successfully").build();
+        }
+        log.error("Siddhi App Deployer is not enabled");
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Siddhi App Deployer is not enabled")
+                .build();
+    }
+
+
+    public Response updateSiddhiApp(Request request, Object siddhiApp) {
+        if (!hasPermission(request, RequestMethod.DEPLOY_SIDDHI_APP)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        List<String> nodeList = null;
+        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
+        if (templateManagerService.isSiddhiAppDeployerEnabled()) {
+            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployer();
+            try {
+                nodeList = deployer.updateSiddhiApp(siddhiApp);
+                for (String node : nodeList) {
+                    templateManagerService.updateDeployedSiddhiApp(node, siddhiApp.toString());
+                    log.info("siddhi app '" + SiddhiManagerHelper.getSiddhiAppName(siddhiApp) + "' updated on node " +
+                            node + " successfully");
+                }
+                return Response.status(Response.Status.OK).entity("Siddhi App updated successfully").build();
+            } catch (SiddhiAppManagerApiException e) {
+                return Response.status(e.getStatus()).entity(e.getMessage()).build();
+            } catch (SiddhiAppsApiHelperException e) {
+                return Response.status(e.getStatus()).entity(e.getMessage()).build();
+            }
+        }
+        log.error("Siddhi App Deployer is not enabled");
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Siddhi App Deployer is not enabled")
+                .build();
+    }
+
+    public Response reShuffle(Request request) {
+        if (!hasPermission(request, RequestMethod.DEPLOY_SIDDHI_APP)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        TemplateManagerService templateManagerService = TemplateManagerInstance.getInstance();
+        if (templateManagerService.isSiddhiAppDeployerEnabled()) {
+            log.info("|----------Reshuffle Process started----------|");
+            SiddhiAppDeployer deployer = templateManagerService.getSiddhiAppDeployer();
+            if (templateManagerService.isSiddhiAppDeployerEnabled()) {
+                return deployer.reShuffle();
+            }
+        }
+        log.error("Siddhi App Deployer is not enabled");
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Siddhi App Deployer is not enabled")
+                .build();
+    }
+
     private Role getUserRole(Request request) {
         PermissionProvider permissionProvider = DataHolder.getInstance().getPermissionProvider();
         String userName = request.getProperties().get(USER_NAME).toString();
@@ -564,5 +670,17 @@ public class BusinessRulesApiServiceImpl extends BusinessRulesApiService {
             }
         }
         return false;
+    }
+
+
+    private static enum RequestMethod {
+        CREATE_BUSINESS_RULE, EDIT_BUSINESS_RULE, DELETE_BUSINESS_RULE,
+        REDEPLOY_BUSINESS_RULE, UPDATE_BUSINESS_RULE, GET_RULE_TEMPLATES,
+        GET_TEMPLATE_GROUP, GET_TEMPLATE_GROUPS, GET_RULE_TEMPLATE,
+        LOAD_BUSINESS_RULE, GET_BUSINESS_RULES, DEPLOY_SIDDHI_APP
+    }
+
+    private static enum Role {
+        MANAGER, VIEWER
     }
 }

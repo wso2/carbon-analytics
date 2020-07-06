@@ -17,6 +17,31 @@
 package org.wso2.carbon.streaming.integrator.core.impl;
 
 import com.google.gson.Gson;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.stream.input.source.Source;
+import io.siddhi.core.stream.output.sink.Sink;
+import io.siddhi.core.util.snapshot.PersistenceReference;
+import io.siddhi.core.util.statistics.metrics.Level;
+import io.siddhi.query.api.SiddhiApp;
+import io.siddhi.query.api.SiddhiElement;
+import io.siddhi.query.api.annotation.Annotation;
+import io.siddhi.query.api.annotation.Element;
+import io.siddhi.query.api.definition.AggregationDefinition;
+import io.siddhi.query.api.definition.FunctionDefinition;
+import io.siddhi.query.api.definition.StreamDefinition;
+import io.siddhi.query.api.definition.TableDefinition;
+import io.siddhi.query.api.definition.TriggerDefinition;
+import io.siddhi.query.api.definition.WindowDefinition;
+import io.siddhi.query.api.execution.ExecutionElement;
+import io.siddhi.query.api.execution.partition.Partition;
+import io.siddhi.query.api.execution.partition.PartitionType;
+import io.siddhi.query.api.execution.partition.RangePartitionType;
+import io.siddhi.query.api.execution.partition.ValuePartitionType;
+import io.siddhi.query.api.execution.query.Query;
+import io.siddhi.query.api.execution.query.selection.OutputAttribute;
+import io.siddhi.query.api.expression.AttributeFunction;
+import io.siddhi.query.compiler.SiddhiCompiler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
@@ -38,26 +63,6 @@ import org.wso2.carbon.streaming.integrator.core.model.SiddhiAppRevision;
 import org.wso2.carbon.streaming.integrator.core.model.SiddhiAppStatus;
 import org.wso2.carbon.streaming.integrator.core.util.StatsEnable;
 import org.wso2.msf4j.Request;
-import io.siddhi.core.SiddhiAppRuntime;
-import io.siddhi.core.SiddhiManager;
-import io.siddhi.core.stream.input.source.Source;
-import io.siddhi.core.stream.output.sink.Sink;
-import io.siddhi.core.util.snapshot.PersistenceReference;
-import io.siddhi.core.util.statistics.metrics.Level;
-import io.siddhi.query.api.SiddhiApp;
-import io.siddhi.query.api.SiddhiElement;
-import io.siddhi.query.api.annotation.Annotation;
-import io.siddhi.query.api.annotation.Element;
-import io.siddhi.query.api.definition.*;
-import io.siddhi.query.api.execution.ExecutionElement;
-import io.siddhi.query.api.execution.partition.Partition;
-import io.siddhi.query.api.execution.partition.PartitionType;
-import io.siddhi.query.api.execution.partition.RangePartitionType;
-import io.siddhi.query.api.execution.partition.ValuePartitionType;
-import io.siddhi.query.api.execution.query.Query;
-import io.siddhi.query.api.execution.query.selection.OutputAttribute;
-import io.siddhi.query.api.expression.AttributeFunction;
-import io.siddhi.query.compiler.SiddhiCompiler;
 
 import java.io.File;
 import java.net.URI;
@@ -81,6 +86,11 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     private static final String PERMISSION_APP_NAME = "SAPP";
     private static final String MANAGE_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.manage";
     private static final String VIEW_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.view";
+
+    private static String getUserName(Request request) {
+        Object username = request.getProperty("username");
+        return username != null ? username.toString() : null;
+    }
 
     public Response siddhiAppsPost(String body) throws NotFoundException {
         String jsonString;
@@ -120,7 +130,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         Response.Status status = Response.Status.OK;
         try {
             boolean isAlreadyExists = StreamProcessorDataHolder.
-                    getStreamProcessorService().isExists(body);
+                    getStreamProcessorService().isExists(StreamProcessorDataHolder.getStreamProcessorService()
+                    .getSiddhiAppName(body));
             String siddhiAppName = StreamProcessorDataHolder.
                     getStreamProcessorService().validateAndSave(body, true);
             if (siddhiAppName != null) {
@@ -551,6 +562,29 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         String jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
                 "There is no Siddhi App exist with provided name : " + appName));
         return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
+    }
+
+    public Response siddhiAppExistsGet(String siddhiAppName) {
+        String jsonString = new Gson().toString();
+        Response.Status status = Response.Status.OK;
+        boolean isAlreadyExists;
+        try {
+            isAlreadyExists = StreamProcessorDataHolder.
+                    getStreamProcessorService().isExists(siddhiAppName);
+        } catch (SiddhiAppConfigurationException e) {
+            jsonString = new Gson().toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.VALIDATION_ERROR,
+                    e.getMessage()));
+            status = Response.Status.BAD_REQUEST;
+            return Response.status(status).entity(jsonString).build();
+        }
+        return Response.status(status).entity(isAlreadyExists).build();
+    }
+
+    public Response siddhiAppsCountGet() {
+        Response.Status status = Response.Status.OK;
+        Map<String, SiddhiAppData> siddhiAppFileMap = StreamProcessorDataHolder.
+                getStreamProcessorService().getSiddhiAppMap();
+        return Response.status(status).entity(siddhiAppFileMap.size()).build();
     }
 
     /**
@@ -1021,10 +1055,24 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         return siddhiAppElementsGet(appName);
     }
 
-    private static String getUserName(Request request) {
-        Object username = request.getProperty("username");
-        return username != null ? username.toString() : null;
+    public Response siddhiAppExistsGet(String siddhiAppName, Request request) throws NotFoundException {
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to enable/disable " +
+                    "stats for all Siddhi App").build();
+        }
+        return siddhiAppExistsGet(siddhiAppName);
     }
+
+    public Response siddhiAppsCountGet(Request request) throws NotFoundException {
+        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to enable/disable " +
+                    "stats for all Siddhi App").build();
+        }
+        return siddhiAppsCountGet();
+    }
+
 
     private PermissionProvider getPermissionProvider() {
         return StreamProcessorDataHolder.getPermissionProvider();
