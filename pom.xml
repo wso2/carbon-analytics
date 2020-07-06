@@ -37,6 +37,7 @@
         <module>components/org.wso2.carbon.siddhi.editor.core</module>
         <module>components/org.wso2.carbon.siddhi.extensions.installer.cli</module>
         <module>components/org.wso2.carbon.siddhi.extensions.installer.core</module>
+        <module>components/org.wso2.carbon.siddhi.error.handler.core</module>
         <module>components/org.wso2.carbon.business.rules.templates.editor.core</module>
         <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.business.rules.web</module>
@@ -56,6 +57,7 @@
         <module>features/org.wso2.carbon.event.simulator.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.extensions.installer.core.feature</module>
+        <module>features/org.wso2.carbon.siddhi.error.handler.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.templates.editor.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.core.feature</module>
         <module>features/org.wso2.carbon.business.rules.web.feature</module>
@@ -926,6 +928,19 @@
                 <version>${commons.io.version}</version>
             </dependency>
 
+            <!-- Siddhi Error Handler related -->
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.siddhi.error.handler.core</artifactId>
+                <version>${carbon.analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.siddhi.error.handler.core.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
+
             <!-- Siddhi Extensions Installer related -->
             <dependency>
                 <groupId>org.wso2.carbon.analytics</groupId>
@@ -1614,8 +1629,8 @@
 
     <properties>
         <carbon.analytics.version>3.0.38-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>5.1.13</siddhi.version>
-        <siddhi.bundle.version>5.1.13</siddhi.bundle.version>
+        <siddhi.version>5.1.14</siddhi.version>
+        <siddhi.bundle.version>5.1.14</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.1.45</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>org.wso2.carbon.analytics.parent</artifactId>
+        <groupId>org.wso2.carbon.analytics</groupId>
+        <version>3.0.38-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>org.wso2.carbon.siddhi.error.handler.core</artifactId>
+    <packaging>bundle</packaging>
+
+    <name>WSO2 Streaming Integrator - Siddhi Error Handler Core</name>
+    <url>http://wso2.org</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.eclipse.osgi</groupId>
+            <artifactId>org.eclipse.osgi.services</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.msf4j</groupId>
+            <artifactId>msf4j-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.utils</groupId>
+            <artifactId>org.wso2.carbon.utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io.wso2</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.streaming.integrator.common</artifactId>
+        </dependency>
+
+        <!-- Siddhi Dependencies -->
+        <dependency>
+            <groupId>org.wso2.orbit.org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.siddhi</groupId>
+            <artifactId>siddhi-query-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.siddhi</groupId>
+            <artifactId>siddhi-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.siddhi</groupId>
+            <artifactId>siddhi-query-compiler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.siddhi</groupId>
+            <artifactId>siddhi-annotations</artifactId>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
+        <private.package>
+            org.wso2.carbon.siddhi.error.handler.core.internal,
+            org.wso2.carbon.siddhi.error.handler.core.internal.*,
+        </private.package>
+        <export.package>
+            org.wso2.carbon.siddhi.error.handler.core.*
+        </export.package>
+        <import.package>
+            com.google.gson; version="${gson.version.range}",
+            com.google.gson.reflect; version="${gson.version.range}",
+            javax.ws.rs;version="${javax.ws.rs.version.range}",
+            javax.ws.rs.core;version="${javax.ws.rs.version.range}",
+            org.osgi.framework;version="${osgi.framework.import.version.range}",
+            org.slf4j; version="${slf4j.version.range}",
+            org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
+            org.wso2.carbon.utils; version="${carbon.utils.version}",
+            org.wso2.msf4j;version="${msf4j.import.version.range}",
+            io.siddhi.*;version="${siddhi.version.range}",
+            *;resolution:=optional
+        </import.package>
+        <carbon.component>
+            osgi.service; objectClass="org.wso2.carbon.streaming.integrator.common.EventStreamService",
+            osgi.service; objectClass="org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService",
+            osgi.service; objectClass="org.wso2.carbon.siddhi.error.handler.core.internal.SiddhiErrorHandlerMicroservice",
+            osgi.service; objectClass="org.wso2.msf4j.Microservice"
+        </carbon.component>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>1.8</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>sonatype.releases</id>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+
+
+</project>

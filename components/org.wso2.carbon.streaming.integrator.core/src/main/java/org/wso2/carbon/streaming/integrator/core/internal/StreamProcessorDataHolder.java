@@ -31,6 +31,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.CarbonRuntime;
+import org.wso2.carbon.streaming.integrator.common.ErrorStoreListener;
 import org.wso2.carbon.streaming.integrator.common.HAStateChangeListener;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppDeploymentListener;
 import org.wso2.carbon.streaming.integrator.core.NodeInfo;
@@ -64,6 +65,7 @@ public class StreamProcessorDataHolder {
     private static StatisticsConfiguration statisticsConfiguration;
     private static StatisticsManager statisticsManager;
     private static boolean isStatisticsEnabled;
+
     /**
      * List used to hold all the registered hs state change listeners.
      */
@@ -78,6 +80,8 @@ public class StreamProcessorDataHolder {
      * List used to hold all the registered Siddhi app deployment listeners.
      */
     private static List<SiddhiAppDeploymentListener> siddhiAppDeploymentListeners = new ArrayList<>();
+
+    private static List<ErrorStoreListener> errorStoreListeners = new ArrayList<>();
 
     private StreamProcessorDataHolder() {
 
@@ -206,6 +210,18 @@ public class StreamProcessorDataHolder {
 
     public static void removeSiddhiAppDeploymentListener(SiddhiAppDeploymentListener siddhiAppDeploymentListener) {
         siddhiAppDeploymentListeners.remove(siddhiAppDeploymentListener);
+    }
+
+    public static void addErrorStoreListener(ErrorStoreListener errorStoreListener) {
+        errorStoreListeners.add(errorStoreListener);
+    }
+
+    public static List<ErrorStoreListener> getErrorStoreListeners() {
+        return errorStoreListeners;
+    }
+
+    public static void removeErrorStoreListener(ErrorStoreListener errorStoreListener) {
+        errorStoreListeners.remove(errorStoreListener);
     }
 
     public static List<HAStateChangeListener> getHaStateChangeListenerList() {
