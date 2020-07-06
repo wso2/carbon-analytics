@@ -51,6 +51,7 @@
         <module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>
         <module>components/org.wso2.carbon.health.check.core</module>
         <module>components/org.wso2.siddhi.parser</module>
+        <module>components/org.wso2.carbon.siddhi.error.preserver.core</module>
 
         <module>features/org.wso2.carbon.streaming.integrator.core.feature</module>
         <module>features/org.wso2.carbon.streaming.integrator.common.feature</module>
