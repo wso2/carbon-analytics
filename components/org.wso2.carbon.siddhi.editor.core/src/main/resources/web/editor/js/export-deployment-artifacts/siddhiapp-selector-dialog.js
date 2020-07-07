@@ -66,7 +66,6 @@ define(['jquery', 'lodash', 'log', 'file_browser', 'js_tree'],
                    }
                 }
             });
-
         };
 
         SiddhiAppSelectorDialog.prototype.getSiddhiApps = function () {
@@ -86,6 +85,10 @@ define(['jquery', 'lodash', 'log', 'file_browser', 'js_tree'],
             var self = this;
             return self.form.find("#sp-name-input-field").val();
         };
+
+        SiddhiAppSelectorDialog.prototype.selectFiles = function(files) {
+            this.fileBrowser.selectFiles(files);
+        }
 
         return SiddhiAppSelectorDialog;
     });

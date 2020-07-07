@@ -408,6 +408,7 @@
                 <i class="fw fw-design-view fw-rotate-90"></i>
                 <span class="toggle-button-text" id="design_view_btn">Design View</span>
             </div>
+            <button class="btn wizard-view-button" id="btn-wizard-view">Wizard View</button>
         </div>
         <!-- End: Toggle Controls Container  -->
     </div>
@@ -2628,6 +2629,30 @@
     </div>
 </script>
 
+<script id="etl-wizard-finalize-template" type="text/x-handlebars-template">
+    <div style="padding: 15px;">
+        {{#if status}}
+        <h2>Successful!</h2>
+
+        <p style="margin-bottom: 15px;">The Siddhi app saved as '{{fileName}}'!</p>
+        <p>Click follow options if you want to test and proceed with deploying the Siddhi app.</p>
+
+        <div class="etl-wizard-final-actions">
+            <button class="btn btn-default" id="btn-test">Test...</button>
+            <button class="btn btn-default" id="btn-export-docker">Export as Docker...</button>
+            <button class="btn btn-default" id="btn-export-k8s">Export to Kubernetes...</button>
+            <button class="btn btn-default" id="btn-deploy">Deploy to Worker...</button>
+        </div>
+        {{else}}
+        <h2>Unable to save the Siddhi app!</h2>
+
+        <p>The following error occurred while saving the Siddhi app.</p>
+        <p>{{errorMessage}}</p>
+        {{/if}}
+
+    </div>
+</script>
+
 <!-- Export Dialog -->
 <div class='modal fade' id='openExportModal' tabindex='-1' role='dialog'>
     <div class='modal-dialog' role='document'>
@@ -2866,11 +2891,49 @@
 <div id="ETLWizardForm" tabindex="-1">
     <div class="wizard-form-content">
         <div class="header-content">
+            <input class="etl-flow-name" id="" type="text" value="UntitledETLTaskFlow"/>
+            <div class="header-steps">
+                <div id="step-1" class="step-item">
+                    Step 1
+                    <br/>
+                    <small>Data Source</small>
+                </div>
+                <div id="step-2" class="step-item">
+                    Step 2
+                    <br/>
+                    <small>Data Destination</small>
+                </div>
+                <div id="step-3" class="step-item">
+                    Step 3
+                    <br/>
+                    <small>Process Input Data</small>
+                </div>
+                <div id="step-4" class="step-item">
+                    Step 4
+                    <br/>
+                    <small>Data Mapping</small>
+                </div>
+                <div id="step-5" class="step-item">
+                    Step 5
+                    <br/>
+                    <small>Process Output Data</small>
+                </div>
+                <div id="step-6" class="step-item">
+                    Step 6
+                    <br/>
+                    <small>Finish</small>
+                </div>
+            </div>
         </div>
         <div style="" class="body-content">
         </div>
         <div class="footer-content">
             <hr style="padding-bottom: 5px" class="form-wizard-hr">
+            <div style="position: relative" class="btn-tray">
+                <button class="btn btn-default back-btn">Back</button>
+                <button class="btn btn-default next-btn">Next</button>
+                <button class="btn btn-default save-btn">Save</button>
+            </div>
         </div>
     </div>
 </div>

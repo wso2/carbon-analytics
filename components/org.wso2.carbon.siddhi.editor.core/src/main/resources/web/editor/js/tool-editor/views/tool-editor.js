@@ -2,10 +2,10 @@
  * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
 define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./source", '../constants',
-        'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils', 'etl_task_view'],
+        'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils', 'etl_task_view', 'etlWizard'],
 
     function (require, $, Backbone, _, log, DesignView, SourceView, constants, UndoManager, Launcher,
-              DebugManager, DesignViewUtils, ETLTaskView) {
+              DebugManager, DesignViewUtils, ETLTaskView, ETLWizard) {
 
         const ENTER_KEY = 13;
 
@@ -42,6 +42,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var previewContainer = this._$parent_el.find(_.get(this.options, 'preview.container'));
                     var loadingScreen = this._$parent_el.find(_.get(this.options, 'loading_screen.container'));
                     var sourceContainer = this._$parent_el.find(_.get(this.options, 'source.container'));
+                    var etlWizardContainer = this._$parent_el.find(_.get(this.options, 'etl_wizard.container'));
                     var designContainer = this._$parent_el.find(_.get(this.options, 'design_view.container'));
                     var etlTaskViewContainer = this._$parent_el.find(_.get(this.options, 'etl_task_view.container'));
                     var debugContainer = this._$parent_el.find(_.get(this.options, 'debug.container'));
@@ -147,6 +148,68 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     this._designView = designView;
                     designView.setRawExtensions(this._sourceView.getRawExtensions())
                     designView.renderToolPalette();
+
+                    $('.toggle-controls-container #btn-wizard-view').on('click', function(e) {
+                        e.preventDefault();
+                        // e.stopPropagation();
+
+                        // assume this is from the source view
+                        if (application.tabController.getActiveTab().getFile().isDirty()) {
+                            DesignViewUtils.prototype.warnAlert("Please save the file before switching to the Design View");
+                            return;
+                        }
+
+                        setTimeout(function(){
+                            var response = self._designView.getDesign(self.getContent());
+                            if (response.status === "success") {
+                                self.JSONObject = JSON.parse(response.responseString);
+
+                                if (!self.canTranslateToWizard(self.JSONObject)) {
+                                    DesignViewUtils.prototype.errorAlert('This Siddhi app cannot open in ETL Wizard mode');
+                                    return;
+                                }
+
+                                sourceContainer.hide();
+                                etlWizardContainer.show();
+                                // console.log('======== switching to etl wizard ========');
+                                // console.log(self.JSONObject);
+
+                                var etlOptions = _.cloneDeep(self.options);
+                                // etlOptions.fileSource = 'hello, world';
+                                etlOptions.dataModel = self.JSONObject;
+
+                                // alert('init etlwizard');
+                                var etlWizard = new ETLWizard(etlOptions);
+                                etlWizard.render();
+                                // alert('init etlwizard: done');
+                                // // The following code has been added to the setTimeout() method because
+                                // // the code needs to run asynchronously for the loading screen
+                                // setTimeout(function () {
+                                //     var fileHashCode = application.tabController.getActiveTab().getFile().attributes.hashCode;
+                                //     var renderedAppContentHashCode = designView.getHashCode();
+                                //     if (fileHashCode != renderedAppContentHashCode || fileHashCode == undefined &&
+                                //         renderedAppContentHashCode == undefined) {
+                                //         designView.setHashCode(fileHashCode);
+                                //         designView.emptyDesignViewGridContainer();
+                                //         designContainer.show();
+                                //         designView.renderDesignGrid(self.JSONObject);
+                                //         loadingScreen.hide();
+                                //     } else {
+                                //         designContainer.show();
+                                //         loadingScreen.hide();
+                                //     }
+                                //     // NOTE - This trigger should be always handled at the end of setTimeout()
+                                //     self.trigger("view-switch", { view: 'design' });
+                                // }, 100);
+                                // toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
+                                //     "<span class=\"toggle-button-text\">Source View</span>");
+                            } else if (response.status === "fail") {
+                                loadingScreen.hide();
+                                DesignViewUtils.prototype.errorAlert(response.errorMessage);
+                            }
+                        }, 100);
+
+                    });
 
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
                     var toggleViewButtonDynamicId = "toggle-view-button-" + this._$parent_el.attr('id');
@@ -301,6 +364,12 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         toggleViewButton.hide();
                         this._etlTaskView = new ETLTaskView({}, etlTaskViewContainer, function() { console.log('haha') }, self._designView.getDesign(self.getContent()));
                     }
+                },
+
+                canTranslateToWizard: function(model) {
+                    // TODO: validate if the siddhi app can be shown in a wizard mode.
+                    alert('I am going to return false :)');
+                    return true;
                 },
 
                 getContent: function () {

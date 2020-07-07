@@ -16,10 +16,10 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'jsonValidator', 
+define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'jsonValidator',
         'app/source-editor/completion-engine', 'alerts', 'dataMapperUtil', 'scopeModel', 'functionModel',
         'operatorModel', 'attributeModel', 'customValueModel'],
-    function(require, log, _, $, AppData, InitialiseData, JSONValidator, CompletionEngine, alerts, DataMapperUtil, 
+    function(require, log, _, $, AppData, InitialiseData, JSONValidator, CompletionEngine, alerts, DataMapperUtil,
         ScopeModel, FunctionModel, OperatorModel, AttributeModel, CustomValueModel) {
 
         var DataMapper = function(container, config) {
@@ -58,7 +58,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
             this.inputListContainer = $(container).find('.etl-task-wizard-canvas').find('.inputs').find('.attributeList');
             this.outputListContainer = $(container).find('.etl-task-wizard-canvas').find('.outputs').find('.attributeList')
-            
+
             //function binding
             this.showExpressionDialog = this.showExpressionDialog.bind(this);
             this.renderAttributes = this.renderAttributes.bind(this);
@@ -142,7 +142,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             <div style="display: flex; flex-wrap: wrap; width: 90%;">
                                 <div style="display: flex; width: 100%;">
                                     <div>
-                                        ${element.name}                                
+                                        ${element.name}
                                     </div>
                                     <div class="attrib-type" style="opacity: 0.8">
                                         (${element.type})
@@ -515,8 +515,8 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
                         tempExp.returnTypes.forEach(function (type) {
                             customDataTypes.push(DataMapperUtil.getGenericDataType(type));
-                            supportedFunctions = functionDataMap[type]['function'] ?
-                                _.merge({}, supportedFunctions, functionDataMap[type]['function']) :
+                            supportedFunctions = functionDataMap[type.toLowerCase()]['function'] ?
+                                _.merge({}, supportedFunctions, functionDataMap[type.toLowerCase()]['function']) :
                                 supportedFunctions;
                         })
                     }
@@ -652,7 +652,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             <a id="custom_val_input_container" style="color: #333">
                                 <div class="attribute" style="display: flex; flex-wrap: wrap;">
                                     <div class="description" style="width: 100%;">
-                                       Add a custom value to the expression 
+                                       Add a custom value to the expression
                                     </div>
                                     <div style="width: 100%;">
                                         Custom Value
@@ -1247,4 +1247,3 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
         return DataMapper;
 
     });
-    

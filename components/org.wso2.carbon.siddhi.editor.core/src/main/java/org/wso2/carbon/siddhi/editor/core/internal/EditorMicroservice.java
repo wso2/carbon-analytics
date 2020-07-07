@@ -46,6 +46,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.http.HttpStatus;
 import org.jaxen.JaxenException;
 import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
@@ -1164,6 +1165,63 @@ public class EditorMicroservice implements Microservice {
             log.error("Unable to generate code view", e);
             return Response.status(Response.Status.BAD_REQUEST)
                     .header("Access-Control-Allow-Origin", "*")
+                    .entity(e.getMessage())
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/etl-wizard/save")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response saveSiddhiApp(
+            @FormDataParam("configName") String configName,
+            @FormDataParam("config") String encodedEventFlowJson,
+            @FormDataParam("overwrite") boolean overwrite) {
+
+        String fileName = new String(Base64.getDecoder().decode(configName), Charset.defaultCharset());
+        java.nio.file.Path filePath = Paths.get(Constants.RUNTIME_PATH, Constants.DIRECTORY_DEPLOYMENT,
+                Constants.DIRECTORY_WORKSPACE, fileName).toAbsolutePath();
+
+        try {
+            if (!overwrite) {
+                // Check if the file already exist. If so return 409 CONFLICT
+                if (workspace.exists(filePath).get("exists").getAsBoolean()) {
+                    return Response.status(Response.Status.CONFLICT).build();
+                }
+            }
+
+            // Get the app source from the encodedEventFlowJson.
+            String eventFlowJson = new String(Base64.getDecoder().decode(encodedEventFlowJson), StandardCharsets.UTF_8);
+            Gson gson = DeserializersRegisterer.getGsonBuilder().disableHtmlEscaping().create();
+            EventFlow eventFlow = gson.fromJson(eventFlowJson, EventFlow.class);
+            String siddhiAppCode = new CodeGenerator().generateSiddhiAppCode(eventFlow);
+
+            // Save the Siddhi app in the file system
+            Files.write(filePath, siddhiAppCode.getBytes());
+
+            // Deploy Siddhi app
+            WorkspaceDeployer.deployConfigFile(fileName, siddhiAppCode);
+
+            JsonObject responseEntity = new JsonObject();
+            responseEntity.addProperty(STATUS, SUCCESS);
+            responseEntity.addProperty("path", filePath.toString());
+
+            // Return status
+            return Response.ok().entity(responseEntity).type(MediaType.APPLICATION_JSON).build();
+        } catch (CodeGenerationException e) {
+            log.error("Unable to generate code view.", e);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .build();
+        } catch (IOException e) {
+            log.error("Unable to read/write the Siddhi app.", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .build();
+        } catch (Exception e) {
+            log.error("Error occurred while saving the Siddhi app.", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())
                     .build();
         }

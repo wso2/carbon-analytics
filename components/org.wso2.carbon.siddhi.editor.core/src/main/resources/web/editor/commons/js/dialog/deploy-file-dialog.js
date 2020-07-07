@@ -15,7 +15,6 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
             inMemoryList = [];
         }
         var DeployFileDialog = function (options) {
-
             this.app = options;
             this.pathSeparator = this.app.getPathSeperator();
         };
@@ -131,10 +130,14 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
             var openConfigModal = fileOpen.filter("#openConfigModal");
             var treeContainer = fileOpen.find("div").filter("#fileTree");
             var openFileWizardError = fileOpen.find("#openFileWizardError");
+
             openFileWizardError.hide();
             fileBrowser = new FileBrowser({
-                container: treeContainer, application: app, fetchFiles: true,
-                showWorkspace: true, multiSelect: true
+                container: treeContainer,
+                application: app,
+                fetchFiles: true,
+                showWorkspace: true,
+                multiSelect: true
             });
             $(treeContainer).on('ready.jstree', function () {
                 $(treeContainer).jstree("open_all");
@@ -327,6 +330,14 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
                     };
                 }
             });
+
+            fileOpen.on('show.bs.modal', function(e) {
+                var handler = setInterval(function() {
+                    fileBrowser.selectFiles(self.app.selectedFiles);
+                    clearInterval(handler);
+                }, 200);
+            });
+
             this._fileOpenModal = fileOpen;
             openConfigModal.modal('hide');
         };

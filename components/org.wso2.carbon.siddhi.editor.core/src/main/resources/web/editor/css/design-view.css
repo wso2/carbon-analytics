@@ -27,19 +27,22 @@
 
 .toggle-controls-container {
     position: absolute;
-    bottom: 35px;
-    right: 10px;
+    bottom: 0;
+    right: 25px;
     z-index: 23;
+    width: 140px;
 }
 
-.toggle-view-button {
+.toggle-view-button, .wizard-view-button {
     transition: 0.15s;
     font-weight: bold;
     color: #333;
+    width: 100%;
     background-color: #f47b20;
+    margin-bottom: 10px;
 }
 
-.toggle-view-button:hover {
+.toggle-view-button:hover, .wizard-view-button:hover {
     color: #fff;
     transition: 0.15s;
 }

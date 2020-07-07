@@ -538,10 +538,18 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
 
             };
 
-            this.handleDeploy = function handleDeploy() {
-                if (_.isNil(this._handleDeploy)) {
-                    this._handleDeploy = new Dialogs.deploy_file_dialog(app);
-                }
+            this.handleDeploy = function handleDeploy(selectedFiles) {
+                // if (_.isNil(this._handleDeploy)) {
+                //     this._handleDeploy = new Dialogs.deploy_file_dialog(app);
+                // }
+                // if (!_.isNil(this._handleDeploy)) {
+                //     this._handleDeploy.clear();
+                // }
+
+                let opts = _.cloneDeep(app);
+                opts.selectedFiles = selectedFiles || [];
+
+                this._handleDeploy = new Dialogs.deploy_file_dialog(opts);
                 this._handleDeploy.render();
                 this._handleDeploy.show();
             };
@@ -555,20 +563,30 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
                 this._handleGenerateStreamDialog.show();
             };
 
-            this.handleExportForDocker = function handleExportForDocker() {
+            this.handleExportForDocker = function handleExportForDocker(selectedFiles) {
                 if (!_.isNil(this._handleExport)) {
                     this._handleExport.clear();
                 }
-                this._handleExport = new Dialogs.export_dialog(app, true);
+
+                let opts = _.cloneDeep(app);
+                opts.selectedFiles = selectedFiles || [];
+                opts.isExportDockerFlow = true;
+
+                this._handleExport = new Dialogs.export_dialog(opts);
                 this._handleExport.render();
                 this._handleExport.show();
             };
 
-            this.handleExportForKubernetes = function handleExportForKubernetes() {
+            this.handleExportForKubernetes = function handleExportForKubernetes(selectedFiles) {
                 if (!_.isNil(this._handleExport)) {
                     this._handleExport.clear();
                 }
-                this._handleExport = new Dialogs.export_dialog(app, false);
+
+                let opts = _.cloneDeep(app);
+                app.selectedFiles = selectedFiles || [];
+                opts.isExportDockerFlow = false;
+
+                this._handleExport = new Dialogs.export_dialog(opts);
                 this._handleExport.render();
                 this._handleExport.show();
             };
