@@ -156,12 +156,28 @@ requirejs.config({
         fillTemplateValueDialog: "js/export-deployment-artifacts/fill-template-value-dialog",
         kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog",
         etlWizard: "js/etl-wizard/etl-wizard",
+        inputOptionConfigurator: "js/etl-wizard/input-option-configurator/input-option-configurator",
+        filterInputOptionComponent: "js/etl-wizard/input-option-configurator/input-option-components/filter-input-option",
         csvMapper: "js/etl-wizard/source-sink-mappers/csv-mapper",
         xmlMapper: "js/etl-wizard/source-sink-mappers/xml-mapper",
         jsonMapper: "js/etl-wizard/source-sink-mappers/json-mapper",
         textMapper: "js/etl-wizard/source-sink-mappers/text-mapper",
         avroMapper: "js/etl-wizard/source-sink-mappers/avro-mapper",
-        inputOutputMapper: "js/etl-wizard/source-sink-mappers/source-sink-mapper"
+        inputOutputMapper: "js/etl-wizard/source-sink-mappers/source-sink-mapper",
+        // Datamapper components
+        scopeNode: "js/etl-wizard/data-mapper-component/node-models/ScopeNode",
+        operatorNode: "js/etl-wizard/data-mapper-component/node-models/OperatorNode",
+        functionNode: "js/etl-wizard/data-mapper-component/node-models/FunctionNode",
+        customValueNode: "js/etl-wizard/data-mapper-component/node-models/CustomValueNode",
+        attributeNode: "js/etl-wizard/data-mapper-component/node-models/AttributeNode",
+        dataMapperUtil: "js/etl-wizard/data-mapper-component/util/data-mapper-util",
+        // new Datamapper components
+        scopeModel: "js/etl-wizard/input-option-configurator/models/ScopeModel",
+        operatorModel: "js/etl-wizard/input-option-configurator/models/OperatorModel",
+        functionModel: "js/etl-wizard/input-option-configurator/models/FunctionModel",
+        customValueModel: "js/etl-wizard/input-option-configurator/models/CustomValueModel",
+        attributeModel: "js/etl-wizard/input-option-configurator/models/AttributeModel",
+        dataMapper: "js/etl-wizard/data-mapper-component/data-mapper",
     },
     map: {
         "*": {

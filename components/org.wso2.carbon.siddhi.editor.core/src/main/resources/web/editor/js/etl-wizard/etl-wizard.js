@@ -17,9 +17,9 @@
  *  * under the License.
  *
  */
-define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor/completion-engine', 'alerts', 'inputOutputMapper'],
+define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor/completion-engine', 'alerts', 'inputOutputMapper', 'inputOptionConfigurator'],
 
-    function (require, $, _, log, smartWizard, CompletionEngine, Alerts, InputOutputMapper) {
+    function (require, $, _, log, smartWizard, CompletionEngine, Alerts, InputOutputMapper, InputOptionConfigurator) {
 
         /**
          * Constants used by the wizard
@@ -92,6 +92,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             };
 
             this.__stepIndex = 1;
+            this.__substep = 0;
             this.__parentWizardForm = this.constructWizardHTMLElements($('#ETLWizardForm').clone());
         };
 
@@ -105,42 +106,35 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var wizardHeaderContent = wizardObj.find(constants.CLASS_WIZARD_MODAL_HEADER);
             var wizardFooterContent = wizardObj.find(constants.CLASS_WIZARD_MODAL_FOOTER);
             var stepIndex = this.__stepIndex;
+            var substep = this.__substep;
             var config = this.__propertyMap;
+            var steps = [
+                {id: 1, description: 'Configure Input'},
+                {id: 2, description: 'Configure Output'},
+                {id: 3, description: 'Configure Input Options'},
+                {id: 4, description: 'Configure schema mapping'},
+                {id: 5, description: 'Configure output options'},
+            ];
+
+            wizardHeaderContent.empty();
+            wizardFooterContent.empty();
 
             // Define header for the wizard
             wizardHeaderContent.append(`
                 <input class="etl-flow-name" id="" type="text" value="UntitledETLTaskFlow"/>
+                <div class="header-steps"></div>
             `);
 
-            wizardHeaderContent.append(`
-                <div class="header-steps">
-                    <div id="step-1" class="step-item">
-                        Step 1
-                        <br/>
-                        <small>Configure Input</small>
-                    </div>
-                    <div id="step-2" class="step-item">
-                        Step 2
-                        <br/>
-                        <small>Configure Output</small>
-                    </div>
-                    <div id="step-3" class="step-item">
-                        Step 3
-                        <br/>
-                        <small>Configure Input Options</small>
-                    </div>
-                    <div id="step-4" class="step-item">
-                        Step 4
-                        <br/>
-                        <small>Configure schema mapping</small>
-                    </div>
-                    <div id="step-5" class="step-item">
-                        Step 5
-                        <br/>
-                        <small>Configure output options</small>
-                    </div>
-                </div>
-            `);
+            steps.forEach(function (step) {
+                wizardHeaderContent.find('.header-steps')
+                    .append(`
+                        <div id="step-${step.id}" class="step-item">
+                            Step ${step.id}
+                            <br/>
+                            <small>${step.description}</small>
+                        </div>
+                    `);
+            });
 
             wizardFooterContent.append(`
                 <div style="position: relative" class="btn-tray">
@@ -152,19 +146,29 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             wizardObj.find(`#step-${stepIndex}`).addClass('selected');
 
             wizardObj.find('.next-btn').on('click', function () {
-                if (stepIndex < 5) {
-                    wizardObj.find(`#step-${stepIndex++}`).removeClass('selected');
-                    wizardObj.find(`#step-${stepIndex}`).addClass('selected');
-                    self.__stepIndex = stepIndex;
+                if (self.__stepIndex < steps.length) {
+                    if(self.__stepIndex < 3 && self.__substep < 2) {
+                        self.__substep++;
+                    } else {
+                        wizardObj.find(`#step-${self.__stepIndex++}`).removeClass('selected');
+                        wizardObj.find(`#step-${self.__stepIndex}`).addClass('selected');
+                        self.__substep = 0;
+                    }
+
                     self.render();
                 }
             });
 
             wizardObj.find('.back-btn').on('click', function () {
-                if (stepIndex > 1) {
-                    wizardObj.find(`#step-${stepIndex--}`).removeClass('selected');
-                    wizardObj.find(`#step-${stepIndex}`).addClass('selected');
-                    self.__stepIndex = stepIndex;
+                if (self.__stepIndex > 0) {
+                    if (self.__stepIndex < 3 && self.__substep > 0) {
+                        self.__substep--;
+                    } else {
+                        wizardObj.find(`#step-${self.__stepIndex--}`).removeClass('selected');
+                        wizardObj.find(`#step-${self.__stepIndex}`).addClass('selected');
+                        self.__substep = 0;
+                    }
+
                     self.render();
                 }
             });
@@ -207,38 +211,42 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 self.__expressionData = CompletionEngine.getRawMetadata();
             }
 
+            wizardBodyContent.empty();
+
             switch (this.__stepIndex) {
                 case 1:
-                    //ToDo : Configure input
-                    wizardBodyContent.empty();
                     this.renderSourceSinkConfigurator(constants.SOURCE_TYPE);
                     this.renderSchemaConfigurator(constants.SOURCE_TYPE);
                     this.renderInputOutputMapper(constants.SOURCE_TYPE);
-
-                    // TODO : Code for Overlay when clicking next
-
-                    // var offsetLeft = wizardBodyContent.find('.content-section')[0].offsetLeft;
-                    // var offsetTop = wizardBodyContent.find('.content-section')[0].offsetTop;
-                    // var minWidth = $(wizardBodyContent.find('.content-section')[0]).width();
-                    // var minHeight = $(wizardBodyContent.find('.content-section')[0]).height();
-                    //
-                    // wizardBodyContent.append(`<div style="position: absolute; top: ${offsetTop-15}; left: ${offsetLeft-15}; width: ${minWidth+30}; height: ${minHeight+30}; background-color: rgb(0,0,0,0.5)"></div>`);
-
                     break;
                 case 2:
-                    // TODO: Configure output
-                    wizardBodyContent.empty();
                     this.renderSourceSinkConfigurator(constants.SINK_TYPE);
                     this.renderSchemaConfigurator(constants.SINK_TYPE);
                     this.renderInputOutputMapper(constants.SINK_TYPE);
                     break;
                 case 3:
+                    var inputOptionConfigurator = new InputOptionConfigurator(wizardBodyContent, self.__propertyMap);
+                    inputOptionConfigurator.render();
                     // TODO: Configure input options
                     break;
                 case 4:
                     // TODO: Configure output options
                     break;
                 case 5:
+            }
+
+            if(this.__stepIndex < 3) {
+                var containers = wizardBodyContent.find('.content-section');
+                for (let i = 0; i < containers.length; i++) {
+                    if(i!==this.__substep) {
+                        var offsetLeft = wizardBodyContent.find('.content-section')[i].offsetLeft;
+                        var offsetTop = wizardBodyContent.find('.content-section')[i].offsetTop;
+                        var minWidth = $(wizardBodyContent.find('.content-section')[i]).width();
+                        var minHeight = $(wizardBodyContent.find('.content-section')[i]).height();
+
+                        wizardBodyContent.append(`<div style="position: absolute; top: ${offsetTop-15}; left: ${offsetLeft-15}; width: ${minWidth+30}; height: ${minHeight+30}; background-color: rgba(0,0,0,0.5)"></div>`);
+                    }
+                }
             }
 
         };
@@ -603,7 +611,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 var inputOutputMapper = new InputOutputMapper(type, mapperContainer, extensionConfig);
                 inputOutputMapper.render();
             }
-
         }
 
         return ETLWizard;
