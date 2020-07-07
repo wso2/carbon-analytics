@@ -225,8 +225,6 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                                         isPersisted: true,
                                         isDirty: false
                                     });
-                                    alert('Opening file');
-                                    // TODO: check if the file is a simple etl flow. if so open the second modal for options.
                                     openConfigModal.modal('hide');
                                     app.commandManager.dispatch("create-new-tab", {tabOptions: {file: file}});
                                 } else {
