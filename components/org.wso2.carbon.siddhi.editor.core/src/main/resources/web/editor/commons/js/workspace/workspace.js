@@ -638,6 +638,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
                 this._ExtensionInstallDialog.show();
             };
 
+            this.openErrorHandlerDialog = function openErrorHandlerDialog() {
+                if(_.isNil(this._errorHandlerDialog)){
+                    this._errorHandlerDialog = new Dialogs.error_handler_dialog(app);
+                }
+                this._errorHandlerDialog.render();
+                this._errorHandlerDialog.show();
+            };
+
             this.openQueryStore = function openQueryStore(options){
                 if(_.isNil(this._queryStoreApi)){
                     var opts = _.cloneDeep(_.get(app.config, 'query_store_api'));
@@ -791,6 +799,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
 
             //Open Extension install dialog
             app.commandManager.registerHandler('extension-install-dialog', this.openExtensionInstallDialog , this);
+
+            // Open Error Handler dialog
+            app.commandManager.registerHandler('error-handler-dialog', this.openErrorHandlerDialog , this);
 
             //Run hint tour
             app.commandManager.registerHandler('tour-guide', this.runGuide, this);
