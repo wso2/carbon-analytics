@@ -16,9 +16,9 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionComponent'],
+define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionComponent', 'windowInputOptionComponent'],
 
-    function (require, $, _, log, Alerts, FilterInputOptionsComponent ) {
+    function (require, $, _, log, Alerts, FilterInputOptionsComponent, WindowInputOptionsComponent) {
         var InputOptionConfigurator = function (container, config) {
             this.__container = container;
             this.__config = config;
@@ -46,10 +46,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
 
             self.__container.find('.input-option-btn-group>button')
                 .on('click', function (evt) {
-                    $(evt.currentTarget).attr('disabled',true);
+                    $(evt.currentTarget).attr('disabled', true);
                     var btnType = evt.currentTarget.id.match('btn-add-([a-z]+)')[1];
 
-                    var inputOptionSection = $('<div class="input-option-section" style="max-width: 45%;min-width: 45%;max-height: 50%;min-height: 70%;display: flex;flex-direction: column;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);padding: 15px;background-color: #3a3a3a;"></div>');
+                    var inputOptionSection = $('<div class="input-option-section" style="margin-right:15px;min-width: 45%;max-width: 45%;min-height: 70%;display: flex;flex-direction: column;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);padding: 15px;background-color: #3a3a3a;"></div>');
 
                     container.find('.input-option-container').append(inputOptionSection);
 
@@ -63,9 +63,25 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
 
                             break;
                         case 'window':
+                            new WindowInputOptionsComponent(inputOptionSection, config).render();
                             break;
                     }
                 });
+
+            if (Object.keys(self.__config.query.filter).length > 0) {
+                var inputOptionSection = $('<div class="input-option-section" style="margin-right:15px;min-width: 45%;max-width: 45%;min-height: 70%;display: flex;flex-direction: column;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);padding: 15px;background-color: #3a3a3a;"></div>');
+                container.find('.input-option-container').append(inputOptionSection);
+                container.find('#btn-add-function').attr('disabled', true);
+                container.find('#btn-add-function').attr('disabled', true);
+                new FilterInputOptionsComponent(inputOptionSection, config).render();
+            }
+
+            if (Object.keys(self.__config.query.filter).length > 0) {
+                var inputOptionSection = $('<div class="input-option-section" style="margin-right:15px;min-width: 45%;max-width: 45%;min-height: 70%;display: flex;flex-direction: column;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);padding: 15px;background-color: #3a3a3a;"></div>');
+                container.find('.input-option-container').append(inputOptionSection);
+                container.find('#btn-add-window').attr('disabled', true);
+                new WindowInputOptionsComponent(inputOptionSection, config).render();
+            }
         }
 
         return InputOptionConfigurator;

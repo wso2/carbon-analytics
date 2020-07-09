@@ -22,7 +22,13 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
         var FilterInputOptionComponent = function (container, config) {
             this.__container = container;
             this.__config = config;
-            this.__expression = new ScopeModel(['bool']);
+
+            if(Object.keys(config.query.filter).length === 0) {
+                config.query.filter['expression'] = new ScopeModel(['bool']);
+            }            
+
+            this.__expression = config.query.filter.expression;
+
             this.__indexArray = [];
             this.__focusNodes = [];
         }
@@ -54,8 +60,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                 </div>
             `);
 
-            console.log(expression);
-
             container.find('.expression-section')
                 .append(`
                     <div style="display: flex; padding: ${focusNodes.length === 0 ? '15px' : '5px'} 0;" class="expression ${focusNodes.length === 0 ? 'focus' : ''}">
@@ -82,8 +86,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                             </div>
                         `);
                 });
-            } else {
-
             }
 
             var allowedAttributes = {};
@@ -127,8 +129,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                             .forEach(function (key) {
                                 allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
                             });
-
-
                         break;
                 }
             } else {

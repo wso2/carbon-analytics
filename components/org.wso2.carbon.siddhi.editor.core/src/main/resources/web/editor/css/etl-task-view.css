@@ -435,3 +435,15 @@
     color: #ee6719;
     cursor: pointer;
 }
+
+.window-option-section .input-section label {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.window-option-section .input-section input {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.window-option-section .input-section input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
