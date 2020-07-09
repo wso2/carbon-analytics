@@ -28,8 +28,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
             CompletionEngine.getRawMetadata().inBuilt.windowProcessors.forEach(function (window) {
                 self.__extensionData[window.name] = window;
             });
-
-            console.log(this.__extensionData)
         }
 
         WindowInputOptionComponent.prototype.constructor = WindowInputOptionComponent;

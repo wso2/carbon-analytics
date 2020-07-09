@@ -447,3 +447,15 @@
 .window-option-section .input-section input::placeholder {
     color: rgba(255, 255, 255, 0.6);
 }
+
+.function-parameter-section .input-section label {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.function-parameter-section .input-section input {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.function-parameter-section .input-section input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}

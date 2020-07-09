@@ -159,6 +159,7 @@ requirejs.config({
         inputOptionConfigurator: "js/etl-wizard/input-option-configurator/input-option-configurator",
         filterInputOptionComponent: "js/etl-wizard/input-option-configurator/input-option-components/filter-input-option",
         windowInputOptionComponent: "js/etl-wizard/input-option-configurator/input-option-components/window-input-option",
+        functionInputOptionComponent: "js/etl-wizard/input-option-configurator/input-option-components/function-input-option",
         csvMapper: "js/etl-wizard/source-sink-mappers/csv-mapper",
         xmlMapper: "js/etl-wizard/source-sink-mappers/xml-mapper",
         jsonMapper: "js/etl-wizard/source-sink-mappers/json-mapper",

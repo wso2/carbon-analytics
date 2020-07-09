@@ -16,9 +16,10 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionComponent', 'windowInputOptionComponent'],
+define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionComponent', 'windowInputOptionComponent', 'functionInputOptionComponent'],
 
-    function (require, $, _, log, Alerts, FilterInputOptionsComponent, WindowInputOptionsComponent) {
+    function (require, $, _, log, Alerts, FilterInputOptionsComponent, WindowInputOptionsComponent, FunctionInputOptionComponent) {
+        
         var InputOptionConfigurator = function (container, config) {
             this.__container = container;
             this.__config = config;
@@ -60,7 +61,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                             break
                         case 'function':
                             container.find('#btn-add-filter').attr('disabled', true);
-
+                            new FunctionInputOptionComponent(inputOptionSection, config).render();
                             break;
                         case 'window':
                             new WindowInputOptionsComponent(inputOptionSection, config).render();
