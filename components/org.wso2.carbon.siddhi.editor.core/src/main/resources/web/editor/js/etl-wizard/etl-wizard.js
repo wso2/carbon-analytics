@@ -17,9 +17,9 @@
  *  * under the License.
  *
  */
-define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor/completion-engine', 'alerts', 'inputOutputMapper', 'inputOptionConfigurator'],
+define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor/completion-engine', 'alerts', 'inputOutputMapper', 'inputOptionConfigurator', 'dataMapper'],
 
-    function (require, $, _, log, smartWizard, CompletionEngine, Alerts, InputOutputMapper, InputOptionConfigurator) {
+    function (require, $, _, log, smartWizard, CompletionEngine, Alerts, InputOutputMapper, InputOptionConfigurator, DataMapper) {
 
         /**
          * Constants used by the wizard
@@ -230,6 +230,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     // TODO: Configure input options
                     break;
                 case 4:
+                    var dataMapperContainer = self.__$parent_el_container.find('.etl-task-wizard-container').clone();
+                    wizardBodyContent.append(dataMapperContainer);
+                    var dataMapper = new DataMapper(dataMapperContainer, self.__propertyMap);
+
                     // TODO: Configure output options
                     break;
                 case 5:

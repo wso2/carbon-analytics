@@ -156,6 +156,7 @@ requirejs.config({
         fillTemplateValueDialog: "js/export-deployment-artifacts/fill-template-value-dialog",
         kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog",
         etlWizard: "js/etl-wizard/etl-wizard",
+        dataMapper: "js/etl-wizard/data-mapper-component/data-mapper",
         inputOptionConfigurator: "js/etl-wizard/input-option-configurator/input-option-configurator",
         filterInputOptionComponent: "js/etl-wizard/input-option-configurator/input-option-components/filter-input-option",
         windowInputOptionComponent: "js/etl-wizard/input-option-configurator/input-option-components/window-input-option",

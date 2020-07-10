@@ -19,7 +19,9 @@
 define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'jsonValidator', 'app/source-editor/completion-engine', 'alerts', 'dataMapperUtil', 'scopeNode', 'operatorNode', 'functionNode', 'attributeNode', 'customValueNode'],
     function(require, log, _, $, AppData, InitialiseData, JSONValidator, CompletionEngine, alerts, DataMapperUtil, ScopeNode, OperatorNode, FunctionNode, AttributeNode, CustomValueNode) {
 
-        var ETLTaskView = function(options, container, callback, appObject) {
+        var DataMapper = function(container, config) {
+            container.show();
+            container.css({'width': '100%'});
             this.inputAttributes = [
                 {
                     name: 'id',
@@ -95,13 +97,26 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.inputListContainer = $(container).find('.etl-task-wizard-canvas').find('.inputs').find('.attributeList');
             this.outputListContainer = $(container).find('.etl-task-wizard-canvas').find('.outputs').find('.attributeList')
             
+            //function binding
+            this.showExpressionDialog = this.showExpressionDialog.bind(this);
+            this.renderAttributes = this.renderAttributes.bind(this);
+            this.renderFunctionAttributeSelector = this.renderFunctionAttributeSelector.bind(this);
+            this.hideExpressionGenerationDialog = this.hideExpressionGenerationDialog.bind(this);
+            this.addNodeToExpression = this.addNodeToExpression.bind(this);
+            this.displayExpression = this.displayExpression.bind(this);
+            this.renderGenerator = this.renderGenerator.bind(this);
+            this.updateFilter = this.updateFilter.bind(this);
+            this.updateExpression = this.updateExpression.bind(this);
+            this.addCoordinate = this.addCoordinate.bind(this);
+            this.removeCoordinate = this.removeCoordinate.bind(this);
+            this.updateConnections = this.updateConnections.bind(this);
+            this.displayCustomValueInput = this.displayCustomValueInput.bind(this);
+
             this.renderAttributes(this.inputAttributes, this.outputAttributes);
             this.functionDataMap = this.generateExpressionMap(this.inputAttributes, CompletionEngine.getRawMetadata());
         }
 
-        ETLTaskView.prototype.constructor = ETLTaskView;
-
-        ETLTaskView.prototype.updateConnections = function(outputAttribute) {
+        DataMapper.prototype.updateConnections = function(outputAttribute) {
             var jsPlumbInstance = this.jsPlumbInstance;
             var inputAttributeEndpoints = this.inputAttributeEndpoints;
             var outputAttributeEndpoints = this.outputAttributeEndpoints;
@@ -127,7 +142,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
         }
 
-        ETLTaskView.prototype.renderAttributes = function(inputAttributes, outputAttributes) {
+        DataMapper.prototype.renderAttributes = function(inputAttributes, outputAttributes) {
             var container = this.container;
             var inputListContainer = this.inputListContainer;
             var outputListContainer = this.outputListContainer;
@@ -223,7 +238,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.outputAttributeEndpoints = outputEndpointMap;
         }
 
-        ETLTaskView.prototype.showExpressionDialog = function(output_attribute) {
+        DataMapper.prototype.showExpressionDialog = function(output_attribute) {
             this.currenOutputElement = output_attribute.name;
             this.expressionMap[output_attribute.name] = this.expressionMap[output_attribute.name] ?
                 this.expressionMap[output_attribute.name] : new ScopeNode([output_attribute.type]);
@@ -260,15 +275,15 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             });
         }
 
-        ETLTaskView.prototype.addCoordinate = function(index) {
+        DataMapper.prototype.addCoordinate = function(index) {
             this.coordinate.push(index);
         }
 
-        ETLTaskView.prototype.removeCoordinate = function() {
+        DataMapper.prototype.removeCoordinate = function() {
             this.coordinate.pop();
         }
 
-        ETLTaskView.prototype.renderGenerator = function() {
+        DataMapper.prototype.renderGenerator = function() {
             var container = this.container;
             var expressionContainer = $(container).find('.expression-container');
             var expression = this.expressionMap[this.currenOutputElement];
@@ -805,13 +820,13 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             }
         }
 
-        ETLTaskView.prototype.updateFilter = function(filterCategory, filterValue) {
+        DataMapper.prototype.updateFilter = function(filterCategory, filterValue) {
             this.selectedCategory = filterCategory;
             this.selectedCategoryFilter = filterValue;
             this.renderGenerator();
         }
 
-        ETLTaskView.prototype.displayCustomValueInput = function(type) {
+        DataMapper.prototype.displayCustomValueInput = function(type) {
             $(this.container).find('#custom_value_input_txt').hide();
             $(this.container).find('#custom_value_input_txt').val('');
             $(this.container).find('#custom_value_input_bool').hide();
@@ -827,7 +842,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             }
         }
 
-        ETLTaskView.prototype.updateExpression = function(expression) {
+        DataMapper.prototype.updateExpression = function(expression) {
             if (this.coordinate.length === 0) {
                 this.expressionMap[this.currenOutputElement] = expression;
             }
@@ -836,7 +851,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.renderGenerator();
         }
 
-        ETLTaskView.prototype.hideExpressionGenerationDialog = function(container, expressionGeneratorContainer) {
+        DataMapper.prototype.hideExpressionGenerationDialog = function(container, expressionGeneratorContainer) {
             expressionGeneratorContainer.remove();
             expressionGeneratorContainer = $(container).find('.popup-backdrop').clone();
             $(container).prepend(expressionGeneratorContainer);
@@ -850,7 +865,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.focusNode = [];
         }
 
-        ETLTaskView.prototype.renderFunctionAttributeSelector = function(type, attributeFunctionArray, outputAttributeName) {
+        DataMapper.prototype.renderFunctionAttributeSelector = function(type, attributeFunctionArray, outputAttributeName) {
             var nodeCategoryContainer = this.expressionGenerationDialog.find('.att-fun-op-container');
             var addNodeToExpression = this.addNodeToExpression;
             var attributeContainer = $(nodeCategoryContainer).find('.select-function-operator-attrib');
@@ -925,7 +940,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             $(nodeCategoryContainer).find('.select-function-operator-attrib').show();
         }
 
-        ETLTaskView.prototype.addNodeToExpression = function(type, node_data, outputAttributeName) {
+        DataMapper.prototype.addNodeToExpression = function(type, node_data, outputAttributeName) {
             var coordinates = this.coordinate;
             var node = null;
             var data = null;
@@ -966,13 +981,13 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.displayExpression(outputAttributeName);
         }
 
-        ETLTaskView.prototype.displayExpression = function(outputAttrName) {
+        DataMapper.prototype.displayExpression = function(outputAttrName) {
             var htmlContent = generateExpressionHTML(this.expressionMap[outputAttrName]);
             $(this.container).find('.main-exp').empty()
             $(this.container).find('.main-exp').append(htmlContent);
         }
 
-        ETLTaskView.prototype.generateExpressionMap = function(inputAttributes, expressionFunctions) {
+        DataMapper.prototype.generateExpressionMap = function(inputAttributes, expressionFunctions) {
             var supportedExtensionTypes = ['time', 'env', 'geo', 'math', 'str'];
             var expressionMap = {
                 string: {},
@@ -1142,6 +1157,6 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             return errorsFound === 0;
         }
 
-        return ETLTaskView;
+        return DataMapper;
 
     });
