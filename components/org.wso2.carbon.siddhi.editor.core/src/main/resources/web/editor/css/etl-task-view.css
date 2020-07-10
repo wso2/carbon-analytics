@@ -24,7 +24,7 @@
 .etl-task-wizard-container .etl-task-wizard-canvas {
     position: relative;
     height: 100%;
-    background-color: rgb(24, 26, 27);
+    /* background-color: rgb(24, 26, 27); */
 }
 
 .etl-task-wizard-container .popup-backdrop {
@@ -84,7 +84,7 @@
     padding-top: 5px;
     font-size: 1.8rem;
     opacity: 1;
-    color: #d6d3cd;
+    /* color: #d6d3cd; */
     position: relative;
     cursor: pointer;
     display: flex;
@@ -95,7 +95,7 @@
     width: 10%;
     text-align: center;
     padding-top: 15px;
-    color: #d6d3cd;
+    /* color: #d6d3cd; */
     display: none;
 }
 

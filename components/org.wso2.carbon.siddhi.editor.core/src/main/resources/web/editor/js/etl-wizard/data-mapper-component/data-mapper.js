@@ -16,56 +16,17 @@
  * under the License.
  */
 
-define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'jsonValidator', 'app/source-editor/completion-engine', 'alerts', 'dataMapperUtil', 'scopeNode', 'operatorNode', 'functionNode', 'attributeNode', 'customValueNode'],
-    function(require, log, _, $, AppData, InitialiseData, JSONValidator, CompletionEngine, alerts, DataMapperUtil, ScopeNode, OperatorNode, FunctionNode, AttributeNode, CustomValueNode) {
+define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'jsonValidator', 
+        'app/source-editor/completion-engine', 'alerts', 'dataMapperUtil', 'scopeNode', 'operatorNode', 'functionNode',
+         'attributeNode', 'customValueNode', 'scopeModel', 'functionModel', 'operatorModel', 'attributeModel', 'customValueModel'],
+    function(require, log, _, $, AppData, InitialiseData, JSONValidator, CompletionEngine, alerts, DataMapperUtil, 
+        ScopeNode, OperatorNode, FunctionNode, AttributeNode, CustomValueNode, ScopeModel, FunctionModel, OperatorModel, AttributeModel, CustomValueModel) {
 
         var DataMapper = function(container, config) {
             container.show();
             container.css({'width': '100%'});
-            this.inputAttributes = [
-                {
-                    name: 'id',
-                    type: 'string',
-                },
-                {
-                    name: 'name',
-                    type: 'string',
-                },
-                {
-                    name: 'amount',
-                    type: 'int'
-                }
-            ];
-
-            // this.outputAttributes = [
-            //   {
-            //     name: 'name',
-            //     type: 'string'
-            //   },
-            //   {
-            //     name: 'isTheCorrect',
-            //     type: 'bool'
-            //   },
-            //   {
-            //     name: 'count',
-            //     type: 'int'
-            //   }
-            // ];
-
-            this.outputAttributes = [
-                {
-                    name: 'id',
-                    type: 'string',
-                },
-                {
-                    name: 'name',
-                    type: 'string',
-                },
-                {
-                    name: 'amount',
-                    type: 'int'
-                }
-            ];
+            this.inputAttributes = config.input.stream.attributes;
+            this.outputAttributes = config.output.stream.attributes;
 
             var color = 'gray';
 
@@ -191,7 +152,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             </div>
                             <div class="clear-icon">
                                 <a href="#" title="Clear mapping" href="#" class="icon clear" style="">
-                                    <i class="fw fw-clear"></i>
+                                    <i style="color:#323232" class="fw fw-clear"></i>
                                 </a>
                             </div>
                         </div>

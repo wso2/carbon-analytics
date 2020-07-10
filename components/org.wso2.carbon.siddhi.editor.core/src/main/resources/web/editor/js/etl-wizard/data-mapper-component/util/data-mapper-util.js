@@ -393,7 +393,7 @@ define(['require', 'jquery', 'lodash', 'log'],
                     }
                     break;
                 case 'function':
-                    htmlContent += `${node.displayName.slice(0, -1)}`;
+                    htmlContent += `<span id="fn${id}">${node.displayName.slice(0, -1)}`;
                     var isFirst = true;
                     node.parameters.forEach(function (param, i) {
                         if (!isFirst) {
@@ -405,7 +405,7 @@ define(['require', 'jquery', 'lodash', 'log'],
                         isFirst = false;
                     })
 
-                    htmlContent += `)`;
+                    htmlContent += `)</span>`;
                     break;
                 case 'scope':
                     if (id.length === 0) {
