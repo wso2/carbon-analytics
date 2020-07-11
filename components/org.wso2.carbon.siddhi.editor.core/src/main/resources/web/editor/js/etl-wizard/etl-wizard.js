@@ -109,11 +109,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var substep = this.__substep;
             var config = this.__propertyMap;
             var steps = [
-                {id: 1, description: 'Configure Input'},
-                {id: 2, description: 'Configure Output'},
-                {id: 3, description: 'Configure Input Options'},
-                {id: 4, description: 'Configure schema mapping'},
-                {id: 5, description: 'Configure output options'},
+                {id: 1, description: 'Data source'},
+                {id: 2, description: 'Data Destination'},
+                {id: 3, description: 'Process Input Data'},
+                {id: 4, description: 'Data Mapping'},
+                {id: 5, description: 'Process Output Data'},
             ];
 
             wizardHeaderContent.empty();
@@ -227,17 +227,16 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 case 3:
                     var inputOptionConfigurator = new InputOptionConfigurator(wizardBodyContent, self.__propertyMap);
                     inputOptionConfigurator.render();
-                    // TODO: Configure input options
                     break;
                 case 4:
                     var dataMapperContainer = self.__$parent_el_container.find('.etl-task-wizard-container').clone();
                     wizardBodyContent.append(dataMapperContainer);
-                    var dataMapper = new DataMapper(dataMapperContainer, self.__propertyMap);
+                    new DataMapper(dataMapperContainer, self.__propertyMap);
 
-                    // TODO: Configure output options
                     break;
                 case 5:
-                    console.log(self.__propertyMap);
+                    // TODO Output option configurator
+                    
             }
 
             if(this.__stepIndex < 3) {
