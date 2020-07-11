@@ -237,6 +237,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     // TODO: Configure output options
                     break;
                 case 5:
+                    console.log(self.__propertyMap);
             }
 
             if(this.__stepIndex < 3) {

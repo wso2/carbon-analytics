@@ -17,10 +17,10 @@
  */
 
 define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'jsonValidator', 
-        'app/source-editor/completion-engine', 'alerts', 'dataMapperUtil', 'scopeNode', 'operatorNode', 'functionNode',
-         'attributeNode', 'customValueNode', 'scopeModel', 'functionModel', 'operatorModel', 'attributeModel', 'customValueModel'],
+        'app/source-editor/completion-engine', 'alerts', 'dataMapperUtil', 'scopeModel', 'functionModel',
+        'operatorModel', 'attributeModel', 'customValueModel'],
     function(require, log, _, $, AppData, InitialiseData, JSONValidator, CompletionEngine, alerts, DataMapperUtil, 
-        ScopeNode, OperatorNode, FunctionNode, AttributeNode, CustomValueNode, ScopeModel, FunctionModel, OperatorModel, AttributeModel, CustomValueModel) {
+        ScopeModel, FunctionModel, OperatorModel, AttributeModel, CustomValueModel) {
 
         var DataMapper = function(container, config) {
             container.show();
@@ -42,9 +42,10 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             })
             this.container = container;
             this.inputAttributeEndpoints = {};
+            this.config = config;
             this.outputAttributeEndpoints = {};
             this.connectionMapRef = {};
-            this.expressionMap = {};
+            this.expressionMap = config.query.mapping;
             this.coordinate = [];
             this.focusNode = [];
             this.selectedCategory = null;
@@ -82,7 +83,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             var inputAttributeEndpoints = this.inputAttributeEndpoints;
             var outputAttributeEndpoints = this.outputAttributeEndpoints;
             var generatedExpression = this.expressionMap[outputAttribute] ?
-                '= ' + generateExpressionHTML(null, this.expressionMap[outputAttribute]) : '';
+                '= ' + DataMapperUtil.generateExpressionHTML2(this.expressionMap[outputAttribute], '', null) : '';
 
             $(outputAttributeEndpoints[outputAttribute].element).find('.mapped-expression').empty();
             $(outputAttributeEndpoints[outputAttribute].element).find('.mapped-expression').append(`
@@ -183,8 +184,8 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 select_all.show();
                 select_all.on('click', function(evt) {
                     outputAttributes.forEach(function(attr) {
-                        expressionMap[attr.name] = new ScopeNode([attr.type]);
-                        expressionMap[attr.name].addNodeToExpression(new AttributeNode({
+                        expressionMap[attr.name] = new ScopeModel([attr.type]);
+                        expressionMap[attr.name].addNode(new AttributeModel({
                             name: attr.name,
                             dataType: attr.type
                         }));
@@ -202,7 +203,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
         DataMapper.prototype.showExpressionDialog = function(output_attribute) {
             this.currenOutputElement = output_attribute.name;
             this.expressionMap[output_attribute.name] = this.expressionMap[output_attribute.name] ?
-                this.expressionMap[output_attribute.name] : new ScopeNode([output_attribute.type]);
+                this.expressionMap[output_attribute.name] : new ScopeModel([output_attribute.type]);
             var container = this.container;
             var hideExpressionGenerationDialog = this.hideExpressionGenerationDialog;
             var expressionGeneratorContainer = this.expressionGenerationDialog.show();
@@ -245,6 +246,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
         }
 
         DataMapper.prototype.renderGenerator = function() {
+            var config = this.config;
             var container = this.container;
             var expressionContainer = $(container).find('.expression-container');
             var expression = this.expressionMap[this.currenOutputElement];
@@ -272,18 +274,17 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     <div class="expression target" style="display: flex">
                         <div class="exp-content" style="width: 100%;">
                         <i style="color: #808080">expression: </i>
-                        ${generateExpressionHTML(null, expression)}
+                            ${DataMapperUtil.generateExpressionHTML2(expression, '', null)}
                         </div>
                     </div>
                 `);
             } else {
                 expressionContainer.append(`
                     <div class="expression" style="">
-                        <i style="color: #808080">expression: </i>${generateExpressionHTML(coordinates[0], expression)}
+                        <i style="color: #808080">expression: </i>${DataMapperUtil.generateExpressionHTML2(expression, '', coordinates[0])}
                     </div>
                 `);
             }
-
 
             // render expression when one attribute/function/scope is selected in drill down form
             coordinates.forEach(function(index, i) {
@@ -293,7 +294,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     expressionContainer.append(`
                       <div class="expression target" style="display: flex; flex-wrap: wrap">
                           <div class="exp-content">
-                              ${generateExpressionHTML(null, tempExp)}
+                              ${DataMapperUtil.generateExpressionHTML2(tempExp, '', null)}
                           </div>
                           <div class="expression-merge">
                               <a href="#">
@@ -305,11 +306,13 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 } else {
                     expressionContainer.append(`
                       <div class="expression">
-                          ${generateExpressionHTML(coordinates[i + 1], tempExp)}
+                          ${DataMapperUtil.generateExpressionHTML2(tempExp, '', coordinates[i + 1])}
                       </div>
                     `);
                 }
             });
+
+
 
             $(expressionContainer).find('.expression.target>.exp-content>span.ok-clear').popover({
                 html: true,
@@ -325,14 +328,8 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     $(evt.currentTarget).popover('show');
                     $(container).find(`#${$(evt.currentTarget).attr('aria-describedby')}`).on('click', function(e) {
                         e.stopPropagation();
-                        var index = evt.currentTarget.classList[0].split('-')[1];
-                        if (tempExp.nodeType === 'function') {
-                            var node = new ScopeNode(tempExp.parameters[index].dataTypes);
-                            node.placeholder = tempExp.parameters[index].placeholder;
-                            tempExp.parameters[index] = node;
-                        } else {
-                            tempExp.children[index] = new ScopeNode(tempExp.children[index].dataTypes);
-                        }
+                        var index = evt.currentTarget.id.split('-');
+                        tempExp.parameters[Number(index[index.length - 1])].rootNode = null;
                         updateExpression(tempExp);
                     })
                     $(container).find('.popover').on('mouseleave', function() {
@@ -348,35 +345,66 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 });
 
             $(expressionContainer).find('.expression.target>.exp-content>span').on('click', function(evt) {
-                coordinates.push(Number(evt.currentTarget.classList[0].split('-')[1]));
-                focusNodes.push(tempExp.children ? _.cloneDeep(tempExp.children[coordinates[coordinates.length - 1]]) :
-                    _.cloneDeep(tempExp.parameters[coordinates[coordinates.length - 1]]));
+                var pathIndex = evt.currentTarget.id.match('item-([a-zA-Z0-9\-]+)')[1].split('-');
+                coordinates.push(pathIndex[pathIndex.length - 1]);
+                switch (pathIndex[pathIndex.length - 1]) {
+                    case 'n':
+                        focusNodes.push(_.cloneDeep(tempExp.rootNode));
+                        break;
+                    case 'l':
+                        focusNodes.push(_.cloneDeep(tempExp.rootNode.leftNode));
+                        break;
+                    case 'r':
+                        focusNodes.push(_.cloneDeep(tempExp.rootNode.rightNode));
+                        break;
+                    default:
+                        focusNodes.push(_.cloneDeep(tempExp.parameters[Number(pathIndex[pathIndex.length - 1])]))
+                }
+
                 renderExpression();
             });
 
-            if (coordinates.length > 0 && tempExp.nodeType === 'function') {
+            if (coordinates.length > 0 && tempExp.type === 'function') {
                 $(expressionContainer).find('.target .add-param').show();
                 $(expressionContainer).find('.target .add-param').off('click');
                 $(expressionContainer).find('.target .add-param').on('click', function(evt) {
                     evt.stopPropagation();
-                    tempExp.parameters.push(new ScopeNode(tempExp.repetitiveParameterTypes));
+                    tempExp.parameters.push(new ScopeModel(tempExp.repetitiveParameterTypes));
                     renderExpression();
                 });
             }
 
             $(expressionContainer).find('.expression.target>.expression-merge').on('click', function(evt) {
-                if (coordinates.length === 1) {
-                    expression.children[coordinates[0]] = focusNodes[0];
-                } else {
-                    var childNode = focusNodes[focusNodes.length - 1];
-                    var parentNode = focusNodes[focusNodes.length - 2];
-                    var replacingIndex = coordinates[coordinates.length - 1];
+                var lastIndex = coordinates[coordinates.length - 1];
 
-                    if (parentNode.children) {
-                        parentNode.children[replacingIndex] = childNode;
-                    } else {
-                        parentNode.parameters[replacingIndex] = childNode;
-                    }
+                switch(lastIndex) {
+                    case 'l':
+                        if(focusNodes[focusNodes.length - 2]) {
+                            focusNodes[focusNodes.length - 2].leftNode = focusNodes[focusNodes.length - 1];
+                        } else {
+                            expression.leftNode = focusNodes[focusNodes.length - 1];
+                        }
+                        break;
+                    case 'r':
+                        if(focusNodes[focusNodes.length - 2]) {
+                            focusNodes[focusNodes.length - 2].rightNode = focusNodes[focusNodes.length - 1];
+                        } else {
+                            expression.rightNode = focusNodes[focusNodes.length - 1];
+                        }
+                        break;
+                    case 'n':
+                        if(focusNodes[focusNodes.length - 2]) {
+                            focusNodes[focusNodes.length - 2].rootNode = focusNodes[focusNodes.length - 1];
+                        } else {
+                            expression.rootNode = focusNodes[focusNodes.length - 1];
+                        }
+                        break;
+                    default:
+                        if(focusNodes[focusNodes.length - 2]) {
+                            focusNodes[focusNodes.length - 2].parameters[Number(lastIndex)] = focusNodes[focusNodes.length - 1];
+                        } else {
+                            expression.parameters[Number(lastIndex)] = focusNodes[focusNodes.length - 1];
+                        }
                 }
                 focusNodes.pop();
                 coordinates.pop();
@@ -391,126 +419,150 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             var supportedFunctions = {};
             var supportedOperators = {};
 
-            // Generate the map of supported attributes/functions/operators based on context
-            if (tempExp.children) { // if the current focus is on a scope node
-                if (tempExp.children.length > 0) { // find the possible attributes if expression contains elements
-                    switch (tempExp.children[tempExp.children.length - 1].nodeType) {
-                        case 'customValue':
-                        case 'attribute':
-                            var attributeGenericDataType = tempExp
-                                .children[tempExp.children.length - 1].genericDataType;
-
-                            Object.keys(DataMapperUtil.OperatorMap).forEach(function(key) {
-                                if (DataMapperUtil.OperatorMap[key].beforeTypes.indexOf(attributeGenericDataType) > -1 &&
-                                    _.intersection(DataMapperUtil.OperatorMap[key].returnTypes, tempExp.supportedGenericDataTypes).length > 0) {
-                                    supportedOperators[key] = DataMapperUtil.OperatorMap[key];
-                                }
+            if (tempExp.rootNode) {
+                switch (tempExp.rootNode.type) {
+                    case 'function':
+                    case 'attribute':
+                    case 'customValue':
+                    case 'scope':
+                        Object.keys(DataMapperUtil.OperatorMap2)
+                            .filter(function (key) {
+                                return DataMapperUtil.OperatorMap2[key].hasLeft
+                                    && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExp.rootNode.genericReturnTypes).length > 0
+                                    && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExp.genericReturnTypes).length > 0
+                            })
+                            .forEach(function (key) {
+                                supportedOperators[key] = DataMapperUtil.OperatorMap2[key]
                             });
+                        break;
+                    case 'operator':
+                        if (tempExp.rootNode.hasRight && !tempExp.rootNode.rightNode) {
+                            config.input.stream.attributes
+                                .filter(function (attr) {
+                                    return tempExp.rootNode.rightTypes.indexOf(DataMapperUtil.getGenericDataType(attr.type)) > -1;
+                                })
+                                .forEach(function (attr) {
+                                    supportedInputAttributes[attr.name] = attr;
+                                });
 
-                            break;
-                        case 'function':
-                        case 'scope':
-                            Object.keys(DataMapperUtil.OperatorMap).forEach(function(key) {
-                                if (_.intersection(DataMapperUtil.OperatorMap[key].beforeTypes, tempExp.children[tempExp.children.length - 1].supportedGenericDataTypes).length > 0 &&
-                                    _.intersection(DataMapperUtil.OperatorMap[key].returnTypes, tempExp.supportedGenericDataTypes).length > 0) {
-                                    supportedOperators[key] = DataMapperUtil.OperatorMap[key];
-                                }
-                            });
-                            break;
-                        case 'operator':
-                            var dataTypesFollowingOperator = tempExp.children[tempExp.children.length - 1].afterTypes;
-                            var dataTypes = [];
-                            Object.keys(functionDataMap).forEach(function(key) {
-                                if (dataTypesFollowingOperator.indexOf(DataMapperUtil.getGenericDataType(key)) > -1) {
+                            supportedInputAttributes['$custom_val_properties'] = {
+                                genericDataTypes: tempExp.rootNode.rightTypes,
+                            };
+
+                            Object.keys(functionDataMap).forEach(function (key) {
+                                var dataTypes = [];
+
+                                if (tempExp.rootNode.genericReturnTypes.indexOf(DataMapperUtil.getGenericDataType(key)) > -1) {
                                     dataTypes.push(key);
-                                    supportedInputAttributes = _.merge({}, supportedInputAttributes, functionDataMap[key]['attribute'])
                                     supportedFunctions = _.merge({}, supportedFunctions, functionDataMap[key]['function'])
                                 }
-                            })
-                            supportedInputAttributes['$custom_val_properties'] = { dataTypes };
+                            });
 
-                            supportedOperators = {
-                                bracket: {
-                                    returnTypes: ['bool', 'text', 'number'],
-                                    beforeTypes: ['bool', 'text', 'number'],
-                                    afterTypes: ['bool', 'text', 'number'],
-                                    symbol: '()',
-                                    description: 'Bracket',
-                                    isFirst: true,
-                                    scope: true
-                                }
+                            if(tempExp.rootNode.type !== 'scope') {
+                                supportedOperators = {
+                                    bracket: {
+                                        returnTypes: ['bool', 'text', 'number'],
+                                        leftTypes: ['bool', 'text', 'number'],
+                                        rightTypes: ['bool', 'text', 'number'],
+                                        symbol: '()',
+                                        description: 'Bracket',
+                                        isFirst: true,
+                                        scope: true
+                                    }
+                                };
                             }
-                            break;
-                    }
-                } else { // if the expression is empty
-                    if (tempExp.dataTypes.indexOf('bool') > -1) {
-                        this.inputAttributes.forEach(function(att) {
-                            supportedInputAttributes[att.name] = att;
-                        })
-                    }
-                    var customDataTypes = []
-                    tempExp.dataTypes.forEach(function(dataType) {
-                        supportedInputAttributes = functionDataMap[dataType]['attribute'] ?
-                            _.merge({}, supportedInputAttributes, functionDataMap[dataType]['attribute']) :
-                            supportedInputAttributes;
-
-                        // Add custom value attribute info
-                        customDataTypes.push(dataType);
-
-                        supportedFunctions = functionDataMap[dataType]['function'] ?
-                            _.merge({}, supportedFunctions, functionDataMap[dataType]['function']) :
-                            supportedFunctions;
-
-                        supportedOperators = {
-                            bracket: {
-                                returnTypes: ['bool', 'text', 'number'],
-                                beforeTypes: ['bool', 'text', 'number'],
-                                afterTypes: ['bool', 'text', 'number'],
-                                symbol: '()',
-                                description: 'Bracket',
-                                isFirst: true,
-                                scope: true
-                            }
+                        } else {
+                            Object.keys(DataMapperUtil.OperatorMap2)
+                                .filter(function (key) {
+                                    return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExp.rootNode.genericReturnTypes).length > 0
+                                        && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExp.genericReturnTypes).length > 0;
+                                })
+                                .forEach(function (key) {
+                                    supportedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                });
                         }
 
-                        Object.keys(DataMapperUtil.OperatorMap).forEach(function(key) {
-                            if ((!supportedOperators[key]) && DataMapperUtil.OperatorMap[key].isFirst && DataMapperUtil.OperatorMap[key].returnTypes.indexOf(DataMapperUtil.getGenericDataType(dataType)) > -1) {
-                                supportedOperators[key] = DataMapperUtil.OperatorMap[key]
-                            }
-                        })
-                    });
-
-
-                    if (selectedCategory === 'Attribute') {
-                        Object.keys(supportedInputAttributes).forEach(function(key) {
-                            if (!(supportedInputAttributes[key].name.toLowerCase().indexOf(selectedFilter) > -1)) {
-                                delete supportedInputAttributes[key];
-                            }
-                        });
-                    }
-
-                    if (selectedCategory === 'Function') {
-                        Object.keys(supportedFunctions).forEach(function(key) {
-                            if (!(supportedFunctions[key].displayName.toLowerCase().indexOf(selectedFilter) > -1)) {
-                                delete supportedFunctions[key];
-                            }
-                        });
-                    }
-
-                    if (selectedCategory === 'Operator') {
-                        Object.keys(supportedOperators).forEach(function(key) {
-                            if (!(supportedOperators[key].description.toLowerCase().indexOf(selectedFilter) > -1)) {
-                                delete supportedOperators[key];
-                            }
-                        });
-                    }
-
-                    supportedInputAttributes['$custom_val_properties'] = {
-                        dataTypes: customDataTypes
-                    }
+                        break;
                 }
+            } else {
+
+                var customDataTypes = []
+                if (tempExp.returnTypes.indexOf('bool') > -1) {
+                    config.input.stream.attributes
+                        .forEach(function (attr) {
+                            supportedInputAttributes[attr.name] = attr;
+                        });
+                    customDataTypes = ['text', 'number', 'bool'];
+
+                } else {
+                    config.input.stream.attributes
+                        .filter(function(attr){
+                            return tempExp.returnTypes.indexOf(attr.type) > -1;
+                        }).forEach(function (attr) {
+                            supportedInputAttributes[attr.name] = attr;
+                        });
+
+                    tempExp.returnTypes.forEach(function(type) {
+                        customDataTypes.push(DataMapperUtil.getGenericDataType(type));
+                        supportedFunctions = functionDataMap[type]['function'] ?
+                            _.merge({}, supportedFunctions, functionDataMap[type]['function']) :
+                            supportedFunctions;
+                    })
+                }
+
+                supportedInputAttributes['$custom_val_properties'] = {
+                    genericDataTypes: customDataTypes
+                };
+
+                supportedOperators['bracket'] = {
+                    returnTypes: ['bool', 'text', 'number'],
+                    leftTypes: ['bool', 'text', 'number'],
+                    rightTypes: ['bool', 'text', 'number'],
+                    symbol: '()',
+                    description: 'Bracket',
+                    isFirst: true,
+                    scope: true
+                }
+
+                Object.keys(DataMapperUtil.OperatorMap2)
+                    .filter(function (key) {
+                        return DataMapperUtil.OperatorMap2[key].isFirst &&
+                            _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExp.returnTypes).length > 0;
+                    })
+                    .forEach(function (key) {
+                        supportedOperators[key] = DataMapperUtil.OperatorMap2[key];
+                    });
             }
 
+            if(tempExp.type === 'function') {
+                supportedOperators = {};
+                supportedFunctions = {};
+                supportedInputAttributes = {};
+            }
+
+            if (selectedCategory === 'Attribute') {
+                Object.keys(supportedInputAttributes).forEach(function(key) {
+                    if (!(supportedInputAttributes[key].name.toLowerCase().indexOf(selectedFilter) > -1)) {
+                        delete supportedInputAttributes[key];
+                    }
+                });
+            }
+
+            if (selectedCategory === 'Function') {
+                Object.keys(supportedFunctions).forEach(function(key) {
+                    if (!(supportedFunctions[key].displayName.toLowerCase().indexOf(selectedFilter) > -1)) {
+                        delete supportedFunctions[key];
+                    }
+                });
+            }
+
+            if (selectedCategory === 'Operator') {
+                Object.keys(supportedOperators).forEach(function(key) {
+                    if (!(supportedOperators[key].description.toLowerCase().indexOf(selectedFilter) > -1)) {
+                        delete supportedOperators[key];
+                    }
+                });
+            }
 
             // render attribute selector
             var nodeCategoryContainer = $(container).find('.node-category');
@@ -604,10 +656,32 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             </a>
                         `);
 
-                        supportedInputAttributes[key].dataTypes.forEach(function(dataType) {
-                            attributeContainer.find('.attrib-selector-containers').find('#custom_val_type').append(`
-                                <option>${dataType}</option>
-                            `);
+                        supportedInputAttributes[key].genericDataTypes.forEach(function(type) {
+                            var customOptionList = attributeContainer.find('.attrib-selector-containers').find('#custom_val_type')
+                            // .append(`
+                            //     <option>${dataType}</option>
+                            // `);
+
+                            switch (type) {
+                                case 'text':
+                                    customOptionList.append(
+                                        `<option>string</option>`
+                                    );
+                                    break;
+                                case 'number':
+                                    customOptionList.append(`
+                                        <option>int</option>
+                                        <option>long</option>
+                                        <option>float</option>
+                                        <option>double</option>
+                                    `);
+                                    break;
+                                case 'bool':
+                                    customOptionList.append(`
+                                        <option>bool</option>
+                                    `);
+                                    break;
+                            }
                         });
                     }
 
@@ -619,7 +693,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                         dataType: supportedInputAttributes[evt.currentTarget.id.split('attr-')[1]].type,
                     }
                     $(container).find('.att-fun-op-search-box').val('');
-                    tempExp.addNodeToExpression(new AttributeNode(nodeData));
+                    tempExp.addNode(new AttributeModel(nodeData));
                     updateExpression(tempExp);
                 });
                 attributeContainer.find('.attrib-selector-containers').find('#custom_val_input_container').off('click');
@@ -647,7 +721,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             value
                         };
                     }
-                    tempExp.addNodeToExpression(new CustomValueNode(nodeData));
+                    tempExp.addNode(new CustomValueModel(nodeData));
                     selectedFilter = '';
                     selectedCategory = null;
                     updateExpression(tempExp);
@@ -715,7 +789,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             return obj
                         }, {})
 
-                        tempExp.addNodeToExpression(new FunctionNode(nodeData));
+                        tempExp.addNode(new FunctionModel(nodeData));
                         selectedFilter = '';
                         selectedCategory = null;
                         updateExpression(tempExp);
@@ -750,17 +824,17 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
                 attributeContainer.find('.attrib-selector-containers').children().on('click', function(evt) {
                     if (evt.currentTarget.id.split('operator-')[1] === 'bracket') {
-                        tempExp.addNodeToExpression(new ScopeNode(tempExp.dataTypes));
+                        tempExp.addNode(new ScopeModel(tempExp.returnTypes));
                     } else {
-                        nodeData = {
-                            symbol: supportedOperators[evt.currentTarget.id.split('operator-')[1]].symbol,
-                            dataTypes: supportedOperators[evt.currentTarget.id.split('operator-')[1]].returnTypes,
-                            isEnd: supportedOperators[evt.currentTarget.id.split('operator-')[1]].isEnd,
-                            afterTypes: supportedOperators[evt.currentTarget.id.split('operator-')[1]].afterTypes,
-                            beforeTypes: supportedOperators[evt.currentTarget.id.split('operator-')[1]].beforeTypes,
-                        }
+                        // nodeData = {
+                        //     symbol: supportedOperators[evt.currentTarget.id.split('operator-')[1]].symbol,
+                        //     dataTypes: supportedOperators[evt.currentTarget.id.split('operator-')[1]].returnTypes,
+                        //     isEnd: supportedOperators[evt.currentTarget.id.split('operator-')[1]].isEnd,
+                        //     afterTypes: supportedOperators[evt.currentTarget.id.split('operator-')[1]].afterTypes,
+                        //     beforeTypes: supportedOperators[evt.currentTarget.id.split('operator-')[1]].beforeTypes,
+                        // }
 
-                        tempExp.addNodeToExpression(new OperatorNode(nodeData));
+                        tempExp.addNode(new OperatorModel(supportedOperators[evt.currentTarget.id.split('operator-')[1]]));
                     }
 
                     $(container).find('.att-fun-op-search-box').val('');
@@ -920,10 +994,10 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                         dataType: this.expressionMap[outputAttributeName].dataType,
                         isEnd: node_data.isFirst | false,
                     };
-                    node = new OperatorNode(data);
+                    node = new OperatorModel(data);
                     break;
                 case 'scope':
-                    node = new ScopeNode([this.expressionMap[outputAttributeName].dataType]);
+                    node = new ScopeModel([this.expressionMap[outputAttributeName].dataType]);
                     break;
                 case 'function':
                     data = {
@@ -931,7 +1005,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                         dataType: this.expressionMap[outputAttributeName].dataType,
                         selectedSyntax: node_data['syntax_selected']
                     }
-                    node = new FunctionNode(data);
+                    node = new FunctionModel(data);
             }
 
             if (coordinates.length === 0) {
@@ -943,7 +1017,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
         }
 
         DataMapper.prototype.displayExpression = function(outputAttrName) {
-            var htmlContent = generateExpressionHTML(this.expressionMap[outputAttrName]);
+            var htmlContent = DataMapperUtil.generateExpressionHTML2(this.expressionMap[outputAttrName], '', null);
             $(this.container).find('.main-exp').empty()
             $(this.container).find('.main-exp').append(htmlContent);
         }
@@ -1027,64 +1101,64 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             return deleteValueFromArray(level - 1, coordinates, array[coordinates[coordinates.length - level]]);
         }
 
-        var generateExpressionHTML = function(highlightIndex, node) {
-            var htmlContent = '';
+        // var generateExpressionHTML = function(highlightIndex, node) {
+        //     var htmlContent = '';
 
-            var i = 0;
-            if (node.children) {
-                node.children.forEach(function(childNode) {
-                    switch (childNode.nodeType) {
-                        case 'attribute':
-                            htmlContent += childNode.name;
-                            break;
-                        case 'customValue':
-                            if (childNode.genericDataType === 'text') {
-                                htmlContent += `\'${childNode.value}\'`
-                            } else {
-                                htmlContent += childNode.value;
-                            }
-                            break;
-                        case 'operator':
-                            htmlContent += ` ${childNode.symbol} `;
-                            break;
-                        case 'function':
-                            htmlContent += `<span class="item-${i} ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''}">`;
-                            htmlContent += generateExpressionHTML(highlightIndex, childNode);
-                            htmlContent += '</span>';
-                            break;
-                        case 'scope':
-                            htmlContent += `<span class="item-${i} ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''} ${childNode.children.length > 0 ? 'ok-clear' : ''}">(${generateExpressionHTML(null, childNode)})</span>`;
-                            break;
-                    }
-                    i++;
-                });
-            } else {
-                if (node.nodeType === 'function') {
-                    htmlContent += `${node.displayName.slice(0, -1)}`
-                    var isFirst = true;
-                    node.parameters.forEach(function(parameterNode) {
-                        if (!isFirst) {
-                            htmlContent += ', '
-                        }
+        //     var i = 0;
+        //     if (node.children) {
+        //         node.children.forEach(function(childNode) {
+        //             switch (childNode.nodeType) {
+        //                 case 'attribute':
+        //                     htmlContent += childNode.name;
+        //                     break;
+        //                 case 'customValue':
+        //                     if (childNode.genericDataType === 'text') {
+        //                         htmlContent += `\'${childNode.value}\'`
+        //                     } else {
+        //                         htmlContent += childNode.value;
+        //                     }
+        //                     break;
+        //                 case 'operator':
+        //                     htmlContent += ` ${childNode.symbol} `;
+        //                     break;
+        //                 case 'function':
+        //                     htmlContent += `<span class="item-${i} ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''}">`;
+        //                     htmlContent += DataMapperUtil.generateExpressionHTML2(highlightIndex, childNode);
+        //                     htmlContent += '</span>';
+        //                     break;
+        //                 case 'scope':
+        //                     htmlContent += `<span class="item-${i} ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''} ${childNode.children.length > 0 ? 'ok-clear' : ''}">(${DataMapperUtil.generateExpressionHTML2(null, childNode)})</span>`;
+        //                     break;
+        //             }
+        //             i++;
+        //         });
+        //     } else {
+        //         if (node.nodeType === 'function') {
+        //             htmlContent += `${node.displayName.slice(0, -1)}`
+        //             var isFirst = true;
+        //             node.parameters.forEach(function(parameterNode) {
+        //                 if (!isFirst) {
+        //                     htmlContent += ', '
+        //                 }
 
-                        if (parameterNode.nodeType === 'scope') {
-                            // title="${parameterNode.placeholder}"
-                            htmlContent += `<span title="${parameterNode.placeholder}" class="param-${i} ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''} ${parameterNode.children.length > 0 ? 'ok-clear' : ''}">${generateExpressionHTML(null, parameterNode)}</span>`;
-                        }
-                        isFirst = false;
-                        i++;
-                    });
-                    if (node.allowRepetitiveParameters) {
-                        htmlContent += `<span title="Add parameter" style="display: none;" class="add-param"><i style="font-size: 1.3rem; padding-left: 1rem;" class="fw fw-import"></i></span>`
-                    }
-                    htmlContent += `)`;
+        //                 if (parameterNode.nodeType === 'scope') {
+        //                     // title="${parameterNode.placeholder}"
+        //                     htmlContent += `<span title="${parameterNode.placeholder}" class="param-${i} ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''} ${parameterNode.children.length > 0 ? 'ok-clear' : ''}">${DataMapperUtil.generateExpressionHTML2(null, parameterNode)}</span>`;
+        //                 }
+        //                 isFirst = false;
+        //                 i++;
+        //             });
+        //             if (node.allowRepetitiveParameters) {
+        //                 htmlContent += `<span title="Add parameter" style="display: none;" class="add-param"><i style="font-size: 1.3rem; padding-left: 1rem;" class="fw fw-import"></i></span>`
+        //             }
+        //             htmlContent += `)`;
 
-                }
-            }
+        //         }
+        //     }
 
 
-            return htmlContent.length === 0 ? '...' : htmlContent;
-        }
+        //     return htmlContent.length === 0 ? '...' : htmlContent;
+        // }
 
         function validateExpressionTree(expression) {
             var errorsFound = 0;
@@ -1121,3 +1195,4 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
         return DataMapper;
 
     });
+    

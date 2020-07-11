@@ -371,7 +371,7 @@ define(['require', 'jquery', 'lodash', 'log'],
             return htmlContent.length === 0 ? '...' : htmlContent;
         }
 
-        var generateExpressionHTML2 = function (node, id) {
+        var generateExpressionHTML2 = function (node, id, highlightCoordinate) {
             var htmlContent = '';
 
             switch (node.type) {
@@ -385,34 +385,37 @@ define(['require', 'jquery', 'lodash', 'log'],
                     break;
                 case 'operator':
                     if (node.hasLeft) {
-                        node.leftNode ? htmlContent += generateExpressionHTML2(node.leftNode, `${id}-l`) : '...'
+                        node.leftNode ? htmlContent += generateExpressionHTML2(node.leftNode, `${id}-l`, highlightCoordinate) : '...'
                     }
                     htmlContent += ` ${node.symbol} `
                     if (node.hasRight) {
-                        node.rightNode ? htmlContent += generateExpressionHTML2(node.rightNode, `${id}-r`) : '...'
+                        node.rightNode ? htmlContent += generateExpressionHTML2(node.rightNode, `${id}-r`, highlightCoordinate) : '...'
                     }
                     break;
                 case 'function':
-                    htmlContent += `<span id="fn${id}">${node.displayName.slice(0, -1)}`;
+                    htmlContent += `${id.length > 0 ? `<span id="item${id}">`: ''}${node.displayName.slice(0, -1)}`;
                     var isFirst = true;
                     node.parameters.forEach(function (param, i) {
                         if (!isFirst) {
                             htmlContent += ', '
                         }
 
-                        htmlContent += `<span id="fn-param${id}-${i}" >${generateExpressionHTML2(param, `${id}-${i}`)}</span>`
+                        htmlContent += `<span class="${param.rootNode ? 'ok-clear': ''}" title="${param.placeholder}" id="item${id}-${i}" >${generateExpressionHTML2(param, `${id}-${i}`, highlightCoordinate)}</span>`
 
                         isFirst = false;
                     })
-
-                    htmlContent += `)</span>`;
+                    if (node.allowRepetitiveParameters) {
+                        htmlContent += `<span title="Add parameter" style="display: none;" class="add-param"><i style="font-size: 1.3rem; padding-left: 1rem;" class="fw fw-import"></i></span>`
+                    }
+                    htmlContent += `)${id.length > 0 ? `</span>`: ''}`;
                     break;
                 case 'scope':
-                    if (id.length === 0) {
+                    var idComponents = id.split('-');
+                    if (id.length === 0 || /\d/.test(idComponents[idComponents.length-1])) {
                         htmlContent += `${node.rootNode ? generateExpressionHTML2(node.rootNode, '-n') : '...'}`
                     } else {
                         htmlContent += `
-                            <span id="scope${id}" >
+                            <span id="item${id}" >
                                 (&nbsp;${node.rootNode? generateExpressionHTML2(node.rootNode, `${id}-n`) : '...'}&nbsp;)
                             </span>`;
                     }
