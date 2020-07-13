@@ -69,27 +69,26 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager',
                 var commandManager = this.application.commandManager;
                 var editorText = activeTab.getFile().getContent();
                 var variableMap = Utils.prototype.retrieveEnvVariables();
-                submitErrorCheck(
-                    {
-                        siddhiApp: editorText,
-                        variables: variableMap,
-                    },
-                    function (response) {
-                        if (response.hasOwnProperty("status") && response.status === "SUCCESS") {
-                            /*
-                             * Siddhi app is valid
-                             */
-                            // only saved files can be run as application
-                            var valid = true;
-                            if (!typeof activeTab.getFile === "function") {
-                                valid = false;
-                            }
-                            var file = activeTab.getFile();
-                            // file is not saved give an error and avoid running
-                            if(file.isDirty()) {
-                                valid = false;
-                            }
-                            if (valid) {
+                var valid = true;
+                if (!typeof activeTab.getFile === "function") {
+                    valid = false;
+                }
+                var file = activeTab.getFile();
+                // file is not saved give an error and avoid running
+                if(file.isDirty()) {
+                    valid = false;
+                }
+                if (valid) {
+                    submitToParse(
+                        {
+                            siddhiApp: editorText,
+                            variables: variableMap,
+                        },
+                        function (response) {
+                            if (response.hasOwnProperty("status") && response.status === "SUCCESS") {
+                                /*
+                                 * Siddhi app is valid
+                                 */
                                 var siddhiAppName = "";
                                 if(activeTab.getTitle().lastIndexOf(".siddhi") != -1){
                                     siddhiAppName = activeTab.getTitle().substring(0, activeTab.getTitle().lastIndexOf(".siddhi"));
@@ -104,15 +103,15 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager',
                                 };
                                 commandManager.dispatch('change-app-status-single-simulation', options);
                             } else {
-                                alerts.error("Save file before running application");
-                            }
-                        } else {
-                            console.log("Error while parsing Errors in Siddhi app", response);
-                            alerts.error("Error while parsing Errors in Siddhi app." + response.message);                        }
+                                console.log("Error while parsing Errors in Siddhi app", response);
+                                alerts.error("Error while parsing Errors in Siddhi app." + response.message);                        }
 
-                    },
-                );
-                function submitErrorCheck(data, callback, errorCallback) {
+                        },
+                    );
+                } else {
+                    alerts.error("Save file before running application");
+                }
+                function submitToParse(data, callback, errorCallback) {
                     if (data.siddhiApp === "") {
                         return;
                     }
