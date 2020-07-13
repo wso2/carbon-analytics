@@ -1,9 +1,9 @@
 /**
  * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
-define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager', 'alerts', 'utils', 'ace/ace'],
+define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager', 'alerts', 'utils'],
 
-    function (log, $, Backbone, _, ContextMenu, LaunchManager, alerts, Utils, ace) {
+    function (log, $, Backbone, _, ContextMenu, LaunchManager, alerts, Utils) {
 
         var Launcher = Backbone.View.extend({
 
