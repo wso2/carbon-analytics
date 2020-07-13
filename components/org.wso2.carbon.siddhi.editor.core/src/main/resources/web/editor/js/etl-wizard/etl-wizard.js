@@ -94,6 +94,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     },
                     orderby: {
                         attributes: []
+                    },
+                    advanced: {
+                        offset: {},
+                        limit: {},
+                        ratelimit: {}
                     }
                 }
             };

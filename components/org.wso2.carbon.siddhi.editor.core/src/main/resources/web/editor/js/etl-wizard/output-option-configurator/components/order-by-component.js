@@ -40,7 +40,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 <div id="orderby-options-dropdown" class="dropdown-menu-style hidden" aria-labelledby="">
                 </div>
                 <div style="margin-top: 15px" id="orderby-attribute-list">
-                    
                 </div>
             `);
 
@@ -100,12 +99,12 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 container.find('#orderby-attribute-list')
                     .append(`
                         <div style="display: flex; background-color: #888; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.15);">
-                            <div style="width: 80%; padding: 5px; text-align: center; color: white">${orderByOption.attribute.name}</div>
-                            <div style="width: 20%">
+                            <div style="width: 60%; padding: 5px; text-align: center; color: white">${orderByOption.attribute.name}</div>
+                            <div style="width: 40%">
                                 <button id="${orderByOption.attribute.name}-sort" style="background: #555; min-width: 70px" class="btn btn-default btn-sort">
                                     ${orderByOption.sort === 'asc' ? `ASC&nbsp;<i class="fw fw-down">` : `DESC&nbsp;<i class="fw fw-down">`}</i>
                                 </button>
-                                <button id="${orderByOption.attribute.name}-delete" style="background: #555; min-width: 70px" class="btn btn-default btn-del">
+                                <button id="${orderByOption.attribute.name}-delete" style="background: #555; min-width: 70px; padding: 8px 12px;" class="btn btn-default btn-del">
                                     <i class="fw fw-delete"></i>
                                 </button>
                             </div>
@@ -132,6 +131,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 }).indexOf(attributeName);
 
                 config.query.orderby.attributes.splice(index, 1);
+                self.render();
             });
         }
 

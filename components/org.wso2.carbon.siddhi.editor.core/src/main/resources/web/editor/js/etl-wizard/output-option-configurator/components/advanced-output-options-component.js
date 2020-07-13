@@ -1,0 +1,222 @@
+/*
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorModel', 'attributeModel', 'customValueModel', 'dataMapperUtil'],
+
+    function (require, $, _, log, Alerts, ScopeModel, OperatorModel, AttributeModel, CustomValueModel, DataMapperUtil) {
+        var AdvancedOutputConfigurationComponent = function (container, config) {
+            this.__container = container;
+            this.__config = config;
+        }
+
+        AdvancedOutputConfigurationComponent.prototype.constructor = AdvancedOutputConfigurationComponent;
+
+        AdvancedOutputConfigurationComponent.prototype.render = function () {
+            var self = this;
+            var config = this.__config;
+            var container = this.__container;
+
+            container.empty();
+            container.append(`
+                <div class="offset-container">
+                    Set offset for batch outputs
+                    <span title="When events are emitted as a batch, offset allows you to offset beginning of the output event batch"><i class="fw fw-info"></i></span>
+                    <button style="background-color: #ee6719" class="btn btn-default btn-circle btn-enable" id="allow-offset" type="button" data-toggle="dropdown">
+                        <i class="fw ${Object.keys(config.query.advanced.offset).length > 0 ? 'fw-check' : 'fw-minus'}"></i>
+                    </button>
+                </div>
+                <div class="limit-container" style="margin-top: 15px;">
+                    Set limit to batch outputs 
+                    <span title="When events are emitted as a batch, limit allows you to limit the number of events in the batch from the defined offset(default=0)"><i class="fw fw-info"></i></span>
+                    <button style="background-color: #ee6719" class="btn btn-default btn-circle btn-enable" id="allow-limit" type="button" data-toggle="dropdown">
+                        <i class="fw ${Object.keys(config.query.advanced.limit).length > 0 ? 'fw-check' : 'fw-minus'}"></i>
+                    </button>
+                </div>
+                <div class="rate-container" style="margin-top: 15px;">
+                    Set rate of output events
+                    <span title="Output rate limiting allows queries to output events periodically based on a specified condition."><i class="fw fw-info"></i></span>
+                    <button style="background-color: #ee6719" class="btn btn-default btn-circle btn-enable" id="allow-rate" type="button" data-toggle="dropdown">
+                        <i class="fw ${Object.keys(config.query.advanced.ratelimit).length > 0 ? 'fw-check' : 'fw-minus'}"></i>
+                    </button>
+                </div>
+            `);
+
+            container.find('div .btn-enable').on('click', function (evt) {
+                var btnType = evt.currentTarget.id.match('allow-([a-z]+)')[1];
+
+                switch (btnType) {
+                    case 'offset':
+                        if (Object.keys(config.query.advanced.offset).length > 0) {
+                            config.query.advanced.offset={};
+                        } else {
+                            config.query.advanced.offset['value'] = 0;
+                        }
+
+                        self.render();
+                        break;
+                    case 'limit':
+                        if (Object.keys(config.query.advanced.offset).length > 0) {
+                            config.query.advanced.limit={};
+                        } else {
+                            config.query.advanced.limit['value'] = 0;
+                        }
+
+                        self.render();
+                        break;
+                    case 'rate':
+                        if (Object.keys(config.query.advanced.ratelimit).length > 0) {
+                            config.query.advanced.ratelimit={};
+                        } else {
+                            config.query.advanced.ratelimit={};
+                            config.query.advanced.ratelimit['enabled'] = true;
+                        }
+
+                        self.render();
+                        break;
+                }
+
+            });
+
+            if(Object.keys(config.query.advanced.offset).length > 0) {
+                container.find('.offset-container')
+                    .append(`
+                        <div>
+                            <label style="margin-bottom: 0" class="" for="txt-offset">offset index</label>
+                            <input id="txt-offset" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.offset.value}">
+                        </div>
+                    `);
+
+                container.find('.offset-container #txt-offset')
+                    .on('keyup', function (evt) {
+                        config.query.advanced.offset.value = Number($(evt.currentTarget).val());
+                    });
+            }
+
+            if(Object.keys(config.query.advanced.limit).length > 0) {
+                container.find('.limit-container')
+                    .append(`
+                        <div>
+                            <label style="margin-bottom: 0" class="" for="txt-limit">event limit</label>
+                            <input id="txt-limit" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.limit.value}">
+                        </div>
+                    `);
+
+                container.find('.limit-container #txt-offset')
+                    .on('keyup', function (evt) {
+                        config.query.advanced.limit.value = Number($(evt.currentTarget).val());
+                    });
+            }
+
+            if(Object.keys(config.query.advanced.ratelimit).length > 0) {
+                container.find('.rate-container').append(`
+                    <div style="margin-top: 15px">
+                        <label for="rate-limit-type">Select output rate limit type</label>
+                        <select id="rate-limit-type">
+                            <option disabled selected value> -- select an option -- </option>
+                            <option value="time-based">Time based</option>
+                            <option value="no-of-events">Number of events</option>
+                            <option value="snapshot">Snapshot based</option>
+                        </select>    
+                    </div>
+                     
+                `);
+
+                if(config.query.advanced.ratelimit['type']) {
+                    container.find('.rate-container #rate-limit-type').val(config.query.advanced.ratelimit['type']);
+
+                    switch (config.query.advanced.ratelimit['type']) {
+                        case 'time-based':
+                            container.find('.rate-container')
+                                .append(`
+                                    <div>
+                                        <span>output events every</span>
+                                        <div>
+                                            <input id="txt-rate-val" style="width: 75%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.ratelimit['value']}">
+                                            <select id="select-granularity">
+                                                <option>second</option>
+                                                <option>minute</option>
+                                                <option>hour</option>
+                                                <option>day</option>
+                                                <option>month</option>
+                                                <option>year</option>
+                                            </select>    
+                                        </div>
+                                    </div>
+                                `);
+                            break;
+                        case 'no-of-events':
+                            container.find('.rate-container')
+                                .append(`
+                                    <div>
+                                        <span>output events every</span>
+                                        <div>
+                                            <input id="txt-rate-val" style="width: 75%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.ratelimit['value']}">
+                                            <span>&nbsp;events</span>    
+                                        </div>
+                                    </div>
+                                `);
+                            break;
+                        case 'snapshot':
+                            container.find('.rate-container')
+                                .append(`
+                                    <div>
+                                        <span>output events every</span>
+                                        <div>
+                                            <input id="txt-rate-val" style="width: 75%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.ratelimit['value']}">
+                                            <select id="select-granularity">
+                                                <option>second</option>
+                                                <option>minute</option>
+                                                <option>hour</option>
+                                                <option>day</option>
+                                                <option>month</option>
+                                                <option>year</option>
+                                            </select>    
+                                        </div>
+                                    </div>
+                                `);
+                            break;
+                    }
+
+                    container.find('.rate-container #txt-rate-val')
+                        .on('keyup', function (evt) {
+                            config.query.advanced.ratelimit['value'] = $(evt.currentTarget).val();
+                        });
+
+                    container.find('.rate-container #select-granularity')
+                        .on('change', function (evt) {
+                            config.query.advanced.ratelimit['granularity'] = $(evt.currentTarget).val();
+                        })
+                }
+
+                container.find('.rate-container #rate-limit-type')
+                    .on('change', function (evt) {
+                        config.query.advanced.ratelimit['type'] = $(evt.currentTarget).val();
+
+                        if ($(evt.currentTarget).val() !== 'no-of-events') {
+                            config.query.advanced.ratelimit['value'] = 5;
+                        }
+                        self.render();
+                    });
+
+
+            }
+
+        }
+
+        return AdvancedOutputConfigurationComponent;
+    });

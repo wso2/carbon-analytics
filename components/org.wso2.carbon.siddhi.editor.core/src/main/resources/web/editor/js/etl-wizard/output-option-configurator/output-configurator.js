@@ -16,9 +16,9 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'lodash', 'log', 'alerts', 'groupByConfigurator', 'orderByConfigurator'],
+define(['require', 'jquery', 'lodash', 'log', 'alerts', 'groupByConfigurator', 'orderByConfigurator', 'advancedOutputConfiguration'],
 
-    function (require, $, _, log, Alerts, GroupByComponent, OrderByComponent) {
+    function (require, $, _, log, Alerts, GroupByComponent, OrderByComponent, AdvancedOutputOptionsComponent) {
 
         var OutputConfigurator = function (container, config) {
             this.__container = container;
@@ -38,7 +38,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'groupByConfigurator', '
                 </div>
                 <div style="max-height: ${self.__container.offsetHeight}; flex-direction: column" class="content-section">
                     <!-- Order by section -->
-                    
                 </div>
                 <div style="max-height: ${self.__container.offsetHeight}; flex-direction: column" class="content-section">
                     Advanced Output Options
@@ -49,6 +48,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'groupByConfigurator', '
 
             new GroupByComponent($(container.find('.content-section')[0]), config, container).render();
             new OrderByComponent($(container.find('.content-section')[1]), config).render();
+            new AdvancedOutputOptionsComponent($(container.find('.content-section')[2]), config).render();
         }
 
         return OutputConfigurator;
