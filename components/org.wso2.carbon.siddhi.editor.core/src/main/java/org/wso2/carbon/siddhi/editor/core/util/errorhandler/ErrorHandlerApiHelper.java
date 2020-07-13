@@ -109,49 +109,15 @@ public class ErrorHandlerApiHelper implements ErrorHandlerApiHelperService {
     }
 
     @Override
-    public JsonObject getTotalErrorEntriesCount(String hostAndPort, String username, String password)
-        throws ErrorHandlerServiceStubException {
-        feign.Response response = HTTPSClientUtil.doGetTotalErrorEntriesCount(hostAndPort, username, password);
-        switch (response.status()) {
-            case 200: // TODO cleanup and add other cases
-                if (response.body() != null) {
-                    try {
-                        String responseBody = getAsString(response.body().asInputStream());
-                        return new JsonParser().parse(responseBody).getAsJsonObject();
-                    } catch (IOException e) {
-                        throw new ErrorHandlerServiceStubException("Failed to read the response.", e);
-                    }
-                }
-            default:
-                throw new ErrorHandlerServiceStubException("Failed to get error entries count. " + response.reason());
-        }
+    public Map<String, String> getStatus(String hostAndPort, String username, String password) throws ErrorHandlerServiceStubException {
+        // TODO implement
+        return null;
     }
 
     @Override
-    public JsonObject getErrorEntriesCount(String siddhiAppName, String hostAndPort, String username, String password)
+    public JsonArray getErrorEntries(String hostAndPort, String username, String password, String siddhiAppName)
         throws ErrorHandlerServiceStubException {
-        feign.Response response =
-            HTTPSClientUtil.doGetErrorEntriesCount(siddhiAppName, hostAndPort, username, password);
-        switch (response.status()) {
-            case 200: // TODO cleanup and add other cases
-                if (response.body() != null) {
-                    try {
-                        String responseBody = getAsString(response.body().asInputStream());
-                        return new JsonParser().parse(responseBody).getAsJsonObject();
-                    } catch (IOException e) {
-                        throw new ErrorHandlerServiceStubException("Failed to read the response.", e);
-                    }
-                }
-            default:
-                throw new ErrorHandlerServiceStubException("Failed to get error entries count. " + response.reason());
-        }
-    }
-
-    @Override
-    public JsonArray getMinimalErrorEntries(String siddhiAppName, String limit, String offset, String hostAndPort,
-                                            String username, String password) throws ErrorHandlerServiceStubException {
-        feign.Response response = HTTPSClientUtil.doGetMinimalErrorEntries(siddhiAppName, limit, offset, hostAndPort,
-            username, password);
+        feign.Response response = HTTPSClientUtil.doGetErrorEntries(hostAndPort, username, password, siddhiAppName);
         switch (response.status()) {
             case 200: // TODO cleanup and add other cases
                 if (response.body() != null) {
@@ -168,29 +134,9 @@ public class ErrorHandlerApiHelper implements ErrorHandlerApiHelperService {
     }
 
     @Override
-    public JsonObject getDescriptiveErrorEntry(String id, String hostAndPort, String username, String password)
+    public boolean replay(String hostAndPort, String username, String password, JsonArray payload)
         throws ErrorHandlerServiceStubException {
-        feign.Response response = HTTPSClientUtil.doGetDescriptiveErrorEntry(id, hostAndPort, username, password);
-        switch (response.status()) {
-            case 200: // TODO cleanup and add other cases
-                if (response.body() != null) {
-                    try {
-                        String responseBody = getAsString(response.body().asInputStream());
-                        return new JsonParser().parse(responseBody).getAsJsonObject();
-                    } catch (IOException e) {
-                        throw new ErrorHandlerServiceStubException("Failed to read the response.", e);
-                    }
-                }
-            default:
-                throw new ErrorHandlerServiceStubException("Failed to get descriptive error entry. " +
-                    response.reason());
-        }
-    }
-
-    @Override
-    public boolean replay(JsonArray payload, String hostAndPort, String username, String password)
-        throws ErrorHandlerServiceStubException {
-        feign.Response response = HTTPSClientUtil.doReplay(payload.toString(), hostAndPort, username, password);
+        feign.Response response = HTTPSClientUtil.doReplay(hostAndPort, username, password, payload.toString());
         switch (response.status()) {
             case 200:
                 return true;
@@ -200,20 +146,8 @@ public class ErrorHandlerApiHelper implements ErrorHandlerApiHelperService {
     }
 
     @Override
-    public boolean discardErrorEntry(String id, String hostAndPort, String username, String password)
-        throws ErrorHandlerServiceStubException {
-        return true; // TODO implement
-    }
-
-    @Override
-    public boolean discardErrorEntries(String siddhiAppName, String hostAndPort, String username, String password)
-        throws ErrorHandlerServiceStubException {
-        return true; // TODO implement
-    }
-
-    @Override
-    public boolean doPurge(String hostAndPort, String username, String password)
-        throws ErrorHandlerServiceStubException {
-        return true; // TODO implement
+    public Object deleteErroneousEvent(String hostAndPort, String username, String password, String payload) throws ErrorHandlerServiceStubException {
+        // TODO implement
+        return null;
     }
 }
