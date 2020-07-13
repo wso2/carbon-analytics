@@ -284,7 +284,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                     var operandList = container.find('.operand-select-section>ul');
 
                     container.find('.operand-category-select>a>div').removeClass('focus');
-                    $(evt.currentTarget).find('a>div').addClass('focus');
+                    $(evt.currentTarget).find('div').addClass('focus');
 
                     operandList.empty();
 

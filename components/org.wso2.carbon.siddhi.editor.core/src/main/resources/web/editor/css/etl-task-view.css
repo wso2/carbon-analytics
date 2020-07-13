@@ -428,7 +428,7 @@
 }
 
 .operand-category-select .focus {
-    background: #5a5a5a;
+    background: #eee;
 }
 
 .expression.focus .expression-content span:hover {
