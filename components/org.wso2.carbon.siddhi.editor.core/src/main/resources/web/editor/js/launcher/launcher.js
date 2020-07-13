@@ -68,7 +68,6 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager',
                 var outputController = this.application.outputController;
                 var commandManager = this.application.commandManager;
                 var editorText = activeTab.getFile().getContent();
-                console.log(editorText);
                 var variableMap = Utils.prototype.retrieveEnvVariables();
                 submitErrorCheck(
                     {
