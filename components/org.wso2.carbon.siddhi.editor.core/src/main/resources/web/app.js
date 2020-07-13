@@ -168,17 +168,18 @@ requirejs.config({
         avroMapper: "js/etl-wizard/source-sink-mappers/avro-mapper",
         inputOutputMapper: "js/etl-wizard/source-sink-mappers/source-sink-mapper",
         // Datamapper components
-        scopeModel: "js/etl-wizard/input-option-configurator/models/ScopeModel",
-        operatorModel: "js/etl-wizard/input-option-configurator/models/OperatorModel",
-        functionModel: "js/etl-wizard/input-option-configurator/models/FunctionModel",
-        customValueModel: "js/etl-wizard/input-option-configurator/models/CustomValueModel",
-        attributeModel: "js/etl-wizard/input-option-configurator/models/AttributeModel",
+        scopeModel: "js/etl-wizard/data-mapper-component/models/ScopeModel",
+        operatorModel: "js/etl-wizard/data-mapper-component/models/OperatorModel",
+        functionModel: "js/etl-wizard/data-mapper-component/models/FunctionModel",
+        customValueModel: "js/etl-wizard/data-mapper-component/models/CustomValueModel",
+        attributeModel: "js/etl-wizard/data-mapper-component/models/AttributeModel",
         dataMapper: "js/etl-wizard/data-mapper-component/data-mapper",
         dataMapperUtil: "js/etl-wizard/data-mapper-component/util/data-mapper-util",
         // output option configurator components for ETL Wizard
         outputConfigurator: "js/etl-wizard/output-option-configurator/output-configurator",
         groupByConfigurator:"js/etl-wizard/output-option-configurator/components/group-by-component",
         orderByConfigurator:"js/etl-wizard/output-option-configurator/components/order-by-component",
+        advancedOutputConfiguration:"js/etl-wizard/output-option-configurator/components/advanced-output-options-component",
         // ETL Wizard Components  <-- end
     },
     map: {
