@@ -73,10 +73,12 @@ public class SiddhiErrorHandlerMicroservice implements ErrorStoreListener, Micro
     @Path("/erroneous-events")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getErroneousEvents(@QueryParam("siddhiApp") String siddhiAppName,
+                                       @QueryParam("descriptive") String isDescriptive,
                                        @QueryParam("limit") String limit, @QueryParam("offset") String offset) {
         if (siddhiAppName != null) {
             try {
-                return Response.ok().entity(ErrorStoreAccessor.getErroneousEvents(siddhiAppName, limit, offset))
+                return Response.ok().
+                    entity(ErrorStoreAccessor.getErroneousEvents(siddhiAppName, isDescriptive, limit, offset))
                     .type(MediaType.APPLICATION_JSON).build();
             } catch (SiddhiErrorHandlerException e) {
                 logger.error("Failed to get erroneous events.", e);
@@ -85,6 +87,19 @@ public class SiddhiErrorHandlerMicroservice implements ErrorStoreListener, Micro
         } else {
             return Response.status(Response.Status.BAD_REQUEST)
                 .entity("Mandatory query parameter 'siddhiApp' is not found.").build();
+        }
+    }
+
+    @GET
+    @Path("/erroneous-events/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getErroneousEvents(@PathParam("id") int id) {
+        try {
+            return Response.ok().entity(ErrorStoreAccessor.getErroneousEvent(id))
+                .type(MediaType.APPLICATION_JSON).build();
+        } catch (SiddhiErrorHandlerException e) {
+            logger.error("Failed to get erroneous event.", e);
+            return Response.serverError().entity("Failed to get erroneous event.").build();
         }
     }
 

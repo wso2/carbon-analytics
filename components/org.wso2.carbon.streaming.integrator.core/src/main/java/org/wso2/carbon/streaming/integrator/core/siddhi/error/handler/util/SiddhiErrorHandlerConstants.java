@@ -36,7 +36,10 @@ public class SiddhiErrorHandlerConstants {
     public static final String CREATE_TABLE = "CREATE_TABLE";
     public static final String INSERT_INTO_TABLE = "INSERT_INTO_TABLE";
     public static final String SELECT_FROM_TABLE = "SELECT_FROM_TABLE";
+    public static final String MINIMAL_SELECT_FROM_TABLE = "MINIMAL_SELECT_FROM_TABLE";
+    public static final String SINGLE_SELECT_FROM_TABLE = "SINGLE_SELECT_FROM_TABLE";
     public static final String SELECT_WITH_LIMIT_OFFSET = "SELECT_WITH_LIMIT_OFFSET";
+    public static final String MINIMAL_SELECT_WITH_LIMIT_OFFSET = "MINIMAL_SELECT_WITH_LIMIT_OFFSET";
     public static final String SELECT_COUNT_FROM_TABLE = "SELECT_COUNT_FROM_TABLE";
     public static final String DELETE_ROW_FROM_TABLE = "DELETE_ROW_FROM_TABLE";
 
@@ -55,5 +58,6 @@ public class SiddhiErrorHandlerConstants {
 
     public static final String LIMIT = "limit";
     public static final String OFFSET = "offset";
+    public static final String DESCRIPTIVE = "descriptive";
 
 }

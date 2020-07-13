@@ -27,7 +27,10 @@ public class ExecutionInfo {
     private String preparedCreateTableStatement;
     private String preparedInsertStatement;
     private String preparedSelectStatement;
+    private String preparedMinimalSelectStatement;
+    private String preparedSingleSelectStatement;
     private String preparedSelectWithLimitOffsetStatement;
+    private String preparedMinimalSelectWithLimitOffsetStatement;
     private String preparedSelectCountFromTableStatement;
     private String preparedDeleteStatement;
 
@@ -65,12 +68,36 @@ public class ExecutionInfo {
         this.preparedSelectStatement = preparedSelectStatement;
     }
 
+    public String getPreparedMinimalSelectStatement() {
+        return preparedMinimalSelectStatement;
+    }
+
+    public void setPreparedMinimalSelectStatement(String preparedMinimalSelectStatement) {
+        this.preparedMinimalSelectStatement = preparedMinimalSelectStatement;
+    }
+
+    public String getPreparedSingleSelectStatement() {
+        return preparedSingleSelectStatement;
+    }
+
+    public void setPreparedSingleSelectStatement(String preparedSingleSelectStatement) {
+        this.preparedSingleSelectStatement = preparedSingleSelectStatement;
+    }
+
     public String getPreparedSelectWithLimitOffsetStatement() {
         return preparedSelectWithLimitOffsetStatement;
     }
 
     public void setPreparedSelectWithLimitOffsetStatement(String preparedSelectWithLimitOffsetStatement) {
         this.preparedSelectWithLimitOffsetStatement = preparedSelectWithLimitOffsetStatement;
+    }
+
+    public String getPreparedMinimalSelectWithLimitOffsetStatement() {
+        return preparedMinimalSelectWithLimitOffsetStatement;
+    }
+
+    public void setPreparedMinimalSelectWithLimitOffsetStatement(String preparedMinimalSelectWithLimitOffsetStatement) {
+        this.preparedMinimalSelectWithLimitOffsetStatement = preparedMinimalSelectWithLimitOffsetStatement;
     }
 
     public String getPreparedSelectCountFromTableStatement() {

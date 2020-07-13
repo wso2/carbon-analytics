@@ -27,7 +27,10 @@ public class RDBMSQueryConfigurationEntry {
     private String createTableQuery;
     private String insertTableQuery;
     private String selectTableQuery;
+    private String minimalSelectTableQuery;
+    private String singleSelectTableQuery;
     private String selectWithLimitOffsetQuery;
+    private String minimalSelectWithLimitOffsetQuery;
     private String selectCountQuery;
     private String deleteQuery;
 
@@ -71,6 +74,22 @@ public class RDBMSQueryConfigurationEntry {
         this.selectTableQuery = selectTableQuery;
     }
 
+    public String getMinimalSelectTableQuery() {
+        return minimalSelectTableQuery;
+    }
+
+    public void setMinimalSelectTableQuery(String minimalSelectTableQuery) {
+        this.minimalSelectTableQuery = minimalSelectTableQuery;
+    }
+
+    public String getSingleSelectTableQuery() {
+        return singleSelectTableQuery;
+    }
+
+    public void setSingleSelectTableQuery(String singleSelectTableQuery) {
+        this.singleSelectTableQuery = singleSelectTableQuery;
+    }
+
     public String getSelectCountQuery() {
         return selectCountQuery;
     }
@@ -85,6 +104,14 @@ public class RDBMSQueryConfigurationEntry {
 
     public void setSelectWithLimitOffsetQuery(String selectWithLimitOffsetQuery) {
         this.selectWithLimitOffsetQuery = selectWithLimitOffsetQuery;
+    }
+
+    public String getMinimalSelectWithLimitOffsetQuery() {
+        return minimalSelectWithLimitOffsetQuery;
+    }
+
+    public void setMinimalSelectWithLimitOffsetQuery(String minimalSelectWithLimitOffsetQuery) {
+        this.minimalSelectWithLimitOffsetQuery = minimalSelectWithLimitOffsetQuery;
     }
 
     public String getDeleteQuery() {

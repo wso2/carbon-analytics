@@ -38,6 +38,7 @@ import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.util.Siddh
 import javax.sql.DataSource;
 import javax.sql.rowset.serial.SerialBlob;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -143,7 +144,11 @@ public class DBErrorStore extends ErrorStore {
         executionInfo.setPreparedInsertStatement(databaseQueryEntries.getInsertTableQuery());
         executionInfo.setPreparedTableExistenceCheckStatement(databaseQueryEntries.getIsTableExistQuery());
         executionInfo.setPreparedSelectStatement(databaseQueryEntries.getSelectTableQuery());
+        executionInfo.setPreparedMinimalSelectStatement(databaseQueryEntries.getMinimalSelectTableQuery());
+        executionInfo.setPreparedSingleSelectStatement(databaseQueryEntries.getSingleSelectTableQuery());
         executionInfo.setPreparedSelectWithLimitOffsetStatement(databaseQueryEntries.getSelectWithLimitOffsetQuery());
+        executionInfo.setPreparedMinimalSelectWithLimitOffsetStatement(
+            databaseQueryEntries.getMinimalSelectWithLimitOffsetQuery());
         executionInfo.setPreparedSelectCountFromTableStatement(databaseQueryEntries.getSelectCountQuery());
         executionInfo.setPreparedDeleteStatement(databaseQueryEntries.getDeleteQuery());
     }
@@ -211,12 +216,23 @@ public class DBErrorStore extends ErrorStore {
         try {
             con = datasource.getConnection();
             con.setAutoCommit(false);
+            boolean isDescriptive = false;
+            if (queryParams.containsKey(SiddhiErrorHandlerConstants.DESCRIPTIVE) &&
+                queryParams.get(SiddhiErrorHandlerConstants.DESCRIPTIVE) != null) {
+                isDescriptive = Boolean.parseBoolean(queryParams.get(SiddhiErrorHandlerConstants.DESCRIPTIVE));
+            }
 
             if (queryParams.containsKey(SiddhiErrorHandlerConstants.LIMIT) &&
                 queryParams.containsKey(SiddhiErrorHandlerConstants.OFFSET) &&
                 queryParams.get(SiddhiErrorHandlerConstants.LIMIT) != null &&
                 queryParams.get(SiddhiErrorHandlerConstants.OFFSET) != null) {
-                stmt = con.prepareStatement(executionInfo.getPreparedSelectWithLimitOffsetStatement());
+
+                if (isDescriptive) {
+                    stmt = con.prepareStatement(executionInfo.getPreparedSelectWithLimitOffsetStatement());
+                } else {
+                    stmt = con.prepareStatement(executionInfo.getPreparedMinimalSelectWithLimitOffsetStatement());
+                }
+
                 if (databaseType.equals(MSSQL_DATABASE_TYPE) || databaseType.equals(ORACLE_DATABASE_TYPE)) {
                     stmt.setInt(2, Integer.parseInt(queryParams.get(SiddhiErrorHandlerConstants.OFFSET)));
                     stmt.setInt(3, Integer.parseInt(queryParams.get(SiddhiErrorHandlerConstants.LIMIT)));
@@ -224,11 +240,13 @@ public class DBErrorStore extends ErrorStore {
                     stmt.setInt(2, Integer.parseInt(queryParams.get(SiddhiErrorHandlerConstants.LIMIT)));
                     stmt.setInt(3, Integer.parseInt(queryParams.get(SiddhiErrorHandlerConstants.OFFSET)));
                 }
-            } else {
+            } else if (isDescriptive) {
                 stmt = con.prepareStatement(executionInfo.getPreparedSelectStatement());
+            } else {
+                stmt = con.prepareStatement(executionInfo.getPreparedMinimalSelectStatement());
             }
             stmt.setString(1, siddhiAppName);
-            return getErrorEntries(con, stmt);
+            return getErrorEntries(isDescriptive, con, stmt);
         } catch (SQLException e) {
             log.error(String.format("Error while retrieving erroneous events of Siddhi app: %s from the datasource: %s",
                 siddhiAppName, datasourceName), e);
@@ -238,7 +256,33 @@ public class DBErrorStore extends ErrorStore {
         }
     }
 
-    private List<ErrorEntry> getErrorEntries(Connection con, PreparedStatement stmt) throws SQLException {
+    @Override
+    public ErrorEntry loadErrorEntry(int id) {
+        Connection con = null;
+        PreparedStatement stmt = null;
+
+        try {
+            con = datasource.getConnection();
+            con.setAutoCommit(false);
+            stmt = con.prepareStatement(executionInfo.getPreparedSingleSelectStatement());
+            stmt.setInt(1, id);
+            // Uses the same method without re-inventing the wheel.
+            List<ErrorEntry> errorEntry = getErrorEntries(true, con, stmt);
+            if (!errorEntry.isEmpty()) {
+                return errorEntry.get(0);
+            }
+            return null;
+        } catch (SQLException e) {
+            log.error(String.format("Error while retrieving erroneous events with id: %s from the datasource: %s",
+                id, datasourceName), e);
+            return null;
+        } finally {
+            DBErrorStoreUtils.cleanupConnections(stmt, con);
+        }
+    }
+
+    private List<ErrorEntry> getErrorEntries(boolean isDescriptive, Connection con, PreparedStatement stmt)
+        throws SQLException {
         List<ErrorEntry> errorEntries = new ArrayList<>();
         try (ResultSet resultSet = stmt.executeQuery()) {
             con.commit();
@@ -246,38 +290,48 @@ public class DBErrorStore extends ErrorStore {
                 Blob blobEvent;
                 Blob blobStackTrace;
                 Blob blobOriginalPayload;
-                if (databaseType.equals(MSSQL_DATABASE_TYPE)) {
-                    blobEvent = new SerialBlob(resultSet.getBytes(SiddhiErrorHandlerConstants.EVENT));
-                    blobStackTrace = new SerialBlob(resultSet.getBytes(SiddhiErrorHandlerConstants.STACK_TRACE));
-                    blobOriginalPayload = new SerialBlob(
-                        resultSet.getBytes(SiddhiErrorHandlerConstants.ORIGINAL_PAYLOAD));
-                } else {
-                    blobEvent = resultSet.getBlob(SiddhiErrorHandlerConstants.EVENT);
-                    blobStackTrace = resultSet.getBlob(SiddhiErrorHandlerConstants.STACK_TRACE);
-                    blobOriginalPayload = resultSet.getBlob(SiddhiErrorHandlerConstants.ORIGINAL_PAYLOAD);
+                byte[] blobEventAsBytes = null;
+                byte[] blobStackTraceAsBytes = null;
+                byte[] blobOriginalPayloadAsBytes = null;
+
+                if (isDescriptive) {
+                    if (databaseType.equals(MSSQL_DATABASE_TYPE)) {
+                        blobEvent = new SerialBlob(resultSet.getBytes(SiddhiErrorHandlerConstants.EVENT));
+                        blobStackTrace = new SerialBlob(resultSet.getBytes(SiddhiErrorHandlerConstants.STACK_TRACE));
+                        blobOriginalPayload = new SerialBlob(
+                            resultSet.getBytes(SiddhiErrorHandlerConstants.ORIGINAL_PAYLOAD));
+                    } else {
+                        blobEvent = resultSet.getBlob(SiddhiErrorHandlerConstants.EVENT);
+                        blobStackTrace = resultSet.getBlob(SiddhiErrorHandlerConstants.STACK_TRACE);
+                        blobOriginalPayload = resultSet.getBlob(SiddhiErrorHandlerConstants.ORIGINAL_PAYLOAD);
+                    }
+                    int blobEventLength = (int) blobEvent.length();
+                    blobEventAsBytes = blobEvent.getBytes(1, blobEventLength);
+
+                    int blobStackTraceLength = (int) blobStackTrace.length();
+                    blobStackTraceAsBytes = blobStackTrace.getBytes(1, blobStackTraceLength);
+
+                    int blobOriginalPayloadLength = (int) blobOriginalPayload.length();
+                    blobOriginalPayloadAsBytes = blobOriginalPayload.getBytes(1, blobOriginalPayloadLength);
                 }
-                int blobEventLength = (int) blobEvent.length();
-                byte[] blobEventAsBytes = blobEvent.getBytes(1, blobEventLength);
 
-                int blobStackTraceLength = (int) blobStackTrace.length();
-                byte[] blobStackTraceAsBytes = blobStackTrace.getBytes(1, blobStackTraceLength);
-
-                int blobOriginalPayloadLength = (int) blobOriginalPayload.length();
-                byte[] blobOriginalPayloadAsBytes = blobOriginalPayload.getBytes(1, blobOriginalPayloadLength);
-
-                ErrorEntry errorEntry = constructErrorEntry(
-                    resultSet.getInt(SiddhiErrorHandlerConstants.ID),
-                    resultSet.getLong(SiddhiErrorHandlerConstants.TIMESTAMP),
-                    resultSet.getString(SiddhiErrorHandlerConstants.SIDDHI_APP_NAME),
-                    resultSet.getString(SiddhiErrorHandlerConstants.STREAM_NAME),
-                    blobEventAsBytes,
-                    resultSet.getString(SiddhiErrorHandlerConstants.CAUSE),
-                    blobStackTraceAsBytes,
-                    blobOriginalPayloadAsBytes,
-                    ErrorOccurrence.valueOf(resultSet.getString(SiddhiErrorHandlerConstants.ERROR_OCCURRENCE)),
-                    ErroneousEventType.valueOf(resultSet.getString(SiddhiErrorHandlerConstants.EVENT_TYPE)),
-                    ErrorType.valueOf(resultSet.getString(SiddhiErrorHandlerConstants.ERROR_TYPE)));
-                errorEntries.add(errorEntry);
+                try {
+                    ErrorEntry errorEntry = constructErrorEntry(
+                        resultSet.getInt(SiddhiErrorHandlerConstants.ID),
+                        resultSet.getLong(SiddhiErrorHandlerConstants.TIMESTAMP),
+                        resultSet.getString(SiddhiErrorHandlerConstants.SIDDHI_APP_NAME),
+                        resultSet.getString(SiddhiErrorHandlerConstants.STREAM_NAME),
+                        blobEventAsBytes,
+                        resultSet.getString(SiddhiErrorHandlerConstants.CAUSE),
+                        blobStackTraceAsBytes,
+                        blobOriginalPayloadAsBytes,
+                        ErrorOccurrence.valueOf(resultSet.getString(SiddhiErrorHandlerConstants.ERROR_OCCURRENCE)),
+                        ErroneousEventType.valueOf(resultSet.getString(SiddhiErrorHandlerConstants.EVENT_TYPE)),
+                        ErrorType.valueOf(resultSet.getString(SiddhiErrorHandlerConstants.ERROR_TYPE)));
+                    errorEntries.add(errorEntry);
+                } catch (IOException | ClassNotFoundException e) {
+                    log.error("Failed to convert error entry. Hence, skipping the entry.", e);
+                }
             }
         }
         return errorEntries;

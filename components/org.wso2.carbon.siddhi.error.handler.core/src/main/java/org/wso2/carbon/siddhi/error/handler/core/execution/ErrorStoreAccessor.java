@@ -34,11 +34,15 @@ public class ErrorStoreAccessor {
     private ErrorStoreAccessor() {
     }
 
-    public static List<ErrorEntry> getErroneousEvents(String siddhiAppName, String limit, String offset)
+    public static List<ErrorEntry> getErroneousEvents(String siddhiAppName, String isDescriptive,
+                                                      String limit, String offset)
         throws SiddhiErrorHandlerException {
         ErrorStore errorStore = SiddhiErrorHandlerDataHolder.getInstance().getErrorStore();
         if (errorStore != null) {
             Map<String, String> queryParams = new HashMap<>();
+            if (isDescriptive != null) {
+                queryParams.put("descriptive", isDescriptive);
+            }
             if (limit != null) {
                 queryParams.put("limit", limit);
             }
@@ -46,6 +50,14 @@ public class ErrorStoreAccessor {
                 queryParams.put("offset", offset);
             }
             return errorStore.loadErrorEntries(siddhiAppName, queryParams);
+        }
+        throw new SiddhiErrorHandlerException("Error store is unavailable.");
+    }
+
+    public static ErrorEntry getErroneousEvent(int id) throws SiddhiErrorHandlerException {
+        ErrorStore errorStore = SiddhiErrorHandlerDataHolder.getInstance().getErrorStore();
+        if (errorStore != null) {
+            return errorStore.loadErrorEntry(id);
         }
         throw new SiddhiErrorHandlerException("Error store is unavailable.");
     }

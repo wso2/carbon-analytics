@@ -71,8 +71,17 @@ public class RDBMSConfiguration {
             databaseQueryEntries.setSelectTableQuery(queryManager.getQuery(
                 SiddhiErrorHandlerConstants.SELECT_FROM_TABLE).
                 replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setMinimalSelectTableQuery(queryManager.getQuery(
+                SiddhiErrorHandlerConstants.MINIMAL_SELECT_FROM_TABLE).
+                replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setSingleSelectTableQuery(queryManager.getQuery(
+                SiddhiErrorHandlerConstants.SINGLE_SELECT_FROM_TABLE).
+                replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
             databaseQueryEntries.setSelectWithLimitOffsetQuery(
                 queryManager.getQuery(SiddhiErrorHandlerConstants.SELECT_WITH_LIMIT_OFFSET).
+                    replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setMinimalSelectWithLimitOffsetQuery(
+                queryManager.getQuery(SiddhiErrorHandlerConstants.MINIMAL_SELECT_WITH_LIMIT_OFFSET).
                     replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
             databaseQueryEntries.setSelectCountQuery(
                 queryManager.getQuery(SiddhiErrorHandlerConstants.SELECT_COUNT_FROM_TABLE).
