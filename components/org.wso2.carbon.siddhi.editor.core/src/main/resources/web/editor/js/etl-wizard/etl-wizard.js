@@ -17,9 +17,9 @@
  *  * under the License.
  *
  */
-define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor/completion-engine', 'alerts', 'inputOutputMapper', 'inputOptionConfigurator', 'dataMapper'],
+define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor/completion-engine', 'alerts', 'inputOutputMapper', 'inputOptionConfigurator', 'dataMapper', 'outputConfigurator'],
 
-    function (require, $, _, log, smartWizard, CompletionEngine, Alerts, InputOutputMapper, InputOptionConfigurator, DataMapper) {
+    function (require, $, _, log, smartWizard, CompletionEngine, Alerts, InputOutputMapper, InputOptionConfigurator, DataMapper, OutputConfigurator) {
 
         /**
          * Constants used by the wizard
@@ -88,6 +88,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     filter: {},
                     function: {},
                     mapping: {},
+                    groupby: {
+                        attributes: [],
+                        havingFilter : {},
+                    },
+                    orderby: {
+                        attributes: []
+                    }
                 }
             };
 
@@ -235,8 +242,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
                     break;
                 case 5:
+                    var outputConfigurator = new OutputConfigurator(wizardBodyContent, self.__propertyMap);
+                    outputConfigurator.render();
                     // TODO Output option configurator
-                    
+
             }
 
             if(this.__stepIndex < 3) {
