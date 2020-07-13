@@ -38,7 +38,6 @@ import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.util.Siddh
 import javax.sql.DataSource;
 import javax.sql.rowset.serial.SerialBlob;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -266,23 +265,19 @@ public class DBErrorStore extends ErrorStore {
                 int blobOriginalPayloadLength = (int) blobOriginalPayload.length();
                 byte[] blobOriginalPayloadAsBytes = blobOriginalPayload.getBytes(1, blobOriginalPayloadLength);
 
-                try {
-                    ErrorEntry errorEntry = constructErrorEntry(
-                        resultSet.getInt(SiddhiErrorHandlerConstants.ID),
-                        resultSet.getLong(SiddhiErrorHandlerConstants.TIMESTAMP),
-                        resultSet.getString(SiddhiErrorHandlerConstants.SIDDHI_APP_NAME),
-                        resultSet.getString(SiddhiErrorHandlerConstants.STREAM_NAME),
-                        blobEventAsBytes,
-                        resultSet.getString(SiddhiErrorHandlerConstants.CAUSE),
-                        blobStackTraceAsBytes,
-                        blobOriginalPayloadAsBytes,
-                        ErrorOccurrence.valueOf(resultSet.getString(SiddhiErrorHandlerConstants.ERROR_OCCURRENCE)),
-                        ErroneousEventType.valueOf(resultSet.getString(SiddhiErrorHandlerConstants.EVENT_TYPE)),
-                        ErrorType.valueOf(resultSet.getString(SiddhiErrorHandlerConstants.ERROR_TYPE)));
-                    errorEntries.add(errorEntry);
-                } catch (IOException | ClassNotFoundException e) {
-                    log.error("Failed to convert error entry. Hence, skipping the entry.", e);
-                }
+                ErrorEntry errorEntry = constructErrorEntry(
+                    resultSet.getInt(SiddhiErrorHandlerConstants.ID),
+                    resultSet.getLong(SiddhiErrorHandlerConstants.TIMESTAMP),
+                    resultSet.getString(SiddhiErrorHandlerConstants.SIDDHI_APP_NAME),
+                    resultSet.getString(SiddhiErrorHandlerConstants.STREAM_NAME),
+                    blobEventAsBytes,
+                    resultSet.getString(SiddhiErrorHandlerConstants.CAUSE),
+                    blobStackTraceAsBytes,
+                    blobOriginalPayloadAsBytes,
+                    ErrorOccurrence.valueOf(resultSet.getString(SiddhiErrorHandlerConstants.ERROR_OCCURRENCE)),
+                    ErroneousEventType.valueOf(resultSet.getString(SiddhiErrorHandlerConstants.EVENT_TYPE)),
+                    ErrorType.valueOf(resultSet.getString(SiddhiErrorHandlerConstants.ERROR_TYPE)));
+                errorEntries.add(errorEntry);
             }
         }
         return errorEntries;
