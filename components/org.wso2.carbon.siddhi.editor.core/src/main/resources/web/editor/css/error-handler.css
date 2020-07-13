@@ -1,0 +1,67 @@
+.error-handler-dialog-form-block {
+    padding: 20px 20px 20px 20px;
+    /*overflow: auto;*/
+    width: 90.15%;
+    background-color: #2C2C2C;
+    margin-left: 30px;
+    margin-bottom: 20px;
+}
+
+.server-properties-clearfix {
+    display: block;
+    content: "";
+    clear: both;
+}
+
+.server-property {
+    float: left;
+    display: inline-block;
+    margin-right: 35px;
+}
+
+.configure-server-input {
+    width: 120px;
+    background-color: #222222;
+    border-style: none;
+    height: 35px;
+    padding-left: 10px;
+    color: #fff;
+}
+
+.error-entry-container {
+    background-color: #373737;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.error-label {
+    color: #03a9f4;
+    background-color: #2C2C2C;
+    padding: 5px;
+    margin: 0;
+    font-weight: bold;
+}
+
+.error-cause {
+    color: #f47b20;
+}
+
+.description {
+    color: #c8c7c7;
+}
+
+.payload-content {
+    color: #FFF;
+    background: #131313;
+    overflow: auto;
+    padding: 10px;
+    font-family: "Lucida Console", Monaco, monospace;
+}
+
+.stack-trace-content {
+    padding: 10px;
+    overflow-y: auto;
+    background: #131313;
+    color: #f44336;
+    font-family: "Lucida Console", Monaco, monospace;
+}
