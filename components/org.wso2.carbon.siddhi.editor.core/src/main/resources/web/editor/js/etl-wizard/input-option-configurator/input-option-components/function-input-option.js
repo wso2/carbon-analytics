@@ -123,7 +123,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                         var inputId = evt.currentTarget.id.match('function-param-([0-9]+)')[1];
                         if($(evt.currentTarget).val().length === 0) {
                             container.find(`#label-function-param-${inputId}`).addClass('not-visible');
-                            $(evt.currentTarget).attr('placeholder', inputId.replaceAll(/-/g,'.'));
+                            $(evt.currentTarget).attr('placeholder', container.find(`#label-function-param-${inputId}`).html());
                         }
                     })
                     .on('keyup', _.debounce(function (evt) {
