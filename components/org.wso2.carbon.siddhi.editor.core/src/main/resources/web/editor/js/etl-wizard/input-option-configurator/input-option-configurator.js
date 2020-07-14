@@ -32,56 +32,81 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
             var container = self.__container;
             var config = self.__config;
 
+            container.empty();
             container.append(`
                 <div style="max-height: ${self.__container.offsetHeight}; flex-direction: column" class="content-section">
                     <div class="input-option-btn-group" style="display: flex;">
-                        <button id="btn-add-filter" style="margin-left: auto; min-width: 90px; background: #ee6719" class="btn btn-default">+ Filter</button>
-                        <button id="btn-add-function" style="margin-left: 15px; min-width: 90px; background: #ee6719" class="btn btn-default">+ Function</button>
-                        <button id="btn-add-window" style="margin-left: 15px; min-width: 90px; background: #ee6719" class="btn btn-default">+ Window</button>
+                        <button id="btn-add-filter" style="min-width: 90px; background: #ee6719" class="btn btn-default"><i class="fw ${Object.keys(config.query.filter).length > 0 ? 'fw-check': 'fw-error'}"></i>&nbsp;Filter</button>
                     </div>
-                    <div class="input-option-container" style="display: flex; align-items: center; justify-content: center; height: calc(100% - 15px)" >
+                    <div class="input-option-container" style="display: flex; height: calc(100% - 15px)" >
+                        
+                    </div>
+                </div>
+                <div  style="max-height: ${self.__container.offsetHeight}; flex-direction: column" class="content-section">
+                    <div class="input-option-btn-group" style="display: flex;">
+                        <button id="btn-add-function" style="margin-left: auto; min-width: 90px; background: #ee6719" class="btn btn-default">
+                            <i class="fw ${Object.keys(config.query.function).length > 0 ? 'fw-check': 'fw-error'}"></i>&nbsp;Function
+                        </button>
+                        <button id="btn-add-window" style="margin-left: 15px; min-width: 90px; background: #ee6719" class="btn btn-default">
+                            <i class="fw ${Object.keys(config.query.window).length > 0 ? 'fw-check': 'fw-error'}"></i>&nbsp;Window
+                        </button>
+                    </div>
+                    <div class="input-option-container" style="display: flex; height: calc(100% - 15px)" >
                         
                     </div>
                 </div>
             `);
 
+            var inputOptionSection = $('<div class="input-option-section" style="width: 100%;margin: 15px 0 15px 0;display: flex;flex-direction: column;padding:15px;background-color: rgba(162,162,162,1);"></div>');
+
+
             self.__container.find('.input-option-btn-group>button')
                 .on('click', function (evt) {
-                    $(evt.currentTarget).attr('disabled', true);
+                    // $(evt.currentTarget).attr('disabled', true);
                     var btnType = evt.currentTarget.id.match('btn-add-([a-z]+)')[1];
 
-                    var inputOptionSection = $('<div class="input-option-section" style="margin-right:15px;min-width: 45%;max-width: 45%;min-height: 70%;display: flex;flex-direction: column;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);padding: 15px;background-color: #3a3a3a;"></div>');
-
-                    container.find('.input-option-container').append(inputOptionSection);
+                    if(config.query[btnType]['enable']) {
+                        config.query[btnType] = {};
+                    } else {
+                        config.query[btnType]['enable'] = true;
+                    }
 
                     switch (btnType) {
-                        case 'filter':
-                            container.find('#btn-add-function').attr('disabled', true);
-                            new FilterInputOptionsComponent(inputOptionSection, config).render();
-                            break
                         case 'function':
-                            container.find('#btn-add-filter').attr('disabled', true);
-                            new FunctionInputOptionComponent(inputOptionSection, config).render();
+                            config.query.window = {}
                             break;
                         case 'window':
-                            new WindowInputOptionsComponent(inputOptionSection, config).render();
+                            config.query.function = {}
                             break;
                     }
-                });
 
+                    self.render();
+                });
+            var containerSection = '';
             if (Object.keys(self.__config.query.filter).length > 0) {
-                var inputOptionSection = $('<div class="input-option-section" style="margin-right:15px;min-width: 45%;max-width: 45%;min-height: 70%;display: flex;flex-direction: column;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);padding: 15px;background-color: #3a3a3a;"></div>');
-                container.find('.input-option-container').append(inputOptionSection);
-                container.find('#btn-add-function').attr('disabled', true);
-                container.find('#btn-add-function').attr('disabled', true);
-                new FilterInputOptionsComponent(inputOptionSection, config).render();
+                containerSection = inputOptionSection.clone();
+                $(container.find('.input-option-container')[0]).append(containerSection);
+                // container.find('#btn-add-filter').attr('disabled', true);
+                var filterComponent = new FilterInputOptionsComponent(containerSection, config);
+                filterComponent.render();
             }
 
-            if (Object.keys(self.__config.query.filter).length > 0) {
-                var inputOptionSection = $('<div class="input-option-section" style="margin-right:15px;min-width: 45%;max-width: 45%;min-height: 70%;display: flex;flex-direction: column;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);padding: 15px;background-color: #3a3a3a;"></div>');
-                container.find('.input-option-container').append(inputOptionSection);
-                container.find('#btn-add-window').attr('disabled', true);
-                new WindowInputOptionsComponent(inputOptionSection, config).render();
+            if (Object.keys(self.__config.query.window).length > 0) {
+                containerSection = inputOptionSection.clone();
+                $(container.find('.input-option-container')[1]).append(containerSection);
+                // container.find('#btn-add-window').attr('disabled', true);
+                // container.find('#btn-add-function').attr('disabled', true);
+                var windowComponent = new WindowInputOptionsComponent(containerSection, config);
+                windowComponent.render();
+            }
+
+            if (Object.keys(self.__config.query.function).length > 0) {
+                containerSection = inputOptionSection.clone();
+                $(container.find('.input-option-container')[1]).append(containerSection);
+                // container.find('#btn-add-window').attr('disabled', true);
+                // container.find('#btn-add-function').attr('disabled', true);
+                var functionComponent = new FunctionInputOptionComponent(containerSection, config);
+                functionComponent.render();
             }
         }
 

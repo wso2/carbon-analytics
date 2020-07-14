@@ -34,9 +34,9 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
 
             container.empty();
             container.append(`
-                <h3 style="margin-top: 0">Function configuration</h3>
-                <div>
-                    <label style="color: white" for="function-name">Window type&nbsp;:&nbsp;</label>
+                <h3 style="margin-top: 0;color: #373737">Function configuration</h3>
+                <div style="color: #373737">
+                    <label for="function-name">Window type&nbsp;:&nbsp;</label>
                     <select name="function-name" id="function-name">
                         <option disabled selected value> -- select an option -- </option>
                     </select>
@@ -59,14 +59,14 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                     if (functionData.syntax.length > 1) {
                         var functionDataContainer = container.find('.function-parameter-section');
                         functionDataContainer.empty();
-                        functionDataContainer.append('<h6 style="color: white">Select function syntax to proceed</h6>');
+                        functionDataContainer.append('<h6 style="color: #373737">Select function syntax to proceed</h6>');
                         var functionList = $('<ul></ul>');
 
                         functionData.syntax.forEach(function (syntax, i) {
                             functionList.append(`
                                 <li class="" id="syntax-id-${i}">
                                     <a>
-                                        <div style="padding: 10px 15px;border-bottom: 1px solid rgba(255, 255, 255, 0.2);" >
+                                        <div style="padding: 10px 15px;border-bottom: 1px solid #373737" >
                                             <b>${syntax.syntax.replaceAll(/</g, '&lt;').replaceAll(/>/g, '&gt;')}</b>
                                         </div>
                                     </a>    
@@ -98,17 +98,17 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                     }
                 });
 
-            if (Object.keys(config.query.function).length > 0) {
+            if (config.query.function['parameters'] && config.query.function['parameters'].length > 0) {
 
                 var functionDataContainer = container.find('.function-parameter-section');
                 functionDataContainer.empty();
-                functionDataContainer.append('<h6 style="color: white">Select function syntax to proceed</h6>');
+                functionDataContainer.append('<h6 style="color: #373737">Select function syntax to proceed</h6>');
 
                 config.query.function.parameters.forEach(function (param, i) {
                     functionDataContainer.append(`
                         <div style="width: 100%; padding-bottom: 10px" class="input-section">
                             <label style="margin-bottom: 0" class="${param.value.length > 0 ? '' : 'not-visible'}" id="label-function-param-${i}" for="function-param-${i}">${param.name}</label>
-                            <input id="function-param-${i}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid rgba(255,255,255,0.8)" placeholder="${param.name}" type="text" value="${param.value}">
+                            <input id="function-param-${i}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #373737" placeholder="${param.name}" type="text" value="${param.value}">
                         </div>
                     `);
                 });

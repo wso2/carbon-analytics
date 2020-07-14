@@ -385,6 +385,7 @@
     max-height: 50%;
     overflow-y: auto;
     max-width: 400px;
+    z-index: 1;
 }
 
 .dropdown-menu-style .dropdown-item {
@@ -418,11 +419,11 @@
 .expression-section .expression {
     padding: 15px 0;
     text-align: center;
-    background: #4a4a4a;
+    background: #b3b3b3;
 }
 
 .expression-section .focus {
-    background: #5a5a5a;
+    background: lightgray;
     font-size: 1.8rem;
     border-left: 1px solid orangered;
 }
@@ -436,26 +437,22 @@
     cursor: pointer;
 }
 
-.window-option-section .input-section label {
-    color: rgba(255, 255, 255, 0.6);
-}
+/*.window-option-section .input-section label {*/
+/*    color: rgba(255, 255, 255, 0.6);*/
+/*}*/
 
-.window-option-section .input-section input {
-    color: rgba(255, 255, 255, 0.8);
-}
+/*.window-option-section .input-section input {*/
+/*    color: rgba(255, 255, 255, 0.8);*/
+/*}*/
 
-.window-option-section .input-section input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-}
 
-.function-parameter-section .input-section label {
-    color: rgba(255, 255, 255, 0.6);
-}
 
-.function-parameter-section .input-section input {
-    color: rgba(255, 255, 255, 0.8);
-}
+/*.function-parameter-section .input-section label {*/
+/*    color: rgba(255, 255, 255, 0.6);*/
+/*}*/
 
-.function-parameter-section .input-section input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-}
+/*.function-parameter-section .input-section input {*/
+/*    color: rgba(255, 255, 255, 0.8);*/
+/*}*/
+
+

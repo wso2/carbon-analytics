@@ -40,14 +40,14 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
 
             container.empty();
             container.append(`
-                <h3 style="margin-top: 0">Window configuration</h3>
-                <div>
-                    <label style="color: white" for="window-type">Window type&nbsp;:&nbsp;</label>
+                <h3 style="margin-top: 0; color: #373737">Window configuration</h3>
+                <div style="color: #373737">
+                    <label for="window-type">Window type&nbsp;:&nbsp;</label>
                     <select name="window-type" id="window-type">
                         <option disabled selected value> -- select an option -- </option>
                     </select>
                 </div>
-                <div style="padding: 0 5px" class="window-option-section">
+                <div style="padding: 0 5px;color: #373737" class="window-option-section">
                         
                 </div>
             `);
@@ -73,18 +73,18 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                 self.render();
             });
 
-            if (Object.keys(config.query.window).length > 0) {
+            if (config.query.window['type']) {
                 container.find('#window-type').val(config.query.window.type)
 
                 if(Object.keys(config.query.window.parameters).length > 0) {
-                    container.find('.window-option-section').append('<h6 style="color: white"><b>Window Options</b></h6>');
+                    container.find('.window-option-section').append('<h6><b>Window Options</b></h6>');
                 }
 
                 Object.keys(config.query.window.parameters).forEach(function (key) {
                     container.find('.window-option-section').append(`
                         <div style="width: 100%; padding-bottom: 10px" class="input-section">
-                            <label style="margin-bottom: 0" class="${config.query.window.parameters[key].value.length > 0 ? '' : 'not-visible'}" id="label-window-op-${key.replaceAll(/\./g,'-')}" for="window-op-${key.replaceAll(/\./g,'-')}">${key}</label>
-                            <input id="window-op-${key.replaceAll(/\./g, '-')}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid rgba(255,255,255,0.8)" placeholder="${key}" type="text" value="${config.query.window.parameters[key].value}">
+                            <label style="margin-bottom: 0; color: #373737" class="${config.query.window.parameters[key].value.length > 0 ? '' : 'not-visible'}" id="label-window-op-${key.replaceAll(/\./g,'-')}" for="window-op-${key.replaceAll(/\./g,'-')}">${key}</label>
+                            <input id="window-op-${key.replaceAll(/\./g, '-')}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #373737" placeholder="${key}" type="text" value="${config.query.window.parameters[key].value}">
                         </div>
                     `);
                 });
