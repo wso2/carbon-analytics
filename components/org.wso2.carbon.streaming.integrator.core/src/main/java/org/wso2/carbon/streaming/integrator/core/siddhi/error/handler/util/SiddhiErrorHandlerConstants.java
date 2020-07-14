@@ -32,19 +32,20 @@ public class SiddhiErrorHandlerConstants {
     public static final String ERROR_STORE_CONFIGS = "config";
     public static final String DEFAULT_DB_ERROR_STORE_DATASOURCE = "WSO2_CARBON_DB";
     public static final String DEFAULT_DB_ERROR_STORE_TABLE_NAME = "SIDDHI_ERROR_STORE_TABLE";
-    public static final String IS_TABLE_EXISTS = "IS_TABLE_EXISTS";
+
+    public static final String IS_TABLE_EXIST = "IS_TABLE_EXIST";
     public static final String CREATE_TABLE = "CREATE_TABLE";
-    public static final String INSERT_INTO_TABLE = "INSERT_INTO_TABLE";
-    public static final String SELECT_FROM_TABLE = "SELECT_FROM_TABLE";
-    public static final String MINIMAL_SELECT_FROM_TABLE = "MINIMAL_SELECT_FROM_TABLE";
-    public static final String SINGLE_SELECT_FROM_TABLE = "SINGLE_SELECT_FROM_TABLE";
+    public static final String INSERT = "INSERT";
+    public static final String SELECT = "SELECT";
+    public static final String MINIMAL_SELECT = "MINIMAL_SELECT";
+    public static final String SELECT_SINGLE = "SELECT_SINGLE";
     public static final String SELECT_WITH_LIMIT_OFFSET = "SELECT_WITH_LIMIT_OFFSET";
     public static final String MINIMAL_SELECT_WITH_LIMIT_OFFSET = "MINIMAL_SELECT_WITH_LIMIT_OFFSET";
-    public static final String SELECT_COUNT_FROM_TABLE = "SELECT_COUNT_FROM_TABLE";
-    public static final String SELECT_COUNT_FROM_TABLE_BY_SIDDHI_APP = "SELECT_COUNT_FROM_TABLE_BY_SIDDHI_APP";
-    public static final String DELETE_ROW_FROM_TABLE = "DELETE_ROW_FROM_TABLE";
-    public static final String DELETE_FROM_TABLE_BY_SIDDHI_APP_NAME = "DELETE_FROM_TABLE_BY_SIDDHI_APP_NAME";
-    public static final String PURGE_TABLE = "PURGE_TABLE";
+    public static final String SELECT_COUNT = "SELECT_COUNT";
+    public static final String SELECT_COUNT_BY_SIDDHI_APP_NAME = "SELECT_COUNT_BY_SIDDHI_APP_NAME";
+    public static final String DELETE = "DELETE";
+    public static final String DELETE_BY_SIDDHI_APP_NAME = "DELETE_BY_SIDDHI_APP_NAME";
+    public static final String PURGE = "PURGE";
 
     public static final String ID = "id";
     public static final String TIMESTAMP = "timestamp";

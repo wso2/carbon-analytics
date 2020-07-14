@@ -25,17 +25,17 @@ public class RDBMSQueryConfigurationEntry {
     private String databaseName;
     private String isTableExistQuery;
     private String createTableQuery;
-    private String insertTableQuery;
-    private String selectTableQuery;
-    private String minimalSelectTableQuery;
-    private String singleSelectTableQuery;
+    private String insertQuery;
+    private String selectQuery;
+    private String minimalSelectQuery;
+    private String selectSingleQuery;
     private String selectWithLimitOffsetQuery;
     private String minimalSelectWithLimitOffsetQuery;
     private String selectCountQuery;
     private String selectCountBySiddhiAppNameQuery;
     private String deleteQuery;
-    private String purgeQuery;
     private String deleteBySiddhiAppNameQuery;
+    private String purgeQuery;
 
     public String getDatabaseName() {
         return databaseName;
@@ -53,12 +53,12 @@ public class RDBMSQueryConfigurationEntry {
         this.createTableQuery = createTableQuery;
     }
 
-    public String getInsertTableQuery() {
-        return insertTableQuery;
+    public String getInsertQuery() {
+        return insertQuery;
     }
 
-    public void setInsertTableQuery(String insertTableQuery) {
-        this.insertTableQuery = insertTableQuery;
+    public void setInsertQuery(String insertQuery) {
+        this.insertQuery = insertQuery;
     }
 
     public String getIsTableExistQuery() {
@@ -69,28 +69,28 @@ public class RDBMSQueryConfigurationEntry {
         this.isTableExistQuery = isTableExistQuery;
     }
 
-    public String getSelectTableQuery() {
-        return selectTableQuery;
+    public String getSelectQuery() {
+        return selectQuery;
     }
 
-    public void setSelectTableQuery(String selectTableQuery) {
-        this.selectTableQuery = selectTableQuery;
+    public void setSelectQuery(String selectQuery) {
+        this.selectQuery = selectQuery;
     }
 
-    public String getMinimalSelectTableQuery() {
-        return minimalSelectTableQuery;
+    public String getMinimalSelectQuery() {
+        return minimalSelectQuery;
     }
 
-    public void setMinimalSelectTableQuery(String minimalSelectTableQuery) {
-        this.minimalSelectTableQuery = minimalSelectTableQuery;
+    public void setMinimalSelectQuery(String minimalSelectQuery) {
+        this.minimalSelectQuery = minimalSelectQuery;
     }
 
-    public String getSingleSelectTableQuery() {
-        return singleSelectTableQuery;
+    public String getSelectSingleQuery() {
+        return selectSingleQuery;
     }
 
-    public void setSingleSelectTableQuery(String singleSelectTableQuery) {
-        this.singleSelectTableQuery = singleSelectTableQuery;
+    public void setSelectSingleQuery(String selectSingleQuery) {
+        this.selectSingleQuery = selectSingleQuery;
     }
 
     public String getSelectCountQuery() {

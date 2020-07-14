@@ -148,7 +148,7 @@ public class SiddhiErrorHandlerMicroservice implements ErrorStoreListener, Micro
             if (siddhiAppName != null) {
                 ErrorStoreAccessor.discardErrorEntries(siddhiAppName);
             } else {
-                ErrorStoreAccessor.purgeErrorStore(Collections.emptyMap()); // TODO make this sure
+                ErrorStoreAccessor.purgeErrorStore(Collections.emptyMap()); // TODO retention policy
             }
             ErrorStoreAccessor.discardErrorEntries(siddhiAppName);
             return Response.ok().build();

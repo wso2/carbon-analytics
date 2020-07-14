@@ -139,21 +139,21 @@ public class DBErrorStore extends ErrorStore {
             throw new DatabaseUnsupportedException("The configured database type " +
                 "is not supported with periodic persistence.");
         }
+        executionInfo.setPreparedCheckTableExistenceStatement(databaseQueryEntries.getIsTableExistQuery());
         executionInfo.setPreparedCreateTableStatement(databaseQueryEntries.getCreateTableQuery());
-        executionInfo.setPreparedInsertStatement(databaseQueryEntries.getInsertTableQuery());
-        executionInfo.setPreparedTableExistenceCheckStatement(databaseQueryEntries.getIsTableExistQuery());
-        executionInfo.setPreparedSelectStatement(databaseQueryEntries.getSelectTableQuery());
-        executionInfo.setPreparedMinimalSelectStatement(databaseQueryEntries.getMinimalSelectTableQuery());
-        executionInfo.setPreparedSingleSelectStatement(databaseQueryEntries.getSingleSelectTableQuery());
+        executionInfo.setPreparedInsertStatement(databaseQueryEntries.getInsertQuery());
+        executionInfo.setPreparedSelectStatement(databaseQueryEntries.getSelectQuery());
+        executionInfo.setPreparedMinimalSelectStatement(databaseQueryEntries.getMinimalSelectQuery());
+        executionInfo.setPreparedSelectSingleStatement(databaseQueryEntries.getSelectSingleQuery());
         executionInfo.setPreparedSelectWithLimitOffsetStatement(databaseQueryEntries.getSelectWithLimitOffsetQuery());
         executionInfo.setPreparedMinimalSelectWithLimitOffsetStatement(
             databaseQueryEntries.getMinimalSelectWithLimitOffsetQuery());
-        executionInfo.setPreparedSelectCountFromTableStatement(databaseQueryEntries.getSelectCountQuery());
-        executionInfo.setPreparedSelectCountFromTableBySiddhiAppNameStatement(
+        executionInfo.setPreparedSelectCountStatement(databaseQueryEntries.getSelectCountQuery());
+        executionInfo.setPreparedSelectCountBySiddhiAppNameStatement(
             databaseQueryEntries.getSelectCountBySiddhiAppNameQuery());
         executionInfo.setPreparedDeleteStatement(databaseQueryEntries.getDeleteQuery());
-        executionInfo.setPreparedPurgeStatement(databaseQueryEntries.getPurgeQuery());
         executionInfo.setPreparedDeleteBySiddhiAppNameStatement(databaseQueryEntries.getDeleteBySiddhiAppNameQuery());
+        executionInfo.setPreparedPurgeStatement(databaseQueryEntries.getPurgeQuery());
     }
 
     @Override
@@ -267,7 +267,7 @@ public class DBErrorStore extends ErrorStore {
         try {
             con = datasource.getConnection();
             con.setAutoCommit(false);
-            stmt = con.prepareStatement(executionInfo.getPreparedSingleSelectStatement());
+            stmt = con.prepareStatement(executionInfo.getPreparedSelectSingleStatement());
             stmt.setInt(1, id);
             // Uses the same method without re-inventing the wheel.
             List<ErrorEntry> errorEntry = getErrorEntries(true, con, stmt);
@@ -348,7 +348,7 @@ public class DBErrorStore extends ErrorStore {
         try {
             con = datasource.getConnection();
             con.setAutoCommit(false);
-            stmt = con.prepareStatement(executionInfo.getPreparedSelectCountFromTableStatement());
+            stmt = con.prepareStatement(executionInfo.getPreparedSelectCountStatement());
             try (ResultSet resultSet = stmt.executeQuery()) {
                 con.commit();
                 if (resultSet.next()) {
@@ -372,7 +372,7 @@ public class DBErrorStore extends ErrorStore {
         try {
             con = datasource.getConnection();
             con.setAutoCommit(false);
-            stmt = con.prepareStatement(executionInfo.getPreparedSelectCountFromTableBySiddhiAppNameStatement());
+            stmt = con.prepareStatement(executionInfo.getPreparedSelectCountBySiddhiAppNameStatement());
             stmt.setString(1, siddhiAppName);
             try (ResultSet resultSet = stmt.executeQuery()) {
                 con.commit();

@@ -59,23 +59,18 @@ public class RDBMSConfiguration {
             QueryManager queryManager = new QueryManager(databaseType, databaseVersion,
                     StreamProcessorDataHolder.getInstance().getConfigProvider());
 
-            databaseQueryEntries.setIsTableExistQuery(
-                queryManager.getQuery(SiddhiErrorHandlerConstants.IS_TABLE_EXISTS).
-                    replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
-            databaseQueryEntries.setCreateTableQuery(queryManager.getQuery(
-                SiddhiErrorHandlerConstants.CREATE_TABLE).
+            databaseQueryEntries.setIsTableExistQuery(queryManager.getQuery(SiddhiErrorHandlerConstants.IS_TABLE_EXIST).
                 replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
-            databaseQueryEntries.setInsertTableQuery(queryManager.getQuery(
-                SiddhiErrorHandlerConstants.INSERT_INTO_TABLE).
+            databaseQueryEntries.setCreateTableQuery(queryManager.getQuery(SiddhiErrorHandlerConstants.CREATE_TABLE).
                 replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
-            databaseQueryEntries.setSelectTableQuery(queryManager.getQuery(
-                SiddhiErrorHandlerConstants.SELECT_FROM_TABLE).
+            databaseQueryEntries.setInsertQuery(queryManager.getQuery(SiddhiErrorHandlerConstants.INSERT).
                 replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
-            databaseQueryEntries.setMinimalSelectTableQuery(queryManager.getQuery(
-                SiddhiErrorHandlerConstants.MINIMAL_SELECT_FROM_TABLE).
+            databaseQueryEntries.setSelectQuery(queryManager.getQuery(SiddhiErrorHandlerConstants.SELECT).
                 replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
-            databaseQueryEntries.setSingleSelectTableQuery(queryManager.getQuery(
-                SiddhiErrorHandlerConstants.SINGLE_SELECT_FROM_TABLE).
+            databaseQueryEntries.setMinimalSelectQuery(queryManager.getQuery(
+                SiddhiErrorHandlerConstants.MINIMAL_SELECT).
+                replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setSelectSingleQuery(queryManager.getQuery(SiddhiErrorHandlerConstants.SELECT_SINGLE).
                 replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
             databaseQueryEntries.setSelectWithLimitOffsetQuery(
                 queryManager.getQuery(SiddhiErrorHandlerConstants.SELECT_WITH_LIMIT_OFFSET).
@@ -83,20 +78,18 @@ public class RDBMSConfiguration {
             databaseQueryEntries.setMinimalSelectWithLimitOffsetQuery(
                 queryManager.getQuery(SiddhiErrorHandlerConstants.MINIMAL_SELECT_WITH_LIMIT_OFFSET).
                     replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
-            databaseQueryEntries.setSelectCountQuery(
-                queryManager.getQuery(SiddhiErrorHandlerConstants.SELECT_COUNT_FROM_TABLE).
-                    replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setSelectCountQuery(queryManager.getQuery(SiddhiErrorHandlerConstants.SELECT_COUNT).
+                replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
             databaseQueryEntries.setSelectCountBySiddhiAppNameQuery(
-                queryManager.getQuery(SiddhiErrorHandlerConstants.SELECT_COUNT_FROM_TABLE_BY_SIDDHI_APP).
+                queryManager.getQuery(SiddhiErrorHandlerConstants.SELECT_COUNT_BY_SIDDHI_APP_NAME).
                     replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
-            databaseQueryEntries.setDeleteQuery(
-                queryManager.getQuery(SiddhiErrorHandlerConstants.DELETE_ROW_FROM_TABLE).
+            databaseQueryEntries.setDeleteQuery(queryManager.getQuery(SiddhiErrorHandlerConstants.DELETE).
                 replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
             databaseQueryEntries.setDeleteBySiddhiAppNameQuery(
-                queryManager.getQuery(SiddhiErrorHandlerConstants.DELETE_FROM_TABLE_BY_SIDDHI_APP_NAME).
+                queryManager.getQuery(SiddhiErrorHandlerConstants.DELETE_BY_SIDDHI_APP_NAME).
                     replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
-            databaseQueryEntries.setPurgeQuery(queryManager.getQuery(SiddhiErrorHandlerConstants.PURGE_TABLE).
-                    replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setPurgeQuery(queryManager.getQuery(SiddhiErrorHandlerConstants.PURGE).
+                replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
 
         } catch (QueryMappingNotAvailableException | ConfigurationException | IOException e) {
             throw new DatasourceConfigurationException("Error reading queries for database: " + databaseType + " "

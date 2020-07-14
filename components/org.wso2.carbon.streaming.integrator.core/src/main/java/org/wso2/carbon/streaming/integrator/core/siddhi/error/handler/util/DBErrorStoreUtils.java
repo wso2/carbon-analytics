@@ -47,7 +47,7 @@ public class DBErrorStoreUtils {
                             " when checking persistence table exists", e);
                     return;
                 }
-                try (ResultSet ignored = stmt.executeQuery(executionInfo.getPreparedTableExistenceCheckStatement())) {
+                try (ResultSet ignored = stmt.executeQuery(executionInfo.getPreparedCheckTableExistenceStatement())) {
                     executionInfo.setTableExist(true);
                 } catch (SQLException e) {
                     if (log.isDebugEnabled()) {
