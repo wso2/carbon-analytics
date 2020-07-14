@@ -1,4 +1,4 @@
-queries:
+queries: # TODO purge should accept retention policy
   -
    mappings:
       CREATE_TABLE:
@@ -11,6 +11,9 @@ queries:
       SELECT_WITH_LIMIT_OFFSET:
       MINIMAL_SELECT_WITH_LIMIT_OFFSET:
       DELETE_ROW_FROM_TABLE:
+      SELECT_COUNT_FROM_TABLE_BY_SIDDHI_APP:
+      DELETE_FROM_TABLE_BY_SIDDHI_APP_NAME:
+      PURGE_TABLE:
 
    type: default
    version: default
@@ -43,6 +46,9 @@ queries:
      MINIMAL_SELECT_WITH_LIMIT_OFFSET: SELECT id, timestamp, siddhiAppName, streamName, cause, errorOccurrence, eventType, errorType FROM {{TABLE_NAME}} WHERE siddhiAppName = ? LIMIT ? OFFSET ?
      SELECT_COUNT_FROM_TABLE: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}}
      DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
+     SELECT_COUNT_FROM_TABLE_BY_SIDDHI_APP: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     DELETE_FROM_TABLE_BY_SIDDHI_APP_NAME: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     PURGE_TABLE: DELETE FROM {{TABLE_NAME}}
 
    type: mysql
    version: default

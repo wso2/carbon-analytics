@@ -41,7 +41,10 @@ public class SiddhiErrorHandlerConstants {
     public static final String SELECT_WITH_LIMIT_OFFSET = "SELECT_WITH_LIMIT_OFFSET";
     public static final String MINIMAL_SELECT_WITH_LIMIT_OFFSET = "MINIMAL_SELECT_WITH_LIMIT_OFFSET";
     public static final String SELECT_COUNT_FROM_TABLE = "SELECT_COUNT_FROM_TABLE";
+    public static final String SELECT_COUNT_FROM_TABLE_BY_SIDDHI_APP = "SELECT_COUNT_FROM_TABLE_BY_SIDDHI_APP";
     public static final String DELETE_ROW_FROM_TABLE = "DELETE_ROW_FROM_TABLE";
+    public static final String DELETE_FROM_TABLE_BY_SIDDHI_APP_NAME = "DELETE_FROM_TABLE_BY_SIDDHI_APP_NAME";
+    public static final String PURGE_TABLE = "PURGE_TABLE";
 
     public static final String ID = "id";
     public static final String TIMESTAMP = "timestamp";

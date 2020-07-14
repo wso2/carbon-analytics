@@ -48,7 +48,7 @@ public class RePlayer {
         for (ErrorEntry errorEntry : errorEntries) {
             try {
                 rePlay(errorEntry);
-                errorStore.discardErroneousEvent(errorEntry.getId());
+                errorStore.discardErrorEntry(errorEntry.getId());
             } catch (SiddhiErrorHandlerException | InterruptedException e) {
                 failureCount++;
             }

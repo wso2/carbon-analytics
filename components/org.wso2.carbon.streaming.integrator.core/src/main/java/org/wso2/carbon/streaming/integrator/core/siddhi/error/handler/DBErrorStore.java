@@ -48,7 +48,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -150,7 +149,11 @@ public class DBErrorStore extends ErrorStore {
         executionInfo.setPreparedMinimalSelectWithLimitOffsetStatement(
             databaseQueryEntries.getMinimalSelectWithLimitOffsetQuery());
         executionInfo.setPreparedSelectCountFromTableStatement(databaseQueryEntries.getSelectCountQuery());
+        executionInfo.setPreparedSelectCountFromTableBySiddhiAppNameStatement(
+            databaseQueryEntries.getSelectCountBySiddhiAppNameQuery());
         executionInfo.setPreparedDeleteStatement(databaseQueryEntries.getDeleteQuery());
+        executionInfo.setPreparedPurgeStatement(databaseQueryEntries.getPurgeQuery());
+        executionInfo.setPreparedDeleteBySiddhiAppNameStatement(databaseQueryEntries.getDeleteBySiddhiAppNameQuery());
     }
 
     @Override
@@ -338,7 +341,56 @@ public class DBErrorStore extends ErrorStore {
     }
 
     @Override
-    public void discardErroneousEvent(int id) {
+    public int getTotalErrorEntriesCount() {
+        Connection con = null;
+        PreparedStatement stmt = null;
+        int count = -1;
+        try {
+            con = datasource.getConnection();
+            con.setAutoCommit(false);
+            stmt = con.prepareStatement(executionInfo.getPreparedSelectCountFromTableStatement());
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                con.commit();
+                if (resultSet.next()) {
+                    count = resultSet.getInt(SiddhiErrorHandlerConstants.ENTRIES_COUNT);
+                }
+            }
+        } catch (SQLException e) {
+            log.error(String.format("Error while getting total error entries count of the datasource: %s",
+                datasourceName), e);
+        } finally {
+            DBErrorStoreUtils.cleanupConnections(stmt, con);
+        }
+        return count;
+    }
+
+    @Override
+    public int getErrorEntriesCount(String siddhiAppName) {
+        Connection con = null;
+        PreparedStatement stmt = null;
+        int count = -1;
+        try {
+            con = datasource.getConnection();
+            con.setAutoCommit(false);
+            stmt = con.prepareStatement(executionInfo.getPreparedSelectCountFromTableBySiddhiAppNameStatement());
+            stmt.setString(1, siddhiAppName);
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                con.commit();
+                if (resultSet.next()) {
+                    count = resultSet.getInt(SiddhiErrorHandlerConstants.ENTRIES_COUNT);
+                }
+            }
+        } catch (SQLException e) {
+            log.error(
+                String.format("Error while retrieving error entries count for Siddhi app : %s", siddhiAppName), e);
+        } finally {
+            DBErrorStoreUtils.cleanupConnections(stmt, con);
+        }
+        return count;
+    }
+
+    @Override
+    public void discardErrorEntry(int id) {
         Connection con = null;
         PreparedStatement stmt = null;
         try {
@@ -349,34 +401,45 @@ public class DBErrorStore extends ErrorStore {
             stmt.executeUpdate();
             con.commit();
         } catch (SQLException e) {
-            log.error(String.format("Failed to delete event entry with id: %s.", id), e);
+            log.error(String.format("Failed to delete error entry with id: %s.", id), e);
         } finally {
             DBErrorStoreUtils.cleanupConnections(stmt, con);
         }
     }
 
     @Override
-    public Map<String, String> getStatus() {
-        Map<String, String> status = new HashMap<>();
+    public void discardErrorEntries(String siddhiAppName) {
         Connection con = null;
         PreparedStatement stmt = null;
         try {
             con = datasource.getConnection();
             con.setAutoCommit(false);
-            stmt = con.prepareStatement(executionInfo.getPreparedSelectCountFromTableStatement());
-            try (ResultSet resultSet = stmt.executeQuery()) {
-                con.commit();
-                while (resultSet.next()) {
-                    status.put(SiddhiErrorHandlerConstants.ENTRIES_COUNT,
-                        String.valueOf(resultSet.getInt(SiddhiErrorHandlerConstants.ENTRIES_COUNT)));
-                }
-            }
+            stmt = con.prepareStatement(executionInfo.getPreparedDeleteBySiddhiAppNameStatement());
+            stmt.setString(1, siddhiAppName);
+            stmt.executeUpdate();
+            con.commit();
         } catch (SQLException e) {
-            log.error(String.format("Error while retrieving status of the datasource: %s", datasourceName), e);
+            log.error(String.format("Failed to delete error entries of Siddhi app: %s.", siddhiAppName), e);
         } finally {
             DBErrorStoreUtils.cleanupConnections(stmt, con);
         }
-        return status;
+    }
+
+    @Override
+    public void purge(Map retentionPolicyParams) {
+        Connection con = null;
+        PreparedStatement stmt = null;
+        try {
+            con = datasource.getConnection();
+            con.setAutoCommit(false);
+            stmt = con.prepareStatement(executionInfo.getPreparedPurgeStatement());
+            stmt.executeUpdate();
+            con.commit();
+        } catch (SQLException e) {
+            log.error("Failed to purge the error store.", e);
+        } finally {
+            DBErrorStoreUtils.cleanupConnections(stmt, con);
+        }
     }
 
 }

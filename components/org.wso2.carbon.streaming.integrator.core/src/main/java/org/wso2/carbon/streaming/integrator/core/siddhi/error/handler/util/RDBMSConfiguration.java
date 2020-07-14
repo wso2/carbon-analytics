@@ -86,9 +86,17 @@ public class RDBMSConfiguration {
             databaseQueryEntries.setSelectCountQuery(
                 queryManager.getQuery(SiddhiErrorHandlerConstants.SELECT_COUNT_FROM_TABLE).
                     replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setSelectCountBySiddhiAppNameQuery(
+                queryManager.getQuery(SiddhiErrorHandlerConstants.SELECT_COUNT_FROM_TABLE_BY_SIDDHI_APP).
+                    replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
             databaseQueryEntries.setDeleteQuery(
                 queryManager.getQuery(SiddhiErrorHandlerConstants.DELETE_ROW_FROM_TABLE).
                 replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setDeleteBySiddhiAppNameQuery(
+                queryManager.getQuery(SiddhiErrorHandlerConstants.DELETE_FROM_TABLE_BY_SIDDHI_APP_NAME).
+                    replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
+            databaseQueryEntries.setPurgeQuery(queryManager.getQuery(SiddhiErrorHandlerConstants.PURGE_TABLE).
+                    replace(SiddhiErrorHandlerConstants.PLACEHOLDER_TABLE_NAME, tableName));
 
         } catch (QueryMappingNotAvailableException | ConfigurationException | IOException e) {
             throw new DatasourceConfigurationException("Error reading queries for database: " + databaseType + " "

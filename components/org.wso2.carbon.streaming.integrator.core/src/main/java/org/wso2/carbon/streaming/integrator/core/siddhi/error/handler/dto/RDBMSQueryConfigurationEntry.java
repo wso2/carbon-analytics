@@ -32,7 +32,10 @@ public class RDBMSQueryConfigurationEntry {
     private String selectWithLimitOffsetQuery;
     private String minimalSelectWithLimitOffsetQuery;
     private String selectCountQuery;
+    private String selectCountBySiddhiAppNameQuery;
     private String deleteQuery;
+    private String purgeQuery;
+    private String deleteBySiddhiAppNameQuery;
 
     public String getDatabaseName() {
         return databaseName;
@@ -114,6 +117,14 @@ public class RDBMSQueryConfigurationEntry {
         this.minimalSelectWithLimitOffsetQuery = minimalSelectWithLimitOffsetQuery;
     }
 
+    public String getSelectCountBySiddhiAppNameQuery() {
+        return selectCountBySiddhiAppNameQuery;
+    }
+
+    public void setSelectCountBySiddhiAppNameQuery(String selectCountBySiddhiAppNameQuery) {
+        this.selectCountBySiddhiAppNameQuery = selectCountBySiddhiAppNameQuery;
+    }
+
     public String getDeleteQuery() {
         return deleteQuery;
     }
@@ -122,4 +133,19 @@ public class RDBMSQueryConfigurationEntry {
         this.deleteQuery = deleteQuery;
     }
 
+    public String getPurgeQuery() {
+        return purgeQuery;
+    }
+
+    public void setPurgeQuery(String purgeQuery) {
+        this.purgeQuery = purgeQuery;
+    }
+
+    public String getDeleteBySiddhiAppNameQuery() {
+        return deleteBySiddhiAppNameQuery;
+    }
+
+    public void setDeleteBySiddhiAppNameQuery(String deleteBySiddhiAppNameQuery) {
+        this.deleteBySiddhiAppNameQuery = deleteBySiddhiAppNameQuery;
+    }
 }
