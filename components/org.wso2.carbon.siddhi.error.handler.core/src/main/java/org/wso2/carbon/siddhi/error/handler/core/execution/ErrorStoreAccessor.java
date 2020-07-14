@@ -31,14 +31,47 @@ import java.util.Map;
  * Communicates with the Error Store for Siddhi Error Handler functionalities.
  */
 public class ErrorStoreAccessor {
+    private static final String ERROR_STORE_IS_UNAVAILABLE_MESSAGE = "Error store is unavailable.";
+
     private ErrorStoreAccessor() {
     }
 
-    public static List<ErrorEntry> getErroneousEvents(String siddhiAppName, String limit, String offset)
+    public static int getTotalErrorEntriesCount() throws SiddhiErrorHandlerException {
+        ErrorStore errorStore = SiddhiErrorHandlerDataHolder.getInstance().getErrorStore();
+        if (errorStore != null) {
+            int count = errorStore.getTotalErrorEntriesCount();
+            if (count > -1) {
+                return count;
+            } else {
+                throw new SiddhiErrorHandlerException("Failed to get total error entries count.");
+            }
+        }
+        throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
+    }
+
+    public static int getErrorEntriesCount(String siddhiAppName) throws SiddhiErrorHandlerException {
+        ErrorStore errorStore = SiddhiErrorHandlerDataHolder.getInstance().getErrorStore();
+        if (errorStore != null) {
+            int count = errorStore.getErrorEntriesCount(siddhiAppName);
+            if (count > -1) {
+                return count;
+            } else {
+                throw new SiddhiErrorHandlerException(
+                    String.format("Failed to get error entries count for Siddhi app: %s.", siddhiAppName));
+            }
+        }
+        throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
+    }
+
+    public static List<ErrorEntry> getErrorEntries(String siddhiAppName, String isDescriptive,
+                                                   String limit, String offset)
         throws SiddhiErrorHandlerException {
         ErrorStore errorStore = SiddhiErrorHandlerDataHolder.getInstance().getErrorStore();
         if (errorStore != null) {
             Map<String, String> queryParams = new HashMap<>();
+            if (isDescriptive != null) {
+                queryParams.put("descriptive", isDescriptive);
+            }
             if (limit != null) {
                 queryParams.put("limit", limit);
             }
@@ -47,24 +80,41 @@ public class ErrorStoreAccessor {
             }
             return errorStore.loadErrorEntries(siddhiAppName, queryParams);
         }
-        throw new SiddhiErrorHandlerException("Error store is unavailable.");
+        throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
     }
 
-    public static void discardErroneousEvent(int id) throws SiddhiErrorHandlerException {
+    public static ErrorEntry getErrorEntry(int id) throws SiddhiErrorHandlerException {
         ErrorStore errorStore = SiddhiErrorHandlerDataHolder.getInstance().getErrorStore();
         if (errorStore != null) {
-            errorStore.discardErroneousEvent(id);
+            return errorStore.loadErrorEntry(id);
+        }
+        throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
+    }
+
+    public static void purgeErrorStore(Map retentionPolicyParams) throws SiddhiErrorHandlerException {
+        ErrorStore errorStore = SiddhiErrorHandlerDataHolder.getInstance().getErrorStore();
+        if (errorStore != null) {
+            errorStore.purge(retentionPolicyParams);
         } else {
-            throw new SiddhiErrorHandlerException("Error store is unavailable.");
+            throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
         }
     }
 
-    public static Map<String, String> getStatus() throws SiddhiErrorHandlerException {
+    public static void discardErrorEntry(int id) throws SiddhiErrorHandlerException {
         ErrorStore errorStore = SiddhiErrorHandlerDataHolder.getInstance().getErrorStore();
         if (errorStore != null) {
-            return errorStore.getStatus();
+            errorStore.discardErrorEntry(id);
         } else {
-            throw new SiddhiErrorHandlerException("Error store is unavailable.");
+            throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
+        }
+    }
+
+    public static void discardErrorEntries(String siddhiAppName) throws SiddhiErrorHandlerException {
+        ErrorStore errorStore = SiddhiErrorHandlerDataHolder.getInstance().getErrorStore();
+        if (errorStore != null) {
+            errorStore.discardErrorEntries(siddhiAppName);
+        } else {
+            throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
         }
     }
 }
