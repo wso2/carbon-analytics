@@ -76,47 +76,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     });
                 },
 
-                byteArrayToString: function(byteArray) {
-                    // const extraByteMap = [ 1, 1, 1, 1, 2, 2, 3, 0 ];
-                    // var count = byteArray.length;
-                    // var str = '';
-                    //
-                    // for (var index = 0;index < count;) {
-                    //     var ch = byteArray[index++];
-                    //     if (ch & 0x80) {
-                    //         var extra = extraByteMap[(ch >> 3) & 0x07];
-                    //         if (!(ch & 0x40) || !extra || ((index + extra) > count)) {
-                    //             return null;
-                    //         }
-                    //
-                    //         ch = ch & (0x3F >> extra);
-                    //         for (;extra > 0;extra -= 1) {
-                    //             var chx = byteArray[index++];
-                    //             if ((chx & 0xC0) != 0x80) {
-                    //                 return null;
-                    //             }
-                    //             ch = (ch << 6) | (chx & 0x3F);
-                    //         }
-                    //     }
-                    //
-                    //     str += String.fromCharCode(ch);
-                    // }
-                    //
-                    // return str;
-
-                },
-
-                stringToByteArray: function(string) {
-                    var result = [];
-                    for (var i = 0; i < string.length; i++) {
-                        result.push(string.charCodeAt(i).toString(2));
-                    }
-                    return result;
-                },
-
-                test: function Decodeuint8arr(uint8array){
-            return new TextDecoder("utf-8").decode(uint8array);
-        },
 
                 fetchErrorEntryDetails: function(errorEntryId, serverHost, serverPort, username, password) {
                     var self = this;
@@ -336,35 +295,33 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
 
                 renderOriginalPayload: function(errorEntry) { // TODO uneditable original payload for occurrences other than before source mapping
                     var originalPayload = $('<div><h4>Original Payload</h4></div>');
-                    if (errorEntry.originalPayloadAsBytes) { // TODO bytes to string
-                        originalPayload.append('<div class="payload-content">' +
-                            this.byteArrayToString(errorEntry.originalPayloadAsBytes)+ '</div>');
+                    if (errorEntry.originalPayloadAsBytes) {
+                        originalPayload.append('<div class="payload-content">' + errorEntry.originalPayloadAsBytes +
+                            '</div>');
                     } else {
                         originalPayload.append('<div>Original payload of the event is not available</div>');
                     }
                     return originalPayload;
                 },
 
-                renderReplayButtonInDetailedErrorEntry: function(errorEntry) {
+                renderReplayButtonInDetailedErrorEntry: function(wrappedErrorEntry) {
                     var self = this;
                     var replay = $('<div></div>');
-                    var replayableErrorEntry = errorEntry;
-                    var isReplayPayloadEditable = (errorEntry.eventType === this.PAYLOAD_STRING);
+                    var replayableWrappedErrorEntry = wrappedErrorEntry;
                     replay.append("<button id='replay' type='button' class='btn btn-primary'>Replay</button>");
-                    if (isReplayPayloadEditable) {
-                        // Editable event payload
+                    if (wrappedErrorEntry.isPayloadModifiable) {
+                        // Payload is not modifiable.
                         replay.append('<br/>');
                         replay.append('<textarea id="eventPayload" rows="4" cols="40" class="payload-content">' +
-                            self.byteArrayToString(replayableErrorEntry.eventAsBytes) + '</textarea>');
+                            wrappedErrorEntry.modifiablePayloadString + '</textarea>');
                     }
 
                     replay.find("#replay").click(function() { // TODO disable if server not configured
-                        if (isReplayPayloadEditable) {
+                        if (wrappedErrorEntry.isPayloadModifiable) {
                             // TODO make sure that no worries about mutating the original object
-                            var eventAsString = replay.find("#eventPayload").val();
-                            replayableErrorEntry.eventAsBytes = self.stringToByteArray(eventAsString);
+                            replayableWrappedErrorEntry.modifiablePayloadString = replay.find("#eventPayload").val();
                         }
-                        self.replay([replayableErrorEntry], self.serverHost, self.serverPort, self.serverUsername,
+                        self.replay([replayableWrappedErrorEntry], self.serverHost, self.serverPort, self.serverUsername,
                             self.serverPassword);
                     });
                     return replay;
@@ -391,7 +348,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     }
                 },
 
-                renderDetailedErrorEntry: function(errorEntry) {
+                renderDetailedErrorEntry: function(wrappedErrorEntry) {
+                    var errorEntry = wrappedErrorEntry.errorEntry;
                     var detailedErrorEntryModal = $(
                         '<div class="modal fade" id="' + errorEntry.id + '">' +
                         '<div class="modal-dialog">' +
@@ -425,9 +383,10 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         `<p class="description">Timestamp: ${errorEntry.timestamp} &nbsp; ID: ${errorEntry.id}</p>` +
                         '</div>');
                     modalBody.append('<br/>');
-                    modalBody.append(this.renderReplayButtonInDetailedErrorEntry(errorEntry));
+                    modalBody.append(this.renderReplayButtonInDetailedErrorEntry(wrappedErrorEntry));
                     modalBody.append('<br/>');
-                    if (errorEntry.eventType !== this.PAYLOAD_STRING) {
+                    if (!wrappedErrorEntry.isPayloadModifiable) {
+                        // Payload is not modifiable. Show the original payload, in case if the user wants to refer.
                         modalBody.append(this.renderOriginalPayload(errorEntry));
                         modalBody.append('<br/>');
                     }
