@@ -51,7 +51,7 @@ public class SiddhiErrorHandlerUtils {
                     errorEntries.add(new ErrorEntry(errorEntry.getId(), errorEntry.getTimestamp(),
                         errorEntry.getSiddhiAppName(), errorEntry.getStreamName(),
                         ErrorHandlerUtils.getAsBytes(payloadString),
-                        errorEntry.getCause(), errorEntry.getStackTrace(), errorEntry.getOriginalPayloadAsBytes(),
+                        errorEntry.getCause(), errorEntry.getStackTrace(), errorEntry.getOriginalPayload(),
                         errorEntry.getErrorOccurrence(), errorEntry.getEventType(), errorEntry.getErrorType()));
                 } catch (IOException e) {
                     throw new SiddhiErrorHandlerException(String.format(
