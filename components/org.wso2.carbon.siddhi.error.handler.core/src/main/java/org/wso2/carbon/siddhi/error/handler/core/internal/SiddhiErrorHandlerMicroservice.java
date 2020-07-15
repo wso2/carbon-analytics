@@ -105,7 +105,8 @@ public class SiddhiErrorHandlerMicroservice implements ErrorStoreListener, Micro
     @Produces(MediaType.APPLICATION_JSON)
     public Response getErrorEntry(@PathParam("id") int id) {
         try {
-            return Response.ok().entity(ErrorStoreAccessor.getErrorEntry(id)).type(MediaType.APPLICATION_JSON).build();
+            return Response.ok().entity(ErrorStoreAccessor.getWrappedErrorEntry(id)).type(MediaType.APPLICATION_JSON)
+                .build();
         } catch (SiddhiErrorHandlerException e) {
             logger.error("Failed to get erroneous event.", e);
             return Response.serverError().entity("Failed to get erroneous event.").build();
