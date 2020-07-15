@@ -46,7 +46,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     });
                 },
 
-                // TODO this is hardcoded atm. WOrker should be dynamic
+                // TODO rename this to 'minimal'
                 fetchErrorEntries: function(siddhiAppName, serverHost, serverPort, username, password) {
                     var self = this;
                     var serviceUrl = self.app.config.services.errorHandler.endpoint;
@@ -59,7 +59,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                             'username': username,
                             'password': password
                         },
-                        url: serviceUrl + '/erroneous-events?siddhiApp=' + siddhiAppName, // TODO hardcoded for now
+                        // TODO for now no limit and offset. Need to have it
+                        url: serviceUrl + '/error-entries?siddhiApp=' + siddhiAppName,
                         async: false,
                         success: function (data) {
                             // self._application.utils.errorData = new Map(Object.entries(data));
@@ -70,6 +71,74 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         error: function (e) {
                             alerts.error("Unable to fetch Erroneous Events." +
                                 "Please see the editor console for further information.")
+                            throw "Unable to read errors";
+                        }
+                    });
+                },
+
+                byteArrayToString: function(byteArray) {
+                    // const extraByteMap = [ 1, 1, 1, 1, 2, 2, 3, 0 ];
+                    // var count = byteArray.length;
+                    // var str = '';
+                    //
+                    // for (var index = 0;index < count;) {
+                    //     var ch = byteArray[index++];
+                    //     if (ch & 0x80) {
+                    //         var extra = extraByteMap[(ch >> 3) & 0x07];
+                    //         if (!(ch & 0x40) || !extra || ((index + extra) > count)) {
+                    //             return null;
+                    //         }
+                    //
+                    //         ch = ch & (0x3F >> extra);
+                    //         for (;extra > 0;extra -= 1) {
+                    //             var chx = byteArray[index++];
+                    //             if ((chx & 0xC0) != 0x80) {
+                    //                 return null;
+                    //             }
+                    //             ch = (ch << 6) | (chx & 0x3F);
+                    //         }
+                    //     }
+                    //
+                    //     str += String.fromCharCode(ch);
+                    // }
+                    //
+                    // return str;
+
+                },
+
+                stringToByteArray: function(string) {
+                    var result = [];
+                    for (var i = 0; i < string.length; i++) {
+                        result.push(string.charCodeAt(i).toString(2));
+                    }
+                    return result;
+                },
+
+                test: function Decodeuint8arr(uint8array){
+            return new TextDecoder("utf-8").decode(uint8array);
+        },
+
+                fetchErrorEntryDetails: function(errorEntryId, serverHost, serverPort, username, password) {
+                    var self = this;
+                    var serviceUrl = self.app.config.services.errorHandler.endpoint;
+                    $.ajax({
+                        type: "GET",
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            'serverHost': serverHost,
+                            'serverPort': serverPort,
+                            'username': username,
+                            'password': password
+                        },
+                        url: serviceUrl + '/error-entries/' + errorEntryId,
+                        async: false,
+                        success: function (data) {
+                            // self._application.utils.errorData = new Map(Object.entries(data));
+                            console.log("Detailed Error Entry received", data)
+                            self.renderDetailedErrorEntry(data);
+                        },
+                        error: function (e) {
+                            alerts.error("Unable to fetch Detailed error entry"); // TODO improve
                             throw "Unable to read errors";
                         }
                     });
@@ -267,9 +336,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
 
                 renderOriginalPayload: function(errorEntry) { // TODO uneditable original payload for occurrences other than before source mapping
                     var originalPayload = $('<div><h4>Original Payload</h4></div>');
-                    if (errorEntry.originalPayload) {
-                        originalPayload.append(
-                            '<div class="payload-content">' + errorEntry.originalPayload + '</div>');
+                    if (errorEntry.originalPayloadAsBytes) { // TODO bytes to string
+                        originalPayload.append('<div class="payload-content">' +
+                            this.byteArrayToString(errorEntry.originalPayloadAsBytes)+ '</div>');
                     } else {
                         originalPayload.append('<div>Original payload of the event is not available</div>');
                     }
@@ -286,12 +355,14 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         // Editable event payload
                         replay.append('<br/>');
                         replay.append('<textarea id="eventPayload" rows="4" cols="40" class="payload-content">' +
-                            errorEntry.event + '</textarea>');
+                            self.byteArrayToString(replayableErrorEntry.eventAsBytes) + '</textarea>');
                     }
+
                     replay.find("#replay").click(function() { // TODO disable if server not configured
                         if (isReplayPayloadEditable) {
                             // TODO make sure that no worries about mutating the original object
-                            replayableErrorEntry.event = replay.find("#eventPayload").val(); // TODO confirm this val()
+                            var eventAsString = replay.find("#eventPayload").val();
+                            replayableErrorEntry.eventAsBytes = self.stringToByteArray(eventAsString);
                         }
                         self.replay([replayableErrorEntry], self.serverHost, self.serverPort, self.serverUsername,
                             self.serverPassword);
@@ -387,10 +458,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     });
 
                     errorEntryElement.find("#detailedInfo").click(function() {
-                        self.renderDetailedErrorEntry(errorEntry);
+                        self.fetchErrorEntryDetails(errorEntry.id, self.serverHost, self.serverPort,
+                            self.serverUsername, self.serverPassword);
                     });
-
-
 
                     return errorEntryElement;
                 },
