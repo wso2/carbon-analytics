@@ -22,10 +22,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.wso2.carbon.siddhi.editor.core.exception.ErrorHandlerServiceStubException;
 
-import javax.ws.rs.core.Response;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Interface for services related to deploying siddhi apps of editor.
  */
@@ -34,15 +30,26 @@ public interface ErrorHandlerApiHelperService {
     JsonArray getSiddhiAppList(String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException;
 
-    Map<String, String> getStatus(String hostAndPort, String username, String password)
+    JsonObject getTotalErrorEntriesCount(String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException;
 
-    JsonArray getErrorEntries(String hostAndPort, String username, String password, String siddhiAppName)
+    JsonObject getErrorEntriesCount(String siddhiAppName, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException;
 
-    boolean replay(String hostAndPort, String username, String password, JsonArray payload)
+    JsonArray getMinimalErrorEntries(String siddhiAppName, String limit, String offset, String hostAndPort,
+                                     String username, String password) throws ErrorHandlerServiceStubException;
+
+    JsonObject getDescriptiveErrorEntry(String id, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException;
 
-    Object deleteErroneousEvent(String hostAndPort, String username, String password, String payload)
+    boolean replay(JsonArray payload, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException;
+
+    boolean discardErrorEntry(String id, String hostAndPort, String username, String password)
+        throws ErrorHandlerServiceStubException;
+
+    boolean discardErrorEntries(String siddhiAppName, String hostAndPort, String username, String password)
+        throws ErrorHandlerServiceStubException;
+
+    boolean doPurge(String hostAndPort, String username, String password) throws ErrorHandlerServiceStubException;
 }

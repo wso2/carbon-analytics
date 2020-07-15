@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.errorhandler.util;
 
-import com.google.gson.JsonArray;
 import feign.Response;
 import org.wso2.carbon.siddhi.editor.core.exception.ErrorHandlerServiceStubException;
 
@@ -54,27 +53,52 @@ public class HTTPSClientUtil {
             .doGetSiddhiAppList();
     }
 
-    public static Response doGetStatus(String hostAndPort, String username, String password)
+    public static Response doGetTotalErrorEntriesCount(String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException {
         return ErrorHandlerFactory.getErrorHandlerHttpsClient(generateURL(hostAndPort), username, password)
-            .doGetStatus();
+            .doGetTotalErrorEntriesCount();
     }
 
-    public static Response doGetErrorEntries(String hostAndPort, String username, String password,
-                                             String siddhiAppName) throws ErrorHandlerServiceStubException {
+    public static Response doGetErrorEntriesCount(String siddhiAppName, String hostAndPort, String username,
+                                                  String password)
+        throws ErrorHandlerServiceStubException {
         return ErrorHandlerFactory.getErrorHandlerHttpsClient(generateURL(hostAndPort), username, password)
-            .doGetErrorEntries(siddhiAppName);
+            .doGetErrorEntriesCount(siddhiAppName);
     }
 
-    public static Response doReplay(String hostAndPort, String username, String password, String payload)
+    public static Response doGetMinimalErrorEntries(String siddhiAppName, String limit, String offset,
+                                                    String hostAndPort, String username, String password)
+        throws ErrorHandlerServiceStubException {
+        return ErrorHandlerFactory.getErrorHandlerHttpsClient(generateURL(hostAndPort), username, password)
+            .doGetMinimalErrorEntries(siddhiAppName, limit, offset);
+    }
+
+    public static Response doGetDescriptiveErrorEntry(String id, String hostAndPort, String username, String password)
+        throws ErrorHandlerServiceStubException {
+        return ErrorHandlerFactory.getErrorHandlerHttpsClient(generateURL(hostAndPort), username, password)
+            .doGetDescriptiveErrorEntry(id);
+    }
+
+    public static Response doReplay(String payload, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException {
         return ErrorHandlerFactory.getErrorHandlerHttpsClient(generateURL(hostAndPort), username, password)
             .doReplay(payload);
     }
 
-    public static Response doDeleteErroneousEvent(String hostAndPort, String username, String password,
-                                                  String erroneousEventId) throws ErrorHandlerServiceStubException {
+    public static Response doDiscardErrorEntry(String id, String hostAndPort, String username, String password)
+        throws ErrorHandlerServiceStubException {
         return ErrorHandlerFactory.getErrorHandlerHttpsClient(generateURL(hostAndPort), username, password)
-            .doDeleteErroneousEvent(erroneousEventId);
+            .doDiscardErrorEntry(id);
+    }
+
+    public static Response doDiscardErrorEntries(String siddhiAppName, String hostAndPort, String username,
+                                                 String password) throws ErrorHandlerServiceStubException {
+        return ErrorHandlerFactory.getErrorHandlerHttpsClient(generateURL(hostAndPort), username, password)
+            .doDiscardErrorEntries(siddhiAppName);
+    }
+
+    public static Response doPurge(String hostAndPort, String username, String password)
+        throws ErrorHandlerServiceStubException {
+        return ErrorHandlerFactory.getErrorHandlerHttpsClient(generateURL(hostAndPort), username, password).doPurge();
     }
 }

@@ -67,19 +67,42 @@ public interface ErrorHandlerServiceStub {
     @Headers("Content-Type: application/json; charset=utf-8")
     Response doGetSiddhiAppList() throws ErrorHandlerServiceStubException;
 
-    @RequestLine("GET /error-handler/status")
-    @Headers("Content-Type: application/json; charset=utf-8")
-    Response doGetStatus() throws ErrorHandlerServiceStubException;
+//    @RequestLine("GET /error-handler/status") // TODO remove this
+//    @Headers("Content-Type: application/json; charset=utf-8")
+//    Response doGetStatus() throws ErrorHandlerServiceStubException;
 
-    @RequestLine("GET /error-handler/erroneous-events?siddhiApp={siddhiAppName}")
+    @RequestLine("GET /error-handler/error-entries/count")
     @Headers("Content-Type: application/json; charset=utf-8")
-    Response doGetErrorEntries(@Param("siddhiAppName") String siddhiAppName) throws ErrorHandlerServiceStubException;
+    Response doGetTotalErrorEntriesCount() throws ErrorHandlerServiceStubException;
+
+    @RequestLine("GET /error-handler/error-entries/count?siddhiApp={siddhiAppName}")
+    @Headers("Content-Type: application/json; charset=utf-8")
+    Response doGetErrorEntriesCount(@Param("siddhiAppName") String siddhiAppName)
+        throws ErrorHandlerServiceStubException;
+
+    @RequestLine("GET /error-handler/error-entries?siddhiApp={siddhiAppName}&limit={limit}&offset={offset}")
+    @Headers("Content-Type: application/json; charset=utf-8")
+    Response doGetMinimalErrorEntries(@Param("siddhiAppName") String siddhiAppName, @Param("limit") String limit,
+                                      @Param("offset") String offset) throws ErrorHandlerServiceStubException;
+
+    @RequestLine("GET /error-handler/error-entries/{id}")
+    @Headers("Content-Type: application/json; charset=utf-8")
+    Response doGetDescriptiveErrorEntry(@Param("id") String id) throws ErrorHandlerServiceStubException;
 
     @RequestLine("POST /error-handler")
     @Headers("Content-Type: application/json; charset=utf-8")
     Response doReplay(String payload) throws ErrorHandlerServiceStubException;
 
-    @RequestLine("DELETE /error-handler/erroneous-events/{id}")
+    @RequestLine("DELETE /error-handler/error-entries/{id}")
     @Headers("Content-Type: text/plain; charset=utf-8")
-    Response doDeleteErroneousEvent(@Param("id") String erroneousEventId) throws ErrorHandlerServiceStubException;
+    Response doDiscardErrorEntry(@Param("id") String errorEntryId) throws ErrorHandlerServiceStubException;
+
+    @RequestLine("DELETE /error-handler/error-entries?siddhiApp={siddhiAppName}")
+    @Headers("Content-Type: text/plain; charset=utf-8")
+    Response doDiscardErrorEntries(@Param("siddhiAppName") String siddhiAppName)
+        throws ErrorHandlerServiceStubException;
+
+    @RequestLine("DELETE /error-handler/error-entries")
+    @Headers("Content-Type: text/plain; charset=utf-8")
+    Response doPurge() throws ErrorHandlerServiceStubException; // TODO retention policy?
 }
