@@ -76,6 +76,30 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     });
                 },
 
+                directReplay: function(errorEntryId, serverHost, serverPort, username, password) { // TODO improve name?
+                    var self = this;
+                    var serviceUrl = self.app.config.services.errorHandler.endpoint;
+                    $.ajax({
+                        type: "GET",
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            'serverHost': serverHost,
+                            'serverPort': serverPort,
+                            'username': username,
+                            'password': password
+                        },
+                        url: serviceUrl + '/error-entries/' + errorEntryId,
+                        async: false,
+                        success: function (data) {
+                            console.log("Detailed Error Entry received. Gonna replay", data)
+                            self.replay([data], serverHost, serverPort, username, password);
+                        },
+                        error: function (e) {
+                            alerts.error("Unable to fetch Detailed error entry"); // TODO improve
+                            throw "Unable to read errors";
+                        }
+                    });
+                },
 
                 fetchErrorEntryDetails: function(errorEntryId, serverHost, serverPort, username, password) {
                     var self = this;
@@ -127,6 +151,60 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         error: function (e) {
                             alerts.error("Unable to fetch Erroneous Events." +
                                 "Please see the editor console for further information.")
+                            throw "Unable to read errors";
+                        }
+                    });
+                },
+
+                discardErrorEntry: function(errorEntryId, serverHost, serverPort, username, password) {
+                    var self = this;
+                    var serviceUrl = self.app.config.services.errorHandler.endpoint;
+                    $.ajax({
+                        type: "DELETE",
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            'serverHost': serverHost,
+                            'serverPort': serverPort,
+                            'username': username,
+                            'password': password
+                        },
+                        url: serviceUrl + '/error-entries/' + errorEntryId,
+                        async: false,
+                        success: function (data) {
+                            // self._application.utils.errorData = new Map(Object.entries(data));
+                            // TODO DOESN"T WORK
+                            console.log("Discarded entry with id: " + errorEntryId, data)
+                            self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
+                        },
+                        error: function (e) {
+                            alerts.error("Unable to fetch Detailed error entry"); // TODO improve
+                            throw "Unable to read errors";
+                        }
+                    });
+                },
+
+                discardErrorEntries: function(siddhiAppName, serverHost, serverPort, username, password) {
+                    var self = this;
+                    var serviceUrl = self.app.config.services.errorHandler.endpoint;
+                    $.ajax({
+                        type: "DELETE",
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            'serverHost': serverHost,
+                            'serverPort': serverPort,
+                            'username': username,
+                            'password': password
+                        },
+                        url: serviceUrl + '/error-entries?siddhiApp=' + siddhiAppName,
+                        async: false,
+                        success: function (data) {
+                            // self._application.utils.errorData = new Map(Object.entries(data));
+                            console.log("Discarded entries for Siddhi app: " + siddhiAppName, data)
+                            // TODO is this behaviour correct? or should I optimize it
+                            self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
+                        },
+                        error: function (e) {
+                            alerts.error("Unable to fetch Detailed error entry"); // TODO improve
                             throw "Unable to read errors";
                         }
                     });
@@ -198,50 +276,61 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     this.serverConfigurations.modal('show');
                 },
 
-                renderServerDetails: function(errorContainer) { // TODO this is about to go away
+                generateServerConfiguredDisplay: function() {
                     var self = this;
-                    // TODO beautify
-                    var serverDetails =
-                        $('<div>' +
-                            `<h4>${self.isServerConfigured ? (self.serverHost + ':' + self.serverPort) :
-                                'Not Configured'}</h4>` +
-                            '<button id="configureServer" type="button" class="btn btn-primary">Configure</button>' +
-                            '</div>');
-
-                    serverDetails.find("#configureServer").click(function() { // TODO deactivate button & validate
+                    // Fetch number of total error entries from the error store.
+                    var serviceUrl = self.app.config.services.errorHandler.endpoint;
+                    var totalErrorEntries = -1;
+                    $.ajax({
+                        type: "GET",
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            'serverHost': self.serverHost,
+                            'serverPort': self.serverPort,
+                            'username': self.serverUsername,
+                            'password': self.serverPassword
+                        },
+                        url: serviceUrl + '/error-entries/count',
+                        async: false,
+                        success: function (data) {
+                            console.log("Count received", data)
+                            totalErrorEntries = data.entriesCount;
+                        },
+                        error: function (e) {
+                            alerts.error("Unable to fetch Detailed error entry"); // TODO improve
+                            throw "Unable to read errors";
+                        }
+                    });
+                    var serverConfiguredDisplay = $('<div></div>');
+                    if (totalErrorEntries > -1) {
+                        serverConfiguredDisplay.append(`<h4>${totalErrorEntries} Errors found</h4>`);
+                    }
+                    serverConfiguredDisplay.append(`<h5>${self.serverHost + ':' + self.serverPort}</h5>`);
+                    serverConfiguredDisplay.append(
+                        '<button id="configureServer" type="button" class="btn btn-primary">Configure</button>');
+                    serverConfiguredDisplay.find("#configureServer").click(function() { // TODO deactivate button & validate
                         self.renderServerConfigurations();
                     });
+                    return serverConfiguredDisplay;
+                },
 
+                generateServerNotConfiguredDisplay: function() {
+                    var self = this;
+                    var serverNotConfiguredDisplay = $('<div>' +
+                        '<h4>SI Server has not been configured</h4>' +
+                        '<button id="configureServer" type="button" class="btn btn-primary">Configure</button>' +
+                        '</div>');
+                    serverNotConfiguredDisplay.find("#configureServer").click(function() { // TODO deactivate button & validate
+                        self.renderServerConfigurations();
+                    });
+                    return serverNotConfiguredDisplay;
+                },
+
+                renderServerDetails: function(errorContainer) { // TODO this is about to go away
+                    var self = this;
+                    var serverDetails = self.isServerConfigured ? this.generateServerConfiguredDisplay() :
+                        this.generateServerNotConfiguredDisplay();
                     errorContainer.append(serverDetails);
-
-                    // TODO remove when confirmed
-                    // var self = this;
-                    // var workerConfigurations = $('<div></div>');
-                    // workerConfigurations.append(
-                    //     '<input type="text" id="serverHost" placeholder="Host" value="' +
-                    //     (this.serverHost || '') + '">');
-                    // workerConfigurations.append(
-                    //     '<input type="text" id="serverPort" placeholder="Host" value="' +
-                    //     (this.serverPort || '') + '">');
-                    // workerConfigurations.append(
-                    //     '<input type="text" id="serverUsername" placeholder="Host" value="' +
-                    //     (this.serverUsername || '') + '">');
-                    // workerConfigurations.append(
-                    //     '<input type="password" id="serverPassword" placeholder="Host" value="' +
-                    //     (this.serverPassword || '') + '">');
-                    // workerConfigurations.append(
-                    //     "<button id='configureWorker' type='button' class='btn btn-primary'>Done</button>");
-                    //
-                    // workerConfigurations.find("button").click(function() { // TODO deactivate button & validate
-                    //     self.serverHost = $(this).parent().find("#serverHost").get(0).value;
-                    //     self.serverPort = $(this).parent().find("#serverPort").get(0).value;
-                    //     self.serverUsername = $(this).parent().find("#serverUsername").get(0).value;
-                    //     self.serverPassword = $(this).parent().find("#serverPassword").get(0).value;
-                    //     self.isServerConfigured = true;
-                    //     self.renderContent();
-                    // });
-                    //
-                    // errorContainer.append(workerConfigurations);
                 },
 
                 renderSiddhiAppSelection: function(siddhiAppList, errorContainer) {
@@ -262,7 +351,11 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         })
                         siddhiAppSelection.append(selectInput);
                         siddhiAppSelection.append(
-                            "<button id='getErrorEntries' type='button' class='btn btn-primary'>Search</button>");
+                            "<button id='getErrorEntries' type='button' class='btn btn-primary'>Fetch</button>");
+                        siddhiAppSelection.append(
+                            "<button id='discardErrorEntries' type='button' class='btn btn-default'>" +
+                            "<div class='divider'></div>" +
+                            "Discard Errors</button>");
 
                         siddhiAppSelection.find("select").change(function() {
                             self.selectedSiddhiApp = this.value;
@@ -270,10 +363,18 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                                 .attr('selected', 'selected')
                         });
 
-                        siddhiAppSelection.find("button").click(function() {
+                        siddhiAppSelection.find("#getErrorEntries").click(function() {
                             var siddhiAppName = $(this).parent().find("select").get(0).value;
                             self.selectedSiddhiApp = siddhiAppName;
-                            self.fetchErrorEntries(siddhiAppName, 'localhost', '9444', 'admin', 'admin');
+                            self.fetchErrorEntries(siddhiAppName, self.serverHost, self.serverPort, self.serverUsername,
+                                self.serverPassword);
+                        });
+
+                        siddhiAppSelection.find("#discardErrorEntries").click(function() { // TODO testing now
+                            var siddhiAppName = $(this).parent().find("select").get(0).value;
+                            self.selectedSiddhiApp = siddhiAppName;
+                            self.discardErrorEntries(siddhiAppName, self.serverHost, self.serverPort,
+                                self.serverUsername, self.serverPassword);
                         });
                     } else {
                         siddhiAppSelection.append("<h3>No Siddhi apps found</h3>"); // TODO confirm this
@@ -295,9 +396,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
 
                 renderOriginalPayload: function(errorEntry) { // TODO uneditable original payload for occurrences other than before source mapping
                     var originalPayload = $('<div><h4>Original Payload</h4></div>');
-                    if (errorEntry.originalPayloadAsBytes) {
-                        originalPayload.append('<div class="payload-content">' + errorEntry.originalPayloadAsBytes +
-                            '</div>');
+                    if (errorEntry.originalPayload) {
+                        originalPayload.append('<div class="payload-content">' + errorEntry.originalPayload + '</div>');
                     } else {
                         originalPayload.append('<div>Original payload of the event is not available</div>');
                     }
@@ -407,18 +507,26 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         this.getRenderableCause(errorEntry, true) +
                         `<p class="description">Timestamp: ${errorEntry.timestamp} &nbsp; ID: ${errorEntry.id}</p>` +
                         '<br/>' +
-                        "<button id='replay' type='button' class='btn btn-primary'>Replay</button>" +
+                        "<button id='replay' type='button' class='btn btn-default'>Replay</button>" +
+                        "<div class='divider'></div>" +
                         "<button id='detailedInfo' type='button' class='btn btn-default'>Detailed Info</button>" +
+                        "<div class='divider'></div>" +
+                        "<button id='discard' type='button' class='btn btn-default'>Discard</button>" +
                         '</div>');
 
                     errorEntryElement.find("#replay").click(function() { // TODO disable if server not configured
-                        self.replay([errorEntry], self.serverHost, self.serverPort, self.serverUsername,
+                        self.directReplay(errorEntry.id, self.serverHost, self.serverPort, self.serverUsername,
                             self.serverPassword);
                     });
 
                     errorEntryElement.find("#detailedInfo").click(function() {
                         self.fetchErrorEntryDetails(errorEntry.id, self.serverHost, self.serverPort,
                             self.serverUsername, self.serverPassword);
+                    });
+
+                    errorEntryElement.find("#discard").click(function() { // TODO testing now
+                        self.discardErrorEntry(errorEntry.id, self.serverHost, self.serverPort, self.serverUsername,
+                            self.serverPassword);
                     });
 
                     return errorEntryElement;

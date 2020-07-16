@@ -202,13 +202,27 @@ public class ErrorHandlerApiHelper implements ErrorHandlerApiHelperService {
     @Override
     public boolean discardErrorEntry(String id, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException {
-        return true; // TODO implement
+        feign.Response response = HTTPSClientUtil.doDiscardErrorEntry(id, hostAndPort, username, password);
+        switch (response.status()) {
+            case 200:
+                return true;
+            default:
+                // TODO finalize messages
+                throw new ErrorHandlerServiceStubException("Failed to delete the entry." + response.reason());
+        }
     }
 
     @Override
     public boolean discardErrorEntries(String siddhiAppName, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException {
-        return true; // TODO implement
+        feign.Response response = HTTPSClientUtil.doDiscardErrorEntries(siddhiAppName, hostAndPort, username, password);
+        switch (response.status()) {
+            case 200:
+                return true;
+            default:
+                // TODO finalize messages
+                throw new ErrorHandlerServiceStubException("Failed to delete the entry." + response.reason());
+        }
     }
 
     @Override

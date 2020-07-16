@@ -1971,7 +1971,7 @@ public class EditorMicroservice implements Microservice {
     @Path("/error-handler/error-entries/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response discardErrorEntry(@QueryParam("id") String id, @HeaderParam("serverHost") String host,
+    public Response discardErrorEntry(@PathParam("id") String id, @HeaderParam("serverHost") String host,
                                       @HeaderParam("serverPort") String port, @HeaderParam("username") String username,
                                       @HeaderParam("password") String password) {
         ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
