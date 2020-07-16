@@ -380,6 +380,8 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
             var extensionData = constants.SOURCE_TYPE === type ?
                 this.__expressionData.extensions.source.sources :
                 this.__expressionData.extensions.sink.sinks;
+            var selectedExtension = null;
+
 
             wizardBodyContent.append(`
                 <div style="max-height: ${wizardBodyContent[0].offsetHeight}; overflow: auto" class="content-section">
@@ -400,14 +402,11 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                                     <div style="padding-top: 15px" class="extension-properties">
                                         <div>
                                           ${type === constants.SOURCE_TYPE ? 'Source' : 'Sink'} properties: 
-                                          ${
-                                            Object.keys(config.properties).length !== Object.keys(config.possibleOptions).length ?
-                                                `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-transport-property" type="button" data-toggle="dropdown">
-                                                    <i class="fw fw-add"></i>
-                                                 </button>` : ''
-                                            }
-                                          <div id="extension-options-dropdown" class="dropdown-menu-style hidden" aria-labelledby="">
-                                          </div>
+                                            <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-transport-property" type="button" data-toggle="dropdown">
+                                                <i class="fw fw-add"></i>
+                                            </button>
+                                            <div id="extension-options-dropdown" class="dropdown-menu-style hidden" aria-labelledby="">
+                                            </div>
                                         </div>
                                         <div style="" class="options">
                                         </div>
@@ -425,14 +424,18 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
             });
 
             if (config.type.length > 0) {
-                Object.keys(config.possibleOptions).forEach(function (key) {
-                    if (!config.properties[key]) {
+                selectedExtension = extensionData.find(function (el) {
+                    return el.name === config.type;
+                });
+
+                selectedExtension.parameters.forEach(function (param) {
+                    if (!config.properties[param.name]) {
                         wizardBodyContent.find('#extension-options-dropdown').append(`
                             <a title="" class="dropdown-item" href="#">
                                 <div>
-                                    <div class="option-title">${key}</div><br/>
-                                    <small style="opacity: 0.8">${config.possibleOptions[key].description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}</small><br/>
-                                    <small style="opacity: 0.8"><b>Default Value</b>: ${config.possibleOptions[key].defaultValue}</small>
+                                    <div class="option-title">${param.name}</div><br/>
+                                    <small style="opacity: 0.8">${param.description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}</small><br/>
+                                    <small style="opacity: 0.8"><b>Default Value</b>: ${param.defaultValue}</small>
                                 </div>
                             </a>
                         `)
@@ -463,6 +466,9 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                 Object.keys(config.properties).forEach(function (key) {
                     var optionData = config.properties[key];
                     var name = key.replaceAll(/\./g, '-');
+                    var selectedOption = selectedExtension.parameters.find(function(element) {
+                        return element.name === key;
+                    });
                     wizardBodyContent.find('.extension-properties>.options').append(`
                         <div style="display: flex; margin-bottom: 15px" class="property-option">
                             <div style="width: 100%" class="input-section">
@@ -470,11 +476,11 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                                 <input id="extension-op-${name}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="${key}" type="text" value="${optionData.value}">
                             </div>
                             <div style="display: flex;padding-top: 20px; padding-left: 5px;" class="delete-section">
-                                <a style="margin-right: 5px; color: #333" title="${optionData.description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}">
+                                <a style="margin-right: 5px; color: #333" title="${selectedOption.description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}">
                                     <i class="fw fw-info"></i>    
                                 </a>  
                                 ${
-                                    optionData.optional ?
+                                    selectedOption.optional ?
                                         `<a style="color: #333">
                                             <i id="extension-op-del-${name}" class="fw fw-delete"></i>    
                                          </a>` : ''
@@ -486,9 +492,13 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
 
                 wizardBodyContent.find('#extension-options-dropdown>a').on('click', function (evt) {
                     var optionName = $(evt.currentTarget).find('.option-title').text();
-
-                    config.properties[optionName] = config.possibleOptions[optionName];
-                    config.properties[optionName].value = config.properties[optionName].defaultValue.replaceAll('`', '');
+                    var selectedOption = selectedExtension.parameters.find(function(element) {
+                        return element.name === optionName;
+                    });
+                    
+                    config.properties[optionName] = {};
+                    config.properties[optionName].value = selectedOption.defaultValue;
+                    config.properties[optionName].type = selectedOption.type;
                     self.render();
                 });
             }
@@ -500,15 +510,16 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                 });
 
                 config.properties = {};
-                config.possibleOptions = {};
+                // config.possibleOptions = {};
                 sourceData.parameters
                     .filter(function (el) {
-                        config.possibleOptions[el.name] = el;
+                        // config.possibleOptions[el.name] = el;
                         return !el.optional;
                     })
                     .forEach(function (param) {
-                        param['value'] = param.defaultValue.replaceAll('`', '');
-                        config.properties[param.name] = param;
+                        var paramData = {}
+                        paramData['value'] = param.defaultValue.replaceAll('`', '');
+                        config.properties[param.name] = paramData;
                     });
 
                 self.render();

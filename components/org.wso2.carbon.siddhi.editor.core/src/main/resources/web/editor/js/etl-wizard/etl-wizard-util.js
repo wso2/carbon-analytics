@@ -16,13 +16,21 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil'],
+define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'app/source-editor/completion-engine'],
 
-    function (require, $, _, log, DataMapperUtil) {
+    function (require, $, _, log, DataMapperUtil, CompletionEngine) {
         var isSourceSinkConfigValid = function (sourceConfig) {
+            
+            
             if (sourceConfig.type.length === 0) {
                 return false;
             }
+
+            // var selectedData = selectedExtension = extensionData.find(function (el) {
+            //     return el.name === sourceConfig.type;
+            // });
+
+            // console.log(selectedData);
 
             var hasMatchingType = true;
             Object.keys(sourceConfig.properties)
