@@ -17,9 +17,9 @@
  *  * under the License.
  *
  */
-define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor/completion-engine', 'alerts', 'inputOutputMapper', 'inputOptionConfigurator', 'dataMapper', 'outputConfigurator'],
+define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engine', 'alerts', 'inputOutputMapper', 'inputOptionConfigurator', 'dataMapper', 'outputConfigurator', 'etlWizardUtil'],
 
-    function (require, $, _, log, smartWizard, CompletionEngine, Alerts, InputOutputMapper, InputOptionConfigurator, DataMapper, OutputConfigurator) {
+    function (require, $, _, log, CompletionEngine, Alerts, InputOutputMapper, InputOptionConfigurator, DataMapper, OutputConfigurator, etlWizardUtil) {
 
         /**
          * Constants used by the wizard
@@ -105,6 +105,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             this.__stepIndex = 1;
             this.__substep = 0;
+            this.__steps = [
+                {id: 1, description: 'Data source'},
+                {id: 2, description: 'Data Destination'},
+                {id: 3, description: 'Process Input Data'},
+                {id: 4, description: 'Data Mapping'},
+                {id: 5, description: 'Process Output Data'},
+            ];
             this.__parentWizardForm = this.constructWizardHTMLElements($('#ETLWizardForm').clone());
         };
 
@@ -120,13 +127,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var stepIndex = this.__stepIndex;
             var substep = this.__substep;
             var config = this.__propertyMap;
-            var steps = [
-                {id: 1, description: 'Data source'},
-                {id: 2, description: 'Data Destination'},
-                {id: 3, description: 'Process Input Data'},
-                {id: 4, description: 'Data Mapping'},
-                {id: 5, description: 'Process Output Data'},
-            ];
+            var steps = this.__steps;
 
             wizardHeaderContent.empty();
             wizardFooterContent.empty();
@@ -158,31 +159,103 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             wizardObj.find(`#step-${stepIndex}`).addClass('selected');
 
             wizardObj.find('.next-btn').on('click', function () {
-                if (self.__stepIndex < steps.length) {
-                    if(self.__stepIndex < 3 && self.__substep < 2) {
-                        self.__substep++;
-                    } else {
-                        wizardObj.find(`#step-${self.__stepIndex++}`).removeClass('selected');
-                        wizardObj.find(`#step-${self.__stepIndex}`).addClass('selected');
-                        self.__substep = 0;
-                    }
+                switch (self.__stepIndex) {
+                    case 1:
+                        switch (self.__substep) {
+                            case 0:
+                                if (etlWizardUtil.isSourceSinkConfigValid(config.input.source)) {
+                                    self.incrementStep(wizardObj);
+                                } else {
+                                    Alerts.error('Invalid source configuration please check the all the values are defined properly');
+                                }
+                                break;
+                            case 1:
+                                if(etlWizardUtil.isStreamDefValid(config.input.stream)) {
+                                    self.incrementStep(wizardObj);
+                                } else {
+                                    Alerts.error('Invalid source configuration please check the all the properties are defined properly');
+                                }
+                                break;
+                            case 2:
+                                if(etlWizardUtil.isInputMappingValid(config.input)) {
+                                    self.incrementStep(wizardObj);
+                                } else {
+                                    Alerts.error('Invalid source mapping configuration please check the mapping configuration');
+                                }
+                                break;
+                        }
+                        break;
+                    case 2:
+                        switch (self.__substep) {
+                            case 0:
+                                if (etlWizardUtil.isSourceSinkConfigValid(config.output.sink)) {
+                                    self.incrementStep(wizardObj);
+                                } else {
+                                    Alerts.error('Invalid sink configuration please check the all the values are defined properly');
+                                }
+                                break;
+                            case 1:
+                                if(etlWizardUtil.isStreamDefValid(config.output.stream)) {
+                                    self.incrementStep(wizardObj);
+                                } else {
+                                    Alerts.error('Invalid stream definition please check the all the properties are defined properly');
+                                }
+                                break;
+                            case 2:
+                                if(etlWizardUtil.isOutputMappingValid(config.output)) {
+                                    self.incrementStep(wizardObj);
+                                } else {
+                                    Alerts.error('Invalid sink mapping configuration please check the mapping configuration');
+                                }
+                                break;
+                        }
+                        break;
+                    case 3:
+                        if(etlWizardUtil.areInputOptionsValid(config.query)) {
+                            self.incrementStep(wizardObj);
+                        } else {
+                            Alerts.error('Invalid input option configuration please check the mapping configuration');
+                        }
+                        break;
+                    case 4:
+                        if(etlWizardUtil.validateDataMapping(config)) {
+                            self.incrementStep(wizardObj);
+                        } else {
+                            Alerts.error('Please perform the attribute mapping for all the output attributes');
+                        }
+                        break;
+                    case 5:
+                        if(etlWizardUtil.validateGroupBy(config.query.groupby) && etlWizardUtil.validateAdvancedOutputOptions(config.query.advanced)) {
+                            self.incrementStep(wizardObj);
+                        } else {
+                            Alerts.error('Please recheck the output options before submitting');
+                        }
+                        break;
 
-                    self.render();
                 }
+
             });
 
             wizardObj.find('.back-btn').on('click', function () {
-                if (self.__stepIndex > 0) {
-                    if (self.__stepIndex < 3 && self.__substep > 0) {
-                        self.__substep--;
-                    } else {
-                        wizardObj.find(`#step-${self.__stepIndex--}`).removeClass('selected');
-                        wizardObj.find(`#step-${self.__stepIndex}`).addClass('selected');
-                        self.__substep = 0;
-                    }
+                switch (stepIndex) {
+                    case 1:
+                        self.decrementStep(wizardObj);
+                        break;
+                    case 2:
+                        self.decrementStep(wizardObj);
+                        break;
+                    case 3:
+                        self.decrementStep(wizardObj);
+                        break;
+                    case 4:
+                        self.decrementStep(wizardObj);
+                        break;
+                    case 5:
+                        self.decrementStep(wizardObj);
+                        break;
 
-                    self.render();
                 }
+
             });
 
             wizardHeaderContent.find('.etl-flow-name')
@@ -199,6 +272,36 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             return wizardObj;
         };
+
+        ETLWizard.prototype.incrementStep = function (wizardObj) {
+            var self = this;
+            if (self.__stepIndex < self.__steps.length) {
+                if (self.__stepIndex < 3 && self.__substep < 2) {
+                    self.__substep++;
+                } else {
+                    wizardObj.find(`#step-${self.__stepIndex++}`).removeClass('selected');
+                    wizardObj.find(`#step-${self.__stepIndex}`).addClass('selected');
+                    self.__substep = 0;
+                }
+
+                self.render();
+            }
+        }
+
+        ETLWizard.prototype.decrementStep = function (wizardObj) {
+            var self = this;
+            if (self.__stepIndex > 0) {
+                if (self.__stepIndex < 3 && self.__substep > 0) {
+                    self.__substep--;
+                } else {
+                    wizardObj.find(`#step-${self.__stepIndex--}`).removeClass('selected');
+                    wizardObj.find(`#step-${self.__stepIndex}`).addClass('selected');
+                    self.__substep = 0;
+                }
+
+                self.render();
+            }
+        }
 
         ETLWizard.prototype.render = function () {
             var self = this;
@@ -395,6 +498,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 var sourceData = extensionData.find(function (el) {
                     return el.name === config.type;
                 });
+
                 config.properties = {};
                 config.possibleOptions = {};
                 sourceData.parameters
@@ -424,12 +528,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     }
                 })
                 .on('keyup', _.debounce(function (evt) {
-                    var optionName = evt.currentTarget.id.match('extension-op-([a-zA-Z-]+)')[1].replaceAll(/-/g, '.');
+                    var optionName = evt.currentTarget.id.match('extension-op-([a-zA-Z0-9-]+)')[1].replaceAll(/-/g, '.');
                     config.properties[optionName].value = $(evt.currentTarget).val();
                 }, 100, {}));
 
             wizardBodyContent.find('.property-option>.delete-section>a>.fw-delete').on('click', function (evt) {
-                var optionName = evt.currentTarget.id.match('extension-op-del-([a-zA-Z-]+)')[1].replaceAll(/-/g, '.');
+                var optionName = evt.currentTarget.id.match('extension-op-del-([a-zA-Z0-9-]+)')[1].replaceAll(/-/g, '.');
                 delete config.properties[optionName];
                 self.render();
             });
@@ -440,6 +544,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var config = type === constants.SOURCE_TYPE ?
                 this.__propertyMap.input.stream : this.__propertyMap.output.stream;
             var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY);
+            config.name = config.name.length > 0 ? config.name : (type === constants.SOURCE_TYPE ? 'input_stream' : 'output_stream');
 
             wizardBodyContent.append(`
                 <div style="max-height: ${wizardBodyContent[0].offsetHeight}; overflow: auto" class="content-section">
@@ -450,7 +555,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     <div style="padding-top: 10px">
                         <div>
                             <label for="stream-name-txt">Enter ${type === constants.SOURCE_TYPE ? 'input' : 'output'} stream name</label>
-                            <input id="stream-name-txt" type="text" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" value="${type === constants.SOURCE_TYPE ? 'input_stream' : 'output_stream'}">
+                            <input id="stream-name-txt" type="text" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" value="${config.name}">
                         </div>
                         <div style="padding-top: 10px">
                             <div style="padding-top: 15px" class="attribute-list">
@@ -521,7 +626,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             });
 
             wizardBodyContent.find("#stream-attribute-type-dropdown>a").on('click', function (evt) {
-                var attributeType = evt.currentTarget.id.match('attrib-option-([a-zA-Z-]+)')[1];
+                var attributeType = evt.currentTarget.id.match('attrib-option-([a-zA-Z0-9-]+)')[1];
                 config.attributes.push({name: '', type: attributeType});
                 self.render();
             });
@@ -610,7 +715,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 config.customEnabled = false;
                 config.samplePayload = '';
 
-                mapper.parameters
+                if(mapper.parameters) {
+                    mapper.parameters
                     .filter(function (el) {
                         config.possibleProperties[el.name] = el;
                         return !el.optional;
@@ -619,6 +725,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         el['value'] = el.defaultValue;
                         config.properties[el.name] = el;
                     });
+                }
 
                 var inputOutputMapper = new InputOutputMapper(type, mapperContainer, extensionConfig);
                 inputOutputMapper.render();

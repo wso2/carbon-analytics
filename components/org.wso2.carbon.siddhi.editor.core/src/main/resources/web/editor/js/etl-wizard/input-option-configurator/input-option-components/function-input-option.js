@@ -30,8 +30,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
             var container = this.__container;
             var config = this.__config;
 
-            console.log(config);
-
             container.empty();
             container.append(`
                 <h3 style="margin-top: 0;color: #373737">Function configuration</h3>
@@ -129,7 +127,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                     .on('keyup', _.debounce(function (evt) {
                         var inputId = evt.currentTarget.id.match('function-param-([0-9]+)')[1];
                         config.query.function.parameters[inputId].value = $(evt.currentTarget).val();
-                        console.log(config.query.function);
                     }, 100, {}))
             }
         }

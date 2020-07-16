@@ -59,10 +59,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
 
             var inputOptionSection = $('<div class="input-option-section" style="width: 100%;margin: 15px 0 15px 0;display: flex;flex-direction: column;padding:15px;background-color: rgba(162,162,162,1);"></div>');
 
-
             self.__container.find('.input-option-btn-group>button')
                 .on('click', function (evt) {
-                    // $(evt.currentTarget).attr('disabled', true);
                     var btnType = evt.currentTarget.id.match('btn-add-([a-z]+)')[1];
 
                     if(config.query[btnType]['enable']) {
@@ -82,11 +80,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
 
                     self.render();
                 });
+                
             var containerSection = '';
             if (Object.keys(self.__config.query.filter).length > 0) {
                 containerSection = inputOptionSection.clone();
                 $(container.find('.input-option-container')[0]).append(containerSection);
-                // container.find('#btn-add-filter').attr('disabled', true);
                 var filterComponent = new FilterInputOptionsComponent(containerSection, config);
                 filterComponent.render();
             }
@@ -94,8 +92,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
             if (Object.keys(self.__config.query.window).length > 0) {
                 containerSection = inputOptionSection.clone();
                 $(container.find('.input-option-container')[1]).append(containerSection);
-                // container.find('#btn-add-window').attr('disabled', true);
-                // container.find('#btn-add-function').attr('disabled', true);
                 var windowComponent = new WindowInputOptionsComponent(containerSection, config);
                 windowComponent.render();
             }
@@ -103,8 +99,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
             if (Object.keys(self.__config.query.function).length > 0) {
                 containerSection = inputOptionSection.clone();
                 $(container.find('.input-option-container')[1]).append(containerSection);
-                // container.find('#btn-add-window').attr('disabled', true);
-                // container.find('#btn-add-function').attr('disabled', true);
                 var functionComponent = new FunctionInputOptionComponent(containerSection, config);
                 functionComponent.render();
             }

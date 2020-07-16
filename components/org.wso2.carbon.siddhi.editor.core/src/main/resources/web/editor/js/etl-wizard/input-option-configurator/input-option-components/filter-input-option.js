@@ -40,7 +40,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
             var self = this;
             var container = this.__container;
             var config = this.__config;
-            var expression = this.__expression;
+            var expression = this.__config.query.filter.expression;
             var indexArray = this.__indexArray;
             var focusNodes = this.__focusNodes;
 
@@ -431,7 +431,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
             })
 
             container.find('.expression.focus .fw-clear').on('click', function(evt) {
-                self.__expression = new ScopeModel(['bool']);
+                self.__config.query.filter.expression = new ScopeModel(['bool']);
                 self.render();
             });
 

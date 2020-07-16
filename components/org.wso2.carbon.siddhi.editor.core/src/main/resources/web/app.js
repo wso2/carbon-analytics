@@ -157,6 +157,7 @@ requirejs.config({
         kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog",
         // ETL Wizard Components  <-- start
         etlWizard: "js/etl-wizard/etl-wizard",
+        etlWizardUtil: "js/etl-wizard/etl-wizard-util",
         inputOptionConfigurator: "js/etl-wizard/input-option-configurator/input-option-configurator",
         filterInputOptionComponent: "js/etl-wizard/input-option-configurator/input-option-components/filter-input-option",
         windowInputOptionComponent: "js/etl-wizard/input-option-configurator/input-option-components/window-input-option",

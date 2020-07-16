@@ -70,7 +70,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                         self.render();
                         break;
                     case 'limit':
-                        if (Object.keys(config.query.advanced.offset).length > 0) {
+                        if (Object.keys(config.query.advanced.limit).length > 0) {
                             config.query.advanced.limit={};
                         } else {
                             config.query.advanced.limit['value'] = 0;
@@ -158,6 +158,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                         </div>
                                     </div>
                                 `);
+                            self.__container.find('.rate-container #select-granularity').val(config.query.advanced.ratelimit['granularity'] );
                             break;
                         case 'no-of-events':
                             container.find('.rate-container')
@@ -189,26 +190,27 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                         </div>
                                     </div>
                                 `);
+                            self.__container.find('.rate-container #select-granularity').val(config.query.advanced.ratelimit['granularity'] );
                             break;
                     }
-
                     container.find('.rate-container #txt-rate-val')
                         .on('keyup', function (evt) {
                             config.query.advanced.ratelimit['value'] = $(evt.currentTarget).val();
                         });
 
-                    container.find('.rate-container #select-granularity')
-                        .on('change', function (evt) {
-                            config.query.advanced.ratelimit['granularity'] = $(evt.currentTarget).val();
-                        })
+                    self.__container.find('.rate-container #select-granularity').on('change', function (evt) {
+                        config.query.advanced.ratelimit['granularity'] = $(evt.currentTarget).val();
+                    });
                 }
 
                 container.find('.rate-container #rate-limit-type')
                     .on('change', function (evt) {
+                        config.query.advanced.ratelimit = {};
                         config.query.advanced.ratelimit['type'] = $(evt.currentTarget).val();
 
                         if ($(evt.currentTarget).val() !== 'no-of-events') {
                             config.query.advanced.ratelimit['value'] = 5;
+                            config.query.advanced.ratelimit['granularity'] = 'second';
                         }
                         self.render();
                     });

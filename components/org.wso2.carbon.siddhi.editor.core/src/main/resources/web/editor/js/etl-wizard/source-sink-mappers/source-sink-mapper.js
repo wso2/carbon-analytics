@@ -31,7 +31,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'csvMapper', 'xmlMapper'
 
         SourceSinkMapper.prototype.render  = function () {
             var mapper = null;
-
+            this.__container.empty();
             switch (this.__config.mapping.type) {
                 case 'csv':
                     mapper = new CSVMapper(this.__sourceOrSinkType, this.__container, this.__config);

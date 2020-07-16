@@ -559,7 +559,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             if (selectedCategory === 'Operator') {
                 Object.keys(supportedOperators).forEach(function(key) {
                     if (!(supportedOperators[key].description.toLowerCase().indexOf(selectedFilter) > -1)) {
-                        delete supportedOperators[key];
+                            delete supportedOperators[key];
                     }
                 });
             }
