@@ -1,4 +1,4 @@
-queries: # TODO purge should accept retention policy
+queries:
   -
    mappings:
       CREATE_TABLE:
@@ -32,7 +32,7 @@ queries: # TODO purge should accept retention policy
      DELETE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
      SELECT_COUNT_BY_SIDDHI_APP_NAME: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      DELETE_BY_SIDDHI_APP_NAME: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
-     PURGE: DELETE FROM {{TABLE_NAME}}
+     PURGE: DELETE FROM {{TABLE_NAME}} WHERE timestamp < ?
 
    type: h2
    version: default
@@ -51,7 +51,7 @@ queries: # TODO purge should accept retention policy
      DELETE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
      SELECT_COUNT_BY_SIDDHI_APP_NAME: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      DELETE_BY_SIDDHI_APP_NAME: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
-     PURGE: DELETE FROM {{TABLE_NAME}}
+     PURGE: DELETE FROM {{TABLE_NAME}} WHERE timestamp < ?
 
    type: mysql
    version: default
@@ -70,7 +70,7 @@ queries: # TODO purge should accept retention policy
      DELETE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
      SELECT_COUNT_BY_SIDDHI_APP_NAME: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      DELETE_BY_SIDDHI_APP_NAME: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
-     PURGE: DELETE FROM {{TABLE_NAME}}
+     PURGE: DELETE FROM {{TABLE_NAME}} WHERE timestamp < ?
 
    type: postgresql
    version: default
@@ -89,7 +89,7 @@ queries: # TODO purge should accept retention policy
      DELETE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
      SELECT_COUNT_BY_SIDDHI_APP_NAME: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      DELETE_BY_SIDDHI_APP_NAME: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
-     PURGE: DELETE FROM {{TABLE_NAME}}
+     PURGE: DELETE FROM {{TABLE_NAME}} WHERE timestamp < ?
 
    type: microsoft sql server
    version: default
@@ -108,7 +108,7 @@ queries: # TODO purge should accept retention policy
      DELETE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
      SELECT_COUNT_BY_SIDDHI_APP_NAME: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      DELETE_BY_SIDDHI_APP_NAME: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
-     PURGE: DELETE FROM {{TABLE_NAME}}
+     PURGE: DELETE FROM {{TABLE_NAME}} WHERE timestamp < ?
 
    type: oracle
    version: default
@@ -127,7 +127,7 @@ queries: # TODO purge should accept retention policy
      DELETE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
      SELECT_COUNT_BY_SIDDHI_APP_NAME: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      DELETE_BY_SIDDHI_APP_NAME: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
-     PURGE: DELETE FROM {{TABLE_NAME}}
+     PURGE: DELETE FROM {{TABLE_NAME}} WHERE timestamp < ?
 
    type: db2
    version: default

@@ -63,4 +63,8 @@ public class SiddhiErrorHandlerUtils {
         }
         return errorEntries;
     }
+
+    public static long getRetentionStartTimestamp(long currentTimestamp, int retentionDays) {
+        return currentTimestamp - (1000L * 60 * 60 * 24 * retentionDays);
+    }
 }

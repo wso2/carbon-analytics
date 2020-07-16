@@ -24,6 +24,7 @@ import io.siddhi.core.util.error.handler.util.ErroneousEventType;
 import org.wso2.carbon.siddhi.error.handler.core.exception.SiddhiErrorHandlerException;
 import org.wso2.carbon.siddhi.error.handler.core.internal.SiddhiErrorHandlerDataHolder;
 import org.wso2.carbon.siddhi.error.handler.core.util.ErrorEntryWrapper;
+import org.wso2.carbon.siddhi.error.handler.core.util.SiddhiErrorHandlerUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -104,9 +105,14 @@ public class ErrorStoreAccessor {
         throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
     }
 
-    public static void purgeErrorStore(Map retentionPolicyParams) throws SiddhiErrorHandlerException {
+    public static void purgeErrorStore(String retentionDays) throws SiddhiErrorHandlerException {
         ErrorStore errorStore = SiddhiErrorHandlerDataHolder.getInstance().getErrorStore();
         if (errorStore != null) {
+            long currentTimestamp = System.currentTimeMillis();
+            long retentionStartTimestamp = SiddhiErrorHandlerUtils
+                .getRetentionStartTimestamp(currentTimestamp, Integer.parseInt(retentionDays));
+            Map<String, String> retentionPolicyParams = new HashMap<>();
+            retentionPolicyParams.put("retentionStartTimestamp", String.valueOf(retentionStartTimestamp));
             errorStore.purge(retentionPolicyParams);
         } else {
             throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
