@@ -157,6 +157,16 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     });
                 },
 
+                replayErrorEntries: function(siddhiAppName, serverHost, serverPort, username, password) {
+                    var self = this;
+                    this.errorEntries.forEach(function (errorEntry) {
+                        // TODO hide all entries until this completes
+                        self.directReplay(errorEntry.id, serverHost, serverPort, username, password);
+                    });
+                    console.log("replay all finished")
+                    self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
+                },
+
                 discardErrorEntry: function(errorEntryId, serverHost, serverPort, username, password) {
                     var self = this;
                     var serviceUrl = self.app.config.services.errorHandler.endpoint;
@@ -226,7 +236,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         '</div>' +
                         '<div id="serverConfigurationsModalBody" class="modal-body">' +
                         '</div>' +
-                        '<div class="modal-footer">' +
+                        '<div class="modal-footer" style="padding-right: 20px; margin-right: 30px">' +
                         '<button id="applyWorkerConfigurations" type="button" class="btn btn-primary">' +
                         "Connect</button>" +
                         "<div class='divider'></div>" +
@@ -238,6 +248,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
 
                     var modalBody = serverConfigurationsModal.find("#serverConfigurationsModalBody");
 
+                    var serverPropertiesBlock =
+                        $('<div class="error-handler-dialog-form-block" ' +
+                            'style="margin-right: 30px; margin-left: 30px; width: auto; overflow: auto"></div>');
                     var serverProperties = $('<div class="server-properties-clearfix"></div>');
                     serverProperties.append('<div class="server-property">' +
                         '<label class="clearfix">Host</label>' +
@@ -259,8 +272,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         '<input type="password" id="serverPassword" placeholder="admin"' +
                         ' class="configure-server-input" value="' + (this.serverPassword || '') + '">' +
                         '</div>');
-                    modalBody.append(serverProperties);
-                    modalBody.append('<br/>');
+                    serverPropertiesBlock.append(serverProperties);
+                    modalBody.append(serverPropertiesBlock);
+                    // modalBody.append('<br/>');
 
                     // TODO deactivate button & validate
                     serverConfigurationsModal.find("#applyWorkerConfigurations").click(function() {
@@ -355,8 +369,10 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                             "<button id='getErrorEntries' type='button' class='btn btn-primary'>Fetch</button>");
                         siddhiAppSelection.append("<div class='divider'></div>");
                         siddhiAppSelection.append(
-                            "<button id='discardErrorEntries' type='button' class='btn btn-default'>" +
-                            "Discard All</button>");
+                            "<button id='discardAll' type='button' class='btn btn-default'>Discard All</button>");
+                        siddhiAppSelection.append("<div class='divider'></div>");
+                        siddhiAppSelection.append(
+                            "<button id='replayAll' type='button' class='btn btn-default'>Replay All</button>");
 
                         siddhiAppSelection.find("select").change(function() {
                             self.selectedSiddhiApp = this.value;
@@ -371,10 +387,17 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                                 self.serverPassword);
                         });
 
-                        siddhiAppSelection.find("#discardErrorEntries").click(function() {
+                        siddhiAppSelection.find("#discardAll").click(function() {
                             var siddhiAppName = $(this).parent().find("select").get(0).value;
                             self.selectedSiddhiApp = siddhiAppName;
                             self.discardErrorEntries(siddhiAppName, self.serverHost, self.serverPort,
+                                self.serverUsername, self.serverPassword);
+                        });
+
+                        siddhiAppSelection.find("#replayAll").click(function() {
+                            var siddhiAppName = $(this).parent().find("select").get(0).value;
+                            self.selectedSiddhiApp = siddhiAppName;
+                            self.replayErrorEntries(siddhiAppName, self.serverHost, self.serverPort,
                                 self.serverUsername, self.serverPassword);
                         });
                     } else {
@@ -409,13 +432,13 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     var self = this;
                     var replay = $('<div></div>');
                     var replayableWrappedErrorEntry = wrappedErrorEntry;
-                    replay.append("<button id='replay' type='button' class='btn btn-primary'>Replay</button>");
                     if (wrappedErrorEntry.isPayloadModifiable) {
                         // Payload is not modifiable.
-                        replay.append('<br/>');
                         replay.append('<textarea id="eventPayload" rows="4" cols="40" class="payload-content">' +
                             wrappedErrorEntry.modifiablePayloadString + '</textarea>');
+                        replay.append('<br/>');
                     }
+                    replay.append("<button id='replay' type='button' class='btn btn-primary'>Replay</button>");
 
                     replay.find("#replay").click(function() { // TODO disable if server not configured
                         if (wrappedErrorEntry.isPayloadModifiable) {
