@@ -1547,5 +1547,29 @@
         "lookupRegex": "siddhi([_-])store([_-])influxdb([_-])2.0.0.jar"
       }
     ]
+  },
+  "azuredatalake": {
+    "extension": {
+      "name": "azuredatalake",
+      "displayName": "Azure Data Lake",
+      "version": "1.0.0"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-azuredatalake",
+        "version": "1.0.0",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/azuredatalake/siddhi-io-azuredatalake/1.0.0/siddhi-io-azuredatalake-1.0.0.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])azuredatalake([_-])1.0.0.jar"
+      }
+    ]
   }
 }
