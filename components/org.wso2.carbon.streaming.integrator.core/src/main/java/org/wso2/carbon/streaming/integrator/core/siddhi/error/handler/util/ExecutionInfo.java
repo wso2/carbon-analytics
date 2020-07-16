@@ -23,13 +23,19 @@ package org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.util;
  */
 public class ExecutionInfo {
 
-    private String preparedTableExistenceCheckStatement;
+    private String preparedCheckTableExistenceStatement;
     private String preparedCreateTableStatement;
     private String preparedInsertStatement;
     private String preparedSelectStatement;
+    private String preparedMinimalSelectStatement;
+    private String preparedSelectSingleStatement;
     private String preparedSelectWithLimitOffsetStatement;
-    private String preparedSelectCountFromTableStatement;
+    private String preparedMinimalSelectWithLimitOffsetStatement;
+    private String preparedSelectCountStatement;
+    private String preparedSelectCountBySiddhiAppNameStatement;
     private String preparedDeleteStatement;
+    private String preparedDeleteBySiddhiAppNameStatement;
+    private String preparedPurgeStatement;
 
     private boolean tableExist = false;
 
@@ -49,12 +55,12 @@ public class ExecutionInfo {
         this.preparedCreateTableStatement = preparedCreateTableStatement;
     }
 
-    public String getPreparedTableExistenceCheckStatement() {
-        return preparedTableExistenceCheckStatement;
+    public String getPreparedCheckTableExistenceStatement() {
+        return preparedCheckTableExistenceStatement;
     }
 
-    public void setPreparedTableExistenceCheckStatement(String preparedTableExistenceCheckStatement) {
-        this.preparedTableExistenceCheckStatement = preparedTableExistenceCheckStatement;
+    public void setPreparedCheckTableExistenceStatement(String preparedCheckTableExistenceStatement) {
+        this.preparedCheckTableExistenceStatement = preparedCheckTableExistenceStatement;
     }
 
     public String getPreparedSelectStatement() {
@@ -65,6 +71,22 @@ public class ExecutionInfo {
         this.preparedSelectStatement = preparedSelectStatement;
     }
 
+    public String getPreparedMinimalSelectStatement() {
+        return preparedMinimalSelectStatement;
+    }
+
+    public void setPreparedMinimalSelectStatement(String preparedMinimalSelectStatement) {
+        this.preparedMinimalSelectStatement = preparedMinimalSelectStatement;
+    }
+
+    public String getPreparedSelectSingleStatement() {
+        return preparedSelectSingleStatement;
+    }
+
+    public void setPreparedSelectSingleStatement(String preparedSelectSingleStatement) {
+        this.preparedSelectSingleStatement = preparedSelectSingleStatement;
+    }
+
     public String getPreparedSelectWithLimitOffsetStatement() {
         return preparedSelectWithLimitOffsetStatement;
     }
@@ -73,12 +95,28 @@ public class ExecutionInfo {
         this.preparedSelectWithLimitOffsetStatement = preparedSelectWithLimitOffsetStatement;
     }
 
-    public String getPreparedSelectCountFromTableStatement() {
-        return preparedSelectCountFromTableStatement;
+    public String getPreparedMinimalSelectWithLimitOffsetStatement() {
+        return preparedMinimalSelectWithLimitOffsetStatement;
     }
 
-    public void setPreparedSelectCountFromTableStatement(String preparedSelectCountFromTableStatement) {
-        this.preparedSelectCountFromTableStatement = preparedSelectCountFromTableStatement;
+    public void setPreparedMinimalSelectWithLimitOffsetStatement(String preparedMinimalSelectWithLimitOffsetStatement) {
+        this.preparedMinimalSelectWithLimitOffsetStatement = preparedMinimalSelectWithLimitOffsetStatement;
+    }
+
+    public String getPreparedSelectCountStatement() {
+        return preparedSelectCountStatement;
+    }
+
+    public void setPreparedSelectCountStatement(String preparedSelectCountStatement) {
+        this.preparedSelectCountStatement = preparedSelectCountStatement;
+    }
+
+    public String getPreparedSelectCountBySiddhiAppNameStatement() {
+        return preparedSelectCountBySiddhiAppNameStatement;
+    }
+
+    public void setPreparedSelectCountBySiddhiAppNameStatement(String preparedSelectCountBySiddhiAppNameStatement) {
+        this.preparedSelectCountBySiddhiAppNameStatement = preparedSelectCountBySiddhiAppNameStatement;
     }
 
     public String getPreparedDeleteStatement() {
@@ -87,6 +125,22 @@ public class ExecutionInfo {
 
     public void setPreparedDeleteStatement(String preparedDeleteStatement) {
         this.preparedDeleteStatement = preparedDeleteStatement;
+    }
+
+    public String getPreparedPurgeStatement() {
+        return preparedPurgeStatement;
+    }
+
+    public void setPreparedPurgeStatement(String preparedPurgeStatement) {
+        this.preparedPurgeStatement = preparedPurgeStatement;
+    }
+
+    public String getPreparedDeleteBySiddhiAppNameStatement() {
+        return preparedDeleteBySiddhiAppNameStatement;
+    }
+
+    public void setPreparedDeleteBySiddhiAppNameStatement(String preparedDeleteBySiddhiAppNameStatement) {
+        this.preparedDeleteBySiddhiAppNameStatement = preparedDeleteBySiddhiAppNameStatement;
     }
 
     public boolean isTableExist() {

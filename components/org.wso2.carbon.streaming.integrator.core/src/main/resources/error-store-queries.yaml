@@ -2,90 +2,132 @@ queries:
   -
    mappings:
       CREATE_TABLE:
-      INSERT_INTO_TABLE:
-      IS_TABLE_EXISTS:
-      SELECT_FROM_TABLE:
-      SELECT_COUNT_FROM_TABLE:
+      INSERT:
+      IS_TABLE_EXIST:
+      SELECT:
+      MINIMAL_SELECT:
+      SELECT_SINGLE:
+      SELECT_COUNT:
       SELECT_WITH_LIMIT_OFFSET:
-      DELETE_ROW_FROM_TABLE:
+      MINIMAL_SELECT_WITH_LIMIT_OFFSET:
+      DELETE:
+      SELECT_COUNT_BY_SIDDHI_APP_NAME:
+      DELETE_BY_SIDDHI_APP_NAME:
+      PURGE:
 
    type: default
    version: default
 
   -
    mappings:
-     IS_TABLE_EXISTS: SELECT * FROM {{TABLE_NAME}} limit 1
+     IS_TABLE_EXIST: SELECT * FROM {{TABLE_NAME}} limit 1
      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL AUTO_INCREMENT, timestamp BIGINT, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event LONGBLOB, cause VARCHAR(255), stackTrace LONGBLOB, originalPayload LONGBLOB, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50), PRIMARY KEY (id))
-     INSERT_INTO_TABLE: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-     SELECT_FROM_TABLE: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     INSERT: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     SELECT: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     SELECT_SINGLE: SELECT * FROM {{TABLE_NAME}} WHERE id = ?
+     MINIMAL_SELECT: SELECT id, timestamp, siddhiAppName, streamName, cause, errorOccurrence, eventType, errorType FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      SELECT_WITH_LIMIT_OFFSET: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ? limit ? offset ?
-     SELECT_COUNT_FROM_TABLE: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}}
-     DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
+     MINIMAL_SELECT_WITH_LIMIT_OFFSET: SELECT id, timestamp, siddhiAppName, streamName, cause, errorOccurrence, eventType, errorType FROM {{TABLE_NAME}} WHERE siddhiAppName = ? limit ? offset ?
+     SELECT_COUNT: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}}
+     DELETE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
+     SELECT_COUNT_BY_SIDDHI_APP_NAME: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     DELETE_BY_SIDDHI_APP_NAME: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     PURGE: DELETE FROM {{TABLE_NAME}} WHERE timestamp < ?
 
    type: h2
    version: default
 
   -
    mappings:
-     IS_TABLE_EXISTS: SELECT * FROM {{TABLE_NAME}} limit 1
+     IS_TABLE_EXIST: SELECT * FROM {{TABLE_NAME}} limit 1
      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL AUTO_INCREMENT, timestamp BIGINT, siddhiAppName VARCHAR (100), streamName VARCHAR(100), event LONGBLOB, cause VARCHAR(255), stackTrace LONGBLOB, originalPayload LONGBLOB, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50), PRIMARY KEY (id))
-     INSERT_INTO_TABLE: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-     SELECT_FROM_TABLE: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     INSERT: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     SELECT: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     SELECT_SINGLE: SELECT * FROM {{TABLE_NAME}} WHERE id = ?
+     MINIMAL_SELECT: SELECT id, timestamp, siddhiAppName, streamName, cause, errorOccurrence, eventType, errorType FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      SELECT_WITH_LIMIT_OFFSET: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ? LIMIT ? OFFSET ?
-     SELECT_COUNT_FROM_TABLE: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}}
-     DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
+     MINIMAL_SELECT_WITH_LIMIT_OFFSET: SELECT id, timestamp, siddhiAppName, streamName, cause, errorOccurrence, eventType, errorType FROM {{TABLE_NAME}} WHERE siddhiAppName = ? LIMIT ? OFFSET ?
+     SELECT_COUNT: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}}
+     DELETE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
+     SELECT_COUNT_BY_SIDDHI_APP_NAME: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     DELETE_BY_SIDDHI_APP_NAME: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     PURGE: DELETE FROM {{TABLE_NAME}} WHERE timestamp < ?
 
    type: mysql
    version: default
 
   -
    mappings:
-     IS_TABLE_EXISTS: SELECT 1 FROM {{TABLE_NAME}} LIMIT 1
+     IS_TABLE_EXIST: SELECT 1 FROM {{TABLE_NAME}} LIMIT 1
      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id serial primary key, timestamp bigint, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event bigint, cause VARCHAR(255), stackTrace bigint, originalPayload bigint, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50))
-     INSERT_INTO_TABLE: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-     SELECT_FROM_TABLE: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     INSERT: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     SELECT: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     SELECT_SINGLE: SELECT * FROM {{TABLE_NAME}} WHERE id = ?
+     MINIMAL_SELECT: SELECT id, timestamp, siddhiAppName, streamName, cause, errorOccurrence, eventType, errorType FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      SELECT_WITH_LIMIT_OFFSET: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ? LIMIT ? OFFSET ?
-     SELECT_COUNT_FROM_TABLE: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}}
-     DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
+     MINIMAL_SELECT_WITH_LIMIT_OFFSET: SELECT id, timestamp, siddhiAppName, streamName, cause, errorOccurrence, eventType, errorType FROM {{TABLE_NAME}} WHERE siddhiAppName = ? LIMIT ? OFFSET ?
+     SELECT_COUNT: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}}
+     DELETE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
+     SELECT_COUNT_BY_SIDDHI_APP_NAME: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     DELETE_BY_SIDDHI_APP_NAME: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     PURGE: DELETE FROM {{TABLE_NAME}} WHERE timestamp < ?
 
    type: postgresql
    version: default
 
   -
    mappings:
-     IS_TABLE_EXISTS: SELECT TOP 1 1 FROM {{TABLE_NAME}}
+     IS_TABLE_EXIST: SELECT TOP 1 1 FROM {{TABLE_NAME}}
      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL IDENTITY(1,1) PRIMARY KEY, timestamp bigint, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event VARBINARY(max), cause VARCHAR(255), stackTrace VARBINARY(max), originalPayload VARBINARY(max), errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50))
-     INSERT_INTO_TABLE: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-     SELECT_FROM_TABLE: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     INSERT: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     SELECT: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     SELECT_SINGLE: SELECT * FROM {{TABLE_NAME}} WHERE id = ?
+     MINIMAL_SELECT: SELECT id, timestamp, siddhiAppName, streamName, cause, errorOccurrence, eventType, errorType FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      SELECT_WITH_LIMIT_OFFSET: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ? OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
-     SELECT_COUNT_FROM_TABLE: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}}
-     DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
+     MINIMAL_SELECT_WITH_LIMIT_OFFSET: SELECT id, timestamp, siddhiAppName, streamName, cause, errorOccurrence, eventType, errorType FROM {{TABLE_NAME}} WHERE siddhiAppName = ? OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+     SELECT_COUNT: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}}
+     DELETE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
+     SELECT_COUNT_BY_SIDDHI_APP_NAME: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     DELETE_BY_SIDDHI_APP_NAME: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     PURGE: DELETE FROM {{TABLE_NAME}} WHERE timestamp < ?
 
    type: microsoft sql server
    version: default
 
   -
    mappings:
-     IS_TABLE_EXISTS: SELECT 1 FROM {{TABLE_NAME}} WHERE rownum=1
+     IS_TABLE_EXIST: SELECT 1 FROM {{TABLE_NAME}} WHERE rownum=1
      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id NUMBER(10) NOT NULL, timestamp LONG, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event BLOB, cause VARCHAR(255), stackTrace BLOB, originalPayload BLOB, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50)); ALTER TABLE {{TABLE_NAME}} ADD (CONSTRAINT err_store_pk PRIMARY KEY (id)); CREATE SEQUENCE err_store_seq START WITH 1;
-     INSERT_INTO_TABLE: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-     SELECT_FROM_TABLE: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     INSERT: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     SELECT: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     SELECT_SINGLE: SELECT * FROM {{TABLE_NAME}} WHERE id = ?
+     MINIMAL_SELECT: SELECT id, timestamp, siddhiAppName, streamName, cause, errorOccurrence, eventType, errorType FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      SELECT_WITH_LIMIT_OFFSET: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ? OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
-     SELECT_COUNT_FROM_TABLE: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}}
-     DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
+     MINIMAL_SELECT_WITH_LIMIT_OFFSET: SELECT id, timestamp, siddhiAppName, streamName, cause, errorOccurrence, eventType, errorType FROM {{TABLE_NAME}} WHERE siddhiAppName = ? OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+     SELECT_COUNT: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}}
+     DELETE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
+     SELECT_COUNT_BY_SIDDHI_APP_NAME: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     DELETE_BY_SIDDHI_APP_NAME: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     PURGE: DELETE FROM {{TABLE_NAME}} WHERE timestamp < ?
 
    type: oracle
    version: default
 
   -
    mappings:
-     IS_TABLE_EXISTS: SELECT * FROM {{TABLE_NAME}} FETCH FIRST 1 ROWS ONLY
+     IS_TABLE_EXIST: SELECT * FROM {{TABLE_NAME}} FETCH FIRST 1 ROWS ONLY
      CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INTEGER GENERATED BY DEFAULT AS IDENTITY NOT NULL, timestamp BIGINT, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event BLOB(2000000000), cause VARCHAR(255), stackTrace BLOB(2000000000), originalPayload BLOB(2000000000), errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50), PRIMARY KEY (id))
-     INSERT_INTO_TABLE: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-     SELECT_FROM_TABLE: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     INSERT: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     SELECT: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     SELECT_SINGLE: SELECT * FROM {{TABLE_NAME}} WHERE id = ?
+     MINIMAL_SELECT: SELECT id, timestamp, siddhiAppName, streamName, cause, errorOccurrence, eventType, errorType FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      SELECT_WITH_LIMIT_OFFSET: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ? LIMIT ? OFFSET ?
-     SELECT_COUNT_FROM_TABLE: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}}
-     DELETE_ROW_FROM_TABLE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
+     MINIMAL_SELECT_WITH_LIMIT_OFFSET: SELECT id, timestamp, siddhiAppName, streamName, cause, errorOccurrence, eventType, errorType FROM {{TABLE_NAME}} WHERE siddhiAppName = ? LIMIT ? OFFSET ?
+     SELECT_COUNT: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}}
+     DELETE: DELETE FROM {{TABLE_NAME}} WHERE id = ?
+     SELECT_COUNT_BY_SIDDHI_APP_NAME: SELECT COUNT(*) AS entriesCount FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     DELETE_BY_SIDDHI_APP_NAME: DELETE FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
+     PURGE: DELETE FROM {{TABLE_NAME}} WHERE timestamp < ?
 
    type: db2
    version: default
