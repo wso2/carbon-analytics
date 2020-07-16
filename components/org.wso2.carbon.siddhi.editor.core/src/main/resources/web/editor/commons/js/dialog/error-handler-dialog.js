@@ -20,6 +20,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
 
                 // TODO this is hardcoded atm. WOrker should be dynamic
                 fetchSiddhiApps: function(serverHost, serverPort, username, password) {
+                    // TODO test: server down, error handler is requested in menu
                     var self = this;
                     var serviceUrl = self.app.config.services.errorHandler.endpoint;
                     $.ajax({
@@ -171,8 +172,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         url: serviceUrl + '/error-entries/' + errorEntryId,
                         async: false,
                         success: function (data) {
-                            // self._application.utils.errorData = new Map(Object.entries(data));
-                            // TODO DOESN"T WORK
                             console.log("Discarded entry with id: " + errorEntryId, data)
                             self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
                         },
@@ -228,6 +227,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         '<div id="serverConfigurationsModalBody" class="modal-body">' +
                         '</div>' +
                         '<div class="modal-footer">' +
+                        '<button id="applyWorkerConfigurations" type="button" class="btn btn-primary">' +
+                        "Connect</button>" +
+                        "<div class='divider'></div>" +
                         '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
                         '</div>' +
                         '</div>' +
@@ -235,7 +237,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         '</div>');
 
                     var modalBody = serverConfigurationsModal.find("#serverConfigurationsModalBody");
-
 
                     var serverProperties = $('<div class="server-properties-clearfix"></div>');
                     serverProperties.append('<div class="server-property">' +
@@ -260,14 +261,13 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         '</div>');
                     modalBody.append(serverProperties);
                     modalBody.append('<br/>');
-                    modalBody.append(
-                        "<button id='applyWorkerConfigurations' type='button' class='btn btn-primary'>Done</button>");
 
-                    modalBody.find("#applyWorkerConfigurations").click(function() { // TODO deactivate button & validate
-                        self.serverHost = $(this).parent().find("#serverHost").val();
-                        self.serverPort = $(this).parent().find("#serverPort").val();
-                        self.serverUsername = $(this).parent().find("#serverUsername").val();
-                        self.serverPassword = $(this).parent().find("#serverPassword").val();
+                    // TODO deactivate button & validate
+                    serverConfigurationsModal.find("#applyWorkerConfigurations").click(function() {
+                        self.serverHost = serverProperties.find("#serverHost").val();
+                        self.serverPort = serverProperties.find("#serverPort").val();
+                        self.serverUsername = serverProperties.find("#serverUsername").val();
+                        self.serverPassword = serverProperties.find("#serverPassword").val();
                         self.isServerConfigured = true;
                         self.renderContent();
                     });
@@ -317,8 +317,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                 generateServerNotConfiguredDisplay: function() {
                     var self = this;
                     var serverNotConfiguredDisplay = $('<div>' +
-                        '<h4>SI Server has not been configured</h4>' +
-                        '<button id="configureServer" type="button" class="btn btn-primary">Configure</button>' +
+                        '<h4>SI Server has not been specified</h4>' +
+                        '<button id="configureServer" type="button" class="btn btn-primary">' +
+                        'Connect to Server</button>' +
                         '</div>');
                     serverNotConfiguredDisplay.find("#configureServer").click(function() { // TODO deactivate button & validate
                         self.renderServerConfigurations();
@@ -336,7 +337,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                 renderSiddhiAppSelection: function(siddhiAppList, errorContainer) {
                     var self = this;
 
-                    var siddhiAppSelection = $('<div></div>');
+                    var siddhiAppSelection = $('<div><h4>Siddhi app</h4></div>');
                     if (siddhiAppList) {
                         var selectInput =
                             $('<select name="siddhiApps" id="siddhiAppSelection" class="form-control"' +
@@ -352,10 +353,10 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         siddhiAppSelection.append(selectInput);
                         siddhiAppSelection.append(
                             "<button id='getErrorEntries' type='button' class='btn btn-primary'>Fetch</button>");
+                        siddhiAppSelection.append("<div class='divider'></div>");
                         siddhiAppSelection.append(
                             "<button id='discardErrorEntries' type='button' class='btn btn-default'>" +
-                            "<div class='divider'></div>" +
-                            "Discard Errors</button>");
+                            "Discard All</button>");
 
                         siddhiAppSelection.find("select").change(function() {
                             self.selectedSiddhiApp = this.value;
@@ -370,7 +371,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                                 self.serverPassword);
                         });
 
-                        siddhiAppSelection.find("#discardErrorEntries").click(function() { // TODO testing now
+                        siddhiAppSelection.find("#discardErrorEntries").click(function() {
                             var siddhiAppName = $(this).parent().find("select").get(0).value;
                             self.selectedSiddhiApp = siddhiAppName;
                             self.discardErrorEntries(siddhiAppName, self.serverHost, self.serverPort,
@@ -448,6 +449,10 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     }
                 },
 
+                getReadableTime: function(timestamp) {
+                    return new Date(timestamp).toLocaleString();
+                },
+
                 renderDetailedErrorEntry: function(wrappedErrorEntry) {
                     var errorEntry = wrappedErrorEntry.errorEntry;
                     var detailedErrorEntryModal = $(
@@ -479,8 +484,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         '<h4>' + errorEntry.streamName + '</h4>' +
                         `<span class="error-label" style="margin-right: 10px;">${errorEntry.eventType}</span>` +
                         `<span class="error-label">${errorEntry.errorOccurrence}</span>` +
-                            this.getRenderableCause(errorEntry) +
-                        `<p class="description">Timestamp: ${errorEntry.timestamp} &nbsp; ID: ${errorEntry.id}</p>` +
+                        this.getRenderableCause(errorEntry) +
+                        `<p class="description">${this.getReadableTime(errorEntry.timestamp)}` +
+                        ` &nbsp; ID: ${errorEntry.id}</p>` +
                         '</div>');
                     modalBody.append('<br/>');
                     modalBody.append(this.renderReplayButtonInDetailedErrorEntry(wrappedErrorEntry));
@@ -505,7 +511,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         `<span class="error-label" style="margin-right: 10px;">${errorEntry.eventType}</span>` +
                         `<span class="error-label">${errorEntry.errorOccurrence}</span>` +
                         this.getRenderableCause(errorEntry, true) +
-                        `<p class="description">Timestamp: ${errorEntry.timestamp} &nbsp; ID: ${errorEntry.id}</p>` +
+                        `<p class="description">${this.getReadableTime(errorEntry.timestamp)}` +
+                        ` &nbsp; ID: ${errorEntry.id}</p>` +
                         '<br/>' +
                         "<button id='replay' type='button' class='btn btn-default'>Replay</button>" +
                         "<div class='divider'></div>" +
