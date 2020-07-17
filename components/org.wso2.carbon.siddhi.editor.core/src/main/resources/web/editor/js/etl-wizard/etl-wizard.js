@@ -112,6 +112,9 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                 {id: 4, description: 'Data Mapping'},
                 {id: 5, description: 'Process Output Data'},
             ];
+            if (config.appName.length === 0) {
+                config.appName = 'UntitledETLTaskFlow';
+            }
             this.__parentWizardForm = this.constructWizardHTMLElements($('#ETLWizardForm').clone());
         };
 
@@ -134,7 +137,7 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
 
             // Define header for the wizard
             wizardHeaderContent.append(`
-                <input class="etl-flow-name" id="" type="text" value="UntitledETLTaskFlow"/>
+                <input class="etl-flow-name" id="" type="text" value="${config.appName}"/>
                 <div class="header-steps"></div>
             `);
 
