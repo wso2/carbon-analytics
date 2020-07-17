@@ -519,6 +519,7 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                     .forEach(function (param) {
                         var paramData = {}
                         paramData['value'] = param.defaultValue.replaceAll('`', '');
+                        paramData.type = param.type;
                         config.properties[param.name] = paramData;
                     });
 
@@ -720,7 +721,7 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
 
                 config.type = $(evt.currentTarget).val();
                 config.properties = {};
-                config.possibleProperties = {};
+                // config.possibleProperties = {};
                 config.attributes = {};
                 config.payload = '';
                 config.customEnabled = false;
@@ -729,22 +730,28 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                 if(mapper.parameters) {
                     mapper.parameters
                     .filter(function (el) {
-                        config.possibleProperties[el.name] = el;
+                        // config.possibleProperties[el.name] = el;
                         return !el.optional;
                     })
                     .forEach(function (el) {
-                        el['value'] = el.defaultValue;
-                        config.properties[el.name] = el;
+                        // el['value'] = el.defaultValue;
+                        var mapperData = {};
+                        mapperData.value = el.defaultValue;
+                        mapperData.type = el.type;
+                        config.properties[el.name] = mapperData;
                     });
                 }
 
-                var inputOutputMapper = new InputOutputMapper(type, mapperContainer, extensionConfig);
+                var inputOutputMapper = new InputOutputMapper(type, mapperContainer, extensionConfig, mapper);
                 inputOutputMapper.render();
             });
 
             if (config.type.length > 0) {
+                var mapper = mapperData.find(function (map) {
+                    return map.name === config.type;
+                });
                 wizardBodyContent.find('#mapper-type').val(config.type);
-                var inputOutputMapper = new InputOutputMapper(type, mapperContainer, extensionConfig);
+                var inputOutputMapper = new InputOutputMapper(type, mapperContainer, extensionConfig, mapper);
                 inputOutputMapper.render();
             }
         }

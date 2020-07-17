@@ -20,11 +20,12 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
     function (require, $, _, log, Alerts) {
 
-        var TextMapper = function (type, container, mapConfig) {
+        var TextMapper = function (type, container, mapConfig, extensionData) {
             this.__mapperContainer = container;
             this.__mapperType = type;
             this.__extensionConfig = mapConfig;
             this.__regexGroupNumber = 0;
+            this.__extensionData = extensionData;
         }
 
         TextMapper.constructor = TextMapper;
@@ -33,6 +34,9 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             var self = this;
             var container = this.__mapperContainer;
             var config = this.__extensionConfig.mapping;
+            var extensionData = this.__extensionData;
+
+            console.log(self.__extensionData);
 
             container.empty();
             container.append(`
@@ -41,12 +45,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                         <div style="padding-top: 15px" class="attribute-list">
                             <div>
                               Source Mapper configuration
-                              ${
-                                Object.keys(config.possibleProperties).length !== Object.keys(config.properties).length ?
-                                    `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-source-mapper-property" type="button" data-toggle="dropdown">
-                                        <i class="fw fw-add"></i>
-                                    </button>`: ''
-                                }
+                              ${extensionData.parameters.length !== config.properties.length ? 
+                                `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-source-mapper-property" type="button" data-toggle="dropdown">
+                                    <i class="fw fw-add"></i>
+                                </button>`
+                                : ''}
                               <div id="source-mapper-option-dropdown" style="left: 150px" class="dropdown-menu-style hidden" aria-labelledby="">
                               </div>
                             </div>
@@ -73,17 +76,17 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
             delete config.properties['regex.groupid'];
 
-            Object.keys(config.possibleProperties)
-                .filter(function (property) {
-                    return !(property.startsWith('regex.'));
+            extensionData.parameters
+                .filter(function(property) {
+                    return !(property.name.startsWith('regex.'));
                 })
-                .forEach(function (key) {
-                    if (!config.properties[key]) {
+                .forEach(function(property) {
+                    if (!config.properties[property.name]) {
                         container.find('#source-mapper-option-dropdown').append(`
                             <a title="" class="dropdown-item" href="#">
-                                <div class="mapper-option">${key}</div><br/>
-                                <small style="opacity: 0.8">${config.possibleProperties[key].description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}</small><br/>
-                                <small style="opacity: 0.8"><b>Default value</b>: ${config.possibleProperties[key].defaultValue}</small>
+                                <div class="mapper-option">${property.name}</div><br/>
+                                <small style="opacity: 0.8">${property.description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}</small><br/>
+                                <small style="opacity: 0.8"><b>Default value</b>: ${property.defaultValue}</small>
                             </a>
                         `);
                     }
@@ -94,6 +97,9 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     return !(property.startsWith('regex.'));
                 }).forEach(function (key) {
                     var optionData = config.properties[key];
+                    var optionFullData = self.__extensionData.parameters.find(function(param) {
+                        return param.name === key;
+                    })
                     var name = key.replaceAll(/\./g, '-');
                     container.find('.source-mapper-options').append(`
                         <div style="display: flex; margin-bottom: 15px" class="mapper-option">
@@ -102,11 +108,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                                     <input id="mapper-op-${name}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="${key}" type="text" value="${optionData.value}">
                                 </div>
                                 <div style="display: flex;padding-top: 20px; padding-left: 5px;" class="delete-section">
-                                    <a style="margin-right: 5px; color: #333" title="${optionData.description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}">
+                                    <a style="margin-right: 5px; color: #333" title="${optionFullData.description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}">
                                         <i class="fw fw-info"></i>    
                                     </a>  
                                     ${
-                                        optionData.optional ?
+                                        optionFullData.optional ?
                                             `<a style="color: #333">
                                                 <i id="mapper-op-del-${name}" class="fw fw-delete"></i>    
                                              </a>` : ''
@@ -137,8 +143,14 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
             container.find('.dropdown-item').on('click', function (evt) {
                 var optionName = $(evt.currentTarget).find('.mapper-option').text();
-                config.properties[optionName] = config.possibleProperties[optionName];
-                config.properties[optionName].value = config.properties[optionName].defaultValue;
+                var extensionData = self.__extensionData.parameters.find(function(param) {
+                    return param.name === optionName;
+                })
+
+                // config.properties[optionName] = config.possibleProperties[optionName];
+                config.properties[optionName] = {}
+                config.properties[optionName].value = extensionData.defaultValue;
+                config.properties[optionName].type = extensionData.type;
                 self.render();
             });
 
@@ -193,6 +205,9 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             var self  = this;
             var container = this.__mapperContainer;
             var config = this.__extensionConfig;
+            var regexIDOption = this.__extensionData.parameters.find(function(param) {
+                return param.name === 'regex.groupid';
+            });
 
             container.append(`
                 <div style="padding-top: 10px" class="regex-group-section">
@@ -200,11 +215,13 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 <div style="padding-top: 10px" class="custom-attribute-section">
                     Attribute mappings:
                 </div>
-            `)
+            `);
+
+            
 
             container.find('.sample-payload-submit-section').append(`
                 <div style="display: flex; width: 100%" >
-                    <span style="width: 100%">Regex Groups<i style="padding: 0 10px;" title="${config.mapping.possibleProperties['regex.groupid'].description}" class="fw fw-info"></i></span>
+                    <span style="width: 100%">Regex Groups<i style="padding: 0 10px;" title="${regexIDOption.description}" class="fw fw-info"></i></span>
                     ${
                         self.__regexGroupNumber < 26 ? 
                             `<button style="padding: 2px 12px; background: #607c8b;" class="btn btn-default" id="btn-add-regex-group" type="button">
@@ -255,7 +272,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
                     config.mapping.properties[`regex.${availableCharacters[Object.keys(availableCharacters)[0]]}`] = {
                         value : '',
-                        description: config.mapping.possibleProperties['regex.groupid'].description
+                        type: regexIDOption.type
                     };
 
                     self.__regexGroupNumber++;

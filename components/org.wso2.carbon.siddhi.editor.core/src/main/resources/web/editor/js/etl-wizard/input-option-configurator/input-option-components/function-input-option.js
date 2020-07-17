@@ -34,7 +34,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
             container.append(`
                 <h3 style="margin-top: 0;color: #373737">Function configuration</h3>
                 <div style="color: #373737">
-                    <label for="function-name">Window type&nbsp;:&nbsp;</label>
+                    <label for="function-name">Function type&nbsp;:&nbsp;</label>
                     <select name="function-name" id="function-name">
                         <option disabled selected value> -- select an option -- </option>
                     </select>
@@ -48,6 +48,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                     <option>${key}</option>
                 `);
             });
+
+            if(config.query.function.name) {
+                container.find('#function-name').val(config.query.function.name);
+            }
 
             container.find('#function-name')
                 .on('change', function (evt) {
@@ -63,7 +67,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                         functionData.syntax.forEach(function (syntax, i) {
                             functionList.append(`
                                 <li class="" id="syntax-id-${i}">
-                                    <a>
+                                    <a style="color:#333">
                                         <div style="padding: 10px 15px;border-bottom: 1px solid #373737" >
                                             <b>${syntax.syntax.replaceAll(/</g, '&lt;').replaceAll(/>/g, '&gt;')}</b>
                                         </div>

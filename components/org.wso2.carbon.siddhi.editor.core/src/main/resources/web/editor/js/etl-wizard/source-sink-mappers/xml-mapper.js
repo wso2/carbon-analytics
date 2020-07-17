@@ -20,11 +20,12 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
     function (require, $, _, log, Alerts) {
 
-        var XMLMapper = function (type, container, mapConfig) {
+        var XMLMapper = function (type, container, mapConfig, mapperData) {
             this.__mapperContainer = container;
             this.__mapperType = type;
             this.__extensionConfig = mapConfig;
             this.__hoveredEl = '';
+            this.__mapperData = mapperData;
         }
 
         XMLMapper.prototype.constructor = XMLMapper;
@@ -33,6 +34,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             var self = this;
             var container = this.__mapperContainer;
             var config = this.__extensionConfig.mapping;
+            var mapperData = this.__mapperData;
 
             container.empty();
             container.append(`
@@ -41,12 +43,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                         <div style="padding-top: 15px" class="attribute-list">
                             <div>
                               Source Mapper configuration
-                              ${
-                                    Object.keys(config.possibleProperties).length !== Object.keys(config.properties).length ?
-                                        `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-source-mapper-property" type="button" data-toggle="dropdown">
-                                            <i class="fw fw-add"></i>
-                                        </button>`: ''
-                                }
+                              ${mapperData.parameters.length !== config.properties.length ? 
+                                `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-source-mapper-property" type="button" data-toggle="dropdown">
+                                    <i class="fw fw-add"></i>
+                                </button>`
+                                : ''}
                               <div id="source-mapper-option-dropdown" style="left: 150px" class="dropdown-menu-style hidden" aria-labelledby="">
                               </div>
                             </div>
@@ -71,21 +72,23 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 </div>
             `);
 
-            Object.keys(config.possibleProperties).forEach(function (key) {
-                if (!config.properties[key]) {
+            mapperData.parameters
+                .filter(function(param) {
+                    return !config.properties[param.name];
+                }).forEach(function(param) {
                     container.find('#source-mapper-option-dropdown').append(`
                         <a title="" class="dropdown-item" href="#">
-                            <div class="mapper-option">${key}</div><br/>
-                            <small style="opacity: 0.8">${config.possibleProperties[key].description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}</small><br/>
-                            <small style="opacity: 0.8"><b>Default value</b>: ${config.possibleProperties[key].defaultValue}</small>
+                            <div class="mapper-option">${param.name}</div><br/>
+                            <small style="opacity: 0.8">${param.description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}</small><br/>
+                            <small style="opacity: 0.8"><b>Default value</b>: ${param.defaultValue}</small>
                         </a>
                     `);
-                }
-            });
+                })
 
             Object.keys(config.properties).forEach(function (key) {
                 var optionData = config.properties[key];
                 var name = key.replaceAll(/\./g, '-');
+                var selectedOption = mapperData.parameters.find(function(param) {return param.name === key})
                 container.find('.source-mapper-options').append(`
                     <div style="display: flex; margin-bottom: 15px" class="mapper-option">
                             <div style="width: 100%" class="input-section">
@@ -93,14 +96,14 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                                 <input id="mapper-op-${name}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="${key}" type="text" value="${optionData.value}">
                             </div>
                             <div style="display: flex;padding-top: 20px; padding-left: 5px;" class="delete-section">
-                                <a style="margin-right: 5px; color: #333" title="${optionData.description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}">
+                                <a style="margin-right: 5px; color: #333" title="${selectedOption.description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}">
                                     <i class="fw fw-info"></i>    
                                 </a>  
                                 ${
-                                    optionData.optional ?
+                                    selectedOption.optional ?
                                         `<a style="color: #333">
                                             <i id="mapper-op-del-${name}" class="fw fw-delete"></i>    
-                                        </a>` : ''
+                                         </a>` : ''
                                 }                              
                             </div>
                         </div>
@@ -127,9 +130,13 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 });
 
             container.find('.dropdown-item').on('click', function (evt) {
-                var optionName = $(evt.currentTarget).find('.mapper-option').text();
-                config.properties[optionName] = config.possibleProperties[optionName];
-                config.properties[optionName].value = config.properties[optionName].defaultValue;
+               var optionName = $(evt.currentTarget).find('.mapper-option').text();
+                var selectedOption = mapperData.parameters.find(function(param) {return param.name === optionName})
+
+                config.properties[optionName] = {
+                    value: selectedOption.defaultValue,
+                    type: selectedOption.type
+                };
                 self.render();
             });
 

@@ -20,33 +20,36 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'csvMapper', 'xmlMapper'
 
     function (require, $, _, log, Alerts, CSVMapper, XMLMapper, JSONMapper, TextMapper, AvroMapper ) {
 
-        var SourceSinkMapper = function (sourceOrSinkType, container, config) {
+        var SourceSinkMapper = function (sourceOrSinkType, container, config, extensionData) {
             this.__sourceOrSinkType = sourceOrSinkType;
             this.__container = container;
             this.__config = config;
-
+            this.__extensionData = extensionData;
         }
 
         SourceSinkMapper.prototype.constructor = SourceSinkMapper;
 
         SourceSinkMapper.prototype.render  = function () {
             var mapper = null;
+            var self = this;
+            var selectedExtension = this.__extensionData;
+
             this.__container.empty();
             switch (this.__config.mapping.type) {
                 case 'csv':
-                    mapper = new CSVMapper(this.__sourceOrSinkType, this.__container, this.__config);
+                    mapper = new CSVMapper(this.__sourceOrSinkType, this.__container, this.__config, selectedExtension);
                     break;
                 case 'xml':
-                    mapper = new XMLMapper(this.__sourceOrSinkType, this.__container, this.__config);
+                    mapper = new XMLMapper(this.__sourceOrSinkType, this.__container, this.__config, selectedExtension);
                     break;
                 case 'json':
-                    mapper = new JSONMapper(this.__sourceOrSinkType, this.__container, this.__config);
+                    mapper = new JSONMapper(this.__sourceOrSinkType, this.__container, this.__config, selectedExtension);
                     break;
                 case 'text':
-                    mapper = new TextMapper(this.__sourceOrSinkType, this.__container, this.__config);
+                    mapper = new TextMapper(this.__sourceOrSinkType, this.__container, this.__config, selectedExtension);
                     break;
                 case 'avro':
-                    mapper = new AvroMapper(this.__sourceOrSinkType, this.__container, this.__config);
+                    mapper = new AvroMapper(this.__sourceOrSinkType, this.__container, this.__config, selectedExtension);
                     break;
             }
 
