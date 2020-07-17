@@ -25,11 +25,17 @@ public class RDBMSQueryConfigurationEntry {
     private String databaseName;
     private String isTableExistQuery;
     private String createTableQuery;
-    private String insertTableQuery;
-    private String selectTableQuery;
+    private String insertQuery;
+    private String selectQuery;
+    private String minimalSelectQuery;
+    private String selectSingleQuery;
     private String selectWithLimitOffsetQuery;
+    private String minimalSelectWithLimitOffsetQuery;
     private String selectCountQuery;
+    private String selectCountBySiddhiAppNameQuery;
     private String deleteQuery;
+    private String deleteBySiddhiAppNameQuery;
+    private String purgeQuery;
 
     public String getDatabaseName() {
         return databaseName;
@@ -47,12 +53,12 @@ public class RDBMSQueryConfigurationEntry {
         this.createTableQuery = createTableQuery;
     }
 
-    public String getInsertTableQuery() {
-        return insertTableQuery;
+    public String getInsertQuery() {
+        return insertQuery;
     }
 
-    public void setInsertTableQuery(String insertTableQuery) {
-        this.insertTableQuery = insertTableQuery;
+    public void setInsertQuery(String insertQuery) {
+        this.insertQuery = insertQuery;
     }
 
     public String getIsTableExistQuery() {
@@ -63,12 +69,28 @@ public class RDBMSQueryConfigurationEntry {
         this.isTableExistQuery = isTableExistQuery;
     }
 
-    public String getSelectTableQuery() {
-        return selectTableQuery;
+    public String getSelectQuery() {
+        return selectQuery;
     }
 
-    public void setSelectTableQuery(String selectTableQuery) {
-        this.selectTableQuery = selectTableQuery;
+    public void setSelectQuery(String selectQuery) {
+        this.selectQuery = selectQuery;
+    }
+
+    public String getMinimalSelectQuery() {
+        return minimalSelectQuery;
+    }
+
+    public void setMinimalSelectQuery(String minimalSelectQuery) {
+        this.minimalSelectQuery = minimalSelectQuery;
+    }
+
+    public String getSelectSingleQuery() {
+        return selectSingleQuery;
+    }
+
+    public void setSelectSingleQuery(String selectSingleQuery) {
+        this.selectSingleQuery = selectSingleQuery;
     }
 
     public String getSelectCountQuery() {
@@ -87,6 +109,22 @@ public class RDBMSQueryConfigurationEntry {
         this.selectWithLimitOffsetQuery = selectWithLimitOffsetQuery;
     }
 
+    public String getMinimalSelectWithLimitOffsetQuery() {
+        return minimalSelectWithLimitOffsetQuery;
+    }
+
+    public void setMinimalSelectWithLimitOffsetQuery(String minimalSelectWithLimitOffsetQuery) {
+        this.minimalSelectWithLimitOffsetQuery = minimalSelectWithLimitOffsetQuery;
+    }
+
+    public String getSelectCountBySiddhiAppNameQuery() {
+        return selectCountBySiddhiAppNameQuery;
+    }
+
+    public void setSelectCountBySiddhiAppNameQuery(String selectCountBySiddhiAppNameQuery) {
+        this.selectCountBySiddhiAppNameQuery = selectCountBySiddhiAppNameQuery;
+    }
+
     public String getDeleteQuery() {
         return deleteQuery;
     }
@@ -95,4 +133,19 @@ public class RDBMSQueryConfigurationEntry {
         this.deleteQuery = deleteQuery;
     }
 
+    public String getPurgeQuery() {
+        return purgeQuery;
+    }
+
+    public void setPurgeQuery(String purgeQuery) {
+        this.purgeQuery = purgeQuery;
+    }
+
+    public String getDeleteBySiddhiAppNameQuery() {
+        return deleteBySiddhiAppNameQuery;
+    }
+
+    public void setDeleteBySiddhiAppNameQuery(String deleteBySiddhiAppNameQuery) {
+        this.deleteBySiddhiAppNameQuery = deleteBySiddhiAppNameQuery;
+    }
 }

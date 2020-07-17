@@ -21,40 +21,50 @@ package org.wso2.carbon.siddhi.error.handler.core.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
-import io.siddhi.core.event.ComplexEvent;
-import io.siddhi.core.event.Event;
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
-import io.siddhi.core.util.error.handler.util.ErroneousEventType;
+import io.siddhi.core.util.error.handler.util.ErrorHandlerUtils;
+import org.wso2.carbon.siddhi.error.handler.core.exception.SiddhiErrorHandlerException;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Contains utility methods related to Siddhi Error Handler.
  */
 public class SiddhiErrorHandlerUtils {
-    private static final Map<ErroneousEventType, Type> mapTypes = new EnumMap<>(ErroneousEventType.class);
-
-    static {
-        mapTypes.put(ErroneousEventType.COMPLEX_EVENT, new TypeToken<ErrorEntry<ComplexEvent>>() {}.getType());
-        mapTypes.put(ErroneousEventType.EVENT, new TypeToken<ErrorEntry<Event>>() {}.getType());
-        mapTypes.put(ErroneousEventType.EVENT_ARRAY, new TypeToken<ErrorEntry<Event[]>>() {}.getType());
-        mapTypes.put(ErroneousEventType.EVENT_LIST, new TypeToken<ErrorEntry<List<Event>>>() {}.getType());
-        mapTypes.put(ErroneousEventType.PAYLOAD_STRING, new TypeToken<ErrorEntry<String>>() {}.getType());
-    }
 
     private SiddhiErrorHandlerUtils() {}
 
-    public static List<ErrorEntry> convertToList(JsonArray errorEntriesBody) {
-        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+    public static List<ErrorEntry> convertToList(JsonArray errorEntryWrappersBody) throws SiddhiErrorHandlerException {
         List<ErrorEntry> errorEntries = new ArrayList<>();
-        for (JsonElement errorEntry : errorEntriesBody) {
-            String eventTypeString = errorEntry.getAsJsonObject().get("eventType").getAsString();
-            ErroneousEventType eventType = ErroneousEventType.valueOf(eventTypeString);
-            errorEntries.add(gson.fromJson(errorEntry, mapTypes.get(eventType)));
+        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        Type mapType = new TypeToken<List<ErrorEntryWrapper>>() {}.getType();
+        List<ErrorEntryWrapper> errorEntryWrappers = gson.fromJson(errorEntryWrappersBody, mapType);
+        for (ErrorEntryWrapper errorEntryWrapper : errorEntryWrappers) {
+            if (errorEntryWrapper.isPayloadModifiable()) {
+                ErrorEntry errorEntry = errorEntryWrapper.getErrorEntry();
+                String payloadString = errorEntryWrapper.getModifiablePayloadString();
+                try {
+                    errorEntries.add(new ErrorEntry(errorEntry.getId(), errorEntry.getTimestamp(),
+                        errorEntry.getSiddhiAppName(), errorEntry.getStreamName(),
+                        ErrorHandlerUtils.getAsBytes(payloadString),
+                        errorEntry.getCause(), errorEntry.getStackTrace(), errorEntry.getOriginalPayload(),
+                        errorEntry.getErrorOccurrence(), errorEntry.getEventType(), errorEntry.getErrorType()));
+                } catch (IOException e) {
+                    throw new SiddhiErrorHandlerException(String.format(
+                        "Failed to get modifiable payload as bytes for error entry with id: %s.", errorEntry.getId()));
+                }
+            } else {
+                errorEntries.add(errorEntryWrapper.getErrorEntry());
+            }
         }
         return errorEntries;
+    }
+
+    public static long getRetentionStartTimestamp(long currentTimestamp, int retentionDays) {
+        return currentTimestamp - (1000L * 60 * 60 * 24 * retentionDays);
     }
 }

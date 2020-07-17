@@ -43,6 +43,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Exposes Siddhi Error Handler as a micro-service.
@@ -57,26 +60,35 @@ public class SiddhiErrorHandlerMicroservice implements ErrorStoreListener, Micro
 
     private static final Logger logger = LoggerFactory.getLogger(SiddhiErrorHandlerMicroservice.class);
 
+    private static final String ENTRIES_COUNT_KEY = "entriesCount";
+
     @GET
-    @Path("/status")
+    @Path("/error-entries/count")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getStatus() {
+    public Response getErrorEntriesCount(@QueryParam("siddhiApp") String siddhiAppName) {
         try {
-            return Response.ok().entity(ErrorStoreAccessor.getStatus()).type(MediaType.APPLICATION_JSON).build();
+            Map<String, Integer> response = new HashMap<>();
+            response.put(ENTRIES_COUNT_KEY, (siddhiAppName != null) ?
+                ErrorStoreAccessor.getErrorEntriesCount(siddhiAppName) :
+                ErrorStoreAccessor.getTotalErrorEntriesCount());
+            return Response.ok().entity(response).type(MediaType.APPLICATION_JSON).build();
         } catch (SiddhiErrorHandlerException e) {
-            logger.error("Failed to get status of the error store.", e);
-            return Response.serverError().entity("Failed to get status of the error store.").build();
+            String message = "Failed to get error entries count.";
+            logger.error(message, e);
+            return Response.serverError().entity(message).build();
         }
     }
 
     @GET
-    @Path("/erroneous-events")
+    @Path("/error-entries")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getErroneousEvents(@QueryParam("siddhiApp") String siddhiAppName,
-                                       @QueryParam("limit") String limit, @QueryParam("offset") String offset) {
+    public Response getErrorEntries(@QueryParam("siddhiApp") String siddhiAppName,
+                                    @QueryParam("descriptive") String isDescriptive,
+                                    @QueryParam("limit") String limit, @QueryParam("offset") String offset) {
         if (siddhiAppName != null) {
             try {
-                return Response.ok().entity(ErrorStoreAccessor.getErroneousEvents(siddhiAppName, limit, offset))
+                return Response.ok().
+                    entity(ErrorStoreAccessor.getErrorEntries(siddhiAppName, isDescriptive, limit, offset))
                     .type(MediaType.APPLICATION_JSON).build();
             } catch (SiddhiErrorHandlerException e) {
                 logger.error("Failed to get erroneous events.", e);
@@ -88,6 +100,19 @@ public class SiddhiErrorHandlerMicroservice implements ErrorStoreListener, Micro
         }
     }
 
+    @GET
+    @Path("/error-entries/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getErrorEntry(@PathParam("id") int id) {
+        try {
+            return Response.ok().entity(ErrorStoreAccessor.getWrappedErrorEntry(id)).type(MediaType.APPLICATION_JSON)
+                .build();
+        } catch (SiddhiErrorHandlerException e) {
+            logger.error("Failed to get erroneous event.", e);
+            return Response.serverError().entity("Failed to get erroneous event.").build();
+        }
+    }
+
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -95,7 +120,7 @@ public class SiddhiErrorHandlerMicroservice implements ErrorStoreListener, Micro
     public Response rePlayErrorEntries(JsonArray errorEntriesBody) {
         try {
             RePlayer.rePlay(SiddhiErrorHandlerUtils.convertToList(errorEntriesBody));
-            return Response.ok().build();
+            return Response.ok().entity(Collections.emptyMap()).build();
         } catch (SiddhiErrorHandlerException e) {
             logger.error("Failed to re-stream errors.", e);
             return Response.serverError().entity("Failed to re-stream errors.").build();
@@ -103,17 +128,46 @@ public class SiddhiErrorHandlerMicroservice implements ErrorStoreListener, Micro
     }
 
     @DELETE
-    @Path("/erroneous-events/{eventId}")
+    @Path("/error-entries/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response discardErroneousEvent(@PathParam("eventId") int eventId) {
+    public Response discardErrorEntry(@PathParam("id") int id) {
         try {
-            ErrorStoreAccessor.discardErroneousEvent(eventId);
-            return Response.ok().build();
+            ErrorStoreAccessor.discardErrorEntry(id);
+            return Response.ok().entity(Collections.emptyMap()).build();
         } catch (SiddhiErrorHandlerException e) {
-            logger.error("Failed to discard erroneous event with id: " + eventId + " .");
-            return Response.serverError().entity("Failed to discard erroneous event with id: " + eventId + " .")
-                .build();
+            String message = "Failed to discard error entry with id: " + id + " .";
+            logger.error(message);
+            return Response.serverError().entity(message).build();
         }
+    }
+
+    @DELETE
+    @Path("/error-entries")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response discardErrorEntries(@QueryParam("siddhiApp") String siddhiAppName,
+                                        @QueryParam("retentionDays") String retentionDays) {
+        if (siddhiAppName != null && retentionDays == null) {
+            try {
+                ErrorStoreAccessor.discardErrorEntries(siddhiAppName);
+                return Response.ok().entity(Collections.emptyMap()).build();
+            } catch (SiddhiErrorHandlerException e) {
+                String message = String.format("Failed to discard error entries of Siddhi app: %s.", siddhiAppName);
+                logger.error(message);
+                return Response.serverError().entity(message).build();
+            }
+        } else if (retentionDays != null && siddhiAppName == null) {
+            try {
+                ErrorStoreAccessor.purgeErrorStore(retentionDays);
+                return Response.ok().entity(Collections.emptyMap()).build();
+            } catch (SiddhiErrorHandlerException e) {
+                String message = "Failed to purge the error store.";
+                logger.error(message);
+                return Response.serverError().entity(message).build();
+            }
+        }
+        return Response.status(Response.Status.BAD_REQUEST)
+            .entity("Exactly one of the following query parameters must be specified: 'siddhiApp', 'retentionDays'.")
+            .build();
     }
 
     /**
