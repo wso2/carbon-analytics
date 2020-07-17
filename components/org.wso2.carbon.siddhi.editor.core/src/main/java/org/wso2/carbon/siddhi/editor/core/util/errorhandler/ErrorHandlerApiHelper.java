@@ -226,8 +226,15 @@ public class ErrorHandlerApiHelper implements ErrorHandlerApiHelperService {
     }
 
     @Override
-    public boolean doPurge(String hostAndPort, String username, String password)
+    public boolean doPurge(int retentionDays, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException {
-        return true; // TODO implement
+        feign.Response response = HTTPSClientUtil.doPurge(retentionDays, hostAndPort, username, password);
+        switch (response.status()) {
+            case 200:
+                return true;
+            default:
+                // TODO finalize messages
+                throw new ErrorHandlerServiceStubException("Failed to purge the error store." + response.reason());
+        }
     }
 }

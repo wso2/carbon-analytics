@@ -18,7 +18,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     this._errorHandlerModal.modal('show');
                 },
 
-                // TODO this is hardcoded atm. WOrker should be dynamic
                 fetchSiddhiApps: function(serverHost, serverPort, username, password) {
                     // TODO test: server down, error handler is requested in menu
                     var self = this;
@@ -35,7 +34,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         url: serviceUrl + '/server/siddhi-apps',
                         async: false,
                         success: function (data) {
-                            // self._application.utils.errorData = new Map(Object.entries(data));
                             console.log("Siddhi apps Response received", data)
                             self.availableSiddhiApps = data;
                         },
@@ -47,7 +45,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     });
                 },
 
-                // TODO rename this to 'minimal'
+                // TODO this will be replaced with pagination. So don't worry about duplicate code with replay all
                 fetchErrorEntries: function(siddhiAppName, serverHost, serverPort, username, password) {
                     var self = this;
                     var serviceUrl = self.app.config.services.errorHandler.endpoint;
@@ -64,7 +62,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         url: serviceUrl + '/error-entries?siddhiApp=' + siddhiAppName,
                         async: false,
                         success: function (data) {
-                            // self._application.utils.errorData = new Map(Object.entries(data));
                             console.log("Erroneous Events Response received", data)
                             self.errorEntries = data;
                             self.renderContent();
@@ -77,7 +74,10 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     });
                 },
 
-                directReplay: function(errorEntryId, serverHost, serverPort, username, password) { // TODO improve name?
+                // TODO improve name?
+                // TODO rename this should fetch after param
+                directReplay: function(errorEntryId, serverHost, serverPort, username, password,
+                                       shouldFetchAfterReplay) {
                     var self = this;
                     var serviceUrl = self.app.config.services.errorHandler.endpoint;
                     $.ajax({
@@ -93,7 +93,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         async: false,
                         success: function (data) {
                             console.log("Detailed Error Entry received. Gonna replay", data)
-                            self.replay([data], serverHost, serverPort, username, password);
+                            self.replay([data], serverHost, serverPort, username, password,
+                                shouldFetchAfterReplay);
                         },
                         error: function (e) {
                             alerts.error("Unable to fetch Detailed error entry"); // TODO improve
@@ -117,7 +118,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         url: serviceUrl + '/error-entries/' + errorEntryId,
                         async: false,
                         success: function (data) {
-                            // self._application.utils.errorData = new Map(Object.entries(data));
                             console.log("Detailed Error Entry received", data)
                             self.renderDetailedErrorEntry(data);
                         },
@@ -128,8 +128,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     });
                 },
 
-                replay: function(payload, serverHost, serverPort, username, password) {
-                    var self = this;
+                replay: function(payload, serverHost, serverPort, username, password, shouldFetchAfterReplay) {
+                    var self = this; // TODO rename this should fetch after param
                     var serviceUrl = self.app.config.services.errorHandler.endpoint;
                     $.ajax({
                         type: "POST",
@@ -147,7 +147,10 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         success: function () {
                             console.log("Replay Response received")
                             // Re-fetch after discarding error
-                            self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
+                            if (shouldFetchAfterReplay) {
+                                self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username,
+                                    password);
+                            }
                         },
                         error: function (e) {
                             alerts.error("Unable to fetch Erroneous Events." +
@@ -159,11 +162,43 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
 
                 replayErrorEntries: function(siddhiAppName, serverHost, serverPort, username, password) {
                     var self = this;
-                    this.errorEntries.forEach(function (errorEntry) {
-                        // TODO hide all entries until this completes
-                        self.directReplay(errorEntry.id, serverHost, serverPort, username, password);
+                    var serviceUrl = self.app.config.services.errorHandler.endpoint;
+                    $.ajax({
+                        type: "GET",
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            'serverHost': serverHost,
+                            'serverPort': serverPort,
+                            'username': username,
+                            'password': password
+                        },
+                        // TODO for now no limit and offset. Need to have it
+                        url: serviceUrl + '/error-entries?siddhiApp=' + siddhiAppName,
+                        async: false,
+                        success: function (data) {
+                            console.log("Erroneous Events Response received", data)
+                            // Initiate state for 'Replay all'
+                            self.replayAllState = {
+                                errorEntries: data,
+                                siddhiAppName: siddhiAppName,
+                                currentErrorNumber: 0,
+                                totalErrorsCount: data.length,
+                            };
+                            if (self.replayAllState.errorEntries) {
+                                self.replayAllState.errorEntries.forEach(function (errorEntry) {
+                                    self.replayAllState.currentErrorNumber++;
+                                    self.updateReplayAllProgressDisplay();
+                                    self.directReplay(errorEntry.id, serverHost, serverPort, username, password);
+                                });
+                                self.replayAllState = null;
+                            }
+                        },
+                        error: function (e) {
+                            alerts.error("Unable to fetch Erroneous Events." +
+                                "Please see the editor console for further information.")
+                            throw "Unable to read errors";
+                        }
                     });
-                    console.log("replay all finished")
                     self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
                 },
 
@@ -207,7 +242,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         url: serviceUrl + '/error-entries?siddhiApp=' + siddhiAppName,
                         async: false,
                         success: function (data) {
-                            // self._application.utils.errorData = new Map(Object.entries(data));
                             console.log("Discarded entries for Siddhi app: " + siddhiAppName, data)
                             // TODO is this behaviour correct? or should I optimize it
                             self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
@@ -217,6 +251,82 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                             throw "Unable to read errors";
                         }
                     });
+                },
+
+                purgeErrorStore: function(retentionDays, serverHost, serverPort, username, password) {
+                    var self = this;
+                    var serviceUrl = self.app.config.services.errorHandler.endpoint;
+                    $.ajax({
+                        type: "DELETE",
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            'serverHost': serverHost,
+                            'serverPort': serverPort,
+                            'username': username,
+                            'password': password
+                        },
+                        url: serviceUrl + '/error-entries?retentionDays=' + retentionDays,
+                        async: false,
+                        success: function (data) {
+                            console.log("Purged error store with retentionDays: " + retentionDays, data)
+                            self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
+                        },
+                        error: function (e) {
+                            alerts.error("Unable to purge the error store."); // TODO improve
+                            throw "Unable to purge the error store";
+                        }
+                    });
+                },
+
+                renderPurgeSettings: function() {
+                    var self = this;
+                    var purgeSettingsModal = $(
+                        '<div class="modal fade" id="purgeSettingsModal">' +
+                        '<div class="modal-dialog">' +
+                        '<div class="modal-content">' +
+                        '<div class="modal-header">' +
+                        "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+                        "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
+                        "</button>" +
+                        '<h2 class="modal-title file-dialog-title">' +
+                        'Purge Error Store' +
+                        '</h2>' +
+                        '<hr class="style1">' +
+                        '</div>' +
+                        '<div id="purgeSettingsModalModalBody" class="modal-body">' +
+                        '</div>' +
+                        '<div class="modal-footer" style="padding-right: 20px; margin-right: 30px">' +
+                        '<button id="doPurge" type="button" class="btn btn-danger">' +
+                        "Purge</button>" +
+                        "<div class='divider'></div>" +
+                        '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>');
+
+                    var modalBody = purgeSettingsModal.find("#purgeSettingsModalModalBody");
+
+                    var purgeSettingsBlock =
+                        $('<div class="error-handler-dialog-form-block" ' +
+                            'style="margin-right: 30px; margin-left: 30px; width: auto; overflow: auto"></div>');
+                    var purgeSettings = $('<div class="server-properties-clearfix"></div>');
+                    purgeSettings.append('<div class="server-property">' +
+                        '<label class="clearfix">Retention Period (Days)</label>' +
+                        '<input type="number" id="retentionDays" min="0" placeholder="0"' +
+                        ' class="configure-server-input"></div>');
+                    purgeSettingsBlock.append(purgeSettings);
+                    modalBody.append(purgeSettingsBlock);
+
+                    // TODO deactivate button & validate
+                    purgeSettingsModal.find("#doPurge").click(function() {
+                        var retentionDays = purgeSettings.find("#retentionDays").val();
+                        self.purgeErrorStore(retentionDays, self.serverHost, self.serverPort, self.serverUsername,
+                            self.serverPassword);
+                    });
+
+                    this.purgeSettings = purgeSettingsModal;
+                    this.purgeSettings.modal('show');
                 },
 
                 renderServerConfigurations: function() {
@@ -248,6 +358,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
 
                     var modalBody = serverConfigurationsModal.find("#serverConfigurationsModalBody");
 
+                    // TODO when giving a wrong host, gets stuck. look into
                     var serverPropertiesBlock =
                         $('<div class="error-handler-dialog-form-block" ' +
                             'style="margin-right: 30px; margin-left: 30px; width: auto; overflow: auto"></div>');
@@ -274,7 +385,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         '</div>');
                     serverPropertiesBlock.append(serverProperties);
                     modalBody.append(serverPropertiesBlock);
-                    // modalBody.append('<br/>');
 
                     // TODO deactivate button & validate
                     serverConfigurationsModal.find("#applyWorkerConfigurations").click(function() {
@@ -319,11 +429,17 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     if (totalErrorEntries > -1) {
                         serverConfiguredDisplay.append(`<h4>${totalErrorEntries} Errors found</h4>`);
                     }
-                    serverConfiguredDisplay.append(`<h5>${self.serverHost + ':' + self.serverPort}</h5>`);
                     serverConfiguredDisplay.append(
-                        '<button id="configureServer" type="button" class="btn btn-primary">Configure</button>');
+                        `<h5 class="description">${self.serverHost + ':' + self.serverPort}&nbsp;&nbsp;`+
+                        `<a id="configureServer"><i class="fw fw-settings"></i></a></h5>`);
+                    serverConfiguredDisplay.append(
+                        '<button id="purgeErrorStore" type="button" class="btn btn-danger">Purge</button>');
+
                     serverConfiguredDisplay.find("#configureServer").click(function() { // TODO deactivate button & validate
                         self.renderServerConfigurations();
+                    });
+                    serverConfiguredDisplay.find("#purgeErrorStore").click(function() { // TODO deactivate button & validate?
+                        self.renderPurgeSettings();
                     });
                     return serverConfiguredDisplay;
                 },
@@ -351,8 +467,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                 renderSiddhiAppSelection: function(siddhiAppList, errorContainer) {
                     var self = this;
 
-                    var siddhiAppSelection = $('<div><h4>Siddhi app</h4></div>');
+                    var siddhiAppSelection = $('<div></div>');
                     if (siddhiAppList) {
+                        siddhiAppSelection.append('<h4>Siddhi app</h4>');
                         var selectInput =
                             $('<select name="siddhiApps" id="siddhiAppSelection" class="form-control"' +
                                 'style="margin-bottom:10px"></select>');
@@ -367,12 +484,14 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         siddhiAppSelection.append(selectInput);
                         siddhiAppSelection.append(
                             "<button id='getErrorEntries' type='button' class='btn btn-primary'>Fetch</button>");
-                        siddhiAppSelection.append("<div class='divider'></div>");
-                        siddhiAppSelection.append(
-                            "<button id='discardAll' type='button' class='btn btn-default'>Discard All</button>");
-                        siddhiAppSelection.append("<div class='divider'></div>");
-                        siddhiAppSelection.append(
-                            "<button id='replayAll' type='button' class='btn btn-default'>Replay All</button>");
+                        if (this.errorEntries && this.errorEntries.length > 0) {
+                            siddhiAppSelection.append("<div class='divider'></div>");
+                            siddhiAppSelection.append(
+                                "<button id='discardAll' type='button' class='btn btn-default'>Discard All</button>");
+                            siddhiAppSelection.append("<div class='divider'></div>");
+                            siddhiAppSelection.append(
+                                "<button id='replayAll' type='button' class='btn btn-default'>Replay All</button>");
+                        }
 
                         siddhiAppSelection.find("select").change(function() {
                             self.selectedSiddhiApp = this.value;
@@ -401,14 +520,14 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                                 self.serverUsername, self.serverPassword);
                         });
                     } else {
-                        siddhiAppSelection.append("<h3>No Siddhi apps found</h3>"); // TODO confirm this
+                        siddhiAppSelection.append("<h4 class='description'>No Siddhi apps found</h4>");
                     }
                     errorContainer.append(siddhiAppSelection);
                 },
 
                 renderErrorEntries: function(errorContainer) {
                     var self = this;
-                    errorDisplay = $('<div></div>');
+                    errorDisplay = $('<div id="errorEntriesContainer"></div>');
 
                     if (this.errorEntries) {
                         this.errorEntries.forEach(function (errorEntry) {
@@ -445,8 +564,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                             // TODO make sure that no worries about mutating the original object
                             replayableWrappedErrorEntry.modifiablePayloadString = replay.find("#eventPayload").val();
                         }
-                        self.replay([replayableWrappedErrorEntry], self.serverHost, self.serverPort, self.serverUsername,
-                            self.serverPassword);
+                        self.replay([replayableWrappedErrorEntry], self.serverHost, self.serverPort,
+                            self.serverUsername, self.serverPassword, true);
                     });
                     return replay;
                 },
@@ -545,8 +664,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         '</div>');
 
                     errorEntryElement.find("#replay").click(function() { // TODO disable if server not configured
+                        self.showLoadingDuringDirectReplay($(this).parent());
                         self.directReplay(errorEntry.id, self.serverHost, self.serverPort, self.serverUsername,
-                            self.serverPassword);
+                            self.serverPassword, true);
                     });
 
                     errorEntryElement.find("#detailedInfo").click(function() {
@@ -562,6 +682,29 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     return errorEntryElement;
                 },
 
+                showLoadingDuringDirectReplay: function(container) {
+                    var containerHeight = container.height();
+                    var containerWidth = container.width();
+                    container.empty();
+                    container.append(`<div style="height: ${containerHeight}; width: ${containerWidth}; ` +
+                        'text-align: center; font-size: 25">' +
+                        '<i class="fw fw-wso2-logo fw-pulse fw-2x" style="padding-top: 70px"></i></div>');
+                },
+
+                updateReplayAllProgressDisplay: function() {
+                    var container = this._errorHandlerModal.find("#siddhiAppErrorEntriesBlock");
+                    var containerHeight = container.height();
+                    var containerWidth = container.width();
+                    container.empty();
+                    container.append(`<div style="height: ${containerHeight}; width: ${containerWidth}; ` +
+                        'text-align: center; font-size: 25; padding-top: 150px">' +
+                        '<i class="fw fw-wso2-logo fw-pulse fw-2x"></i>'+
+                        `<h3>Replaying Error ${this.replayAllState.currentErrorNumber}`+
+                        ` of ${this.replayAllState.totalErrorsCount}</h3>` +
+                        `<h5 class="description">${this.replayAllState.siddhiAppName}</h5>` +
+                        '</div>');
+                },
+
                 renderContent: function(errorContainer) {
                     var container = errorContainer || this._errorHandlerModal.find("div").filter("#errorContainer");
                     if (this.isServerConfigured) {
@@ -569,19 +712,21 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                             this.serverHost, this.serverPort, this.serverUsername, this.serverPassword);
                     }
                     container.empty();
-                    var serverConfigBlock = $('<div class="error-handler-dialog-form-block"></div>');
-                    this.renderServerDetails(serverConfigBlock);
-                    var errorEntriesBlock = $('<div class="error-handler-dialog-form-block" ' +
+                    var serverDetailsBlock =
+                        $('<div id="serverDetailsBlock" class="error-handler-dialog-form-block"></div>');
+                    this.renderServerDetails(serverDetailsBlock);
+                    var siddhiAppErrorEntriesBlock =
+                        $('<div id="siddhiAppErrorEntriesBlock" class="error-handler-dialog-form-block" ' +
                         'style="height: 50%; margin-bottom: 0; overflow: auto;"></div>');
                     var siddhiAppSelection = $('<div style="margin-bottom: 20px"></div>');
                     this.renderSiddhiAppSelection(this.availableSiddhiApps, siddhiAppSelection);
-                    errorEntriesBlock.append(siddhiAppSelection);
+                    siddhiAppErrorEntriesBlock.append(siddhiAppSelection);
                     var errorEntries = $('<div style="overflow:auto; height:100%"></div>');
                     this.renderErrorEntries(errorEntries);
 
-                    errorEntriesBlock.append(errorEntries);
-                    container.append(serverConfigBlock);
-                    container.append(errorEntriesBlock);
+                    siddhiAppErrorEntriesBlock.append(errorEntries);
+                    container.append(serverDetailsBlock);
+                    container.append(siddhiAppErrorEntriesBlock);
                 },
 
                 render: function() {

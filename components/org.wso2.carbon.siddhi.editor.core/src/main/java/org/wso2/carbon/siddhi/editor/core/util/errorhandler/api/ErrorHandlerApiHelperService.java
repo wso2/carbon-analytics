@@ -51,5 +51,6 @@ public interface ErrorHandlerApiHelperService {
     boolean discardErrorEntries(String siddhiAppName, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException;
 
-    boolean doPurge(String hostAndPort, String username, String password) throws ErrorHandlerServiceStubException;
+    boolean doPurge(int retentionDays, String hostAndPort, String username, String password)
+        throws ErrorHandlerServiceStubException;
 }

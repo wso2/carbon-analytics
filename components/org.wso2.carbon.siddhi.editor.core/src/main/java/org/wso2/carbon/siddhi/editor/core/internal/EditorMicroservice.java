@@ -1992,43 +1992,38 @@ public class EditorMicroservice implements Microservice {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response discardErrorEntries(@QueryParam("siddhiApp") String siddhiAppName,
+                                        @QueryParam("retentionDays") String retentionDays,
                                         @HeaderParam("serverHost") String host, @HeaderParam("serverPort") String port,
                                         @HeaderParam("username") String username,
                                         @HeaderParam("password") String password) {
         ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
         String hostAndPort = host + ":" + port;
-        try {
-            boolean isSuccess =
-                errorHandlerApiHelper.discardErrorEntries(siddhiAppName, hostAndPort, username, password);
-            if (isSuccess) {
-                return Response.ok().entity(new Gson().toJson("{}")).build();
+        if (siddhiAppName != null && retentionDays == null) {
+            try {
+                boolean isSuccess =
+                    errorHandlerApiHelper.discardErrorEntries(siddhiAppName, hostAndPort, username, password);
+                if (isSuccess) {
+                    return Response.ok().entity(new Gson().toJson("{}")).build();
+                }
+                return Response.serverError().entity(
+                    String.format("Failed to discard error entries for Siddhi app: %s.", siddhiAppName)).build();
+            } catch (ErrorHandlerServiceStubException e) {
+                return Response.serverError().entity(e).build();
             }
-            return Response.serverError().entity(
-                String.format("Failed to discard error entries for Siddhi app: %s.", siddhiAppName)).build();
-        } catch (ErrorHandlerServiceStubException e) {
-            return Response.serverError().entity(e).build();
-        }
-    }
-
-    @DELETE
-    @Path("/error-handler/error-entries")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response purgeErrorStore(@HeaderParam("serverHost") String host, @HeaderParam("serverPort") String port,
-                                    @HeaderParam("username") String username,
-                                    @HeaderParam("password") String password) { // TODO retention policy?
-        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
-        String hostAndPort = host + ":" + port;
-        try {
-            boolean isSuccess =
-                errorHandlerApiHelper.doPurge(hostAndPort, username, password);
-            if (isSuccess) {
-                return Response.ok().entity(new Gson().toJson("{}")).build();
+        } else if (retentionDays != null && siddhiAppName == null) {
+            try {
+                boolean isSuccess =
+                    errorHandlerApiHelper.doPurge(Integer.parseInt(retentionDays), hostAndPort, username, password);
+                if (isSuccess) {
+                    return Response.ok().entity(new Gson().toJson("{}")).build();
+                }
+                return Response.serverError().entity("Failed to purge the error store.").build();
+            } catch (ErrorHandlerServiceStubException e) {
+                return Response.serverError().entity(e).build();
             }
-            return Response.serverError().entity("Failed to purge the error store.").build();
-        } catch (ErrorHandlerServiceStubException e) {
-            return Response.serverError().entity(e).build();
         }
+        return Response.status(Response.Status.BAD_REQUEST)
+            .entity("Exactly one of the following query parameters is required: 'siddhiApp', 'retentionDays'.").build();
     }
 
     /**

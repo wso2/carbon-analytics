@@ -97,8 +97,9 @@ public class HTTPSClientUtil {
             .doDiscardErrorEntries(siddhiAppName);
     }
 
-    public static Response doPurge(String hostAndPort, String username, String password)
+    public static Response doPurge(int retentionDays, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException {
-        return ErrorHandlerFactory.getErrorHandlerHttpsClient(generateURL(hostAndPort), username, password).doPurge();
+        return ErrorHandlerFactory.getErrorHandlerHttpsClient(generateURL(hostAndPort), username, password)
+            .doPurge(retentionDays);
     }
 }

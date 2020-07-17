@@ -102,7 +102,7 @@ public interface ErrorHandlerServiceStub {
     Response doDiscardErrorEntries(@Param("siddhiAppName") String siddhiAppName)
         throws ErrorHandlerServiceStubException;
 
-    @RequestLine("DELETE /error-handler/error-entries")
+    @RequestLine("DELETE /error-handler/error-entries?retentionDays={retentionDays}")
     @Headers("Content-Type: text/plain; charset=utf-8")
-    Response doPurge() throws ErrorHandlerServiceStubException; // TODO retention policy?
+    Response doPurge(@Param("retentionDays") int retentionDays) throws ErrorHandlerServiceStubException;
 }
