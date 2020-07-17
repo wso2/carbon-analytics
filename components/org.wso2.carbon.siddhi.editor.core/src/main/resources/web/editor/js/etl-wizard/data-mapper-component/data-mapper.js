@@ -176,6 +176,10 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     isTarget: true,
                     maxConnections: -1
                 });
+
+                if(expressionMap[element.name]) {
+                    updateConnections(element.name);
+                }
             });
 
             if (this.isInputOutputIdentical) {

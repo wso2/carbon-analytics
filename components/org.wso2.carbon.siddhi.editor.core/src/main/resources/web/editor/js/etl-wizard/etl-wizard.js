@@ -86,7 +86,10 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                 query: {
                     window: {},
                     filter: {},
-                    function: {},
+                    function: {
+                        enable: true,
+                        text: `rdbms:query("INFO", "Sample Event :", true)`
+                    },
                     mapping: {},
                     groupby: {
                         attributes: [],
@@ -112,8 +115,8 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                 {id: 4, description: 'Data Mapping'},
                 {id: 5, description: 'Process Output Data'},
             ];
-            if (config.appName.length === 0) {
-                config.appName = 'UntitledETLTaskFlow';
+            if (this.__propertyMap.appName.length === 0) {
+                this.__propertyMap.appName = 'UntitledETLTaskFlow';
             }
             this.__parentWizardForm = this.constructWizardHTMLElements($('#ETLWizardForm').clone());
         };

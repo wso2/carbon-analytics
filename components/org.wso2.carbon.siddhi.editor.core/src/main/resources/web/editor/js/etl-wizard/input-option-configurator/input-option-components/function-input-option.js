@@ -49,14 +49,57 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                 `);
             });
 
-            if(config.query.function.name) {
-                container.find('#function-name').val(config.query.function.name);
+            if (config.query.function.text) {
+                var functionName = config.query.function.text.match('([a-zA-Z:_0-9]+)\(.*\)')[1];
+                console.log(functionName)
+            } else {
+                if (config.query.function.name) {
+                    container.find('#function-name').val(config.query.function.name);
+                }
+
+                if (config.query.function['parameters'] && Object.keys(config.query.function['parameters']).length > 0) {
+
+                    var functionDataContainer = container.find('.function-parameter-section');
+                    functionDataContainer.empty();
+                    functionDataContainer.append('<h6 style="color: #373737">Select function syntax to proceed</h6>');
+
+                    Object.keys(config.query.function.parameters)
+                        .forEach(function(key, i) {
+                            var paramData = config.query.function.parameters[key];
+                            functionDataContainer.append(`
+                                <div style="width: 100%; padding-bottom: 10px" class="input-section">
+                                    <label style="margin-bottom: 0" class="${paramData.length > 0 ? '' : 'not-visible'}" id="label-function-param-${key.replaceAll(/\./g, '-')}" for="function-param-${key.replaceAll(/\./g, '-')}">${key}</label>
+                                    <input id="function-param-${key.replaceAll(/\./g, '-')}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #373737" placeholder="${key}" type="text" value="${paramData.value}">
+                                </div>
+                            `);
+                        })
+
+                    container.find('.function-parameter-section .input-section input')
+                        .on('focus', function (evt) {
+                            var inputId = evt.currentTarget.id.match('function-param-([a-zA-Z\-\.0-9]+)')[1];
+                            container.find(`#label-function-param-${inputId}`).removeClass('not-visible');
+                            $(evt.currentTarget).attr('placeholder', 'Type here to input the value');
+                        })
+                        .on('focusout', function (evt) {
+                            var inputId = evt.currentTarget.id.match('function-param-([a-zA-Z\-\.0-9]+)')[1];
+                            if ($(evt.currentTarget).val().length === 0) {
+                                container.find(`#label-function-param-${inputId}`).addClass('not-visible');
+                                $(evt.currentTarget).attr('placeholder', container.find(`#label-function-param-${inputId}`).html());
+                            }
+                        })
+                        .on('keyup', _.debounce(function (evt) {
+                            var inputId = evt.currentTarget.id.match('function-param-([a-zA-Z\-\.0-9]+)')[1].replaceAll(/-/g, '.');
+                            config.query.function.parameters[inputId].value = $(evt.currentTarget).val();
+                        }, 100, {}))
+                }
             }
 
             container.find('#function-name')
                 .on('change', function (evt) {
                     var functionID = $(evt.currentTarget).val();
                     var functionData = self.__functionData[functionID];
+                    var syntax = null;
+                    config.query.function = {enable: true, name: functionID}
 
                     if (functionData.syntax.length > 1) {
                         var functionDataContainer = container.find('.function-parameter-section');
@@ -66,73 +109,45 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
 
                         functionData.syntax.forEach(function (syntax, i) {
                             functionList.append(`
-                                <li class="" id="syntax-id-${i}">
-                                    <a style="color:#333">
-                                        <div style="padding: 10px 15px;border-bottom: 1px solid #373737" >
-                                            <b>${syntax.syntax.replaceAll(/</g, '&lt;').replaceAll(/>/g, '&gt;')}</b>
-                                        </div>
-                                    </a>    
-                                </li>
-                            `)
+                                    <li class="" id="syntax-id-${i}">
+                                        <a style="color:#333">
+                                            <div style="padding: 10px 15px;border-bottom: 1px solid #373737" >
+                                                <b>${syntax.syntax.replaceAll(/</g, '&lt;').replaceAll(/>/g, '&gt;')}</b>
+                                            </div>
+                                        </a>    
+                                    </li>
+                                `)
                         });
 
                         functionDataContainer.append(functionList);
                         functionList.find('li').on('click', function (evt) {
                             var syntaxIndex = evt.currentTarget.id.match('syntax-id-([0-9]+)')[1];
-                            config.query.function['name'] = functionID;
-                            config.query.function['syntax'] = functionData.syntax[Number(syntaxIndex)];
-                            config.query.function['syntax'].parameterData = _.reduce(functionData.parameters, function (obj, param) {
-                                obj[param.name] = param.description
-                                return obj
-                            }, {});
-                            config.query.function['parameters'] = self.generateParameters(config.query.function['syntax']);
-                            self.render();
+                            self.renderParametersFromSyntax(functionData, functionData.syntax[Number(syntaxIndex)]);
                         });
                     } else {
-                        config.query.function['name'] = functionID;
-                        config.query.function['syntax'] = functionData.syntax[0];
-                        config.query.function['syntax'].parameterData = _.reduce(functionData.parameters, function (obj, param) {
-                            obj[param.name] = param.description
-                            return obj
-                        }, {})
-                        config.query.function['parameters'] = self.generateParameters(config.query.function['syntax']);
-                        self.render();
+                        self.renderParametersFromSyntax(functionData, functionData.syntax[0])
                     }
                 });
+        }
 
-            if (config.query.function['parameters'] && config.query.function['parameters'].length > 0) {
+        FunctionInputOptionComponent.prototype.renderParametersFromSyntax = function (functionData, syntax) {
+            var self = this;
+            var config = this.__config;            
+            var regExp = /\(([^)]+)\)/;
+            var parameters = regExp.exec(syntax.syntax)[1].split(',');
+            config.query.function['parameters'] = {}
+            parameters.forEach(function (param) {
+                var parameterName = param.trim().split(' ')[1];
+                var paramData = functionData.parameters.find(function (paramDat) {
+                    return paramDat.name === parameterName;
+                })
+                config.query.function.parameters[parameterName] = {
+                    value: paramData.defaultValue,
+                    type: paramData.type
+                }
+            });
 
-                var functionDataContainer = container.find('.function-parameter-section');
-                functionDataContainer.empty();
-                functionDataContainer.append('<h6 style="color: #373737">Select function syntax to proceed</h6>');
-
-                config.query.function.parameters.forEach(function (param, i) {
-                    functionDataContainer.append(`
-                        <div style="width: 100%; padding-bottom: 10px" class="input-section">
-                            <label style="margin-bottom: 0" class="${param.value.length > 0 ? '' : 'not-visible'}" id="label-function-param-${i}" for="function-param-${i}">${param.name}</label>
-                            <input id="function-param-${i}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #373737" placeholder="${param.name}" type="text" value="${param.value}">
-                        </div>
-                    `);
-                });
-
-                container.find('.function-parameter-section .input-section input')
-                    .on('focus', function (evt) {
-                        var inputId = evt.currentTarget.id.match('function-param-([0-9]+)')[1];
-                        container.find(`#label-function-param-${inputId}`).removeClass('not-visible');
-                        $(evt.currentTarget).attr('placeholder', 'Type here to input the value');
-                    })
-                    .on('focusout', function (evt) {
-                        var inputId = evt.currentTarget.id.match('function-param-([0-9]+)')[1];
-                        if($(evt.currentTarget).val().length === 0) {
-                            container.find(`#label-function-param-${inputId}`).addClass('not-visible');
-                            $(evt.currentTarget).attr('placeholder', container.find(`#label-function-param-${inputId}`).html());
-                        }
-                    })
-                    .on('keyup', _.debounce(function (evt) {
-                        var inputId = evt.currentTarget.id.match('function-param-([0-9]+)')[1];
-                        config.query.function.parameters[inputId].value = $(evt.currentTarget).val();
-                    }, 100, {}))
-            }
+            self.render();
         }
 
         FunctionInputOptionComponent.prototype.generateParameters = function (syntax) {
