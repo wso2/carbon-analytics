@@ -36,7 +36,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                 <div style="color: #373737">
                     <label for="function-name">Function type&nbsp;:&nbsp;</label>
                     <select name="function-name" id="function-name">
-                        <option disabled selected value> -- select an option -- </option>
+                        <option disabled selected value="0"> -- select an option -- </option>
                     </select>
                 </div>
                 <div style="padding: 0 5px" class="function-parameter-section">
@@ -51,14 +51,31 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
 
             if (config.query.function.text) {
                 var functionName = config.query.function.text.match('([a-zA-Z:_0-9]+)\(.*\)')[1];
-                console.log(functionName)
+                container.find('.function-parameter-section')
+                    .append(`
+                        <div style="display:flex;margin-top: 15px; text-align: center; font-size: 1.8rem;">
+                            <div style="flex: 1">
+                                <span>${config.query.function.text}</span>
+                            </div>
+                            <div>
+                                <a style="color: #323232">
+                                    <i title="clear stream processor function" class="fw fw-clear"></i>    
+                                </a>    
+                            </div>
+                        </div>
+                    `);
+
+                container.find('#function-name').val(functionName);
+                container.find('.fw-clear').on('click', function(evt) {
+                    config.query.function = {enable: true}
+                    self.render();
+                });
             } else {
                 if (config.query.function.name) {
                     container.find('#function-name').val(config.query.function.name);
                 }
 
                 if (config.query.function['parameters'] && Object.keys(config.query.function['parameters']).length > 0) {
-
                     var functionDataContainer = container.find('.function-parameter-section');
                     functionDataContainer.empty();
                     functionDataContainer.append('<h6 style="color: #373737">Select function syntax to proceed</h6>');
