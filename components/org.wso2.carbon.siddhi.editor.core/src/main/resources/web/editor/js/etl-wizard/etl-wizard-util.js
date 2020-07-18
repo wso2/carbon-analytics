@@ -265,7 +265,7 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'app/source-edit
 
         var validateGroupBy = function (groupBy) {
             var isValid = true;
-            if (groupBy.attributes.length > 0 && typeof groupBy.havingFilter !== 'string') {
+            if (groupBy.attributes.length > 0 && typeof groupBy.havingFilter.expression !== 'string') {
                 isValid = validateExpression(groupBy.havingFilter.expression);
 
                 if (isValid) {

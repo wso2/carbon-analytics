@@ -82,8 +82,9 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             var jsPlumbInstance = this.jsPlumbInstance;
             var inputAttributeEndpoints = this.inputAttributeEndpoints;
             var outputAttributeEndpoints = this.outputAttributeEndpoints;
-            var generatedExpression = this.expressionMap[outputAttribute] ?
-                '= ' + DataMapperUtil.generateExpressionHTML2(this.expressionMap[outputAttribute], '', null) : '';
+            var generatedExpression = this.expressionMap[outputAttribute] && typeof this.expressionMap[outputAttribute] !== 'string' ?
+                '= ' + DataMapperUtil.generateExpressionHTML2(this.expressionMap[outputAttribute], '', null)
+                : this.expressionMap[outputAttribute] ? `= ${this.expressionMap[outputAttribute]}` : '';
 
             $(outputAttributeEndpoints[outputAttribute].element).find('.mapped-expression').empty();
             $(outputAttributeEndpoints[outputAttribute].element).find('.mapped-expression').append(`
@@ -176,10 +177,6 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     isTarget: true,
                     maxConnections: -1
                 });
-
-                if(expressionMap[element.name]) {
-                    updateConnections(element.name);
-                }
             });
 
             if (this.isInputOutputIdentical) {
@@ -202,6 +199,11 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
             this.inputAttributeEndpoints = inputEndpointMap;
             this.outputAttributeEndpoints = outputEndpointMap;
+            outputAttributes.forEach(function (element) {
+                if (expressionMap[element.name]) {
+                    updateConnections(element.name);
+                }
+            });
         }
 
         DataMapper.prototype.showExpressionDialog = function(output_attribute) {
@@ -278,7 +280,11 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     <div class="expression target" style="display: flex">
                         <div class="exp-content" style="width: 100%;">
                         <i style="color: #808080">expression: </i>
-                            ${DataMapperUtil.generateExpressionHTML2(expression, '', null)}
+                            ${
+                                typeof expression !== 'string' ?
+                                    DataMapperUtil.generateExpressionHTML2(expression, '', null)
+                                    : expression
+                            }
                         </div>
                     </div>
                 `);
@@ -423,126 +429,129 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             var supportedFunctions = {};
             var supportedOperators = {};
 
-            if (tempExp.rootNode) {
-                switch (tempExp.rootNode.type) {
-                    case 'function':
-                    case 'attribute':
-                    case 'customValue':
-                    case 'scope':
-                        Object.keys(DataMapperUtil.OperatorMap2)
-                            .filter(function (key) {
-                                return DataMapperUtil.OperatorMap2[key].hasLeft
-                                    && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExp.rootNode.genericReturnTypes).length > 0
-                                    && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExp.genericReturnTypes).length > 0
-                            })
-                            .forEach(function (key) {
-                                supportedOperators[key] = DataMapperUtil.OperatorMap2[key]
-                            });
-                        break;
-                    case 'operator':
-                        if (tempExp.rootNode.hasRight && !tempExp.rootNode.rightNode) {
-                            config.input.stream.attributes
-                                .filter(function (attr) {
-                                    return tempExp.rootNode.rightTypes.indexOf(DataMapperUtil.getGenericDataType(attr.type)) > -1;
-                                })
-                                .forEach(function (attr) {
-                                    supportedInputAttributes[attr.name] = attr;
-                                });
-
-                            supportedInputAttributes['$custom_val_properties'] = {
-                                genericDataTypes: tempExp.rootNode.rightTypes,
-                            };
-
-                            Object.keys(functionDataMap).forEach(function (key) {
-                                var dataTypes = [];
-
-                                if (tempExp.rootNode.genericReturnTypes.indexOf(DataMapperUtil.getGenericDataType(key)) > -1) {
-                                    dataTypes.push(key);
-                                    supportedFunctions = _.merge({}, supportedFunctions, functionDataMap[key]['function'])
-                                }
-                            });
-
-                            if(tempExp.rootNode.type !== 'scope') {
-                                supportedOperators = {
-                                    bracket: {
-                                        returnTypes: ['bool', 'text', 'number'],
-                                        leftTypes: ['bool', 'text', 'number'],
-                                        rightTypes: ['bool', 'text', 'number'],
-                                        symbol: '()',
-                                        description: 'Bracket',
-                                        isFirst: true,
-                                        scope: true
-                                    }
-                                };
-                            }
-                        } else {
+            if (typeof tempExp !== 'string') {
+                if (tempExp.rootNode) {
+                    switch (tempExp.rootNode.type) {
+                        case 'function':
+                        case 'attribute':
+                        case 'customValue':
+                        case 'scope':
                             Object.keys(DataMapperUtil.OperatorMap2)
                                 .filter(function (key) {
-                                    return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExp.rootNode.genericReturnTypes).length > 0
-                                        && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExp.genericReturnTypes).length > 0;
+                                    return DataMapperUtil.OperatorMap2[key].hasLeft
+                                        && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExp.rootNode.genericReturnTypes).length > 0
+                                        && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExp.genericReturnTypes).length > 0
                                 })
                                 .forEach(function (key) {
                                     supportedOperators[key] = DataMapperUtil.OperatorMap2[key]
                                 });
-                        }
+                            break;
+                        case 'operator':
+                            if (tempExp.rootNode.hasRight && !tempExp.rootNode.rightNode) {
+                                config.input.stream.attributes
+                                    .filter(function (attr) {
+                                        return tempExp.rootNode.rightTypes.indexOf(DataMapperUtil.getGenericDataType(attr.type)) > -1;
+                                    })
+                                    .forEach(function (attr) {
+                                        supportedInputAttributes[attr.name] = attr;
+                                    });
 
-                        break;
-                }
-            } else {
+                                supportedInputAttributes['$custom_val_properties'] = {
+                                    genericDataTypes: tempExp.rootNode.rightTypes,
+                                };
 
-                var customDataTypes = []
-                if (tempExp.returnTypes.indexOf('bool') > -1) {
-                    config.input.stream.attributes
-                        .forEach(function (attr) {
-                            supportedInputAttributes[attr.name] = attr;
-                        });
-                    customDataTypes = ['text', 'number', 'bool'];
+                                Object.keys(functionDataMap).forEach(function (key) {
+                                    var dataTypes = [];
 
+                                    if (tempExp.rootNode.genericReturnTypes.indexOf(DataMapperUtil.getGenericDataType(key)) > -1) {
+                                        dataTypes.push(key);
+                                        supportedFunctions = _.merge({}, supportedFunctions, functionDataMap[key]['function'])
+                                    }
+                                });
+
+                                if (tempExp.rootNode.type !== 'scope') {
+                                    supportedOperators = {
+                                        bracket: {
+                                            returnTypes: ['bool', 'text', 'number'],
+                                            leftTypes: ['bool', 'text', 'number'],
+                                            rightTypes: ['bool', 'text', 'number'],
+                                            symbol: '()',
+                                            description: 'Bracket',
+                                            isFirst: true,
+                                            scope: true
+                                        }
+                                    };
+                                }
+                            } else {
+                                Object.keys(DataMapperUtil.OperatorMap2)
+                                    .filter(function (key) {
+                                        return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExp.rootNode.genericReturnTypes).length > 0
+                                            && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExp.genericReturnTypes).length > 0;
+                                    })
+                                    .forEach(function (key) {
+                                        supportedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                    });
+                            }
+
+                            break;
+                    }
                 } else {
-                    config.input.stream.attributes
-                        .filter(function(attr){
-                            return tempExp.returnTypes.indexOf(attr.type) > -1;
-                        }).forEach(function (attr) {
+
+                    var customDataTypes = []
+                    if (tempExp.returnTypes.indexOf('bool') > -1) {
+                        config.input.stream.attributes
+                            .forEach(function (attr) {
+                                supportedInputAttributes[attr.name] = attr;
+                            });
+                        customDataTypes = ['text', 'number', 'bool'];
+
+                    } else {
+                        config.input.stream.attributes
+                            .filter(function (attr) {
+                                return tempExp.returnTypes.indexOf(attr.type) > -1;
+                            }).forEach(function (attr) {
                             supportedInputAttributes[attr.name] = attr;
                         });
 
-                    tempExp.returnTypes.forEach(function(type) {
-                        customDataTypes.push(DataMapperUtil.getGenericDataType(type));
-                        supportedFunctions = functionDataMap[type]['function'] ?
-                            _.merge({}, supportedFunctions, functionDataMap[type]['function']) :
-                            supportedFunctions;
-                    })
+                        tempExp.returnTypes.forEach(function (type) {
+                            customDataTypes.push(DataMapperUtil.getGenericDataType(type));
+                            supportedFunctions = functionDataMap[type]['function'] ?
+                                _.merge({}, supportedFunctions, functionDataMap[type]['function']) :
+                                supportedFunctions;
+                        })
+                    }
+
+                    supportedInputAttributes['$custom_val_properties'] = {
+                        genericDataTypes: customDataTypes
+                    };
+
+                    supportedOperators['bracket'] = {
+                        returnTypes: ['bool', 'text', 'number'],
+                        leftTypes: ['bool', 'text', 'number'],
+                        rightTypes: ['bool', 'text', 'number'],
+                        symbol: '()',
+                        description: 'Bracket',
+                        isFirst: true,
+                        scope: true
+                    }
+
+                    Object.keys(DataMapperUtil.OperatorMap2)
+                        .filter(function (key) {
+                            return DataMapperUtil.OperatorMap2[key].isFirst &&
+                                _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExp.returnTypes).length > 0;
+                        })
+                        .forEach(function (key) {
+                            supportedOperators[key] = DataMapperUtil.OperatorMap2[key];
+                        });
                 }
 
-                supportedInputAttributes['$custom_val_properties'] = {
-                    genericDataTypes: customDataTypes
-                };
-
-                supportedOperators['bracket'] = {
-                    returnTypes: ['bool', 'text', 'number'],
-                    leftTypes: ['bool', 'text', 'number'],
-                    rightTypes: ['bool', 'text', 'number'],
-                    symbol: '()',
-                    description: 'Bracket',
-                    isFirst: true,
-                    scope: true
+                if (tempExp.type === 'function') {
+                    supportedOperators = {};
+                    supportedFunctions = {};
+                    supportedInputAttributes = {};
                 }
-
-                Object.keys(DataMapperUtil.OperatorMap2)
-                    .filter(function (key) {
-                        return DataMapperUtil.OperatorMap2[key].isFirst &&
-                            _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExp.returnTypes).length > 0;
-                    })
-                    .forEach(function (key) {
-                        supportedOperators[key] = DataMapperUtil.OperatorMap2[key];
-                    });
             }
 
-            if(tempExp.type === 'function') {
-                supportedOperators = {};
-                supportedFunctions = {};
-                supportedInputAttributes = {};
-            }
 
             if (selectedCategory === 'Attribute') {
                 Object.keys(supportedInputAttributes).forEach(function(key) {
@@ -1165,31 +1174,70 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
         // }
 
         function validateExpressionTree(expression) {
+            // var errorsFound = 0;
+            // validateLevel(expression);
+            //
+            // function validateLevel(expression) {
+            //     if (expression.nodeType === 'scope') {
+            //
+            //         if (expression.children.length === 0) {
+            //             errorsFound++;
+            //         }
+            //
+            //         if (expression.children.length > 0 &&
+            //             expression.children[expression.children.length - 1].nodeType === 'operator' &&
+            //             !(expression.children[expression.children.length - 1].isEnd)) {
+            //
+            //             errorsFound++;
+            //         }
+            //
+            //         expression.children.forEach(function(childNode) {
+            //             validateLevel(childNode);
+            //         });
+            //
+            //     } else if (expression.nodeType === 'function') {
+            //         expression.parameters.forEach(function(parameter) {
+            //             validateLevel(parameter);
+            //         })
+            //     }
+            // }
+            //
+            // return errorsFound === 0;
+
             var errorsFound = 0;
             validateLevel(expression);
 
             function validateLevel(expression) {
-                if (expression.nodeType === 'scope') {
+                switch (expression.type) {
+                    case 'scope':
+                        if (expression.rootNode) {
+                            validateLevel(expression.rootNode);
+                        } else {
+                            errorsFound++;
+                        }
+                        break;
+                    case 'operator':
+                        if (expression.hasLeft) {
+                            if (expression.leftNode) {
+                                validateLevel(expression.leftNode);
+                            } else {
+                                errorsFound++;
+                            }
+                        }
 
-                    if (expression.children.length === 0) {
-                        errorsFound++;
-                    }
-
-                    if (expression.children.length > 0 &&
-                        expression.children[expression.children.length - 1].nodeType === 'operator' &&
-                        !(expression.children[expression.children.length - 1].isEnd)) {
-
-                        errorsFound++;
-                    }
-
-                    expression.children.forEach(function(childNode) {
-                        validateLevel(childNode);
-                    });
-
-                } else if (expression.nodeType === 'function') {
-                    expression.parameters.forEach(function(parameter) {
-                        validateLevel(parameter);
-                    })
+                        if (expression.hasRight) {
+                            if (expression.rightNode) {
+                                validateLevel(expression.rightNode);
+                            } else {
+                                errorsFound++;
+                            }
+                        }
+                        break;
+                    case 'function':
+                        expression.parameters.forEach(function (paramNode) {
+                            validateLevel(paramNode);
+                        })
+                        break;
                 }
             }
 

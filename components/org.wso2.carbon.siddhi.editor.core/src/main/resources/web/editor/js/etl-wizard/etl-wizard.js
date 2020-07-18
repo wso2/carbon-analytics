@@ -85,15 +85,20 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                 },
                 query: {
                     window: {},
-                    filter: {},
-                    function: {
-                        enable: true,
-                        text: `rdbms:query("INFO", "Sample Event :", true)`
+                    filter: {
+                        // enable: true,
+                        // expression: 'haha'
                     },
-                    mapping: {},
+                    function: {
+                        // enable: true,
+                        // text: `rdbms:query("INFO", "Sample Event :", true)`
+                    },
+                    mapping: {
+                        // id: "id"
+                    },
                     groupby: {
                         attributes: [],
-                        havingFilter : {},
+                        havingFilter : {}
                     },
                     orderby: {
                         attributes: []
@@ -387,7 +392,6 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                 this.__expressionData.extensions.source.sources :
                 this.__expressionData.extensions.sink.sinks;
             var selectedExtension = null;
-
 
             wizardBodyContent.append(`
                 <div style="max-height: ${wizardBodyContent[0].offsetHeight}; overflow: auto" class="content-section">

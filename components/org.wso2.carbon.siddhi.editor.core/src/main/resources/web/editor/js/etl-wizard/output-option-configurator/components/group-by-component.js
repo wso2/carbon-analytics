@@ -24,7 +24,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
             this.__container = container;
             this.__indexArray = [];
             this.__focusNodes = [];
-            this.__expression = null;
+            this.__expression = config.query.groupby.havingFilter.expression || null;
         }
 
         QueryGroupByComponent.prototype.constructor = QueryGroupByComponent;
@@ -157,22 +157,32 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                         <div style="background-color: #3a3a3a">
                             <div style="color: #fff; margin-top: 15px" class="expression-section">
                             </div>
-                            <div class="operand-section" style="display: flex; flex: 1; flex-direction: column">
-                                <div class="operand-category-select" style="display: flex;">
-                                    
-                                </div>
-                                <div class="operand-select-section" style="background: #6a6a6a; overflow: auto">
-                                    <ul>
-                                    </ul>
-                                </div>
-                            </div>
+                            ${
+                                typeof config.query.groupby.havingFilter !=='string'?
+                                    `<div class="operand-section" style="display: flex; flex: 1; flex-direction: column">
+                                        <div class="operand-category-select" style="display: flex;">
+                                            
+                                        </div>
+                                        <div class="operand-select-section" style="background: #6a6a6a; overflow: auto">
+                                            <ul>
+                                            </ul>
+                                        </div>
+                                    </div>` : ''    
+                            }
+                            
                         </div>
                     `);
 
                 container.find('.expression-section')
                     .append(`
                         <div style="display: flex; padding: ${focusNodes.length === 0 ? '15px' : '5px'} 0;" class="expression ${focusNodes.length === 0 ? 'focus' : ''}">
-                            <div style="width: 95%" class="expression-content">${DataMapperUtil.generateExpressionHTML2(expression, '')}</div>    
+                            <div style="width: 95%" class="expression-content">
+                                ${
+                                    typeof expression !== 'string' ?
+                                        DataMapperUtil.generateExpressionHTML2(expression, '')
+                                        : expression
+                                }
+                            </div>    
                             ${
                                 focusNodes.length === 0 ?
                                     `<div style="padding: 5px;" class="icon-section"><a><i class="fw fw-clear"></i></a></div>`
@@ -181,80 +191,91 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                         </div>
                     `);
 
+                container.find('.expression-section .fw-clear')
+                    .on('click', function () {
+                        config.query.groupby.havingFilter['enabled'] = true;
+                        config.query.groupby.havingFilter['expression'] = new ScopeModel(['bool']);
+                        self.__expression = config.query.groupby.havingFilter['expression'];
+                        self.render();
+                    })
+
                 var allowedAttributes = {};
                 var allowedOperators = {};
 
                 var tempExpression = focusNodes.length > 0 ? focusNodes[focusNodes.length - 1] : expression;
 
-                if (tempExpression.rootNode) {
-                    switch (tempExpression.rootNode.type) {
-                        case 'function':
-                        case 'attribute':
-                        case 'customValue':
-                        case 'scope':
-                            Object.keys(DataMapperUtil.OperatorMap2)
-                                .filter(function (key) {
-                                    return DataMapperUtil.OperatorMap2[key].hasLeft && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
-                                })
-                                .forEach(function (key) {
-                                    allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
-                                });
-                            break;
-                        case 'operator':
-                            if (tempExpression.rootNode.hasRight && !tempExpression.rootNode.rightNode) {
-                                config.query.groupby.attributes
-                                    .filter(function (attr) {
-                                        return tempExpression.rootNode.rightTypes.indexOf(DataMapperUtil.getGenericDataType(attr.type)) > -1;
+                if (typeof tempExpression !== 'string') {
+
+                    if (tempExpression.rootNode) {
+                        switch (tempExpression.rootNode.type) {
+                            case 'function':
+                            case 'attribute':
+                            case 'customValue':
+                            case 'scope':
+                                Object.keys(DataMapperUtil.OperatorMap2)
+                                    .filter(function (key) {
+                                        return DataMapperUtil.OperatorMap2[key].hasLeft && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
                                     })
-                                    .forEach(function (attr) {
-                                        allowedAttributes[attr.name] = attr;
+                                    .forEach(function (key) {
+                                        allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
                                     });
+                                break;
+                            case 'operator':
+                                if (tempExpression.rootNode.hasRight && !tempExpression.rootNode.rightNode) {
+                                    config.query.groupby.attributes
+                                        .filter(function (attr) {
+                                            return tempExpression.rootNode.rightTypes.indexOf(DataMapperUtil.getGenericDataType(attr.type)) > -1;
+                                        })
+                                        .forEach(function (attr) {
+                                            allowedAttributes[attr.name] = attr;
+                                        });
 
-                                allowedAttributes['$custom_val_properties'] = {
-                                    genericDataTypes: tempExpression.rootNode.rightTypes,
-                                };
-                            }
+                                    allowedAttributes['$custom_val_properties'] = {
+                                        genericDataTypes: tempExpression.rootNode.rightTypes,
+                                    };
+                                }
 
-                            Object.keys(DataMapperUtil.OperatorMap2)
-                                .filter(function (key) {
-                                    return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
-                                })
-                                .forEach(function (key) {
-                                    allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
-                                });
-                            break;
-                    }
-                } else {
-                    config.query.groupby.attributes
-                        .forEach(function (attr) {
-                            allowedAttributes[attr.name] = attr;
-                        });
-
-                    allowedAttributes['$custom_val_properties'] = {
-                        genericDataTypes: ['text', 'number', 'bool']
-                    };
-
-                    allowedOperators = {
-                        bracket: {
-                            returnTypes: ['bool', 'text', 'number'],
-                            leftTypes: ['bool', 'text', 'number'],
-                            rightTypes: ['bool', 'text', 'number'],
-                            symbol: '()',
-                            description: 'Bracket',
-                            isFirst: true,
-                            scope: true
+                                Object.keys(DataMapperUtil.OperatorMap2)
+                                    .filter(function (key) {
+                                        return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
+                                    })
+                                    .forEach(function (key) {
+                                        allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                    });
+                                break;
                         }
-                    };
+                    } else {
+                        config.query.groupby.attributes
+                            .forEach(function (attr) {
+                                allowedAttributes[attr.name] = attr;
+                            });
 
-                    Object.keys(DataMapperUtil.OperatorMap2)
-                        .filter(function (key) {
-                            return DataMapperUtil.OperatorMap2[key].isFirst &&
-                                _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.returnTypes).length > 0;
-                        })
-                        .forEach(function (key) {
-                            allowedOperators[key] = DataMapperUtil.OperatorMap2[key];
-                        });
+                        allowedAttributes['$custom_val_properties'] = {
+                            genericDataTypes: ['text', 'number', 'bool']
+                        };
 
+                        allowedOperators = {
+                            bracket: {
+                                returnTypes: ['bool', 'text', 'number'],
+                                leftTypes: ['bool', 'text', 'number'],
+                                rightTypes: ['bool', 'text', 'number'],
+                                symbol: '()',
+                                description: 'Bracket',
+                                isFirst: true,
+                                scope: true
+                            }
+                        };
+
+                        Object.keys(DataMapperUtil.OperatorMap2)
+                            .filter(function (key) {
+                                return DataMapperUtil.OperatorMap2[key].isFirst &&
+                                    _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.returnTypes).length > 0;
+                            })
+                            .forEach(function (key) {
+                                allowedOperators[key] = DataMapperUtil.OperatorMap2[key];
+                            });
+
+                    }
                 }
 
                 if (Object.keys(allowedAttributes).length > 0) {

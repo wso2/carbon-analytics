@@ -54,22 +54,31 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                 </div>
                 <div style="color: #373737" class="expression-section">
                 </div>
-                <div class="operand-section" style="display: flex; flex: 1; margin-top: 15px">
-                    <div class="operand-category-select" style="width: 20%">
-                        <ul>
-                        </ul>
-                    </div>
-                    <div class="operand-select-section" style="width: 80%; background: #d3d3d3; overflow: auto">
-                        <ul>
-                        </ul>
-                    </div>
-                </div>
+                ${
+                    typeof expression !== 'string' ?
+                        `<div class="operand-section" style="display: flex; flex: 1; margin-top: 15px">
+                            <div class="operand-category-select" style="width: 20%">
+                                <ul>
+                                </ul>
+                            </div>
+                            <div class="operand-select-section" style="width: 80%; background: #d3d3d3; overflow: auto">
+                                <ul>
+                                </ul>
+                            </div>
+                        </div>` : ''
+                }
             `);
 
             container.find('.expression-section')
                 .append(`
                     <div style="display: flex; padding: ${focusNodes.length === 0 ? '15px' : '5px'} 0;" class="expression ${focusNodes.length === 0 ? 'focus' : ''}">
-                        <div style="width: 95%" class="expression-content">${DataMapperUtil.generateExpressionHTML2(expression, '')}</div>    
+                        <div style="width: 95%" class="expression-content">
+                            ${
+                                typeof expression !== 'string' ?
+                                    DataMapperUtil.generateExpressionHTML2(expression, '')
+                                    : expression
+                            }
+                        </div>    
                         ${
                         focusNodes.length === 0 ?
                             `<div style="width: 5%;padding: 5px;" class="icon-section"><a style="color: #373737"><i class="fw fw-clear"></i></a></div>`
@@ -99,119 +108,121 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
 
             var tempExpression = focusNodes.length > 0 ? focusNodes[focusNodes.length - 1] : expression;
 
-            if (tempExpression.rootNode) {
-                switch (tempExpression.rootNode.type) {
-                    case 'function':
-                    case 'attribute':
-                    case 'customValue':
-                    case 'scope':
+            if (typeof tempExpression !== 'string') {
+                if (tempExpression.rootNode) {
+                    switch (tempExpression.rootNode.type) {
+                        case 'function':
+                        case 'attribute':
+                        case 'customValue':
+                        case 'scope':
 
-                        if(tempExpression.genericReturnTypes.indexOf('bool') > -1) {
-                            Object.keys(DataMapperUtil.OperatorMap2)
-                                .filter(function (key) {
-                                    return DataMapperUtil.OperatorMap2[key].hasLeft
-                                        && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
-                                })
-                                .forEach(function (key) {
-                                    allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
-                                });
-                        } else {
-                            Object.keys(DataMapperUtil.OperatorMap2)
-                                .filter(function (key) {
-                                    return DataMapperUtil.OperatorMap2[key].hasLeft
-                                        && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
-                                        && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.genericReturnTypes).length > 0
-                                })
-                                .forEach(function (key) {
-                                    allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
-                                });
-                        }
-                        break;
-                    case 'operator':
-                        if (tempExpression.rootNode.hasRight && !tempExpression.rootNode.rightNode) {
-                            config.input.stream.attributes
-                                .filter(function (attr) {
-                                    return tempExpression.rootNode.rightTypes.indexOf(DataMapperUtil.getGenericDataType(attr.type)) > -1;
-                                })
-                                .forEach(function (attr) {
-                                    allowedAttributes[attr.name] = attr;
-                                });
-
-                            allowedAttributes['$custom_val_properties'] = {
-                                genericDataTypes: tempExpression.rootNode.rightTypes,
-                            };
-
-                            if(tempExpression.rootNode.type !== 'scope') {
-                                allowedOperators = {
-                                    bracket: {
-                                        returnTypes: ['bool', 'text', 'number'],
-                                        leftTypes: ['bool', 'text', 'number'],
-                                        rightTypes: ['bool', 'text', 'number'],
-                                        symbol: '()',
-                                        description: 'Bracket',
-                                        isFirst: true,
-                                        scope: true
-                                    }
-                                };
+                            if (tempExpression.genericReturnTypes.indexOf('bool') > -1) {
+                                Object.keys(DataMapperUtil.OperatorMap2)
+                                    .filter(function (key) {
+                                        return DataMapperUtil.OperatorMap2[key].hasLeft
+                                            && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
+                                    })
+                                    .forEach(function (key) {
+                                        allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                    });
+                            } else {
+                                Object.keys(DataMapperUtil.OperatorMap2)
+                                    .filter(function (key) {
+                                        return DataMapperUtil.OperatorMap2[key].hasLeft
+                                            && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
+                                            && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.genericReturnTypes).length > 0
+                                    })
+                                    .forEach(function (key) {
+                                        allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                    });
                             }
-                        } else {
-                            Object.keys(DataMapperUtil.OperatorMap2)
-                                .filter(function (key) {
-                                    return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
-                                        && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.genericReturnTypes).length > 0;
-                                })
-                                .forEach(function (key) {
-                                    allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
-                                });
-                        }
+                            break;
+                        case 'operator':
+                            if (tempExpression.rootNode.hasRight && !tempExpression.rootNode.rightNode) {
+                                config.input.stream.attributes
+                                    .filter(function (attr) {
+                                        return tempExpression.rootNode.rightTypes.indexOf(DataMapperUtil.getGenericDataType(attr.type)) > -1;
+                                    })
+                                    .forEach(function (attr) {
+                                        allowedAttributes[attr.name] = attr;
+                                    });
 
-                        break;
-                }
-            } else {
+                                allowedAttributes['$custom_val_properties'] = {
+                                    genericDataTypes: tempExpression.rootNode.rightTypes,
+                                };
 
-                var customDataTypes = []
-                if (tempExpression.returnTypes.indexOf('bool') > -1) {
-                    config.input.stream.attributes
-                        .forEach(function (attr) {
+                                if (tempExpression.rootNode.type !== 'scope') {
+                                    allowedOperators = {
+                                        bracket: {
+                                            returnTypes: ['bool', 'text', 'number'],
+                                            leftTypes: ['bool', 'text', 'number'],
+                                            rightTypes: ['bool', 'text', 'number'],
+                                            symbol: '()',
+                                            description: 'Bracket',
+                                            isFirst: true,
+                                            scope: true
+                                        }
+                                    };
+                                }
+                            } else {
+                                Object.keys(DataMapperUtil.OperatorMap2)
+                                    .filter(function (key) {
+                                        return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
+                                            && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.genericReturnTypes).length > 0;
+                                    })
+                                    .forEach(function (key) {
+                                        allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                    });
+                            }
+
+                            break;
+                    }
+                } else {
+
+                    var customDataTypes = []
+                    if (tempExpression.returnTypes.indexOf('bool') > -1) {
+                        config.input.stream.attributes
+                            .forEach(function (attr) {
+                                allowedAttributes[attr.name] = attr;
+                            });
+                        customDataTypes = ['text', 'number', 'bool'];
+
+                    } else {
+                        config.input.stream.attributes
+                            .filter(function (attr) {
+                                return tempExpression.returnTypes.indexOf(attr.type) > -1;
+                            }).forEach(function (attr) {
                             allowedAttributes[attr.name] = attr;
                         });
-                    customDataTypes = ['text', 'number', 'bool'];
 
-                } else {
-                    config.input.stream.attributes
-                        .filter(function(attr){
-                            return tempExpression.returnTypes.indexOf(attr.type) > -1;
-                        }).forEach(function (attr) {
-                        allowedAttributes[attr.name] = attr;
-                    });
+                        tempExpression.returnTypes.forEach(function (type) {
+                            customDataTypes.push(DataMapperUtil.getGenericDataType(type));
+                        })
+                    }
 
-                    tempExpression.returnTypes.forEach(function(type) {
-                        customDataTypes.push(DataMapperUtil.getGenericDataType(type));
-                    })
+                    allowedAttributes['$custom_val_properties'] = {
+                        genericDataTypes: customDataTypes
+                    };
+
+                    allowedOperators['bracket'] = {
+                        returnTypes: ['bool', 'text', 'number'],
+                        leftTypes: ['bool', 'text', 'number'],
+                        rightTypes: ['bool', 'text', 'number'],
+                        symbol: '()',
+                        description: 'Bracket',
+                        isFirst: true,
+                        scope: true
+                    }
+
+                    Object.keys(DataMapperUtil.OperatorMap2)
+                        .filter(function (key) {
+                            return DataMapperUtil.OperatorMap2[key].isFirst &&
+                                _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.returnTypes).length > 0;
+                        })
+                        .forEach(function (key) {
+                            allowedOperators[key] = DataMapperUtil.OperatorMap2[key];
+                        });
                 }
-
-                allowedAttributes['$custom_val_properties'] = {
-                    genericDataTypes: customDataTypes
-                };
-
-                allowedOperators['bracket'] = {
-                    returnTypes: ['bool', 'text', 'number'],
-                    leftTypes: ['bool', 'text', 'number'],
-                    rightTypes: ['bool', 'text', 'number'],
-                    symbol: '()',
-                    description: 'Bracket',
-                    isFirst: true,
-                    scope: true
-                }
-
-                Object.keys(DataMapperUtil.OperatorMap2)
-                    .filter(function (key) {
-                        return DataMapperUtil.OperatorMap2[key].isFirst &&
-                            _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.returnTypes).length > 0;
-                    })
-                    .forEach(function (key) {
-                        allowedOperators[key] = DataMapperUtil.OperatorMap2[key];
-                    });
             }
 
             if (Object.keys(allowedAttributes).length > 0) {
