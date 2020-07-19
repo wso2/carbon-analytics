@@ -2,8 +2,8 @@
  * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
-    function (require, _, $, Constants, Backbone, alerts) {
+define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagination'],
+    function (require, _, $, Constants, Backbone, alerts, pagination) {
         var ErrorHandlerDialog = Backbone.View.extend(
             {
                 PAYLOAD_STRING: 'PAYLOAD_STRING',
@@ -47,31 +47,71 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
 
                 // TODO this will be replaced with pagination. So don't worry about duplicate code with replay all
                 fetchErrorEntries: function(siddhiAppName, serverHost, serverPort, username, password) {
-                    var self = this;
-                    var serviceUrl = self.app.config.services.errorHandler.endpoint;
-                    $.ajax({
-                        type: "GET",
-                        contentType: "application/json; charset=utf-8",
-                        headers: {
-                            'serverHost': serverHost,
-                            'serverPort': serverPort,
-                            'username': username,
-                            'password': password
-                        },
-                        // TODO for now no limit and offset. Need to have it
-                        url: serviceUrl + '/error-entries?siddhiApp=' + siddhiAppName,
-                        async: false,
-                        success: function (data) {
-                            console.log("Erroneous Events Response received", data)
-                            self.errorEntries = data;
-                            self.renderContent();
-                        },
-                        error: function (e) {
-                            alerts.error("Unable to fetch Erroneous Events." +
-                                "Please see the editor console for further information.")
-                            throw "Unable to read errors";
-                        }
-                    });
+                    // TODO remove when below is finalized
+                    // var self = this;
+                    // var serviceUrl = self.app.config.services.errorHandler.endpoint;
+                    // $.ajax({
+                    //     type: "GET",
+                    //     contentType: "application/json; charset=utf-8",
+                    //     headers: {
+                    //         'serverHost': serverHost,
+                    //         'serverPort': serverPort,
+                    //         'username': username,
+                    //         'password': password
+                    //     },
+                    //     // TODO for now no limit and offset. Need to have it
+                    //     url: serviceUrl + '/error-entries?siddhiApp=' + siddhiAppName,
+                    //     async: false,
+                    //     success: function (data) {
+                    //         console.log("Erroneous Events Response received", data)
+                    //         self.errorEntries = data;
+                    //         self.renderContent();
+                    //     },
+                    //     error: function (e) {
+                    //         alerts.error("Unable to fetch Erroneous Events." +
+                    //             "Please see the editor console for further information.")
+                    //         throw "Unable to read errors";
+                    //     }
+                    // });
+
+                    // var self = this;
+                    // this.paginator.pagination({
+                    //     dataSource: function(done) {
+                    //         var serviceUrl = self.app.config.services.errorHandler.endpoint;
+                    //         $.ajax({ // TODO confirm this
+                    //             type: 'GET',
+                    //             contentType: "application/json; charset=utf-8",
+                    //             headers: {
+                    //                 'serverHost': serverHost,
+                    //                 'serverPort': serverPort,
+                    //                 'username': username,
+                    //                 'password': password,
+                    //             },
+                    //             url: serviceUrl + '/error-entries?siddhiApp=' + siddhiAppName,
+                    //             success: function(response) {
+                    //                 console.log("Response received: ", response)
+                    //                 done(response);
+                    //             }
+                    //         });
+                    //     },
+                    //     alias: {
+                    //         pageNumber: 'offset',
+                    //         pageSize: 'limit'
+                    //     },
+                    //     pageSize: 1,
+                    //     ajax: {
+                    //         beforeSend: function() {
+                    //             console.log('Loading data from DB ...');
+                    //         }
+                    //     },
+                    //     callback: function(data, pagination) {
+                    //         console.log("callback data", data)
+                    //         console.log("callback pagination", pagination)
+                    //         self.errorEntries = data;
+                    //         self.paginationData = pagination;
+                    //         self.renderContent();
+                    //     }
+                    // })
                 },
 
                 // TODO improve name?
@@ -148,8 +188,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                             console.log("Replay Response received")
                             // Re-fetch after discarding error
                             if (shouldFetchAfterReplay) {
-                                self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username,
-                                    password);
+                                // self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username,
+                                //     password); // TODO remove
+                                self.renderContent();
                             }
                         },
                         error: function (e) {
@@ -199,7 +240,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                             throw "Unable to read errors";
                         }
                     });
-                    self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
+                    // TODO remove
+                    // self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
+                    self.renderContent();
                 },
 
                 discardErrorEntry: function(errorEntryId, serverHost, serverPort, username, password) {
@@ -218,7 +261,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         async: false,
                         success: function (data) {
                             console.log("Discarded entry with id: " + errorEntryId, data)
-                            self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
+                            // TODO remove
+                            // self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
+                            self.renderContent();
                         },
                         error: function (e) {
                             alerts.error("Unable to fetch Detailed error entry"); // TODO improve
@@ -243,8 +288,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         async: false,
                         success: function (data) {
                             console.log("Discarded entries for Siddhi app: " + siddhiAppName, data)
-                            // TODO is this behaviour correct? or should I optimize it
-                            self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
+                            // TODO remove
+                            // self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
+                            self.renderContent();
                         },
                         error: function (e) {
                             alerts.error("Unable to fetch Detailed error entry"); // TODO improve
@@ -269,7 +315,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         async: false,
                         success: function (data) {
                             console.log("Purged error store with retentionDays: " + retentionDays, data)
-                            self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
+                            // TODO remove
+                            // self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
+                            self.renderContent();
                         },
                         error: function (e) {
                             alerts.error("Unable to purge the error store."); // TODO improve
@@ -502,8 +550,10 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         siddhiAppSelection.find("#getErrorEntries").click(function() {
                             var siddhiAppName = $(this).parent().find("select").get(0).value;
                             self.selectedSiddhiApp = siddhiAppName;
-                            self.fetchErrorEntries(siddhiAppName, self.serverHost, self.serverPort, self.serverUsername,
-                                self.serverPassword);
+                            // todo remove
+                            // self.fetchErrorEntries(siddhiAppName, self.serverHost, self.serverPort, self.serverUsername,
+                            //     self.serverPassword);
+                            self.renderContent();
                         });
 
                         siddhiAppSelection.find("#discardAll").click(function() {
@@ -705,7 +755,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                         '</div>');
                 },
 
-                renderContent: function(errorContainer) {
+                renderContent: function(errorContainer) { // TODO add pagination as minified file
                     var container = errorContainer || this._errorHandlerModal.find("div").filter("#errorContainer");
                     if (this.isServerConfigured) {
                         this.fetchSiddhiApps(
@@ -721,12 +771,124 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts'],
                     var siddhiAppSelection = $('<div style="margin-bottom: 20px"></div>');
                     this.renderSiddhiAppSelection(this.availableSiddhiApps, siddhiAppSelection);
                     siddhiAppErrorEntriesBlock.append(siddhiAppSelection);
-                    var errorEntries = $('<div style="overflow:auto; height:100%"></div>');
-                    this.renderErrorEntries(errorEntries);
+                    // var errorEntries = $('<div id="paginatedErrorEntries" style="overflow:auto; height:100%"></div>');
+                    // this.renderErrorEntries(errorEntries);
 
-                    siddhiAppErrorEntriesBlock.append(errorEntries);
+                    // TODO because we re-render everytime
+                    if (this.errorEntriesDiv && this.paginator) {
+                        this.errorEntriesDiv.empty();
+                        this.paginator.empty();
+                    } else {
+                        this.errorEntriesDiv =
+                            $('<div id="paginatedErrorEntries" style="overflow:auto; height:100%"></div>');
+                        this.paginator = $('<div id="paginator"></div>');
+                    }
+
+                    if (this.isServerConfigured && this.selectedSiddhiApp) {
+                        var self = this;
+                        this.paginator.pagination({
+                            dataSource: function(done) {
+                                var serviceUrl = self.app.config.services.errorHandler.endpoint;
+                                $.ajax({ // TODO confirm this
+                                    type: 'GET',
+                                    contentType: "application/json; charset=utf-8",
+                                    headers: {
+                                        'serverHost': self.serverHost,
+                                        'serverPort': self.serverPort,
+                                        'username': self.serverUsername,
+                                        'password': self.serverPassword,
+                                    },
+                                    url: serviceUrl + '/error-entries?siddhiApp=' + self.selectedSiddhiApp,
+                                    success: function(response) {
+                                        console.log("Response received: ", response)
+                                        done(response);
+                                    }
+                                });
+                            },
+                            alias: {
+                                pageNumber: 'offset',
+                                pageSize: 'limit'
+                            },
+                            pageSize: 1,
+                            ajax: {
+                                beforeSend: function() {
+                                    console.log('Loading data from DB ...');
+                                }
+                            },
+                            callback: function(data, pagination) {
+                                console.log("callback data", data)
+                                console.log("callback pagination", pagination)
+                                self.errorEntries = data;
+                                self.paginationData = pagination;
+
+                                // var html = ''; // TODO remove
+                                // if (data) {
+                                //     data.forEach(function (data) {
+                                //         html += self.renderErrorEntry(data).html();
+                                //     });
+                                //     self.errorEntriesDiv.html(
+                                //         '<div id="paginatedErrorEntries" style="overflow:auto; height:100%">' +
+                                //         html + '</div>');
+                                // }
+                                self.errorEntriesDiv.empty();
+                                self.renderErrorEntries(self.errorEntriesDiv);
+                            }
+                        });
+                    }
+
+
+                    siddhiAppErrorEntriesBlock.append(this.errorEntriesDiv);
+                    siddhiAppErrorEntriesBlock.append(this.paginator);
+
                     container.append(serverDetailsBlock);
                     container.append(siddhiAppErrorEntriesBlock);
+
+                    // TODO below works but rough. uncomment when finzlied
+                    // var dataContainer = $('<div></div>');
+                    // var paginator = $('<div id="demo"></div>');
+                    //
+                    // var self = this;
+                    // paginator.pagination({
+                    //     dataSource: function(done) {
+                    //         var serviceUrl = self.app.config.services.errorHandler.endpoint;
+                    //         $.ajax({ // TODO confirm this
+                    //             type: 'GET',
+                    //             contentType: "application/json; charset=utf-8",
+                    //             headers: {
+                    //                 'serverHost': 'localhost',
+                    //                 'serverPort': '9444',
+                    //                 'username': 'admin',
+                    //                 'password': 'admin'
+                    //             },
+                    //             // TODO soft code siddhi appname. make offset and limit dynamic
+                    //             url: serviceUrl + '/error-entries?siddhiApp=SinkTransportErrorTest',
+                    //             success: function(response) {
+                    //                 console.log("Response received: ", response)
+                    //                 done(response);
+                    //             }
+                    //         });
+                    //     },
+                    //     alias: {
+                    //         pageNumber: 'offset',
+                    //         pageSize: 'limit'
+                    //     },
+                    //     pageSize: 1,
+                    //     ajax: {
+                    //         beforeSend: function() {
+                    //             dataContainer.html('Loading data from DB ...');
+                    //         }
+                    //     },
+                    //     callback: function(data, pagination) {
+                    //         // template method of yourself
+                    //         console.log("callback data", data)
+                    //         console.log("callback pagination", pagination)
+                    //         var html = JSON.stringify(data);
+                    //         dataContainer.html(html);
+                    //     }
+                    // })
+                    // container.append(dataContainer);
+                    // container.append(paginator);
+
                 },
 
                 render: function() {
