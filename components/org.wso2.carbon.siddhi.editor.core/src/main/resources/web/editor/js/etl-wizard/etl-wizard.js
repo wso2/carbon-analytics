@@ -54,7 +54,8 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                     },
                     stream: {
                         name: "",
-                        attributes: []
+                        attributes: [],
+                        addLog: false
                     },
                     mapping: {
                         type: '',
@@ -73,7 +74,8 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                     },
                     stream: {
                         name: "",
-                        attributes: []
+                        attributes: [],
+                        addLog: false
                     },
                     mapping: {
                         type: '',
@@ -450,8 +452,6 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                 case 5:
                     var outputConfigurator = new OutputConfigurator(wizardBodyContent, self.__propertyMap);
                     outputConfigurator.render();
-                    // TODO Output option configurator
-
             }
 
             if(this.__stepIndex < 3) {
@@ -478,6 +478,15 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                 this.__expressionData.extensions.source.sources :
                 this.__expressionData.extensions.sink.sinks;
             var selectedExtension = null;
+
+            var logIndex = extensionData
+                            .map(function(extension) {
+                                return extension.name;
+                            }).indexOf('log');
+            
+            if(logIndex > -1) {
+                extensionData.splice(logIndex, 1);
+            }
 
             wizardBodyContent.append(`
                 <div style="max-height: ${wizardBodyContent[0].offsetHeight}; overflow: auto" class="content-section">
@@ -660,6 +669,16 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                         Configure Schema<br/>
                         <small style="font-size: 1.3rem">Configure ${type === constants.SOURCE_TYPE ? 'input' : 'output'} stream definition</small>
                     </div>
+                    <div style="display: flex; padding-top:15px">
+                        <div style="width: 100%;padding-top: 5px">
+                            Add log sink for testing                                      
+                        </div>
+                        <div>
+                            <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-enable-log-sink" type="button" data-toggle="dropdown">
+                                <i class="fw ${config.addLog ? 'fw-check' : 'fw-minus'}"></i>
+                            </button> 
+                        </div>
+                    </div>
                     <div style="padding-top: 10px">
                         <div>
                             <label for="stream-name-txt">Enter ${type === constants.SOURCE_TYPE ? 'input' : 'output'} stream name</label>
@@ -683,6 +702,10 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                 </div>
             `);
 
+            wizardBodyContent.find('#btn-enable-log-sink').on('click', function(evt) {
+                config.addLog = !config.addLog;
+                self.render();
+            });
             var attributeTypeDiv = wizardBodyContent.find('#stream-attribute-type-dropdown');
 
             constants.SUPPORTED_DATA_TYPES.forEach(function (dataType) {
