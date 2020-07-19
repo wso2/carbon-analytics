@@ -36,8 +36,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             var config = this.__extensionConfig.mapping;
             var extensionData = this.__extensionData;
 
-            console.log(self.__extensionData);
-
             container.empty();
             container.append(`
                 <div id="source-mapper-configurator">

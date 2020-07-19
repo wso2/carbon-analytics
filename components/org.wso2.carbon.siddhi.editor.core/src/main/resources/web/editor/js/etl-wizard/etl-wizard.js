@@ -40,6 +40,8 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
             this.__app = initOpts.application;
             this.__$parent_el_container = $(initOpts.container);
             this.__expressionData = undefined;
+            this.__previousSchemaDef = undefined;
+            this.__resetSchema = false;
 
             //object structure used to store data
             this.__propertyMap = {
@@ -129,6 +131,70 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
         //Constructor for the ETLWizard
         ETLWizard.prototype.constructor = ETLWizard;
 
+        // handle schema changes
+        ETLWizard.prototype.handleSchemaChange = function(typeOfSchema, wizardObj, config) {
+            var self = this;
+            var newSchemaDef = typeOfSchema === constants.SOURCE_TYPE ?
+                                self.__propertyMap.input.stream.attributes:
+                                self.__propertyMap.output.stream.attributes;
+
+            wizardObj.find('.next-btn').popover({
+                html: true,
+                content: function () {
+                    return '<div>' +
+                        'Schema change detected this will reset the subsequent mappings generated using the schema do you wish to proceed with changes?' +
+                        '</div>' +
+                        '<div>' +
+                        '    <button class="popover-confirm-proceed" >Yes</button>' +
+                        '    <button class="popover-confirm-cancel" >No</button>' +
+                        '    <button class="popover-btn-reset" >Reset</button>' +
+                        '</div>';
+                },
+                template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-content" style="display: flex; flex-direction: column"></div></div>',
+                placement: 'top',
+            });
+        
+            if(self.__previousSchemaDef.length > 0 && !_.isEqual(self.__previousSchemaDef, newSchemaDef)) {
+                
+                wizardObj.find('.next-btn').popover('show');
+                wizardObj.find(`#${wizardObj.find('.next-btn').attr('aria-describedby')} .popover-confirm-proceed`).on('click', function (e) {
+                    e.stopPropagation();
+                    if(typeOfSchema === constants.SOURCE_TYPE) {
+                        self.__propertyMap.input.mapping.attributes = {};
+                        self.__propertyMap.input.mapping.samplePayload = "";
+                        self.__propertyMap.query.mapping = {};
+                        self.__propertyMap.query.filter = {};
+                    } else {
+                        self.__propertyMap.output.mapping.attributes = {};
+                        self.__propertyMap.output.mapping.samplePayload = "";
+                        self.__propertyMap.output.mapping.payload = "";
+                        self.__propertyMap.query.groupby = {
+                            attributes: [],
+                            havingFilter: {}
+                        };
+                        self.__propertyMap.query.orderby.attributes = [];
+                    }
+                    
+                    wizardObj.find('.next-btn').popover('hide');
+                    self.__previousSchemaDef = undefined;
+                    self.incrementStep(wizardObj);
+                });
+                wizardObj.find(`#${wizardObj.find('.next-btn').attr('aria-describedby')} .popover-confirm-cancel`).on('click', function (e) {
+                    e.stopPropagation();
+                    wizardObj.find('.next-btn').popover('hide');
+                });
+                wizardObj.find(`#${wizardObj.find('.next-btn').attr('aria-describedby')} .popover-btn-reset`).on('click', function (e) {
+                    e.stopPropagation();
+                    wizardObj.find('.next-btn').popover('hide');
+                    self.__resetSchema = true;
+                    self.render();
+                });
+            } else {
+                self.__previousSchemaDef = undefined;
+                self.incrementStep(wizardObj);
+            }
+        }
+
         //Construct and return wizard skeleton
         ETLWizard.prototype.constructWizardHTMLElements = function (wizardObj) {
             var self = this;
@@ -169,7 +235,9 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
 
             wizardObj.find(`#step-${stepIndex}`).addClass('selected');
 
-            wizardObj.find('.next-btn').on('click', function () {
+
+
+            wizardObj.find('.next-btn').on('click', function (evt) {
                 switch (self.__stepIndex) {
                     case 1:
                         switch (self.__substep) {
@@ -182,12 +250,13 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                                 break;
                             case 1:
                                 if(etlWizardUtil.isStreamDefValid(config.input.stream)) {
-                                    self.incrementStep(wizardObj);
+                                    self.handleSchemaChange(constants.SOURCE_TYPE, wizardObj, config);
                                 } else {
                                     Alerts.error('Invalid source configuration please check the all the properties are defined properly');
                                 }
                                 break;
                             case 2:
+                                // wizardObj.find('.next-btn').popover({});
                                 if(etlWizardUtil.isInputMappingValid(config.input)) {
                                     self.incrementStep(wizardObj);
                                 } else {
@@ -207,7 +276,7 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                                 break;
                             case 1:
                                 if(etlWizardUtil.isStreamDefValid(config.output.stream)) {
-                                    self.incrementStep(wizardObj);
+                                    self.handleSchemaChange(constants.SOURCE_TYPE, wizardObj, config);
                                 } else {
                                     Alerts.error('Invalid stream definition please check the all the properties are defined properly');
                                 }
@@ -323,7 +392,8 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
             var previewContainer = this.__$parent_el_container.find(_.get(this.__options, 'preview.container'));
             var toggleControlsContainer = this.__$parent_el_container.find('.toggle-controls-container');
             var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY)
-
+            
+            this.__parentWizardForm.find('.next-btn').popover('destroy');
             etlWizardContainer.append(this.__parentWizardForm);
 
             canvasContainer.removeClass('show-div').addClass('hide-div');
@@ -335,6 +405,23 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
 
             if (!self.__expressionData) {
                 self.__expressionData = CompletionEngine.getRawMetadata();
+            }
+
+            if(self.__resetSchema) {
+                if(this.__stepIndex === 1) {
+                    this.__propertyMap.input.stream.attributes = _.cloneDeep(self.__previousSchemaDef);
+                } else if(this.__stepIndex === 2) {
+                    this.__propertyMap.output.stream.attributes = _.cloneDeep(self.__previousSchemaDef);
+                }
+                self.__resetSchema = false;
+            }
+
+            if(!this.__previousSchemaDef && this.__stepIndex === 1) {
+                this.__previousSchemaDef = _.cloneDeep(this.__propertyMap.input.stream.attributes);    
+            }
+
+            if(!this.__previousSchemaDef && this.__stepIndex === 2) {
+                this.__previousSchemaDef = _.cloneDeep(this.__propertyMap.output.stream.attributes);    
             }
 
             wizardBodyContent.empty();
@@ -380,7 +467,6 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                     }
                 }
             }
-
         };
 
         ETLWizard.prototype.renderSourceSinkConfigurator = function (type) {
@@ -564,7 +650,7 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
         ETLWizard.prototype.renderSchemaConfigurator = function (type) {
             var self = this;
             var config = type === constants.SOURCE_TYPE ?
-                this.__propertyMap.input.stream : this.__propertyMap.output.stream;
+                self.__propertyMap.input.stream : self.__propertyMap.output.stream;
             var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY);
             config.name = config.name.length > 0 ? config.name : (type === constants.SOURCE_TYPE ? 'input_stream' : 'output_stream');
 
