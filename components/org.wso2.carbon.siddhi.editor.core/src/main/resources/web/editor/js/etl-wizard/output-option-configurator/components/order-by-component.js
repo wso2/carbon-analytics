@@ -33,7 +33,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
             container.empty();
             container.append(`
-                Order Output by fields
+                <div style="font-size: 1.8rem">
+                    Order output records<br/>
+                    <small style="font-size: 1.3rem">Sort output records based on fields in ascending or descending order</small>
+                </div>
                 <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-orderby-property" type="button" data-toggle="dropdown">
                     <i class="fw fw-add"></i>
                 </button>

@@ -33,6 +33,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
 
             container.empty();
             container.append(`
+                <div style="font-size: 1.8rem">
+                    Configure output rate & limits<br/>
+                    <small style="font-size: 1.3rem">Advanced options to configure output rate and limit where data will be published to the destination</small>
+                </div>
                 <div class="offset-container">
                     Set offset for batch outputs
                     <span title="When events are emitted as a batch, offset allows you to offset beginning of the output event batch"><i class="fw fw-info"></i></span>
