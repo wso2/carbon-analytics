@@ -69,6 +69,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                 extensionData[windowExtensionType].parameters.forEach(function (paramData) {
                     config.query.window.parameters[paramData.name] = {
                         value: paramData.defaultValue,
+                        type: paramData.type
                     }
                 });
                 self.render();
