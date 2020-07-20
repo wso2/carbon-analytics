@@ -71,6 +71,7 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                         type: '',
                         properties: {},
                         possibleOptions: {},
+                        addOnError: false
                     },
                     stream: {
                         name: "",
@@ -494,6 +495,19 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                         Transport Properties<br/>
                         <small style="font-size: 1.3rem">Configure ${type === constants.SOURCE_TYPE ? 'Source' : 'Sink'} extension</small>
                     </div>
+                    ${
+                        type !== constants.SOURCE_TYPE ?
+                            `<div style="display: flex; padding-top:15px">
+                                <div style="width: 100%;padding-top: 5px">
+                                    Store mapping errors                                      
+                                </div>
+                                <div>
+                                    <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-enable-error-handling" type="button" data-toggle="dropdown">
+                                        <i class="fw ${config.addOnError ? 'fw-check' : 'fw-minus'}"></i>
+                                    </button> 
+                                </div>
+                            </div>` : ''
+                    }
                     <div style="padding-top: 10px">
                         <div>
                             <label for="extension-type">${type === constants.SOURCE_TYPE ? 'Source' : 'Sink'} type</label>
@@ -501,6 +515,7 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                                 <option disabled selected value> -- select an option -- </option>
                             </select>
                         </div>
+
                         ${
                             config.type.length > 0 ?
                                 `
@@ -521,6 +536,11 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                     </div>
                 </div>
             `);
+
+            wizardBodyContent.find('#btn-enable-error-handling').on('click', function(evt) {
+                config.addOnError = !config.addOnError;
+                self.render();
+            });
 
             extensionData.forEach(function (extension) {
                 wizardBodyContent.find('#extension-type').append(`
