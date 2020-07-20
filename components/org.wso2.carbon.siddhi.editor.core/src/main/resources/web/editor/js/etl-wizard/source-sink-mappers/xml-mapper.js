@@ -44,10 +44,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                             <div>
                               Source Mapper configuration
                               ${mapperData.parameters.length !== config.properties.length ?
-                    `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-source-mapper-property" type="button" data-toggle="dropdown">
-                                    <i class="fw fw-add"></i>
-                                </button>`
-                    : ''}
+                                `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-source-mapper-property" type="button" data-toggle="dropdown">
+                                                <i class="fw fw-add"></i>
+                                            </button>`
+                                : ''}
                               <div id="source-mapper-option-dropdown" style="left: 150px" class="dropdown-menu-style hidden" aria-labelledby="">
                               </div>
                             </div>
@@ -195,12 +195,66 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             var config = this.__extensionConfig;
             var hoveredEl = this.__hoveredEl;
 
-            container.append(`
-                <div style="display: flex; padding-top: 10px" class="sample-payload-submit-section">
-                    <input id="sample-payload-submit-input" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Enter the sample payload here" type="text" value="">
-                    <button style="background-color: #ee6719" class="btn btn-default btn-add-sample-payload">Submit</button>
-                </div>
-            `);
+            if(self.__mapperType === 'source') {
+                if(config.mapping.samplePayload.length === 0 && Object.keys(config.mapping.attributes).length === 0) {
+                    container.append(`
+                        <div style="display: flex; padding-top: 10px" class="sample-payload-submit-section">
+                            <textarea id="sample-payload-submit-input" style="height: 100px; width: 100%; border: none; background-color: transparent; border: 1px solid #333" placeholder="Enter the sample payload here" type="text" value=""></textarea>
+                            <div style="margin-left: 5px;">
+                                <button style="background-color: #ee6719" class="btn btn-default btn-add-sample-payload">Submit</button>
+                            </div>
+                        </div>
+                    `);
+                } else {
+                    container.append(`
+                        <div style="display: flex; padding-top: 10px" class="sample-payload-submit-section">
+                            <div>
+                                <button style="background-color: #ee6719" class="btn btn-default btn-clear-mapping">Clear</button>
+                            </div>
+                        </div>
+                    `);
+                }
+            } else {
+                if(config.mapping.samplePayload.length === 0 && config.mapping.payload.length === 0) {
+                    container.append(`
+                        <div style="display: flex; padding-top: 10px" class="sample-payload-submit-section">
+                            <textarea id="sample-payload-submit-input" style="height: 100px; width: 100%; border: none; background-color: transparent; border: 1px solid #333" placeholder="Enter the sample payload here" type="text" value=""></textarea>
+                            <div style="margin-left: 5px;">
+                                <button style="background-color: #ee6719" class="btn btn-default btn-add-sample-payload">Submit</button>
+                            </div>
+                        </div>
+                    `);
+                } else {
+                    container.append(`
+                        <div style="display: flex; padding-top: 10px" class="sample-payload-submit-section">
+                            <div>
+                                <button style="background-color: #ee6719" class="btn btn-default btn-clear-mapping">Clear</button>
+                            </div>
+                        </div>
+                    `);
+                }
+            }
+
+            
+
+            container.find('.btn-clear-mapping')
+                .on('click', function(evt) {
+                    config.mapping.samplePayload = '';
+                    config.mapping.attributes = {};
+                    if(self.__mapperType === 'sink') {
+                        config.mapping.payload = '';
+                    }
+                    self.render();
+                });
+
+            // container.append(`
+            //     <div style="display: flex; padding-top: 10px" class="sample-payload-submit-section">
+            //         <textarea id="sample-payload-submit-input" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Enter the sample payload here" type="text" value=""></textarea>
+            //         <div>
+            //             <button style="background-color: #ee6719" class="btn btn-default btn-add-sample-payload">Submit</button>
+            //         </div>
+            //     </div>
+            // `);
 
             if (config.mapping.samplePayload.length > 0 || config.mapping.payload.length > 0) {
                 var parsedXml = new DOMParser().parseFromString(config.mapping.samplePayload.length > 0 ? config.mapping.samplePayload : config.mapping.payload, 'text/xml');
