@@ -21,220 +21,177 @@ package org.wso2.carbon.siddhi.editor.core.util.errorhandler;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import feign.Response;
+import feign.RetryableException;
+import org.apache.commons.io.IOUtils;
 import org.wso2.carbon.siddhi.editor.core.exception.ErrorHandlerServiceStubException;
 import org.wso2.carbon.siddhi.editor.core.util.errorhandler.api.ErrorHandlerApiHelperService;
 import org.wso2.carbon.siddhi.editor.core.util.errorhandler.util.HTTPSClientUtil;
 
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Map;
 
 /**
  * Consists of a method for the deployment feature for the exposed Siddhi App Api.
  */
 public class ErrorHandlerApiHelper implements ErrorHandlerApiHelperService {
 
-    // TODO remove this sample implementation when done
-//    public boolean deploySiddhiApp(String hostAndPort, String username, String password, String siddhiApp,
-//                                   String fileName) throws SiddhiAppDeployerServiceStubException {
-//
-//        Response response = null;
-//        try {
-//            response = HTTPSClientUtil.doPutRequest(hostAndPort, username, password, siddhiApp);
-//            int status = response.status();
-//            switch (status) {
-//                case 200:
-//                    return true;
-//                case 201:
-//                    return true;
-//                case 400:
-//                    throw new SiddhiAppDeployerServiceStubException("Status code " + status +
-//                            " received. A validation error occurred during " +
-//                            "saving the siddhi app '" + fileName + "' on the node '" + hostAndPort + "'");
-//                case 401:
-//                    throw new SiddhiAppDeployerServiceStubException("Status code " + status +
-//                            " received. Invalid user name or password on the node '" +
-//                            hostAndPort + "' for the user " + username);
-//                case 500:
-//                    throw new SiddhiAppDeployerServiceStubException("Status code " + status +
-//                            " received. Unexpected error occurred during " +
-//                            "saving the siddhi app '" + fileName + "' on the node '" + hostAndPort + "'");
-//                default:
-//                    throw new SiddhiAppDeployerServiceStubException("Unexpected status code '" + status +
-//                            "' received when trying to deploy the siddhi app '" + fileName + "' on node '" +
-//                            hostAndPort + "'");
-//            }
-//        } catch (RetryableException e) {
-//            throw new SiddhiAppDeployerServiceStubException("Cannot connect to the worker node (" + hostAndPort + ") " +
-//                    "for retrieving status of the siddhi app " + fileName + ".", e);
-//        } finally {
-//            closeResponse(response);
-//        }
-//    }
-
-    private void closeResponse(Response response) {
-
-        if (response != null) {
-            response.close();
-        }
-    }
+    private static final String CANNOT_CONNECT_TO_SERVER_ERROR_FORMAT = "Cannot connect to the server node %s.";
+    private static final String FAILED_TO_READ_THE_RESPONSE_ERROR = "Failed to read the response.";
 
     private String getAsString(InputStream inputStream) throws IOException {
-//        InputStream inputStream = HTTPSClientUtil.doGetErrorEntries(hostAndPort, "admin", "admin", "MappingErrorTest").body().asInputStream();
-        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-        char charArray[] = new char[(int) inputStream.available()];
-        inputStreamReader.read(charArray);
-        return new String(charArray);
+        return IOUtils.toString(inputStream);
     }
 
     @Override
     public JsonArray getSiddhiAppList(String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException {
-        feign.Response response = HTTPSClientUtil.doGetSiddhiAppList(hostAndPort, username, password); // TODO implement
-        switch (response.status()) {
-            case 200: // TODO cleanup and add other cases
-                if (response.body() != null) {
-                    try {
-                        String responseBody = getAsString(response.body().asInputStream());
-                        return new JsonParser().parse(responseBody).getAsJsonArray();
-                    } catch (IOException e) {
-                        throw new ErrorHandlerServiceStubException("Failed to read the response.", e);
-                    }
-                }
-            default:
-                throw new ErrorHandlerServiceStubException("Failed to get error entries. " + response.reason());
+        try (Response response = HTTPSClientUtil.doGetSiddhiAppList(hostAndPort, username, password)) {
+            if (response.status() == 200 && response.body() != null) {
+                String responseBody = getAsString(response.body().asInputStream());
+                return new JsonParser().parse(responseBody).getAsJsonArray();
+            }
+            throw new ErrorHandlerServiceStubException("Failed to get siddhi app list. " + response.reason());
+        } catch (RetryableException e) {
+            throw new ErrorHandlerServiceStubException(
+                String.format(CANNOT_CONNECT_TO_SERVER_ERROR_FORMAT, hostAndPort), e);
+        } catch (IOException e) {
+            throw new ErrorHandlerServiceStubException(FAILED_TO_READ_THE_RESPONSE_ERROR, e);
         }
     }
 
     @Override
     public JsonObject getTotalErrorEntriesCount(String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException {
-        feign.Response response = HTTPSClientUtil.doGetTotalErrorEntriesCount(hostAndPort, username, password);
-        switch (response.status()) {
-            case 200: // TODO cleanup and add other cases
-                if (response.body() != null) {
-                    try {
-                        String responseBody = getAsString(response.body().asInputStream());
-                        return new JsonParser().parse(responseBody).getAsJsonObject();
-                    } catch (IOException e) {
-                        throw new ErrorHandlerServiceStubException("Failed to read the response.", e);
-                    }
-                }
-            default:
-                throw new ErrorHandlerServiceStubException("Failed to get error entries count. " + response.reason());
+        try (Response response = HTTPSClientUtil.doGetTotalErrorEntriesCount(hostAndPort, username, password)) {
+            if (response.status() == 200 && response.body() != null) {
+                String responseBody = getAsString(response.body().asInputStream());
+                return new JsonParser().parse(responseBody).getAsJsonObject();
+            }
+            throw new ErrorHandlerServiceStubException("Failed to get error entries count. " + response.reason());
+        } catch (RetryableException e) {
+            throw new ErrorHandlerServiceStubException(
+                String.format(CANNOT_CONNECT_TO_SERVER_ERROR_FORMAT, hostAndPort), e);
+        } catch (IOException e) {
+            throw new ErrorHandlerServiceStubException(FAILED_TO_READ_THE_RESPONSE_ERROR, e);
         }
     }
 
     @Override
     public JsonObject getErrorEntriesCount(String siddhiAppName, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException {
-        feign.Response response =
-            HTTPSClientUtil.doGetErrorEntriesCount(siddhiAppName, hostAndPort, username, password);
-        switch (response.status()) {
-            case 200: // TODO cleanup and add other cases
-                if (response.body() != null) {
-                    try {
-                        String responseBody = getAsString(response.body().asInputStream());
-                        return new JsonParser().parse(responseBody).getAsJsonObject();
-                    } catch (IOException e) {
-                        throw new ErrorHandlerServiceStubException("Failed to read the response.", e);
-                    }
-                }
-            default:
-                throw new ErrorHandlerServiceStubException("Failed to get error entries count. " + response.reason());
+        try (Response response =
+                 HTTPSClientUtil.doGetErrorEntriesCount(siddhiAppName, hostAndPort, username, password)) {
+            if (response.status() == 200 && response.body() != null) {
+                String responseBody = getAsString(response.body().asInputStream());
+                return new JsonParser().parse(responseBody).getAsJsonObject();
+            }
+            throw new ErrorHandlerServiceStubException(
+                String.format("Failed to get error entries count for Siddhi app: %s. %s",
+                    siddhiAppName, response.reason()));
+        } catch (RetryableException e) {
+            throw new ErrorHandlerServiceStubException(
+                String.format(CANNOT_CONNECT_TO_SERVER_ERROR_FORMAT, hostAndPort), e);
+        } catch (IOException e) {
+            throw new ErrorHandlerServiceStubException(FAILED_TO_READ_THE_RESPONSE_ERROR, e);
         }
     }
 
     @Override
     public JsonArray getMinimalErrorEntries(String siddhiAppName, String limit, String offset, String hostAndPort,
                                             String username, String password) throws ErrorHandlerServiceStubException {
-        feign.Response response = HTTPSClientUtil.doGetMinimalErrorEntries(siddhiAppName, limit, offset, hostAndPort,
-            username, password);
-        switch (response.status()) {
-            case 200: // TODO cleanup and add other cases
-                if (response.body() != null) {
-                    try {
-                        String responseBody = getAsString(response.body().asInputStream());
-                        return new JsonParser().parse(responseBody).getAsJsonArray();
-                    } catch (IOException e) {
-                        throw new ErrorHandlerServiceStubException("Failed to read the response.", e);
-                    }
-                }
-            default:
-                throw new ErrorHandlerServiceStubException("Failed to get error entries. " + response.reason());
+        try (Response response = HTTPSClientUtil.doGetMinimalErrorEntries(siddhiAppName, limit, offset, hostAndPort,
+            username, password)) {
+            if (response.status() == 200 && response.body() != null) {
+                String responseBody = getAsString(response.body().asInputStream());
+                return new JsonParser().parse(responseBody).getAsJsonArray();
+            }
+            throw new ErrorHandlerServiceStubException(
+                String.format("Failed to get minimal error entries for Siddhi app: %s. %s",
+                    siddhiAppName, response.reason()));
+        } catch (RetryableException e) {
+            throw new ErrorHandlerServiceStubException(
+                String.format(CANNOT_CONNECT_TO_SERVER_ERROR_FORMAT, hostAndPort), e);
+        } catch (IOException e) {
+            throw new ErrorHandlerServiceStubException(FAILED_TO_READ_THE_RESPONSE_ERROR, e);
         }
     }
 
     @Override
     public JsonObject getDescriptiveErrorEntry(String id, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException {
-        feign.Response response = HTTPSClientUtil.doGetDescriptiveErrorEntry(id, hostAndPort, username, password);
-        switch (response.status()) {
-            case 200: // TODO cleanup and add other cases
-                if (response.body() != null) {
-                    try {
-                        String responseBody = getAsString(response.body().asInputStream());
-                        return new JsonParser().parse(responseBody).getAsJsonObject();
-                    } catch (IOException e) {
-                        throw new ErrorHandlerServiceStubException("Failed to read the response.", e);
-                    }
-                }
-            default:
-                throw new ErrorHandlerServiceStubException("Failed to get descriptive error entry. " +
-                    response.reason());
+        try (Response response = HTTPSClientUtil.doGetDescriptiveErrorEntry(id, hostAndPort, username, password)) {
+            if (response.status() == 200 && response.body() != null) {
+                String responseBody = getAsString(response.body().asInputStream());
+                return new JsonParser().parse(responseBody).getAsJsonObject();
+            }
+            throw new ErrorHandlerServiceStubException(
+                String.format("Failed to get descriptive error entry with id: %s. %s", id, response.reason()));
+        } catch (RetryableException e) {
+            throw new ErrorHandlerServiceStubException(
+                String.format(CANNOT_CONNECT_TO_SERVER_ERROR_FORMAT, hostAndPort), e);
+        } catch (IOException e) {
+            throw new ErrorHandlerServiceStubException(FAILED_TO_READ_THE_RESPONSE_ERROR, e);
         }
     }
 
     @Override
     public boolean replay(JsonArray payload, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException {
-        feign.Response response = HTTPSClientUtil.doReplay(payload.toString(), hostAndPort, username, password);
-        switch (response.status()) {
-            case 200:
+        try (Response response = HTTPSClientUtil.doReplay(payload.toString(), hostAndPort, username, password)) {
+            if (response.status() == 200) {
                 return true;
-            default:
-                throw new ErrorHandlerServiceStubException("There were failures during replay." + response.reason());
+            }
+            throw new ErrorHandlerServiceStubException("There were failures during the replay." + response.reason());
+        } catch (RetryableException e) {
+            throw new ErrorHandlerServiceStubException(
+                String.format(CANNOT_CONNECT_TO_SERVER_ERROR_FORMAT, hostAndPort), e);
         }
     }
 
     @Override
     public boolean discardErrorEntry(String id, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException {
-        feign.Response response = HTTPSClientUtil.doDiscardErrorEntry(id, hostAndPort, username, password);
-        switch (response.status()) {
-            case 200:
+        try (Response response = HTTPSClientUtil.doDiscardErrorEntry(id, hostAndPort, username, password)) {
+            if (response.status() == 200) {
                 return true;
-            default:
-                // TODO finalize messages
-                throw new ErrorHandlerServiceStubException("Failed to delete the entry." + response.reason());
+            }
+            throw new ErrorHandlerServiceStubException(
+                String.format("Failed to delete the error entry with id: %s. %s", id, response.reason()));
+        } catch (RetryableException e) {
+            throw new ErrorHandlerServiceStubException(
+                String.format(CANNOT_CONNECT_TO_SERVER_ERROR_FORMAT, hostAndPort), e);
         }
     }
 
     @Override
     public boolean discardErrorEntries(String siddhiAppName, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException {
-        feign.Response response = HTTPSClientUtil.doDiscardErrorEntries(siddhiAppName, hostAndPort, username, password);
-        switch (response.status()) {
-            case 200:
+        try (Response response =
+                 HTTPSClientUtil.doDiscardErrorEntries(siddhiAppName, hostAndPort, username, password)) {
+            if (response.status() == 200) {
                 return true;
-            default:
-                // TODO finalize messages
-                throw new ErrorHandlerServiceStubException("Failed to delete the entry." + response.reason());
+            }
+            throw new ErrorHandlerServiceStubException(
+                String.format("Failed to discard error entries of Siddhi app: %s. %s", siddhiAppName,
+                    response.reason()));
+        } catch (RetryableException e) {
+            throw new ErrorHandlerServiceStubException(
+                String.format(CANNOT_CONNECT_TO_SERVER_ERROR_FORMAT, hostAndPort), e);
         }
     }
 
     @Override
     public boolean doPurge(int retentionDays, String hostAndPort, String username, String password)
         throws ErrorHandlerServiceStubException {
-        feign.Response response = HTTPSClientUtil.doPurge(retentionDays, hostAndPort, username, password);
-        switch (response.status()) {
-            case 200:
+        try (Response response = HTTPSClientUtil.doPurge(retentionDays, hostAndPort, username, password)) {
+            if (response.status() == 200) {
                 return true;
-            default:
-                // TODO finalize messages
-                throw new ErrorHandlerServiceStubException("Failed to purge the error store." + response.reason());
+            }
+            throw new ErrorHandlerServiceStubException("Failed to purge the error store." + response.reason());
+        } catch (RetryableException e) {
+            throw new ErrorHandlerServiceStubException(
+                String.format(CANNOT_CONNECT_TO_SERVER_ERROR_FORMAT, hostAndPort), e);
         }
     }
 }

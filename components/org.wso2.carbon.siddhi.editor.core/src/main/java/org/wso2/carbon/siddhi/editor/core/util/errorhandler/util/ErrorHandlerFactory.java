@@ -21,25 +21,26 @@ package org.wso2.carbon.siddhi.editor.core.util.errorhandler.util;
 import org.wso2.carbon.siddhi.editor.core.internal.EditorDataHolder;
 
 /**
- * Factory that is used to produce a HTTPS client for calling a Worker.
+ * Factory that is used to produce a HTTPS client for calling a SI Server.
  */
 public class ErrorHandlerFactory {
 
     private static final int CLIENT_CONNECTION_TIMEOUT = 5000;
     private static final int CLIENT_READ_TIMEOUT = 5000;
 
+    private ErrorHandlerFactory(){}
+
     /**
-     * Returns an HTTPS client for deploying Siddhi apps to the Worker.
+     * Returns an HTTPS client for communicating with the SI server.
      *
-     * @param httpsUrl HTTPS URL of the Worker
-     * @param username Username
-     * @param password Password
-     * @return SiddhiAppDeployerServiceStub instance which functions as the HTTPS client
+     * @param httpsUrl HTTPS URL of the SI server.
+     * @param username Username.
+     * @param password Password.
+     * @return ErrorHandlerServiceStub instance which functions as the HTTPS client.
      */
     public static ErrorHandlerServiceStub getErrorHandlerHttpsClient(String httpsUrl, String username,
                                                                      String password) {
-
         return EditorDataHolder.getInstance().getClientBuilderService().build(username, password,
-                CLIENT_CONNECTION_TIMEOUT, CLIENT_READ_TIMEOUT, ErrorHandlerServiceStub.class, httpsUrl);
+            CLIENT_CONNECTION_TIMEOUT, CLIENT_READ_TIMEOUT, ErrorHandlerServiceStub.class, httpsUrl);
     }
 }

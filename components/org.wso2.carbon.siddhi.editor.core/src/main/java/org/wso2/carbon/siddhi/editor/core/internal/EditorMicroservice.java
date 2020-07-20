@@ -1835,12 +1835,11 @@ public class EditorMicroservice implements Microservice {
                                      @HeaderParam("password") String password) {
         ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
         String hostAndPort = host + ":" + port;
-
         try {
             return Response.ok()
                 .entity(errorHandlerApiHelper.getSiddhiAppList(hostAndPort, username, password)).build();
         } catch (ErrorHandlerServiceStubException e) {
-            return Response.serverError().entity(e).build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
@@ -1854,7 +1853,6 @@ public class EditorMicroservice implements Microservice {
                                               @HeaderParam("password") String password) {
         ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
         String hostAndPort = host + ":" + port;
-
         try {
             return Response.ok()
                 .entity(errorHandlerApiHelper.getTotalErrorEntriesCount(hostAndPort, username, password)).build();
@@ -1873,7 +1871,6 @@ public class EditorMicroservice implements Microservice {
                                          @HeaderParam("password") String password) {
         ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
         String hostAndPort = host + ":" + port;
-
         try {
             return Response.ok().entity(
                 errorHandlerApiHelper.getErrorEntriesCount(siddhiAppName, hostAndPort, username, password)).build();
@@ -1894,7 +1891,6 @@ public class EditorMicroservice implements Microservice {
                                            @HeaderParam("password") String password) {
         ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
         String hostAndPort = host + ":" + port;
-
         try {
             JsonArray jsonArray = errorHandlerApiHelper.getMinimalErrorEntries(siddhiAppName, limit, offset,
                 hostAndPort, username, password);
@@ -1902,30 +1898,6 @@ public class EditorMicroservice implements Microservice {
         } catch (ErrorHandlerServiceStubException e) {
             return Response.serverError().entity(e).build();
         }
-    }
-
-    public static void main(String[] args) throws IOException, ClassNotFoundException { // TODO remove :)
-        byte[] test = new byte[]{-84, -19, 0, 5, 116, 0, 29, 123, 34, 102, 111, 111, 34, 58, 34, 67, 97, 107, 101, 34, 44, 34, 97, 109, 111, 117, 110, 116, 34, 58, 50, 48, 46, 48, 50, 125};
-//        System.out.println(test.toString());
-        String str = new String(test);
-        System.out.println(str);
-        Object res = getAsObject(test);
-//        byte[] test2 = getAsBytes("senthu");
-//        byte[] test2 = getAsBytes("{\"foo\":\"Cake\",\"amount\":20.02}");
-//        Object o = null;
-    }
-
-    public static Object getAsObject(byte[] byteArray) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream baip = new ByteArrayInputStream(byteArray);
-        ObjectInputStream ois = new ObjectInputStream(baip);
-        return ois.readObject();
-    }
-
-    public static byte[] getAsBytes(Object event) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(event);
-        return baos.toByteArray();
     }
 
     @GET
@@ -1938,7 +1910,6 @@ public class EditorMicroservice implements Microservice {
                                              @HeaderParam("password") String password) {
         ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
         String hostAndPort = host + ":" + port;
-
         try {
             JsonObject jsonObject = errorHandlerApiHelper.getDescriptiveErrorEntry(id, hostAndPort, username, password);
             return Response.ok().entity(jsonObject).build();
@@ -1961,7 +1932,7 @@ public class EditorMicroservice implements Microservice {
             if (isSuccess) {
                 return Response.ok().entity(new Gson().toJson("{}")).build();
             }
-            return Response.serverError().entity("There were failures during the replay").build();
+            return Response.serverError().entity("There were failures during the replay.").build();
         } catch (ErrorHandlerServiceStubException e) {
             return Response.serverError().entity(e).build();
         }

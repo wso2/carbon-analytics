@@ -625,8 +625,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     var errorEntryId = errorEntry.id;
                     var errorEntryElement = $('<div class="error-entry-container">' +
                         `<h4>${errorEntry.streamName}</h4>` +
-                        `<span class="error-label" style="margin-right: 10px;">${errorEntry.eventType}</span>` +
-                        `<span class="error-label">${errorEntry.errorOccurrence}</span>` +
+                        '<span class="error-label" title="Event Type" style="margin-right: 10px;">'+
+                        `${errorEntry.eventType}</span>` +
+                        `<span class="error-label" title="Error Occurrence">${errorEntry.errorOccurrence}</span>` +
                         this.getRenderableCause(errorEntry, true) +
                         `<p class="description">${this.getReadableTime(errorEntry.timestamp)}` +
                         ` &nbsp; ID: ${errorEntryId}</p><br/>` +
@@ -678,8 +679,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
 
                     modalBody.append('<div>' +
                         '<h4>' + errorEntry.streamName + '</h4>' +
-                        `<span class="error-label" style="margin-right: 10px;">${errorEntry.eventType}</span>` +
-                        `<span class="error-label">${errorEntry.errorOccurrence}</span>` +
+                        `<span class="error-label" title="Event Type" style="margin-right: 10px;">` +
+                        `${errorEntry.eventType}</span>` +
+                        `<span class="error-label" title="Error Occurrence">${errorEntry.errorOccurrence}</span>` +
                         this.getRenderableCause(errorEntry) +
                         `<p class="description">${this.getReadableTime(errorEntry.timestamp)}` +
                         ` &nbsp; ID: ${errorEntry.id}</p></div>`);

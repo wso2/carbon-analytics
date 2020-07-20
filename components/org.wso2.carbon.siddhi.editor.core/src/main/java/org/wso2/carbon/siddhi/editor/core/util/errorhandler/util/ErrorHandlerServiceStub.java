@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.siddhi.editor.core.util.errorhandler.util;
 
-import com.google.gson.JsonArray;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -26,50 +25,13 @@ import feign.Response;
 import org.wso2.carbon.siddhi.editor.core.exception.ErrorHandlerServiceStubException;
 
 /**
- * Feign client for sending requests.
+ * Feign client for sending requests of the Error Handler.
  */
 public interface ErrorHandlerServiceStub {
-
-    // TODO remove these references
-//    @RequestLine("POST /siddhi-apps")
-//    @Headers("Content-Type: text/plain; charset=utf-8")
-//    Response doPostRequest(String payload) throws SiddhiAppDeployerServiceStubException;
-//
-//    @RequestLine("PUT /siddhi-apps")
-//    @Headers("Content-Type: text/plain; charset=utf-8")
-//    Response doPutRequest(String payload) throws SiddhiAppDeployerServiceStubException;
-//
-//    @RequestLine("GET /siddhi-apps/{appName}")
-//    @Headers("Content-Type: application/json; charset=utf-8")
-//    Response doGetSiddhiApp(@Param("appName") String appName) throws SiddhiAppDeployerServiceStubException;
-//
-//    @RequestLine("DELETE /siddhi-apps/{appName}")
-//    @Headers("Content-Type: text/plain; charset=utf-8")
-//    Response doDeleteRequest(@Param("appName") String appName) throws SiddhiAppDeployerServiceStubException;
-//
-//    @RequestLine("GET /siddhi-apps/{appName}/status")
-//    @Headers("Content-Type: text/plain; charset=utf-8")
-//    Response doGetRequest(@Param("appName") String appName) throws SiddhiAppDeployerServiceStubException;
-//
-//    @RequestLine("GET /siddhi-apps")
-//    @Headers("Content-Type: application/json; charset=utf-8")
-//    Response doGetSiddhiAppList() throws SiddhiAppDeployerServiceStubException;
-//
-//    @RequestLine("GET /siddhi-apps/count")
-//    @Headers("Content-Type: application/json; charset=utf-8")
-//    Response doGetSiddhiAppCount() throws SiddhiAppDeployerServiceStubException;
-//
-//    @RequestLine("GET /siddhi-apps/{appName}/isExists")
-//    @Headers("Content-Type: application/json; charset=utf-8")
-//    Response doGetSiddhiAppAvailability(@Param("appName") String appName) throws SiddhiAppDeployerServiceStubException;
 
     @RequestLine("GET /siddhi-apps")
     @Headers("Content-Type: application/json; charset=utf-8")
     Response doGetSiddhiAppList() throws ErrorHandlerServiceStubException;
-
-//    @RequestLine("GET /error-handler/status") // TODO remove this
-//    @Headers("Content-Type: application/json; charset=utf-8")
-//    Response doGetStatus() throws ErrorHandlerServiceStubException;
 
     @RequestLine("GET /error-handler/error-entries/count")
     @Headers("Content-Type: application/json; charset=utf-8")

@@ -22,7 +22,7 @@ import feign.Response;
 import org.wso2.carbon.siddhi.editor.core.exception.ErrorHandlerServiceStubException;
 
 /**
- * Contains HTTPS client related methods.
+ * Contains HTTPS client related methods for the Error Handler.
  */
 public class HTTPSClientUtil {
 
@@ -38,11 +38,10 @@ public class HTTPSClientUtil {
     /**
      * Generates an HTTPS URL with the given hostAndPort.
      *
-     * @param hostAndPort Host and Port of the Worker node in {Host}:{Port} format
-     * @return HTTPS URL
+     * @param hostAndPort Host and Port of the Server node in {Host}:{Port} format.
+     * @return HTTPS URL.
      */
     private static String generateURL(String hostAndPort) {
-
         return PROTOCOL + "://" + hostAndPort;
     }
 

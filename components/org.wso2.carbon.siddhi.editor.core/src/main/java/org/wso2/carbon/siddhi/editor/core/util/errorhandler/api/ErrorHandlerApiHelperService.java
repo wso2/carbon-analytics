@@ -23,7 +23,7 @@ import com.google.gson.JsonObject;
 import org.wso2.carbon.siddhi.editor.core.exception.ErrorHandlerServiceStubException;
 
 /**
- * Interface for services related to deploying siddhi apps of editor.
+ * Interface for Error handler services, available to Editor microservice.
  */
 public interface ErrorHandlerApiHelperService {
 
