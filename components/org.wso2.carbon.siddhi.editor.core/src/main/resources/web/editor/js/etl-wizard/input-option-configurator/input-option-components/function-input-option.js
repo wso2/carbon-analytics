@@ -8,6 +8,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
             this.__functionData = {};
             this.__allowRepetitiveParameters = false;
             this.__repetitiveParameterTypes = [];
+            this.__repetitiveParamName = '';
 
             var extensionData = CompletionEngine.getRawMetadata().extensions;
 
@@ -89,7 +90,30 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                                     <input id="function-param-${key.replaceAll(/\./g, '-')}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #373737" placeholder="${key}" type="text" value="${paramData.value}">
                                 </div>
                             `);
-                        })
+                        });
+                    
+                    if(self.__allowRepetitiveParameters) {
+                        functionDataContainer.append(`
+                            <button id="btn-add-repetitive-param" class="btn btn-default">Add repetitive parameter</button>
+                        `);
+
+                        functionDataContainer.find('#btn-add-repetitive-param')
+                            .on('click', function(evt) {
+                                var number = 0;
+                                Object.keys(config.query.function.parameters)
+                                    .forEach(function(key, i) {
+                                        if(key.startsWith(self.__repetitiveParamName)) {
+                                            number++;
+                                        }
+                                    });
+                                config.query.function.parameters[`${self.__repetitiveParamName}.${number}`] = {
+                                    value: '',
+                                    type: self.__repetitiveParameterTypes
+                                };
+
+                                self.render();
+                            })
+                    }
 
                     container.find('.function-parameter-section .input-section input')
                         .on('focus', function (evt) {
@@ -155,12 +179,24 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
             config.query.function['parameters'] = {}
             parameters.forEach(function (param) {
                 var parameterName = param.trim().split(' ')[1];
-                var paramData = functionData.parameters.find(function (paramDat) {
-                    return paramDat.name === parameterName;
-                })
-                config.query.function.parameters[parameterName] = {
-                    value: paramData.defaultValue,
-                    type: paramData.type
+                if(parameterName !== '...') {
+                    var paramData = functionData.parameters.find(function (paramDat) {
+                        return paramDat.name === parameterName;
+                    })
+                    config.query.function.parameters[parameterName] = {
+                        value: paramData.defaultValue,
+                        type: paramData.type
+                    }
+                } else{
+                    var paramDataIndex = functionData.parameters.map(function (param) {
+                        return param.name;
+                    }).length-1;
+
+                    if(paramDataIndex > -1) {
+                        self.__allowRepetitiveParameters = true;
+                        self.__repetitiveParameterTypes = functionData.parameters[paramDataIndex].type;
+                        self.__repetitiveParamName = functionData.parameters[paramDataIndex].name;
+                    }
                 }
             });
 
