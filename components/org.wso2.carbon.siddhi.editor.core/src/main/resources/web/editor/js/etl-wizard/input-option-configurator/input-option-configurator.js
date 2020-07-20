@@ -45,7 +45,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                 <div  style="max-height: ${self.__container.offsetHeight}; flex-direction: column" class="content-section">
                     <div class="input-option-btn-group" style="display: flex;">
                         <button id="btn-add-function" style="margin-left: auto; min-width: 90px; background: #ee6719" class="btn btn-default">
-                            <i class="fw ${Object.keys(config.query.function).length > 0 ? 'fw-check': 'fw-error'}"></i>&nbsp;Function
+                            <i class="fw ${Object.keys(config.query.function).length > 0 ? 'fw-check': 'fw-error'}"></i>&nbsp;Streaming Function
                         </button>
                         <button id="btn-add-window" style="margin-left: 15px; min-width: 90px; background: #ee6719" class="btn btn-default">
                             <i class="fw ${Object.keys(config.query.window).length > 0 ? 'fw-check': 'fw-error'}"></i>&nbsp;Window

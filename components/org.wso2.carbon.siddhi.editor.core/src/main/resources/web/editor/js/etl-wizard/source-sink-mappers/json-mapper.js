@@ -198,18 +198,36 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 </div>
             `);
 
-            if (config.mapping.samplePayload.length > 0) {
-                var jsonObject = JSON.parse(config.mapping.samplePayload);
+            console.log('real-payload', config.mapping.payload);
+            console.log('sample-payload', config.mapping.payload);
+
+
+            if (config.mapping.samplePayload.length > 0 || config.mapping.payload.length > 0) {
+                var jsonObject = config.mapping.samplePayload.length > 0 ?
+                                    JSON.parse(config.mapping.samplePayload)
+                                    : config.mapping.payload;
 
                 container.append(`
                     <div style="border: 1px solid #333; padding: 5px; margin-top: 5px;" class="parsed-representation-container">
-                        ${self.generateHTMLFromJSON(jsonObject, '', '')}
+                        ${typeof jsonObject !== 'string' ?  self.generateHTMLFromJSON(jsonObject, '', '') : jsonObject}
                     </div>
-                    <small>Hover over the attributes to assign attributes</small>
+                    ${typeof jsonObject !== 'string' ?`<small>Hover over the attributes to assign attributes</small>` : ''}
                     <div id="source-mapper-attribute-dropdown" style="left: 150px" class="dropdown-menu-style hidden" aria-labelledby="">
                     </div>
                 `);
+            }
 
+            if ( self.__mapperData.namespace === 'sourceMapper' && Object.keys(config.mapping.attributes).length > 0) {
+                container.append('<div style="margin: 15px 0 10px 0">Mapped attributes</div><div style="display: flex; flex-direction: column" id="mapped-attrib-list"></div>')
+                Object.keys(config.mapping.attributes).forEach(function (key) {
+                    container.find('#mapped-attrib-list')
+                        .append(`
+                            <div style="width: 100%; padding-bottom: 5px" class="attribute-map">
+                                <label style="margin-bottom: 0" class="" id="" for="index-${key.replaceAll(/\//g, '-')}">${config.mapping.attributes[key].attributeName}</label>
+                                <input disabled id="index-${key.replaceAll(/\//g, '-')}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="" type="text" value="${key}">
+                            </div>
+                        `)
+                });
             }
 
             container.find('.btn-add-sample-payload').on('click', function (evt) {
@@ -328,8 +346,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     }, 300);
                 });
         }
-
-
 
         JSONMapper.prototype.generateHTMLFromJSON = function(jsonObject, indent, id) {
             var self = this;

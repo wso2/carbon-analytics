@@ -43,11 +43,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                         <div style="padding-top: 15px" class="attribute-list">
                             <div>
                               Source Mapper configuration
-                              ${mapperData.parameters.length !== config.properties.length ? 
-                                `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-source-mapper-property" type="button" data-toggle="dropdown">
+                              ${mapperData.parameters.length !== config.properties.length ?
+                    `<button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-source-mapper-property" type="button" data-toggle="dropdown">
                                     <i class="fw fw-add"></i>
                                 </button>`
-                                : ''}
+                    : ''}
                               <div id="source-mapper-option-dropdown" style="left: 150px" class="dropdown-menu-style hidden" aria-labelledby="">
                               </div>
                             </div>
@@ -73,9 +73,9 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             `);
 
             mapperData.parameters
-                .filter(function(param) {
+                .filter(function (param) {
                     return !config.properties[param.name];
-                }).forEach(function(param) {
+                }).forEach(function (param) {
                     container.find('#source-mapper-option-dropdown').append(`
                         <a title="" class="dropdown-item" href="#">
                             <div class="mapper-option">${param.name}</div><br/>
@@ -88,7 +88,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             Object.keys(config.properties).forEach(function (key) {
                 var optionData = config.properties[key];
                 var name = key.replaceAll(/\./g, '-');
-                var selectedOption = mapperData.parameters.find(function(param) {return param.name === key})
+                var selectedOption = mapperData.parameters.find(function (param) { return param.name === key })
                 container.find('.source-mapper-options').append(`
                     <div style="display: flex; margin-bottom: 15px" class="mapper-option">
                             <div style="width: 100%" class="input-section">
@@ -100,11 +100,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                                     <i class="fw fw-info"></i>    
                                 </a>  
                                 ${
-                                    selectedOption.optional ?
-                                        `<a style="color: #333">
+                    selectedOption.optional ?
+                        `<a style="color: #333">
                                             <i id="mapper-op-del-${name}" class="fw fw-delete"></i>    
                                          </a>` : ''
-                                }                              
+                    }                              
                             </div>
                         </div>
                 `);
@@ -130,8 +130,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 });
 
             container.find('.dropdown-item').on('click', function (evt) {
-               var optionName = $(evt.currentTarget).find('.mapper-option').text();
-                var selectedOption = mapperData.parameters.find(function(param) {return param.name === optionName})
+                var optionName = $(evt.currentTarget).find('.mapper-option').text();
+                var selectedOption = mapperData.parameters.find(function (param) { return param.name === optionName })
 
                 config.properties[optionName] = {
                     value: selectedOption.defaultValue,
@@ -202,8 +202,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 </div>
             `);
 
-            if (config.mapping.samplePayload.length > 0) {
-                var parsedXml = new DOMParser().parseFromString(config.mapping.samplePayload, 'text/xml');
+            if (config.mapping.samplePayload.length > 0 || config.mapping.payload.length > 0) {
+                var parsedXml = new DOMParser().parseFromString(config.mapping.samplePayload.length > 0 ? config.mapping.samplePayload : config.mapping.payload, 'text/xml');
 
                 container.append(`
                     <div style="border: 1px solid #333; padding: 5px; margin-top: 5px;" class="parsed-representation-container">
@@ -214,6 +214,19 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     </div>
                 `);
 
+            }
+
+            if ( self.__mapperData.namespace === 'sourceMapper' && Object.keys(config.mapping.attributes).length > 0) {
+                container.append('<div style="margin: 15px 0 10px 0">Mapped attributes</div><div style="display: flex; flex-direction: column" id="mapped-attrib-list"></div>')
+                Object.keys(config.mapping.attributes).forEach(function (key) {
+                    container.find('#mapped-attrib-list')
+                        .append(`
+                            <div style="width: 100%; padding-bottom: 5px" class="attribute-map">
+                                <label style="margin-bottom: 0" class="" id="" for="index-${key.replaceAll(/\//g, '-')}">${config.mapping.attributes[key].attributeName}</label>
+                                <input disabled id="index-${key.replaceAll(/\//g, '-')}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="" type="text" value="${key}">
+                            </div>
+                        `)
+                });
             }
 
             container.find('.btn-add-sample-payload').on('click', function (evt) {
@@ -247,59 +260,61 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
                     if (config.mapping.properties['enclosing.element'] && config.mapping.properties['enclosing.element'].value.startsWith('\/\/')) {
                         enclosedElementPath = config.mapping.properties['enclosing.element'].value.substr(2).split('/');
-                    } else if(config.mapping.properties['enclosing.element'] && config.mapping.properties['enclosing.element'].value.startsWith('\/')) {
+                    } else if (config.mapping.properties['enclosing.element'] && config.mapping.properties['enclosing.element'].value.startsWith('\/')) {
                         enclosedElementPath = config.mapping.properties['enclosing.element'].value.substr(1).split('/');
-                    }  else if (config.mapping.properties['enclosing.element']) {
+                    } else if (config.mapping.properties['enclosing.element']) {
                         enclosedElementPath = config.mapping.properties['enclosing.element'].value.replaceAll(/\/\//g, '\/').split('/');
                     }
 
                     var index = enclosedElementPath.length > 0 ? pathArray.indexOf(enclosedElementPath[0]) : -1;
-                    if(index > -1) {
+                    if (index > -1) {
                         pathArray.splice(0, (++index));
 
-                        for (let i = 1; i < enclosedElementPath.length ; i++) {
-                            pathArray = pathArray.splice(0,1);
+                        for (let i = 1; i < enclosedElementPath.length; i++) {
+                            pathArray = pathArray.splice(0, 1);
                         }
-                        pathArray.splice(0,1);
+                        pathArray.splice(0, 1);
                     }
 
                     pathArray.forEach(function (path, i) {
-                        if(i !== 0) {
+                        if (i !== 0) {
                             name += '/';
                         }
                         name += path;
                     });
 
-                    config.mapping.attributes[hoveredEl] = {attributeName: attribName, value: name};
-                    if(self.__mapperType === 'sink') {
+                    config.mapping.attributes[hoveredEl] = { attributeName: attribName, value: name };
+                    if (self.__mapperType === 'sink') {
                         self.updateConfigPayload();
                     }
                     self.render();
                 });
 
-            container.find('.parsed-representation-container>span.no-clear')
-                .on('mouseover', function (evt) {
-                    hoveredEl = evt.currentTarget.id.match('custom-map-val-([a-zA-Z0-9\-]+)')[1].replaceAll(/-/g, '\/').substr(1);
-                    var elementObj = container.find('#source-mapper-attribute-dropdown');
-                    var leftOffset =  evt.currentTarget.offsetLeft;
-                    var topOffset = evt.currentTarget.offsetTop + 20;
+            if(!(config.mapping.samplePayload.length === 0 && config.mapping.payload.length > 0)) {
+                container.find('.parsed-representation-container>span.no-clear')
+                    .on('mouseover', function (evt) {
+                        hoveredEl = evt.currentTarget.id.match('custom-map-val-([a-zA-Z0-9\-]+)')[1].replaceAll(/-/g, '\/').substr(1);
+                        var elementObj = container.find('#source-mapper-attribute-dropdown');
+                        var leftOffset = evt.currentTarget.offsetLeft;
+                        var topOffset = evt.currentTarget.offsetTop + 20;
 
-                    elementObj.css({"left": `${leftOffset}px`, 'top': `${topOffset}px`});
-                    elementObj.removeClass('hidden');
+                        elementObj.css({ "left": `${leftOffset}px`, 'top': `${topOffset}px` });
+                        elementObj.removeClass('hidden');
 
-                    elementObj.on('mouseleave', function (evt) {
-                        elementObj.addClass('hidden');
-                    })
-                })
-                .on('mouseleave', function (evt) {
-                    var elementObj = container.find('#source-mapper-attribute-dropdown');
-
-                    setTimeout(function () {
-                        if (!container.find('#source-mapper-attribute-dropdown:hover').length > 0) {
+                        elementObj.on('mouseleave', function (evt) {
                             elementObj.addClass('hidden');
-                        }
-                    }, 300);
-                });
+                        });
+                    })
+                    .on('mouseleave', function (evt) {
+                        var elementObj = container.find('#source-mapper-attribute-dropdown');
+
+                        setTimeout(function () {
+                            if (!container.find('#source-mapper-attribute-dropdown:hover').length > 0) {
+                                elementObj.addClass('hidden');
+                            }
+                        }, 300);
+                    });
+            }
 
             container.find('.parsed-representation-container>span.ok-to-clear').popover({
                 html: true,
@@ -320,15 +335,15 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 .on('mouseover', function (evt) {
                     $(evt.currentTarget).popover('show');
                     hoveredEl = evt.currentTarget.id.match('custom-map-val-([a-zA-Z0-9\-]+)')[1].replaceAll(/-/g, '\/').substr(1);
-                    $(container).find(`#${$(evt.currentTarget).attr('aria-describedby')}`).on('click', function(e) {
+                    $(container).find(`#${$(evt.currentTarget).attr('aria-describedby')}`).on('click', function (e) {
                         e.stopPropagation();
                         delete config.mapping.attributes[hoveredEl];
-                        if(self.__mapperType === 'sink') {
+                        if (self.__mapperType === 'sink') {
                             self.updateConfigPayload();
                         }
                         self.render();
                     })
-                    $(container).find('.popover').on('mouseleave', function() {
+                    $(container).find('.popover').on('mouseleave', function () {
                         $(evt.currentTarget).popover('hide');
                     });
                 })
@@ -343,7 +358,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
 
 
-        XMLMapper.prototype.generateHTMLFromXML = function(xmlObject, indent, id) {
+        XMLMapper.prototype.generateHTMLFromXML = function (xmlObject, indent, id) {
             var content = '';
             var config = this.__extensionConfig;
 
@@ -353,13 +368,13 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     content += ` ${xmlObject.children[i].attributes[key].name}="${xmlObject.children[i].attributes[key].nodeValue}" `
                 });
                 content += '&gt;';
-                if(xmlObject.children[i].childElementCount > 0) {
-                    content += `<br/>${this.generateHTMLFromXML(xmlObject.children[i], indent+'&nbsp;&nbsp;&nbsp;&nbsp;', `${id}-${xmlObject.children[i].tagName}`)}`;
+                if (xmlObject.children[i].childElementCount > 0) {
+                    content += `<br/>${this.generateHTMLFromXML(xmlObject.children[i], indent + '&nbsp;&nbsp;&nbsp;&nbsp;', `${id}-${xmlObject.children[i].tagName}`)}`;
                 } else {
                     var key = `${id}-${xmlObject.children[i].tagName}`;
                     var attrib_key = key.replaceAll(/-/g, '\/').substr(1);
 
-                    content += `<span id="custom-map-val-${key}" class="custom-mapper-val ${config.mapping.attributes[attrib_key] ? 'ok-to-clear': 'no-clear'}" id="attrib-val-${i}">${config.mapping.attributes[attrib_key] ? `{{  ${config.mapping.attributes[attrib_key].attributeName}  }}` : this.__mapperType === 'source' ? '{{value}}' : xmlObject.children[i].textContent }</span>`;
+                    content += `<span id="custom-map-val-${key}" class="custom-mapper-val ${config.mapping.attributes[attrib_key] ? 'ok-to-clear' : 'no-clear'}" id="attrib-val-${i}">${config.mapping.attributes[attrib_key] ? `{{  ${config.mapping.attributes[attrib_key].attributeName}  }}` : this.__mapperType === 'source' ? '{{value}}' : xmlObject.children[i].textContent}</span>`;
                 }
                 content += `${xmlObject.children[i].childElementCount > 0 ? indent : ''}&lt;/${xmlObject.children[i].tagName}&gt;<br/>`;
             }
@@ -377,19 +392,19 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     content += ` ${xmlObject.children[i].attributes[key].name}="${xmlObject.children[i].attributes[key].nodeValue}" `
                 });
                 content += '>';
-                if(xmlObject.children[i].childElementCount > 0) {
+                if (xmlObject.children[i].childElementCount > 0) {
                     content += `${this.generateSinkPayload(xmlObject.children[i], `${id}-${xmlObject.children[i].tagName}`)}`;
                 } else {
                     var key = `${id}-${xmlObject.children[i].tagName}`;
                     var attrib_key = key.replaceAll(/-/g, '\/').substr(1);
 
-                    content += `${config.mapping.attributes[attrib_key] ? `{{${config.mapping.attributes[attrib_key].attributeName}}}` : xmlObject.children[i].textContent }`;
+                    content += `${config.mapping.attributes[attrib_key] ? `{{${config.mapping.attributes[attrib_key].attributeName}}}` : xmlObject.children[i].textContent}`;
                 }
                 content += `</${xmlObject.children[i].tagName}>`;
             }
 
             return content;
         }
-        
+
         return XMLMapper;
     });
