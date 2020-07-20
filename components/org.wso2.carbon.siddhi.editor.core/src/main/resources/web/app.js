@@ -38,7 +38,7 @@ requirejs.config({
         datatables_wso2: "commons/lib/theme-wso2-2.0.0/extensions/datatables/js/dataTables.wso2",
         enjoyhint: "commons/lib/enjoyhint/enjoyhint.min",
         smart_wizard: "commons/lib/smartWizard/js/jquery.smartWizard.min",
-        pagination: "commons/lib/pagination/pagination",
+        pagination: "commons/lib/pagination/pagination.min",
         //beautify: "commons/lib/beautify",
         ///////////////////////
         // custom modules ////

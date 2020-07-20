@@ -38,9 +38,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             self.availableSiddhiApps = data;
                         },
                         error: function (e) {
-                            alerts.error("Unable to fetch Siddhi apps." +
-                                "Please see the editor console for further information.")
-                            throw "Unable to read errors";
+                            alerts.error("Unable to fetch Siddhi apps");
+                            throw "Unable to fetch Siddhi apps";
                         }
                     });
                 },
@@ -137,8 +136,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                                 shouldFetchAfterReplay);
                         },
                         error: function (e) {
-                            alerts.error("Unable to fetch Detailed error entry"); // TODO improve
-                            throw "Unable to read errors";
+                            alerts.error("Unable to replay");
+                            throw "Unable to replay";
                         }
                     });
                 },
@@ -162,8 +161,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             self.renderDetailedErrorEntry(data);
                         },
                         error: function (e) {
-                            alerts.error("Unable to fetch Detailed error entry"); // TODO improve
-                            throw "Unable to read errors";
+                            alerts.error("Unable to fetch detailed info of the error");
+                            throw "Unable to fetch detailed info of the error";
                         }
                     });
                 },
@@ -194,9 +193,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             }
                         },
                         error: function (e) {
-                            alerts.error("Unable to fetch Erroneous Events." +
-                                "Please see the editor console for further information.")
-                            throw "Unable to read errors";
+                            alerts.error("Unable to replay");
+                            throw "Unable to replay";
                         }
                     });
                 },
@@ -235,9 +233,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             }
                         },
                         error: function (e) {
-                            alerts.error("Unable to fetch Erroneous Events." +
-                                "Please see the editor console for further information.")
-                            throw "Unable to read errors";
+                            alerts.error("Unable to replay")
+                            throw "Unable to replay";
                         }
                     });
                     // TODO remove
@@ -266,10 +263,47 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             self.renderContent();
                         },
                         error: function (e) {
-                            alerts.error("Unable to fetch Detailed error entry"); // TODO improve
-                            throw "Unable to read errors";
+                            alerts.error("Unable to discard the error");
+                            throw "Unable to discard the error";
                         }
                     });
+                },
+
+                renderDiscardErrorEntryConfirmation: function(errorEntry) {
+                    var self = this;
+                    var discardErrorEntryConfirmationModal = $(
+                        '<div class="modal fade" id="discardErrorEntryConfirmationModal">' +
+                        '<div class="modal-dialog">' +
+                        '<div class="modal-content">' +
+                        '<div class="modal-header">' +
+                        "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+                        "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
+                        "</button>" +
+                        '<h4 class="modal-title file-dialog-title">' +
+                        'Confirm Discard' +
+                        '</h4>' +
+                        '<hr class="style1">' +
+                        '</div>' +
+                        '<div id="discardErrorEntryConfirmationModalBody" class="modal-body">' +
+                        `Are you sure you want to discard the error with ID <b>${errorEntry.id}</b> ?` +
+                        '</div>' +
+                        '<div class="modal-footer" style="padding-right: 20px; margin-right: 30px">' +
+                        '<button id="discard" type="button" class="btn btn-primary">Discard</button>' +
+                        "<div class='divider'></div>" +
+                        '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>');
+
+                    discardErrorEntryConfirmationModal.find("#discard").click(function() {
+                        self.discardErrorEntry(errorEntry.id, self.serverHost, self.serverPort, self.serverUsername,
+                            self.serverPassword);
+                        self.discardErrorEntryConfirmation.modal('hide');
+                    });
+
+                    this.discardErrorEntryConfirmation = discardErrorEntryConfirmationModal;
+                    this.discardErrorEntryConfirmation.modal('show');
                 },
 
                 discardErrorEntries: function(siddhiAppName, serverHost, serverPort, username, password) {
@@ -293,10 +327,47 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             self.renderContent();
                         },
                         error: function (e) {
-                            alerts.error("Unable to fetch Detailed error entry"); // TODO improve
-                            throw "Unable to read errors";
+                            alerts.error("Unable to discard errors");
+                            throw "Unable to discard errors";
                         }
                     });
+                },
+
+                renderDiscardErrorEntriesConfirmation: function(siddhiAppName) {
+                    var self = this;
+                    var discardErrorEntriesConfirmationModal = $(
+                        '<div class="modal fade" id="discardErrorEntriesConfirmationModal">' +
+                        '<div class="modal-dialog">' +
+                        '<div class="modal-content">' +
+                        '<div class="modal-header">' +
+                        "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+                        "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
+                        "</button>" +
+                        '<h4 class="modal-title file-dialog-title">' +
+                        'Confirm Discard All' +
+                        '</h4>' +
+                        '<hr class="style1">' +
+                        '</div>' +
+                        '<div id="discardErrorEntriesConfirmationModalBody" class="modal-body">' +
+                        `Are you sure you want to discard all the errors of Siddhi app <b>${siddhiAppName}</b>?` +
+                        '</div>' +
+                        '<div class="modal-footer" style="padding-right: 20px; margin-right: 30px">' +
+                        '<button id="discardAll" type="button" class="btn btn-primary">Discard All</button>' +
+                        "<div class='divider'></div>" +
+                        '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>');
+
+                    discardErrorEntriesConfirmationModal.find("#discardAll").click(function() {
+                        self.discardErrorEntries(siddhiAppName, self.serverHost, self.serverPort, self.serverUsername,
+                            self.serverPassword);
+                        self.discardErrorEntriesConfirmation.modal('hide');
+                    });
+
+                    this.discardErrorEntriesConfirmation = discardErrorEntriesConfirmationModal;
+                    this.discardErrorEntriesConfirmation.modal('show');
                 },
 
                 purgeErrorStore: function(retentionDays, serverHost, serverPort, username, password) {
@@ -320,10 +391,48 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             self.renderContent();
                         },
                         error: function (e) {
-                            alerts.error("Unable to purge the error store."); // TODO improve
+                            alerts.error("Unable to purge the error store");
                             throw "Unable to purge the error store";
                         }
                     });
+                },
+
+                renderPurgeConfirmation: function(retentionDays) {
+                    var self = this;
+                    var purgeConfirmationModal = $(
+                        '<div class="modal fade" id="purgeConfirmationModal">' +
+                        '<div class="modal-dialog">' +
+                        '<div class="modal-content">' +
+                        '<div class="modal-header">' +
+                        "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+                        "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
+                        "</button>" +
+                        '<h4 class="modal-title file-dialog-title">' +
+                        'Confirm Purge' +
+                        '</h4>' +
+                        '<hr class="style1">' +
+                        '</div>' +
+                        '<div id="purgeConfirmationModalBody" class="modal-body">' +
+                        'Are you sure you want to purge the error store with a retention period of ' +
+                        ` <b>${retentionDays} Days</b>?` +
+                        '</div>' +
+                        '<div class="modal-footer" style="padding-right: 20px; margin-right: 30px">' +
+                        '<button id="purge" type="button" class="btn btn-primary">Purge</button>' +
+                        "<div class='divider'></div>" +
+                        '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>');
+
+                    purgeConfirmationModal.find("#purge").click(function() {
+                        self.purgeErrorStore(retentionDays, self.serverHost, self.serverPort, self.serverUsername,
+                            self.serverPassword);
+                        self.purgeConfirmation.modal('hide');
+                    });
+
+                    this.purgeConfirmation = purgeConfirmationModal;
+                    this.purgeConfirmation.modal('show');
                 },
 
                 renderPurgeSettings: function() {
@@ -369,8 +478,10 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     // TODO deactivate button & validate
                     purgeSettingsModal.find("#doPurge").click(function() {
                         var retentionDays = purgeSettings.find("#retentionDays").val();
-                        self.purgeErrorStore(retentionDays, self.serverHost, self.serverPort, self.serverUsername,
-                            self.serverPassword);
+                        self.renderPurgeConfirmation(retentionDays);
+                        self.purgeSettings.modal('hide');
+                        // self.purgeErrorStore(retentionDays, self.serverHost, self.serverPort, self.serverUsername,
+                        //     self.serverPassword);
                     });
 
                     this.purgeSettings = purgeSettingsModal;
@@ -442,6 +553,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         self.serverPassword = serverProperties.find("#serverPassword").val();
                         self.isServerConfigured = true;
                         self.renderContent();
+                        self.serverConfigurations.modal('hide');
                     });
 
                     this.serverConfigurations = serverConfigurationsModal;
@@ -469,8 +581,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             totalErrorEntries = data.entriesCount;
                         },
                         error: function (e) {
-                            alerts.error("Unable to fetch Detailed error entry"); // TODO improve
-                            throw "Unable to read errors";
+                            alerts.error("Unable to fetch error count");
+                            throw "Unable to fetch error count";
                         }
                     });
                     var serverConfiguredDisplay = $('<div></div>');
@@ -559,8 +671,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         siddhiAppSelection.find("#discardAll").click(function() {
                             var siddhiAppName = $(this).parent().find("select").get(0).value;
                             self.selectedSiddhiApp = siddhiAppName;
-                            self.discardErrorEntries(siddhiAppName, self.serverHost, self.serverPort,
-                                self.serverUsername, self.serverPassword);
+                            // self.discardErrorEntries(siddhiAppName, self.serverHost, self.serverPort,
+                            //     self.serverUsername, self.serverPassword);
+                            self.renderDiscardErrorEntriesConfirmation(siddhiAppName);
                         });
 
                         siddhiAppSelection.find("#replayAll").click(function() {
@@ -616,6 +729,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         }
                         self.replay([replayableWrappedErrorEntry], self.serverHost, self.serverPort,
                             self.serverUsername, self.serverPassword, true);
+                        self.detailedErrorEntry.modal('hide');
                     });
                     return replay;
                 },
@@ -724,9 +838,10 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             self.serverUsername, self.serverPassword);
                     });
 
-                    errorEntryElement.find("#discard").click(function() { // TODO testing now
-                        self.discardErrorEntry(errorEntry.id, self.serverHost, self.serverPort, self.serverUsername,
-                            self.serverPassword);
+                    errorEntryElement.find("#discard").click(function() {
+                        self.renderDiscardErrorEntryConfirmation(errorEntry);
+                        // self.discardErrorEntry(errorEntry.id, self.serverHost, self.serverPort, self.serverUsername,
+                        //     self.serverPassword);
                     });
 
                     return errorEntryElement;
@@ -809,7 +924,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                                 pageNumber: 'offset',
                                 pageSize: 'limit'
                             },
-                            pageSize: 1,
+                            pageSize: 2,
                             ajax: {
                                 beforeSend: function() {
                                     console.log('Loading data from DB ...');
