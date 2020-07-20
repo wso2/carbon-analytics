@@ -427,18 +427,23 @@ public class DBErrorStore extends ErrorStore {
 
     @Override
     public void purge(Map retentionPolicyParams) {
-        Connection con = null;
-        PreparedStatement stmt = null;
-        try {
-            con = datasource.getConnection();
-            con.setAutoCommit(false);
-            stmt = con.prepareStatement(executionInfo.getPreparedPurgeStatement());
-            stmt.executeUpdate();
-            con.commit();
-        } catch (SQLException e) {
-            log.error("Failed to purge the error store.", e);
-        } finally {
-            DBErrorStoreUtils.cleanupConnections(stmt, con);
+        if (retentionPolicyParams.containsKey(SiddhiErrorHandlerConstants.RETENTION_START_TIMESTAMP)) {
+            long retentionStartTimestamp = Long.parseLong(
+                (String) retentionPolicyParams.get(SiddhiErrorHandlerConstants.RETENTION_START_TIMESTAMP));
+            Connection con = null;
+            PreparedStatement stmt = null;
+            try {
+                con = datasource.getConnection();
+                con.setAutoCommit(false);
+                stmt = con.prepareStatement(executionInfo.getPreparedPurgeStatement());
+                stmt.setLong(1, retentionStartTimestamp);
+                stmt.executeUpdate();
+                con.commit();
+            } catch (SQLException e) {
+                log.error("Failed to purge the error store.", e);
+            } finally {
+                DBErrorStoreUtils.cleanupConnections(stmt, con);
+            }
         }
     }
 

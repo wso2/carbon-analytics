@@ -63,5 +63,6 @@ public class SiddhiErrorHandlerConstants {
     public static final String LIMIT = "limit";
     public static final String OFFSET = "offset";
     public static final String DESCRIPTIVE = "descriptive";
+    public static final String RETENTION_START_TIMESTAMP = "retentionStartTimestamp";
 
 }

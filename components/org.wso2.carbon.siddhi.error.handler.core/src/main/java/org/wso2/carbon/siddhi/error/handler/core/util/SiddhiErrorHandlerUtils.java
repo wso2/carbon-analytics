@@ -23,8 +23,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
+import io.siddhi.core.util.error.handler.util.ErrorHandlerUtils;
+import org.wso2.carbon.siddhi.error.handler.core.exception.SiddhiErrorHandlerException;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,9 +38,33 @@ public class SiddhiErrorHandlerUtils {
 
     private SiddhiErrorHandlerUtils() {}
 
-    public static List<ErrorEntry> convertToList(JsonArray errorEntriesBody) {
+    public static List<ErrorEntry> convertToList(JsonArray errorEntryWrappersBody) throws SiddhiErrorHandlerException {
+        List<ErrorEntry> errorEntries = new ArrayList<>();
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-        Type mapType = new TypeToken<List<ErrorEntry>>() {}.getType();
-        return gson.fromJson(errorEntriesBody, mapType);
+        Type mapType = new TypeToken<List<ErrorEntryWrapper>>() {}.getType();
+        List<ErrorEntryWrapper> errorEntryWrappers = gson.fromJson(errorEntryWrappersBody, mapType);
+        for (ErrorEntryWrapper errorEntryWrapper : errorEntryWrappers) {
+            if (errorEntryWrapper.isPayloadModifiable()) {
+                ErrorEntry errorEntry = errorEntryWrapper.getErrorEntry();
+                String payloadString = errorEntryWrapper.getModifiablePayloadString();
+                try {
+                    errorEntries.add(new ErrorEntry(errorEntry.getId(), errorEntry.getTimestamp(),
+                        errorEntry.getSiddhiAppName(), errorEntry.getStreamName(),
+                        ErrorHandlerUtils.getAsBytes(payloadString),
+                        errorEntry.getCause(), errorEntry.getStackTrace(), errorEntry.getOriginalPayload(),
+                        errorEntry.getErrorOccurrence(), errorEntry.getEventType(), errorEntry.getErrorType()));
+                } catch (IOException e) {
+                    throw new SiddhiErrorHandlerException(String.format(
+                        "Failed to get modifiable payload as bytes for error entry with id: %s.", errorEntry.getId()));
+                }
+            } else {
+                errorEntries.add(errorEntryWrapper.getErrorEntry());
+            }
+        }
+        return errorEntries;
+    }
+
+    public static long getRetentionStartTimestamp(long currentTimestamp, int retentionDays) {
+        return currentTimestamp - (1000L * 60 * 60 * 24 * retentionDays);
     }
 }

@@ -105,7 +105,8 @@ public class SiddhiErrorHandlerMicroservice implements ErrorStoreListener, Micro
     @Produces(MediaType.APPLICATION_JSON)
     public Response getErrorEntry(@PathParam("id") int id) {
         try {
-            return Response.ok().entity(ErrorStoreAccessor.getErrorEntry(id)).type(MediaType.APPLICATION_JSON).build();
+            return Response.ok().entity(ErrorStoreAccessor.getWrappedErrorEntry(id)).type(MediaType.APPLICATION_JSON)
+                .build();
         } catch (SiddhiErrorHandlerException e) {
             logger.error("Failed to get erroneous event.", e);
             return Response.serverError().entity("Failed to get erroneous event.").build();
@@ -119,7 +120,7 @@ public class SiddhiErrorHandlerMicroservice implements ErrorStoreListener, Micro
     public Response rePlayErrorEntries(JsonArray errorEntriesBody) {
         try {
             RePlayer.rePlay(SiddhiErrorHandlerUtils.convertToList(errorEntriesBody));
-            return Response.ok().build();
+            return Response.ok().entity(Collections.emptyMap()).build();
         } catch (SiddhiErrorHandlerException e) {
             logger.error("Failed to re-stream errors.", e);
             return Response.serverError().entity("Failed to re-stream errors.").build();
@@ -132,7 +133,7 @@ public class SiddhiErrorHandlerMicroservice implements ErrorStoreListener, Micro
     public Response discardErrorEntry(@PathParam("id") int id) {
         try {
             ErrorStoreAccessor.discardErrorEntry(id);
-            return Response.ok().build();
+            return Response.ok().entity(Collections.emptyMap()).build();
         } catch (SiddhiErrorHandlerException e) {
             String message = "Failed to discard error entry with id: " + id + " .";
             logger.error(message);
@@ -143,20 +144,30 @@ public class SiddhiErrorHandlerMicroservice implements ErrorStoreListener, Micro
     @DELETE
     @Path("/error-entries")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response discardErrorEntries(@QueryParam("siddhiApp") String siddhiAppName) {
-        try {
-            if (siddhiAppName != null) {
+    public Response discardErrorEntries(@QueryParam("siddhiApp") String siddhiAppName,
+                                        @QueryParam("retentionDays") String retentionDays) {
+        if (siddhiAppName != null && retentionDays == null) {
+            try {
                 ErrorStoreAccessor.discardErrorEntries(siddhiAppName);
-            } else {
-                ErrorStoreAccessor.purgeErrorStore(Collections.emptyMap()); // TODO retention policy
+                return Response.ok().entity(Collections.emptyMap()).build();
+            } catch (SiddhiErrorHandlerException e) {
+                String message = String.format("Failed to discard error entries of Siddhi app: %s.", siddhiAppName);
+                logger.error(message);
+                return Response.serverError().entity(message).build();
             }
-            ErrorStoreAccessor.discardErrorEntries(siddhiAppName);
-            return Response.ok().build();
-        } catch (SiddhiErrorHandlerException e) {
-            String message = "Failed to discard error entries.";
-            logger.error(message);
-            return Response.serverError().entity(message).build();
+        } else if (retentionDays != null && siddhiAppName == null) {
+            try {
+                ErrorStoreAccessor.purgeErrorStore(retentionDays);
+                return Response.ok().entity(Collections.emptyMap()).build();
+            } catch (SiddhiErrorHandlerException e) {
+                String message = "Failed to purge the error store.";
+                logger.error(message);
+                return Response.serverError().entity(message).build();
+            }
         }
+        return Response.status(Response.Status.BAD_REQUEST)
+            .entity("Exactly one of the following query parameters must be specified: 'siddhiApp', 'retentionDays'.")
+            .build();
     }
 
     /**

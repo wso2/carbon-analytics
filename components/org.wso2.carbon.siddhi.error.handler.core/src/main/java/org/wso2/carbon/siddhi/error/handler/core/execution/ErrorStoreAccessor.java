@@ -20,9 +20,13 @@ package org.wso2.carbon.siddhi.error.handler.core.execution;
 
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
 import io.siddhi.core.util.error.handler.store.ErrorStore;
+import io.siddhi.core.util.error.handler.util.ErroneousEventType;
 import org.wso2.carbon.siddhi.error.handler.core.exception.SiddhiErrorHandlerException;
 import org.wso2.carbon.siddhi.error.handler.core.internal.SiddhiErrorHandlerDataHolder;
+import org.wso2.carbon.siddhi.error.handler.core.util.ErrorEntryWrapper;
+import org.wso2.carbon.siddhi.error.handler.core.util.SiddhiErrorHandlerUtils;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,17 +87,32 @@ public class ErrorStoreAccessor {
         throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
     }
 
-    public static ErrorEntry getErrorEntry(int id) throws SiddhiErrorHandlerException {
+    public static ErrorEntryWrapper getWrappedErrorEntry(int id) throws SiddhiErrorHandlerException {
         ErrorStore errorStore = SiddhiErrorHandlerDataHolder.getInstance().getErrorStore();
         if (errorStore != null) {
-            return errorStore.loadErrorEntry(id);
+            ErrorEntry errorEntry = errorStore.loadErrorEntry(id);
+            if (errorEntry != null) {
+                try {
+                    return new ErrorEntryWrapper(errorEntry,
+                        errorEntry.getEventType() == ErroneousEventType.PAYLOAD_STRING);
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new SiddhiErrorHandlerException("Failed to generate modifiable payload for error entry.", e);
+                }
+            } else {
+                return null;
+            }
         }
         throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
     }
 
-    public static void purgeErrorStore(Map retentionPolicyParams) throws SiddhiErrorHandlerException {
+    public static void purgeErrorStore(String retentionDays) throws SiddhiErrorHandlerException {
         ErrorStore errorStore = SiddhiErrorHandlerDataHolder.getInstance().getErrorStore();
         if (errorStore != null) {
+            long currentTimestamp = System.currentTimeMillis();
+            long retentionStartTimestamp = SiddhiErrorHandlerUtils
+                .getRetentionStartTimestamp(currentTimestamp, Integer.parseInt(retentionDays));
+            Map<String, String> retentionPolicyParams = new HashMap<>();
+            retentionPolicyParams.put("retentionStartTimestamp", String.valueOf(retentionStartTimestamp));
             errorStore.purge(retentionPolicyParams);
         } else {
             throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
