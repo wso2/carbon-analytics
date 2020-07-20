@@ -11,7 +11,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                 initialize: function(options) {
                     this.app = options;
                     this.dialog_containers = $(_.get(options.config.dialog, 'container'));
-                    console.log("Finalize available workers")
                 },
 
                 show: function() {
@@ -19,7 +18,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                 },
 
                 fetchSiddhiApps: function(serverHost, serverPort, username, password) {
-                    // TODO test: server down, error handler is requested in menu
                     var self = this;
                     var serviceUrl = self.app.config.services.errorHandler.endpoint;
                     $.ajax({
@@ -34,110 +32,11 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         url: serviceUrl + '/server/siddhi-apps',
                         async: false,
                         success: function (data) {
-                            console.log("Siddhi apps Response received", data)
                             self.availableSiddhiApps = data;
                         },
                         error: function (e) {
                             alerts.error("Unable to fetch Siddhi apps");
                             throw "Unable to fetch Siddhi apps";
-                        }
-                    });
-                },
-
-                // TODO this will be replaced with pagination. So don't worry about duplicate code with replay all
-                fetchErrorEntries: function(siddhiAppName, serverHost, serverPort, username, password) {
-                    // TODO remove when below is finalized
-                    // var self = this;
-                    // var serviceUrl = self.app.config.services.errorHandler.endpoint;
-                    // $.ajax({
-                    //     type: "GET",
-                    //     contentType: "application/json; charset=utf-8",
-                    //     headers: {
-                    //         'serverHost': serverHost,
-                    //         'serverPort': serverPort,
-                    //         'username': username,
-                    //         'password': password
-                    //     },
-                    //     // TODO for now no limit and offset. Need to have it
-                    //     url: serviceUrl + '/error-entries?siddhiApp=' + siddhiAppName,
-                    //     async: false,
-                    //     success: function (data) {
-                    //         console.log("Erroneous Events Response received", data)
-                    //         self.errorEntries = data;
-                    //         self.renderContent();
-                    //     },
-                    //     error: function (e) {
-                    //         alerts.error("Unable to fetch Erroneous Events." +
-                    //             "Please see the editor console for further information.")
-                    //         throw "Unable to read errors";
-                    //     }
-                    // });
-
-                    // var self = this;
-                    // this.paginator.pagination({
-                    //     dataSource: function(done) {
-                    //         var serviceUrl = self.app.config.services.errorHandler.endpoint;
-                    //         $.ajax({ // TODO confirm this
-                    //             type: 'GET',
-                    //             contentType: "application/json; charset=utf-8",
-                    //             headers: {
-                    //                 'serverHost': serverHost,
-                    //                 'serverPort': serverPort,
-                    //                 'username': username,
-                    //                 'password': password,
-                    //             },
-                    //             url: serviceUrl + '/error-entries?siddhiApp=' + siddhiAppName,
-                    //             success: function(response) {
-                    //                 console.log("Response received: ", response)
-                    //                 done(response);
-                    //             }
-                    //         });
-                    //     },
-                    //     alias: {
-                    //         pageNumber: 'offset',
-                    //         pageSize: 'limit'
-                    //     },
-                    //     pageSize: 1,
-                    //     ajax: {
-                    //         beforeSend: function() {
-                    //             console.log('Loading data from DB ...');
-                    //         }
-                    //     },
-                    //     callback: function(data, pagination) {
-                    //         console.log("callback data", data)
-                    //         console.log("callback pagination", pagination)
-                    //         self.errorEntries = data;
-                    //         self.paginationData = pagination;
-                    //         self.renderContent();
-                    //     }
-                    // })
-                },
-
-                // TODO improve name?
-                // TODO rename this should fetch after param
-                directReplay: function(errorEntryId, serverHost, serverPort, username, password,
-                                       shouldFetchAfterReplay) {
-                    var self = this;
-                    var serviceUrl = self.app.config.services.errorHandler.endpoint;
-                    $.ajax({
-                        type: "GET",
-                        contentType: "application/json; charset=utf-8",
-                        headers: {
-                            'serverHost': serverHost,
-                            'serverPort': serverPort,
-                            'username': username,
-                            'password': password
-                        },
-                        url: serviceUrl + '/error-entries/' + errorEntryId,
-                        async: false,
-                        success: function (data) {
-                            console.log("Detailed Error Entry received. Gonna replay", data)
-                            self.replay([data], serverHost, serverPort, username, password,
-                                shouldFetchAfterReplay);
-                        },
-                        error: function (e) {
-                            alerts.error("Unable to replay");
-                            throw "Unable to replay";
                         }
                     });
                 },
@@ -157,7 +56,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         url: serviceUrl + '/error-entries/' + errorEntryId,
                         async: false,
                         success: function (data) {
-                            console.log("Detailed Error Entry received", data)
                             self.renderDetailedErrorEntry(data);
                         },
                         error: function (e) {
@@ -167,12 +65,44 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     });
                 },
 
-                replay: function(payload, serverHost, serverPort, username, password, shouldFetchAfterReplay) {
-                    var self = this; // TODO rename this should fetch after param
+                renderDiscardErrorEntriesConfirmation: function(siddhiAppName) {
+                    var self = this;
+                    var discardErrorEntriesConfirmationModal = $(
+                        '<div class="modal fade" id="discardErrorEntriesConfirmationModal">' +
+                        '<div class="modal-dialog">' +
+                        '<div class="modal-content">' +
+                        '<div class="modal-header">' +
+                        "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+                        "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
+                        "</button>" +
+                        '<h4 class="modal-title file-dialog-title">Confirm Discard All</h4>' +
+                        '<hr class="style1">' +
+                        '</div>' +
+                        '<div id="discardErrorEntriesConfirmationModalBody" class="modal-body">' +
+                        `Are you sure you want to discard all the errors of Siddhi app <b>${siddhiAppName}</b>?` +
+                        '</div>' +
+                        '<div class="modal-footer" style="padding-right: 20px; margin-right: 30px">' +
+                        '<button id="discardAll" type="button" class="btn btn-primary">Discard All</button>' +
+                        "<div class='divider'></div>" +
+                        '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>');
+                    discardErrorEntriesConfirmationModal.find("#discardAll").click(function() {
+                        self.discardErrorEntries(siddhiAppName, self.serverHost, self.serverPort, self.serverUsername,
+                            self.serverPassword);
+                        self.discardErrorEntriesConfirmation.modal('hide');
+                    });
+                    this.discardErrorEntriesConfirmation = discardErrorEntriesConfirmationModal;
+                    this.discardErrorEntriesConfirmation.modal('show');
+                },
+
+                discardErrorEntries: function(siddhiAppName, serverHost, serverPort, username, password) {
+                    var self = this;
                     var serviceUrl = self.app.config.services.errorHandler.endpoint;
                     $.ajax({
-                        type: "POST",
-                        dataType: "json",
+                        type: "DELETE",
                         contentType: "application/json; charset=utf-8",
                         headers: {
                             'serverHost': serverHost,
@@ -180,21 +110,71 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             'username': username,
                             'password': password
                         },
-                        data: JSON.stringify(payload),
-                        url: serviceUrl,
+                        url: serviceUrl + '/error-entries?siddhiApp=' + siddhiAppName,
                         async: false,
                         success: function () {
-                            console.log("Replay Response received")
-                            // Re-fetch after discarding error
-                            if (shouldFetchAfterReplay) {
-                                // self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username,
-                                //     password); // TODO remove
-                                self.renderContent();
-                            }
+                            self.renderContent();
                         },
                         error: function (e) {
-                            alerts.error("Unable to replay");
-                            throw "Unable to replay";
+                            alerts.error("Unable to discard errors");
+                            throw "Unable to discard errors";
+                        }
+                    });
+                },
+
+                renderDiscardErrorEntryConfirmation: function(errorEntry) {
+                    var self = this;
+                    var discardErrorEntryConfirmationModal = $(
+                        '<div class="modal fade" id="discardErrorEntryConfirmationModal">' +
+                        '<div class="modal-dialog">' +
+                        '<div class="modal-content">' +
+                        '<div class="modal-header">' +
+                        "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+                        "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
+                        "</button>" +
+                        '<h4 class="modal-title file-dialog-title">Confirm Discard</h4>' +
+                        '<hr class="style1">' +
+                        '</div>' +
+                        '<div id="discardErrorEntryConfirmationModalBody" class="modal-body">' +
+                        `Are you sure you want to discard the error with ID <b>${errorEntry.id}</b> ?` +
+                        '</div>' +
+                        '<div class="modal-footer" style="padding-right: 20px; margin-right: 30px">' +
+                        '<button id="discard" type="button" class="btn btn-primary">Discard</button>' +
+                        "<div class='divider'></div>" +
+                        '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>');
+                    discardErrorEntryConfirmationModal.find("#discard").click(function() {
+                        self.discardErrorEntry(errorEntry.id, self.serverHost, self.serverPort, self.serverUsername,
+                            self.serverPassword);
+                        self.discardErrorEntryConfirmation.modal('hide');
+                    });
+                    this.discardErrorEntryConfirmation = discardErrorEntryConfirmationModal;
+                    this.discardErrorEntryConfirmation.modal('show');
+                },
+
+                discardErrorEntry: function(errorEntryId, serverHost, serverPort, username, password) {
+                    var self = this;
+                    var serviceUrl = self.app.config.services.errorHandler.endpoint;
+                    $.ajax({
+                        type: "DELETE",
+                        contentType: "application/json; charset=utf-8",
+                        headers: {
+                            'serverHost': serverHost,
+                            'serverPort': serverPort,
+                            'username': username,
+                            'password': password
+                        },
+                        url: serviceUrl + '/error-entries/' + errorEntryId,
+                        async: false,
+                        success: function () {
+                            self.renderContent();
+                        },
+                        error: function (e) {
+                            alerts.error("Unable to discard the error");
+                            throw "Unable to discard the error";
                         }
                     });
                 },
@@ -211,12 +191,10 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             'username': username,
                             'password': password
                         },
-                        // TODO for now no limit and offset. Need to have it
                         url: serviceUrl + '/error-entries?siddhiApp=' + siddhiAppName,
                         async: false,
                         success: function (data) {
-                            console.log("Erroneous Events Response received", data)
-                            // Initiate state for 'Replay all'
+                            // Initiate state for 'Replay all'.
                             self.replayAllState = {
                                 errorEntries: data,
                                 siddhiAppName: siddhiAppName,
@@ -237,16 +215,28 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             throw "Unable to replay";
                         }
                     });
-                    // TODO remove
-                    // self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
                     self.renderContent();
                 },
 
-                discardErrorEntry: function(errorEntryId, serverHost, serverPort, username, password) {
+                updateReplayAllProgressDisplay: function() {
+                    var container = this._errorHandlerModal.find("#siddhiAppErrorEntriesBlock");
+                    var containerHeight = container.height();
+                    var containerWidth = container.width();
+                    container.empty();
+                    container.append(`<div style="height: ${containerHeight}; width: ${containerWidth}; ` +
+                        'text-align: center; font-size: 25; padding-top: 150px">' +
+                        '<i class="fw fw-wso2-logo fw-pulse fw-2x"></i>'+
+                        `<h3>Replaying Error ${this.replayAllState.currentErrorNumber}`+
+                        ` of ${this.replayAllState.totalErrorsCount}</h3>` +
+                        `<h5 class="description">${this.replayAllState.siddhiAppName}</h5></div>`);
+                },
+
+                directReplay: function(errorEntryId, serverHost, serverPort, username, password,
+                                       reRenderContentOnSuccess) {
                     var self = this;
                     var serviceUrl = self.app.config.services.errorHandler.endpoint;
                     $.ajax({
-                        type: "DELETE",
+                        type: "GET",
                         contentType: "application/json; charset=utf-8",
                         headers: {
                             'serverHost': serverHost,
@@ -257,60 +247,30 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         url: serviceUrl + '/error-entries/' + errorEntryId,
                         async: false,
                         success: function (data) {
-                            console.log("Discarded entry with id: " + errorEntryId, data)
-                            // TODO remove
-                            // self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
-                            self.renderContent();
+                            self.replay([data], serverHost, serverPort, username, password, reRenderContentOnSuccess);
                         },
                         error: function (e) {
-                            alerts.error("Unable to discard the error");
-                            throw "Unable to discard the error";
+                            alerts.error("Unable to replay");
+                            throw "Unable to replay";
                         }
                     });
                 },
 
-                renderDiscardErrorEntryConfirmation: function(errorEntry) {
-                    var self = this;
-                    var discardErrorEntryConfirmationModal = $(
-                        '<div class="modal fade" id="discardErrorEntryConfirmationModal">' +
-                        '<div class="modal-dialog">' +
-                        '<div class="modal-content">' +
-                        '<div class="modal-header">' +
-                        "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
-                        "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
-                        "</button>" +
-                        '<h4 class="modal-title file-dialog-title">' +
-                        'Confirm Discard' +
-                        '</h4>' +
-                        '<hr class="style1">' +
-                        '</div>' +
-                        '<div id="discardErrorEntryConfirmationModalBody" class="modal-body">' +
-                        `Are you sure you want to discard the error with ID <b>${errorEntry.id}</b> ?` +
-                        '</div>' +
-                        '<div class="modal-footer" style="padding-right: 20px; margin-right: 30px">' +
-                        '<button id="discard" type="button" class="btn btn-primary">Discard</button>' +
-                        "<div class='divider'></div>" +
-                        '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>');
-
-                    discardErrorEntryConfirmationModal.find("#discard").click(function() {
-                        self.discardErrorEntry(errorEntry.id, self.serverHost, self.serverPort, self.serverUsername,
-                            self.serverPassword);
-                        self.discardErrorEntryConfirmation.modal('hide');
-                    });
-
-                    this.discardErrorEntryConfirmation = discardErrorEntryConfirmationModal;
-                    this.discardErrorEntryConfirmation.modal('show');
+                showLoadingDuringDirectReplay: function(container) {
+                    var containerHeight = container.height();
+                    var containerWidth = container.width();
+                    container.empty();
+                    container.append(`<div style="height: ${containerHeight}; width: ${containerWidth}; ` +
+                        'text-align: center; font-size: 25">' +
+                        '<i class="fw fw-wso2-logo fw-pulse fw-2x" style="padding-top: 70px"></i></div>');
                 },
 
-                discardErrorEntries: function(siddhiAppName, serverHost, serverPort, username, password) {
+                replay: function(payload, serverHost, serverPort, username, password, reRenderContentOnSuccess) {
                     var self = this;
                     var serviceUrl = self.app.config.services.errorHandler.endpoint;
                     $.ajax({
-                        type: "DELETE",
+                        type: "POST",
+                        dataType: "json",
                         contentType: "application/json; charset=utf-8",
                         headers: {
                             'serverHost': serverHost,
@@ -318,56 +278,109 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             'username': username,
                             'password': password
                         },
-                        url: serviceUrl + '/error-entries?siddhiApp=' + siddhiAppName,
+                        data: JSON.stringify(payload),
+                        url: serviceUrl,
                         async: false,
-                        success: function (data) {
-                            console.log("Discarded entries for Siddhi app: " + siddhiAppName, data)
-                            // TODO remove
-                            // self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
-                            self.renderContent();
+                        success: function () {
+                            if (reRenderContentOnSuccess) {
+                                self.renderContent();
+                            }
                         },
                         error: function (e) {
-                            alerts.error("Unable to discard errors");
-                            throw "Unable to discard errors";
+                            alerts.error("Unable to replay");
+                            throw "Unable to replay";
                         }
                     });
                 },
 
-                renderDiscardErrorEntriesConfirmation: function(siddhiAppName) {
+                renderPurgeSettings: function() {
                     var self = this;
-                    var discardErrorEntriesConfirmationModal = $(
-                        '<div class="modal fade" id="discardErrorEntriesConfirmationModal">' +
+                    var purgeSettingsModal = $('<div class="modal fade" id="purgeSettingsModal">' +
                         '<div class="modal-dialog">' +
                         '<div class="modal-content">' +
                         '<div class="modal-header">' +
                         "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
                         "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
                         "</button>" +
-                        '<h4 class="modal-title file-dialog-title">' +
-                        'Confirm Discard All' +
-                        '</h4>' +
+                        '<h3 class="modal-title file-dialog-title">Purge Error Store</h3>' +
                         '<hr class="style1">' +
                         '</div>' +
-                        '<div id="discardErrorEntriesConfirmationModalBody" class="modal-body">' +
-                        `Are you sure you want to discard all the errors of Siddhi app <b>${siddhiAppName}</b>?` +
+                        '<div id="purgeSettingsModalModalBody" class="modal-body">' +
                         '</div>' +
                         '<div class="modal-footer" style="padding-right: 20px; margin-right: 30px">' +
-                        '<button id="discardAll" type="button" class="btn btn-primary">Discard All</button>' +
+                        '<button id="doPurge" type="button" class="btn btn-danger">' +
+                        "Purge</button>" +
+                        "<div class='divider'></div>" +
+                        '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>');
+                    var modalBody = purgeSettingsModal.find("#purgeSettingsModalModalBody");
+                    var purgeSettingsBlock =
+                        $('<div class="error-handler-dialog-form-block" ' +
+                            'style="margin-right: 30px; margin-left: 30px; width: auto; overflow: auto"></div>');
+                    var purgeSettings = $('<div class="server-properties-clearfix"></div>');
+                    purgeSettings.append('<div class="server-property">' +
+                        '<label class="clearfix">Retention Period (Days)</label>' +
+                        '<input type="number" id="retentionDays" min="0" placeholder="0"' +
+                        ' class="configure-server-input"></div>');
+                    purgeSettingsBlock.append(purgeSettings);
+                    modalBody.append(purgeSettingsBlock);
+
+                    // Disable the button initially.
+                    purgeSettingsModal.find("#doPurge").click(function() {
+                        var retentionDays = purgeSettings.find("#retentionDays").val();
+                        self.renderPurgeConfirmation(retentionDays);
+                        self.purgeSettings.modal('hide');
+                    });
+                    purgeSettingsModal.find("#doPurge").prop('disabled',true);
+
+                    // Enable the button on input.
+                    purgeSettings.find("#retentionDays").on('input', function() {
+                        if (typeof this.value !== 'undefined' && this.value !== '') {
+                            purgeSettingsModal.find("#doPurge").prop('disabled',false);
+                        } else {
+                            purgeSettingsModal.find("#doPurge").prop('disabled',true);
+                        }
+                    });
+
+                    this.purgeSettings = purgeSettingsModal;
+                    this.purgeSettings.modal('show');
+                },
+
+                renderPurgeConfirmation: function(retentionDays) {
+                    var self = this;
+                    var purgeConfirmationModal = $(
+                        '<div class="modal fade" id="purgeConfirmationModal">' +
+                        '<div class="modal-dialog">' +
+                        '<div class="modal-content">' +
+                        '<div class="modal-header">' +
+                        "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+                        "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
+                        "</button>" +
+                        '<h4 class="modal-title file-dialog-title">Confirm Purge</h4>' +
+                        '<hr class="style1">' +
+                        '</div>' +
+                        '<div id="purgeConfirmationModalBody" class="modal-body">' +
+                        'Are you sure you want to purge the error store with a retention period of ' +
+                        ` <b>${retentionDays} Days</b>?` +
+                        '</div>' +
+                        '<div class="modal-footer" style="padding-right: 20px; margin-right: 30px">' +
+                        '<button id="purge" type="button" class="btn btn-primary">Purge</button>' +
                         "<div class='divider'></div>" +
                         '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
                         '</div>' +
                         '</div>' +
                         '</div>' +
                         '</div>');
-
-                    discardErrorEntriesConfirmationModal.find("#discardAll").click(function() {
-                        self.discardErrorEntries(siddhiAppName, self.serverHost, self.serverPort, self.serverUsername,
+                    purgeConfirmationModal.find("#purge").click(function() {
+                        self.purgeErrorStore(retentionDays, self.serverHost, self.serverPort, self.serverUsername,
                             self.serverPassword);
-                        self.discardErrorEntriesConfirmation.modal('hide');
+                        self.purgeConfirmation.modal('hide');
                     });
-
-                    this.discardErrorEntriesConfirmation = discardErrorEntriesConfirmationModal;
-                    this.discardErrorEntriesConfirmation.modal('show');
+                    this.purgeConfirmation = purgeConfirmationModal;
+                    this.purgeConfirmation.modal('show');
                 },
 
                 purgeErrorStore: function(retentionDays, serverHost, serverPort, username, password) {
@@ -384,10 +397,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         },
                         url: serviceUrl + '/error-entries?retentionDays=' + retentionDays,
                         async: false,
-                        success: function (data) {
-                            console.log("Purged error store with retentionDays: " + retentionDays, data)
-                            // TODO remove
-                            // self.fetchErrorEntries(self.selectedSiddhiApp, serverHost, serverPort, username, password);
+                        success: function () {
                             self.renderContent();
                         },
                         error: function (e) {
@@ -395,97 +405,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             throw "Unable to purge the error store";
                         }
                     });
-                },
-
-                renderPurgeConfirmation: function(retentionDays) {
-                    var self = this;
-                    var purgeConfirmationModal = $(
-                        '<div class="modal fade" id="purgeConfirmationModal">' +
-                        '<div class="modal-dialog">' +
-                        '<div class="modal-content">' +
-                        '<div class="modal-header">' +
-                        "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
-                        "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
-                        "</button>" +
-                        '<h4 class="modal-title file-dialog-title">' +
-                        'Confirm Purge' +
-                        '</h4>' +
-                        '<hr class="style1">' +
-                        '</div>' +
-                        '<div id="purgeConfirmationModalBody" class="modal-body">' +
-                        'Are you sure you want to purge the error store with a retention period of ' +
-                        ` <b>${retentionDays} Days</b>?` +
-                        '</div>' +
-                        '<div class="modal-footer" style="padding-right: 20px; margin-right: 30px">' +
-                        '<button id="purge" type="button" class="btn btn-primary">Purge</button>' +
-                        "<div class='divider'></div>" +
-                        '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>');
-
-                    purgeConfirmationModal.find("#purge").click(function() {
-                        self.purgeErrorStore(retentionDays, self.serverHost, self.serverPort, self.serverUsername,
-                            self.serverPassword);
-                        self.purgeConfirmation.modal('hide');
-                    });
-
-                    this.purgeConfirmation = purgeConfirmationModal;
-                    this.purgeConfirmation.modal('show');
-                },
-
-                renderPurgeSettings: function() {
-                    var self = this;
-                    var purgeSettingsModal = $(
-                        '<div class="modal fade" id="purgeSettingsModal">' +
-                        '<div class="modal-dialog">' +
-                        '<div class="modal-content">' +
-                        '<div class="modal-header">' +
-                        "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
-                        "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
-                        "</button>" +
-                        '<h2 class="modal-title file-dialog-title">' +
-                        'Purge Error Store' +
-                        '</h2>' +
-                        '<hr class="style1">' +
-                        '</div>' +
-                        '<div id="purgeSettingsModalModalBody" class="modal-body">' +
-                        '</div>' +
-                        '<div class="modal-footer" style="padding-right: 20px; margin-right: 30px">' +
-                        '<button id="doPurge" type="button" class="btn btn-danger">' +
-                        "Purge</button>" +
-                        "<div class='divider'></div>" +
-                        '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>');
-
-                    var modalBody = purgeSettingsModal.find("#purgeSettingsModalModalBody");
-
-                    var purgeSettingsBlock =
-                        $('<div class="error-handler-dialog-form-block" ' +
-                            'style="margin-right: 30px; margin-left: 30px; width: auto; overflow: auto"></div>');
-                    var purgeSettings = $('<div class="server-properties-clearfix"></div>');
-                    purgeSettings.append('<div class="server-property">' +
-                        '<label class="clearfix">Retention Period (Days)</label>' +
-                        '<input type="number" id="retentionDays" min="0" placeholder="0"' +
-                        ' class="configure-server-input"></div>');
-                    purgeSettingsBlock.append(purgeSettings);
-                    modalBody.append(purgeSettingsBlock);
-
-                    // TODO deactivate button & validate
-                    purgeSettingsModal.find("#doPurge").click(function() {
-                        var retentionDays = purgeSettings.find("#retentionDays").val();
-                        self.renderPurgeConfirmation(retentionDays);
-                        self.purgeSettings.modal('hide');
-                        // self.purgeErrorStore(retentionDays, self.serverHost, self.serverPort, self.serverUsername,
-                        //     self.serverPassword);
-                    });
-
-                    this.purgeSettings = purgeSettingsModal;
-                    this.purgeSettings.modal('show');
                 },
 
                 renderServerConfigurations: function() {
@@ -498,9 +417,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
                         "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
                         "</button>" +
-                        '<h2 class="modal-title file-dialog-title">' +
-                        'Server Configurations' +
-                        '</h2>' +
+                        '<h3 class="modal-title file-dialog-title">Server Configurations</h3>' +
                         '<hr class="style1">' +
                         '</div>' +
                         '<div id="serverConfigurationsModalBody" class="modal-body">' +
@@ -514,10 +431,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         '</div>' +
                         '</div>' +
                         '</div>');
-
                     var modalBody = serverConfigurationsModal.find("#serverConfigurationsModalBody");
-
-                    // TODO when giving a wrong host, gets stuck. look into
                     var serverPropertiesBlock =
                         $('<div class="error-handler-dialog-form-block" ' +
                             'style="margin-right: 30px; margin-left: 30px; width: auto; overflow: auto"></div>');
@@ -545,19 +459,40 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     serverPropertiesBlock.append(serverProperties);
                     modalBody.append(serverPropertiesBlock);
 
-                    // TODO deactivate button & validate
                     serverConfigurationsModal.find("#applyWorkerConfigurations").click(function() {
-                        self.serverHost = serverProperties.find("#serverHost").val();
-                        self.serverPort = serverProperties.find("#serverPort").val();
-                        self.serverUsername = serverProperties.find("#serverUsername").val();
-                        self.serverPassword = serverProperties.find("#serverPassword").val();
-                        self.isServerConfigured = true;
-                        self.renderContent();
-                        self.serverConfigurations.modal('hide');
+                        var serverHost = serverProperties.find("#serverHost").val();
+                        var serverPort = serverProperties.find("#serverPort").val();
+                        var serverUsername = serverProperties.find("#serverUsername").val();
+                        var serverPassword = serverProperties.find("#serverPassword").val();
+
+                        var isRequiredPropertyAbsent = false;
+                        [serverHost, serverPort, serverUsername, serverPassword].forEach(function (requiredProperty) {
+                            if (typeof requiredProperty === 'undefined' || requiredProperty === '') {
+                                isRequiredPropertyAbsent = true;
+                            }
+                        });
+                        if (!isRequiredPropertyAbsent) {
+                            self.serverHost = serverHost;
+                            self.serverPort = serverPort;
+                            self.serverUsername = serverUsername;
+                            self.serverPassword = serverPassword;
+                            self.isServerConfigured = true;
+                            self.renderContent();
+                            self.serverConfigurations.modal('hide');
+                        } else {
+                            alerts.error("Please provide values for all the properties of the server");
+                        }
                     });
 
                     this.serverConfigurations = serverConfigurationsModal;
                     this.serverConfigurations.modal('show');
+                },
+
+                renderServerDetails: function(errorContainer) {
+                    var self = this;
+                    var serverDetails = self.isServerConfigured ? this.generateServerConfiguredDisplay() :
+                        this.generateServerNotConfiguredDisplay();
+                    errorContainer.append(serverDetails);
                 },
 
                 generateServerConfiguredDisplay: function() {
@@ -577,7 +512,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         url: serviceUrl + '/error-entries/count',
                         async: false,
                         success: function (data) {
-                            console.log("Count received", data)
                             totalErrorEntries = data.entriesCount;
                         },
                         error: function (e) {
@@ -595,10 +529,10 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     serverConfiguredDisplay.append(
                         '<button id="purgeErrorStore" type="button" class="btn btn-danger">Purge</button>');
 
-                    serverConfiguredDisplay.find("#configureServer").click(function() { // TODO deactivate button & validate
+                    serverConfiguredDisplay.find("#configureServer").click(function() {
                         self.renderServerConfigurations();
                     });
-                    serverConfiguredDisplay.find("#purgeErrorStore").click(function() { // TODO deactivate button & validate?
+                    serverConfiguredDisplay.find("#purgeErrorStore").click(function() {
                         self.renderPurgeSettings();
                     });
                     return serverConfiguredDisplay;
@@ -611,22 +545,14 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         '<button id="configureServer" type="button" class="btn btn-primary">' +
                         'Connect to Server</button>' +
                         '</div>');
-                    serverNotConfiguredDisplay.find("#configureServer").click(function() { // TODO deactivate button & validate
+                    serverNotConfiguredDisplay.find("#configureServer").click(function() {
                         self.renderServerConfigurations();
                     });
                     return serverNotConfiguredDisplay;
                 },
 
-                renderServerDetails: function(errorContainer) { // TODO this is about to go away
-                    var self = this;
-                    var serverDetails = self.isServerConfigured ? this.generateServerConfiguredDisplay() :
-                        this.generateServerNotConfiguredDisplay();
-                    errorContainer.append(serverDetails);
-                },
-
                 renderSiddhiAppSelection: function(siddhiAppList, errorContainer) {
                     var self = this;
-
                     var siddhiAppSelection = $('<div></div>');
                     if (siddhiAppList) {
                         siddhiAppSelection.append('<h4>Siddhi app</h4>');
@@ -644,38 +570,33 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         siddhiAppSelection.append(selectInput);
                         siddhiAppSelection.append(
                             "<button id='getErrorEntries' type='button' class='btn btn-primary'>Fetch</button>");
-                        if (this.errorEntries && this.errorEntries.length > 0) {
-                            siddhiAppSelection.append("<div class='divider'></div>");
-                            siddhiAppSelection.append(
-                                "<button id='discardAll' type='button' class='btn btn-default'>Discard All</button>");
-                            siddhiAppSelection.append("<div class='divider'></div>");
-                            siddhiAppSelection.append(
-                                "<button id='replayAll' type='button' class='btn btn-default'>Replay All</button>");
-                        }
+                        siddhiAppSelection.append("<div class='divider'></div>");
+                        this.discardAllButton =
+                            $("<button id='discardAll' type='button' class='btn btn-default'>Discard All</button>");
+                        this.replayAllButton =
+                            $("<button id='replayAll' type='button' class='btn btn-default'>Replay All</button>");
+                        siddhiAppSelection.append(this.discardAllButton);
+                        siddhiAppSelection.append("<div class='divider'></div>");
+                        siddhiAppSelection.append(this.replayAllButton);
+                        // Hide the buttons initially. These will be shown when at least one error entry is available.
+                        this.discardAllButton.hide();
+                        this.replayAllButton.hide();
 
                         siddhiAppSelection.find("select").change(function() {
                             self.selectedSiddhiApp = this.value;
                             $(this).parent().find("select").find("option[value='" + this.value + "']")
                                 .attr('selected', 'selected')
                         });
-
                         siddhiAppSelection.find("#getErrorEntries").click(function() {
                             var siddhiAppName = $(this).parent().find("select").get(0).value;
                             self.selectedSiddhiApp = siddhiAppName;
-                            // todo remove
-                            // self.fetchErrorEntries(siddhiAppName, self.serverHost, self.serverPort, self.serverUsername,
-                            //     self.serverPassword);
                             self.renderContent();
                         });
-
                         siddhiAppSelection.find("#discardAll").click(function() {
                             var siddhiAppName = $(this).parent().find("select").get(0).value;
                             self.selectedSiddhiApp = siddhiAppName;
-                            // self.discardErrorEntries(siddhiAppName, self.serverHost, self.serverPort,
-                            //     self.serverUsername, self.serverPassword);
                             self.renderDiscardErrorEntriesConfirmation(siddhiAppName);
                         });
-
                         siddhiAppSelection.find("#replayAll").click(function() {
                             var siddhiAppName = $(this).parent().find("select").get(0).value;
                             self.selectedSiddhiApp = siddhiAppName;
@@ -691,7 +612,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                 renderErrorEntries: function(errorContainer) {
                     var self = this;
                     errorDisplay = $('<div id="errorEntriesContainer"></div>');
-
                     if (this.errorEntries) {
                         this.errorEntries.forEach(function (errorEntry) {
                             errorDisplay.append(self.renderErrorEntry(errorEntry));
@@ -700,48 +620,81 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     errorContainer.append(errorDisplay);
                 },
 
-                renderOriginalPayload: function(errorEntry) { // TODO uneditable original payload for occurrences other than before source mapping
-                    var originalPayload = $('<div><h4>Original Payload</h4></div>');
-                    if (errorEntry.originalPayload) {
-                        originalPayload.append('<div class="payload-content">' + errorEntry.originalPayload + '</div>');
-                    } else {
-                        originalPayload.append('<div>Original payload of the event is not available</div>');
-                    }
-                    return originalPayload;
-                },
-
-                renderReplayButtonInDetailedErrorEntry: function(wrappedErrorEntry) {
+                renderErrorEntry: function(errorEntry) {
                     var self = this;
-                    var replay = $('<div></div>');
-                    var replayableWrappedErrorEntry = wrappedErrorEntry;
-                    if (wrappedErrorEntry.isPayloadModifiable) {
-                        // Payload is not modifiable.
-                        replay.append('<textarea id="eventPayload" rows="4" cols="40" class="payload-content">' +
-                            wrappedErrorEntry.modifiablePayloadString + '</textarea>');
-                        replay.append('<br/>');
-                    }
-                    replay.append("<button id='replay' type='button' class='btn btn-primary'>Replay</button>");
+                    var errorEntryId = errorEntry.id;
+                    var errorEntryElement = $('<div class="error-entry-container">' +
+                        `<h4>${errorEntry.streamName}</h4>` +
+                        `<span class="error-label" style="margin-right: 10px;">${errorEntry.eventType}</span>` +
+                        `<span class="error-label">${errorEntry.errorOccurrence}</span>` +
+                        this.getRenderableCause(errorEntry, true) +
+                        `<p class="description">${this.getReadableTime(errorEntry.timestamp)}` +
+                        ` &nbsp; ID: ${errorEntryId}</p><br/>` +
+                        `<button id='replay_${errorEntryId}' type='button' class='btn btn-default'>Replay</button>` +
+                        "<div class='divider'></div>" +
+                        `<button id='detailedInfo_${errorEntryId}' type='button' class='btn btn-default'>` +
+                        `Detailed Info</button><div class='divider'></div>` +
+                        `<button id='discard_${errorEntryId}' type='button' class='btn btn-default'>Discard</button>` +
+                        `</div>`);
 
-                    replay.find("#replay").click(function() { // TODO disable if server not configured
-                        if (wrappedErrorEntry.isPayloadModifiable) {
-                            // TODO make sure that no worries about mutating the original object
-                            replayableWrappedErrorEntry.modifiablePayloadString = replay.find("#eventPayload").val();
-                        }
-                        self.replay([replayableWrappedErrorEntry], self.serverHost, self.serverPort,
-                            self.serverUsername, self.serverPassword, true);
-                        self.detailedErrorEntry.modal('hide');
+                    errorEntryElement.find("#replay_" + errorEntryId).click(function() {
+                        self.showLoadingDuringDirectReplay($(this).parent());
+                        self.directReplay(errorEntry.id, self.serverHost, self.serverPort, self.serverUsername,
+                            self.serverPassword, true);
                     });
-                    return replay;
+                    errorEntryElement.find("#detailedInfo_" + errorEntryId).click(function() {
+                        self.fetchErrorEntryDetails(errorEntry.id, self.serverHost, self.serverPort,
+                            self.serverUsername, self.serverPassword);
+                    });
+                    errorEntryElement.find("#discard_" + errorEntryId).click(function() {
+                        self.renderDiscardErrorEntryConfirmation(errorEntry);
+                    });
+                    return errorEntryElement;
                 },
 
-                renderStackTrace: function(errorEntry) {
-                    var stackTrace = $('<div><h4>Stack Trace</h4></div>');
-                    if (errorEntry.stackTrace) {
-                        stackTrace.append('<div class="stack-trace-content">' + errorEntry.stackTrace + '</div>');
-                    } else {
-                        stackTrace.append('<div>Stacktrace Not Available</div>');
+                renderDetailedErrorEntry: function(wrappedErrorEntry) {
+                    var errorEntry = wrappedErrorEntry.errorEntry;
+                    var detailedErrorEntryModal = $(
+                        '<div class="modal fade" id="' + errorEntry.id + '">' +
+                        '<div class="modal-dialog">' +
+                        '<div class="modal-content">' +
+                        '<div class="modal-header">' +
+                        "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
+                        "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
+                        "</button>" +
+                        '<h3 class="modal-title file-dialog-title" id="heading">Error Entry</h3>' +
+                        '<hr class="style1">' +
+                        '</div>' +
+                        '<div id="detailedErrorModalBody" class="modal-body">' +
+                        '</div>' +
+                        '<div class="modal-footer">' +
+                        '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>');
+
+                    var modalBody = detailedErrorEntryModal.find("#detailedErrorModalBody");
+
+                    modalBody.append('<div>' +
+                        '<h4>' + errorEntry.streamName + '</h4>' +
+                        `<span class="error-label" style="margin-right: 10px;">${errorEntry.eventType}</span>` +
+                        `<span class="error-label">${errorEntry.errorOccurrence}</span>` +
+                        this.getRenderableCause(errorEntry) +
+                        `<p class="description">${this.getReadableTime(errorEntry.timestamp)}` +
+                        ` &nbsp; ID: ${errorEntry.id}</p></div>`);
+                    modalBody.append('<br/>');
+                    modalBody.append(this.renderReplayButtonInDetailedErrorEntry(wrappedErrorEntry));
+                    modalBody.append('<br/>');
+                    if (!wrappedErrorEntry.isPayloadModifiable) {
+                        // Payload is not modifiable. Show the original payload, in case if the user wants to refer.
+                        modalBody.append(this.renderOriginalPayload(errorEntry));
+                        modalBody.append('<br/>');
                     }
-                    return stackTrace;
+                    modalBody.append(this.renderStackTrace(errorEntry));
+
+                    this.detailedErrorEntry = detailedErrorEntryModal;
+                    this.detailedErrorEntry.modal('show');
                 },
 
                 getRenderableCause: function(errorEntry, shouldShorten) {
@@ -759,118 +712,50 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     return new Date(timestamp).toLocaleString();
                 },
 
-                renderDetailedErrorEntry: function(wrappedErrorEntry) {
-                    var errorEntry = wrappedErrorEntry.errorEntry;
-                    var detailedErrorEntryModal = $(
-                        '<div class="modal fade" id="' + errorEntry.id + '">' +
-                        '<div class="modal-dialog">' +
-                        '<div class="modal-content">' +
-                        '<div class="modal-header">' +
-                        "<button type='button' class='close' data-dismiss='modal' aria-label='Close'>" +
-                        "<i class=\"fw fw-cancel  about-dialog-close\"></i>" +
-                        "</button>" +
-                        '<h2 class="modal-title file-dialog-title" id="heading">' + // TODO finalize this tag
-                        'Error Entry' +
-                        '</h2>' +
-                        '<hr class="style1">' +
-                        '</div>' +
-                        '<div id="detailedErrorModalBody" class="modal-body">' +
-                        '</div>' +
-                        '<div class="modal-footer">' +
-                        '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>');
-
-                    var modalBody = detailedErrorEntryModal.find("#detailedErrorModalBody");
-
-                    // TODO add all the details
-                    modalBody.append('<div>' +
-                        '<h4>' + errorEntry.streamName + '</h4>' +
-                        `<span class="error-label" style="margin-right: 10px;">${errorEntry.eventType}</span>` +
-                        `<span class="error-label">${errorEntry.errorOccurrence}</span>` +
-                        this.getRenderableCause(errorEntry) +
-                        `<p class="description">${this.getReadableTime(errorEntry.timestamp)}` +
-                        ` &nbsp; ID: ${errorEntry.id}</p>` +
-                        '</div>');
-                    modalBody.append('<br/>');
-                    modalBody.append(this.renderReplayButtonInDetailedErrorEntry(wrappedErrorEntry));
-                    modalBody.append('<br/>');
-                    if (!wrappedErrorEntry.isPayloadModifiable) {
-                        // Payload is not modifiable. Show the original payload, in case if the user wants to refer.
-                        modalBody.append(this.renderOriginalPayload(errorEntry));
-                        modalBody.append('<br/>');
-                    }
-                    modalBody.append(this.renderStackTrace(errorEntry));
-
-                    this.detailedErrorEntry = detailedErrorEntryModal;
-                    this.detailedErrorEntry.modal('show');
-                },
-
-                renderErrorEntry: function(errorEntry) {
+                renderReplayButtonInDetailedErrorEntry: function(wrappedErrorEntry) {
                     var self = this;
+                    var replay = $('<div></div>');
+                    var replayableWrappedErrorEntry = wrappedErrorEntry;
+                    if (wrappedErrorEntry.isPayloadModifiable) {
+                        // Payload is not modifiable.
+                        replay.append('<textarea id="eventPayload" rows="4" cols="40" class="payload-content">' +
+                            wrappedErrorEntry.modifiablePayloadString + '</textarea>');
+                        replay.append('<br/>');
+                    }
+                    replay.append("<button id='replay' type='button' class='btn btn-primary'>Replay</button>");
 
-                    // TODO styling is hardcoded. This should use standard classes
-                    var errorEntryElement = $('<div class="error-entry-container">' +
-                        `<h4>${errorEntry.streamName}</h4>` +
-                        `<span class="error-label" style="margin-right: 10px;">${errorEntry.eventType}</span>` +
-                        `<span class="error-label">${errorEntry.errorOccurrence}</span>` +
-                        this.getRenderableCause(errorEntry, true) +
-                        `<p class="description">${this.getReadableTime(errorEntry.timestamp)}` +
-                        ` &nbsp; ID: ${errorEntry.id}</p>` +
-                        '<br/>' +
-                        "<button id='replay' type='button' class='btn btn-default'>Replay</button>" +
-                        "<div class='divider'></div>" +
-                        "<button id='detailedInfo' type='button' class='btn btn-default'>Detailed Info</button>" +
-                        "<div class='divider'></div>" +
-                        "<button id='discard' type='button' class='btn btn-default'>Discard</button>" +
-                        '</div>');
-
-                    errorEntryElement.find("#replay").click(function() { // TODO disable if server not configured
-                        self.showLoadingDuringDirectReplay($(this).parent());
-                        self.directReplay(errorEntry.id, self.serverHost, self.serverPort, self.serverUsername,
-                            self.serverPassword, true);
+                    replay.find("#replay").click(function() {
+                        if (wrappedErrorEntry.isPayloadModifiable) {
+                            replayableWrappedErrorEntry.modifiablePayloadString = replay.find("#eventPayload").val();
+                        }
+                        self.replay([replayableWrappedErrorEntry], self.serverHost, self.serverPort,
+                            self.serverUsername, self.serverPassword, true);
+                        self.detailedErrorEntry.modal('hide');
                     });
-
-                    errorEntryElement.find("#detailedInfo").click(function() {
-                        self.fetchErrorEntryDetails(errorEntry.id, self.serverHost, self.serverPort,
-                            self.serverUsername, self.serverPassword);
-                    });
-
-                    errorEntryElement.find("#discard").click(function() {
-                        self.renderDiscardErrorEntryConfirmation(errorEntry);
-                        // self.discardErrorEntry(errorEntry.id, self.serverHost, self.serverPort, self.serverUsername,
-                        //     self.serverPassword);
-                    });
-
-                    return errorEntryElement;
+                    return replay;
                 },
 
-                showLoadingDuringDirectReplay: function(container) {
-                    var containerHeight = container.height();
-                    var containerWidth = container.width();
-                    container.empty();
-                    container.append(`<div style="height: ${containerHeight}; width: ${containerWidth}; ` +
-                        'text-align: center; font-size: 25">' +
-                        '<i class="fw fw-wso2-logo fw-pulse fw-2x" style="padding-top: 70px"></i></div>');
+                renderOriginalPayload: function(errorEntry) {
+                    var originalPayload = $('<div><h4>Original Payload</h4></div>');
+                    if (errorEntry.originalPayload) {
+                        originalPayload.append('<div class="payload-content">' + errorEntry.originalPayload + '</div>');
+                    } else {
+                        originalPayload.append('<div>Original payload of the event is not available</div>');
+                    }
+                    return originalPayload;
                 },
 
-                updateReplayAllProgressDisplay: function() {
-                    var container = this._errorHandlerModal.find("#siddhiAppErrorEntriesBlock");
-                    var containerHeight = container.height();
-                    var containerWidth = container.width();
-                    container.empty();
-                    container.append(`<div style="height: ${containerHeight}; width: ${containerWidth}; ` +
-                        'text-align: center; font-size: 25; padding-top: 150px">' +
-                        '<i class="fw fw-wso2-logo fw-pulse fw-2x"></i>'+
-                        `<h3>Replaying Error ${this.replayAllState.currentErrorNumber}`+
-                        ` of ${this.replayAllState.totalErrorsCount}</h3>` +
-                        `<h5 class="description">${this.replayAllState.siddhiAppName}</h5>` +
-                        '</div>');
+                renderStackTrace: function(errorEntry) {
+                    var stackTrace = $('<div><h4>Stack Trace</h4></div>');
+                    if (errorEntry.stackTrace) {
+                        stackTrace.append('<div class="stack-trace-content">' + errorEntry.stackTrace + '</div>');
+                    } else {
+                        stackTrace.append('<div>Stacktrace Not Available</div>');
+                    }
+                    return stackTrace;
                 },
 
-                renderContent: function(errorContainer) { // TODO add pagination as minified file
+                renderContent: function(errorContainer) {
                     var container = errorContainer || this._errorHandlerModal.find("div").filter("#errorContainer");
                     if (this.isServerConfigured) {
                         this.fetchSiddhiApps(
@@ -886,10 +771,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     var siddhiAppSelection = $('<div style="margin-bottom: 20px"></div>');
                     this.renderSiddhiAppSelection(this.availableSiddhiApps, siddhiAppSelection);
                     siddhiAppErrorEntriesBlock.append(siddhiAppSelection);
-                    // var errorEntries = $('<div id="paginatedErrorEntries" style="overflow:auto; height:100%"></div>');
-                    // this.renderErrorEntries(errorEntries);
 
-                    // TODO because we re-render everytime
+                    // Cleanup pagination elements during a re-render, or initialize them.
                     if (this.errorEntriesDiv && this.paginator) {
                         this.errorEntriesDiv.empty();
                         this.paginator.empty();
@@ -904,7 +787,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         this.paginator.pagination({
                             dataSource: function(done) {
                                 var serviceUrl = self.app.config.services.errorHandler.endpoint;
-                                $.ajax({ // TODO confirm this
+                                $.ajax({
                                     type: 'GET',
                                     contentType: "application/json; charset=utf-8",
                                     headers: {
@@ -915,7 +798,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                                     },
                                     url: serviceUrl + '/error-entries?siddhiApp=' + self.selectedSiddhiApp,
                                     success: function(response) {
-                                        console.log("Response received: ", response)
                                         done(response);
                                     }
                                 });
@@ -924,90 +806,26 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                                 pageNumber: 'offset',
                                 pageSize: 'limit'
                             },
-                            pageSize: 2,
-                            ajax: {
-                                beforeSend: function() {
-                                    console.log('Loading data from DB ...');
-                                }
-                            },
+                            pageSize: 10,
                             callback: function(data, pagination) {
-                                console.log("callback data", data)
-                                console.log("callback pagination", pagination)
                                 self.errorEntries = data;
                                 self.paginationData = pagination;
-
-                                // var html = ''; // TODO remove
-                                // if (data) {
-                                //     data.forEach(function (data) {
-                                //         html += self.renderErrorEntry(data).html();
-                                //     });
-                                //     self.errorEntriesDiv.html(
-                                //         '<div id="paginatedErrorEntries" style="overflow:auto; height:100%">' +
-                                //         html + '</div>');
-                                // }
                                 self.errorEntriesDiv.empty();
                                 self.renderErrorEntries(self.errorEntriesDiv);
+                                if (data.length > 0) {
+                                    self.discardAllButton.show();
+                                    self.replayAllButton.show();
+                                }
                             }
                         });
                     }
-
-
                     siddhiAppErrorEntriesBlock.append(this.errorEntriesDiv);
                     siddhiAppErrorEntriesBlock.append(this.paginator);
-
                     container.append(serverDetailsBlock);
                     container.append(siddhiAppErrorEntriesBlock);
-
-                    // TODO below works but rough. uncomment when finzlied
-                    // var dataContainer = $('<div></div>');
-                    // var paginator = $('<div id="demo"></div>');
-                    //
-                    // var self = this;
-                    // paginator.pagination({
-                    //     dataSource: function(done) {
-                    //         var serviceUrl = self.app.config.services.errorHandler.endpoint;
-                    //         $.ajax({ // TODO confirm this
-                    //             type: 'GET',
-                    //             contentType: "application/json; charset=utf-8",
-                    //             headers: {
-                    //                 'serverHost': 'localhost',
-                    //                 'serverPort': '9444',
-                    //                 'username': 'admin',
-                    //                 'password': 'admin'
-                    //             },
-                    //             // TODO soft code siddhi appname. make offset and limit dynamic
-                    //             url: serviceUrl + '/error-entries?siddhiApp=SinkTransportErrorTest',
-                    //             success: function(response) {
-                    //                 console.log("Response received: ", response)
-                    //                 done(response);
-                    //             }
-                    //         });
-                    //     },
-                    //     alias: {
-                    //         pageNumber: 'offset',
-                    //         pageSize: 'limit'
-                    //     },
-                    //     pageSize: 1,
-                    //     ajax: {
-                    //         beforeSend: function() {
-                    //             dataContainer.html('Loading data from DB ...');
-                    //         }
-                    //     },
-                    //     callback: function(data, pagination) {
-                    //         // template method of yourself
-                    //         console.log("callback data", data)
-                    //         console.log("callback pagination", pagination)
-                    //         var html = JSON.stringify(data);
-                    //         dataContainer.html(html);
-                    //     }
-                    // })
-                    // container.append(dataContainer);
-                    // container.append(paginator);
-
                 },
 
                 render: function() {
-                    console.log("render")
                     var self = this;
                     if (!_.isNil(this._errorHandlerModal)) {
                         this._errorHandlerModal.remove();
@@ -1026,23 +844,16 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         "</div>" +
                         "<div class='modal-body'>" +
                         "<div class='container-fluid'>" +
-
                         "<form class='form-horizontal' onsubmit='return false'>" +
-
                         "<div class='form-group'>" +
-
                         "<div id='errorContainer'></div>" +
-
                         "</div>" +
-
                         "<div class='form-group'>" +
                         "<div class='file-dialog-form-btn'>" +
                         "<button type='button' class='btn btn-default' data-dismiss='modal'>cancel</button>" +
                         "</div>" +
                         "</div>" +
                         "</form>" +
-
-
                         "<div id='errorHandlerErrorModal' class='alert alert-danger'>" +
                         "<strong>Error!</strong>Something went wrong." +
                         "</div>" +
@@ -1051,13 +862,10 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         "</div>" +
                         "</div>" +
                         "</div>");
-
                     var errorHandlerModal = errorHandlerModalHolder.filter("#errorHandlerModal");
                     var errorHandlerErrorModal = errorHandlerModalHolder.find("#errorHandlerErrorModal");
-
                     var errorContainer = errorHandlerModal.find("div").filter("#errorContainer");
                     this.renderContent(errorContainer);
-
                     $(this.dialog_containers).append(errorHandlerModal);
                     errorHandlerErrorModal.hide();
                     this._errorHandlerModal = errorHandlerModal;
