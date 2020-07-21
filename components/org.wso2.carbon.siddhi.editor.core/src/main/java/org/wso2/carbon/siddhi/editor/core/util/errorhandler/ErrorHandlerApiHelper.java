@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Consists of a method for the deployment feature for the exposed Siddhi App Api.
+ * Consists of methods that communicate with the Error Handler API, exposed from the SI server.
  */
 public class ErrorHandlerApiHelper implements ErrorHandlerApiHelperService {
 
