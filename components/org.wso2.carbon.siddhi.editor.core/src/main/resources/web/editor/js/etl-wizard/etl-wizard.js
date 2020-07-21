@@ -945,6 +945,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     function: {
                         // enable: true,
                         // text: `rdbms:query("INFO", "Sample Event :", true)`
+                        "enable": true,
+                        "name": "str:tokenize",
+                        "parameters": {
+                            "input.string": { "value": "name", "type": ["STRING"] },
+                            "regex": { "value": "'-'", "type": ["STRING"] }
+                        }
                     },
                     mapping: {
                         // id: "id"

@@ -275,8 +275,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     container.find('#mapped-attrib-list')
                         .append(`
                             <div style="width: 100%; padding-bottom: 5px" class="attribute-map">
-                                <label style="margin-bottom: 0" class="" id="" for="index-${key.replaceAll(/\//g, '-')}">${config.mapping.attributes[key].attributeName}</label>
-                                <input disabled id="index-${key.replaceAll(/\//g, '-')}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="" type="text" value="${key}">
+                                <label style="margin-bottom: 0" class="" id="" for="index-${key.replaceAll(/\//g, '-')}">${key}</label>
+                                <input disabled id="index-${key.replaceAll(/\//g, '-')}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="" type="text" value="${config.mapping.attributes[key]}">
                             </div>
                         `)
                 });
@@ -289,9 +289,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             });
 
             config.stream.attributes.forEach(function (el) {
-                var definedAttributes = Object.values(config.mapping.attributes).map(function (value) {
-                    return value.attributeName;
-                });
+                var definedAttributes = Object.keys(config.mapping.attributes);
 
                 if (!(definedAttributes.indexOf(el.name) > -1)) {
                     container.find('#source-mapper-attribute-dropdown').append(`
@@ -328,7 +326,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                         name += path;
                     });
 
-                    config.mapping.attributes[hoveredEl] = {attributeName: attribName, value: name};
+                    // console.log[hoveredEl];
+                    config.mapping.attributes[attribName] = hoveredEl.replaceAll(/-/g, '.');
                     if(self.__mapperType === 'sink') {
                         self.updateConfigPayload();
                     }
@@ -380,7 +379,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     hoveredEl = evt.currentTarget.id.match('custom-map-val-([a-zA-Z0-9\-]+)')[1];
                     $(container).find(`#${$(evt.currentTarget).attr('aria-describedby')}`).on('click', function(e) {
                         e.stopPropagation();
-                        delete config.mapping.attributes[hoveredEl];
+                        var attributeIndex = Object.values(config.mapping.attributes).indexOf(hoveredEl.replaceAll(/-/g, '.'));
+                        delete config.mapping.attributes[Object.keys(config.mapping.attributes)[attributeIndex]];
                         if(self.__mapperType === 'sink') {
                             self.updateConfigPayload();
                         }
@@ -403,6 +403,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             var self = this;
             var content = '';
             var config = this.__extensionConfig;
+            var value = id.substr(1).replaceAll(/-/g,'.');
+            var attribIndex = Object.values(config.mapping.attributes).indexOf(value);
 
             switch (typeof jsonObject) {
                 case 'object':
@@ -424,10 +426,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     }
                     break;
                 case "number":
-                    content += `<span id="custom-map-val${id}" class="custom-mapper-val ${config.mapping.attributes[id.substr(1)] ? 'ok-to-clear': 'no-clear'}" >${config.mapping.attributes[id.substr(1)] ? `{{ ${config.mapping.attributes[id.substr(1)].attributeName} }}` : jsonObject}</span>,<br/>`
+                    content += `<span id="custom-map-val${id}" class="custom-mapper-val ${attribIndex > -1 ? 'ok-to-clear': 'no-clear'}" >${attribIndex > -1 ? `{{ ${Object.keys(config.mapping.attributes)[attribIndex]} }}` : jsonObject}</span>,<br/>`
                     break;
                 case "string":
-                    content += `<span id="custom-map-val${id}" class="custom-mapper-val ${config.mapping.attributes[id.substr(1)] ? 'ok-to-clear': 'no-clear'}" >${config.mapping.attributes[id.substr(1)] ? `{{ ${config.mapping.attributes[id.substr(1)].attributeName} }}` : `"${jsonObject}"`}</span>,<br/>`
+                    content += `<span id="custom-map-val${id}" class="custom-mapper-val ${attribIndex > -1 ? 'ok-to-clear': 'no-clear'}" >${attribIndex > -1 ? `{{ ${Object.keys(config.mapping.attributes)[attribIndex]} }}` : `"${jsonObject}"`}</span>,<br/>`
                     break;
             }
             return content;
@@ -437,6 +439,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             var self = this;
             var content = '';
             var config = this.__extensionConfig;
+            var value = id.substr(1).replaceAll(/-/g,'.');
+            var attribIndex = Object.values(config.mapping.attributes).indexOf(value);
 
             if(id.length === 0) {
                 content += '"""';
@@ -469,10 +473,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     }
                     break;
                 case "number":
-                    content += `${config.mapping.attributes[id.substr(1)] ? config.mapping.attributes[id.substr(1)].attributeName : jsonObject }`
+                    content += `${attribIndex > -1 ? Object.keys(config.mapping.attributes)[attribIndex] : jsonObject }`
                     break;
                 case "string":
-                    content += `"${config.mapping.attributes[id.substr(1)] ? `{{${config.mapping.attributes[id.substr(1)].attributeName}}` : jsonObject }"`
+                    content += `"${attribIndex > -1 ? `{{${Object.keys(config.mapping.attributes)[attribIndex]}}` : jsonObject }"`
                     break;
             }
 

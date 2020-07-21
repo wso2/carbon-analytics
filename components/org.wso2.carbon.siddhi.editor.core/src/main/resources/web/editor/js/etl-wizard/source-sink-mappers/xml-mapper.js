@@ -276,8 +276,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     container.find('#mapped-attrib-list')
                         .append(`
                             <div style="width: 100%; padding-bottom: 5px" class="attribute-map">
-                                <label style="margin-bottom: 0" class="" id="" for="index-${key.replaceAll(/\//g, '-')}">${config.mapping.attributes[key].attributeName}</label>
-                                <input disabled id="index-${key.replaceAll(/\//g, '-')}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="" type="text" value="${key}">
+                                <label style="margin-bottom: 0" class="" id="" for="index-${key.replaceAll(/\//g, '-')}">${key}</label>
+                                <input disabled id="index-${key.replaceAll(/\//g, '-')}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="" type="text" value="${config.mapping.attributes[key]}">
                             </div>
                         `)
                 });
@@ -290,9 +290,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             });
 
             config.stream.attributes.forEach(function (el) {
-                var definedAttributes = Object.values(config.mapping.attributes).map(function (value) {
-                    return value.attributeName;
-                });
+                var definedAttributes = Object.keys(config.mapping.attributes);
 
                 if (!(definedAttributes.indexOf(el.name) > -1)) {
                     container.find('#source-mapper-attribute-dropdown').append(`
@@ -337,7 +335,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                         name += path;
                     });
 
-                    config.mapping.attributes[hoveredEl] = { attributeName: attribName, value: name };
+                    // config.mapping.attributes[hoveredEl] = { attributeName: attribName, value: name };
+                    config.mapping.attributes[attribName] = name;
                     if (self.__mapperType === 'sink') {
                         self.updateConfigPayload();
                     }
@@ -391,7 +390,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     hoveredEl = evt.currentTarget.id.match('custom-map-val-([a-zA-Z0-9\-]+)')[1].replaceAll(/-/g, '\/').substr(1);
                     $(container).find(`#${$(evt.currentTarget).attr('aria-describedby')}`).on('click', function (e) {
                         e.stopPropagation();
-                        delete config.mapping.attributes[hoveredEl];
+                        var index = Object.values(config.mapping.attributes).indexOf(hoveredEl);
+                        delete config.mapping.attributes[Object.keys(config.mapping.attributes)[index]];
                         if (self.__mapperType === 'sink') {
                             self.updateConfigPayload();
                         }
@@ -427,8 +427,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 } else {
                     var key = `${id}-${xmlObject.children[i].tagName}`;
                     var attrib_key = key.replaceAll(/-/g, '\/').substr(1);
-
-                    content += `<span id="custom-map-val-${key}" class="custom-mapper-val ${config.mapping.attributes[attrib_key] ? 'ok-to-clear' : 'no-clear'}" id="attrib-val-${i}">${config.mapping.attributes[attrib_key] ? `{{  ${config.mapping.attributes[attrib_key].attributeName}  }}` : this.__mapperType === 'source' ? '{{value}}' : xmlObject.children[i].textContent}</span>`;
+                    var attributeIndex = Object.values(config.mapping.attributes).indexOf(attrib_key);                    
+                    content += `<span id="custom-map-val-${key}" class="custom-mapper-val ${attributeIndex > -1 ? 'ok-to-clear' : 'no-clear'}" id="attrib-val-${i}">${attributeIndex > -1 ? `{{  ${Object.keys(config.mapping.attributes)[attributeIndex]}  }}` : this.__mapperType === 'source' ? '{{value}}' : xmlObject.children[i].textContent}</span>`;
                 }
                 content += `${xmlObject.children[i].childElementCount > 0 ? indent : ''}&lt;/${xmlObject.children[i].tagName}&gt;<br/>`;
             }
@@ -451,8 +451,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 } else {
                     var key = `${id}-${xmlObject.children[i].tagName}`;
                     var attrib_key = key.replaceAll(/-/g, '\/').substr(1);
-
-                    content += `${config.mapping.attributes[attrib_key] ? `{{${config.mapping.attributes[attrib_key].attributeName}}}` : xmlObject.children[i].textContent}`;
+                    var attributeIndex = Object.values(config.mapping.attributes).indexOf(attrib_key);                    
+                    content += `${attributeIndex > -1 ? `{{${Object.keys(config.mapping.attributes)[attributeIndex]}}}` : xmlObject.children[i].textContent}`;
                 }
                 content += `</${xmlObject.children[i].tagName}>`;
             }
