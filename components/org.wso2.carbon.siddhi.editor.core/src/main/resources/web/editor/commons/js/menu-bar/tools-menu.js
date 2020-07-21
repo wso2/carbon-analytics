@@ -62,7 +62,7 @@ define([],function (){
             },
             {
                 id: "errorHandler",
-                label: "Error Handler",
+                label: "Error Store Explorer",
                 command: {
                     id: "error-handler-dialog",
                     shortcuts: {
