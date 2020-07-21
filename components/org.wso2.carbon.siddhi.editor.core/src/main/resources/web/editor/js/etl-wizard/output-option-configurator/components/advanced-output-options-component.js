@@ -33,7 +33,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
 
             container.empty();
             container.append(`
-                <div style="font-size: 1.8rem">
+                <div style="font-size: 1.8rem; margin-bottom: 15px">
                     Configure output rate & limits<br/>
                     <small style="font-size: 1.3rem">Advanced options to configure output rate and limit where data will be published to the destination</small>
                 </div>

@@ -51,13 +51,21 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                                 </div>
                             </div>`
                             : `
-                                <div style="height: 100%; width: 100%; display: table;">
-                                    <a  id="btn-add-filter" class='enable-input-option grey-on-hover' style="display: table-cell; vertical-align: middle; color: #222;">
-                                        <img src="/editor/images/filter-query.svg" class="tool-image">
-                                        <div style="text-align:center">
-                                            Filter Input
+                                <div style="height: 100%; width: 100%;">
+                                    <div style="display:table; height: 100%; width: 100%;">
+                                        <div style="display:table-cell; vertical-align: middle;">
+                                            <div style="display: flex; width: fit-content; margin-left: auto; margin-right: auto;">
+                                                <a  id="btn-add-filter" class='enable-input-option grey-on-hover' style="color: #222;">
+                                                    <div style="padding: 15px;">
+                                                        <img src="/editor/images/filter-query.svg" class="tool-image">
+                                                        <div style="text-align:center">
+                                                            Filter Input
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
                                         </div>
-                                    </a>
+                                    </div>
                                 </div>
                             `
                     }
@@ -79,26 +87,32 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                             </div>
                         ` : `
                             <div style="height: 100%; width: 100%; display:flex; flex-direction:column">
-                                <a  id="btn-add-window" class='enable-input-option grey-on-hover' style="color: #222;flex:1">
-                                    <div style="height: 100%; width: 100%; display: table">
-                                        <div style="display: table-cell; vertical-align:middle">
-                                            <img src="/editor/images/window-query.svg" class="tool-image">
-                                            <div style="text-align:center">
-                                                Window Input
-                                            </div>
+                                <div style="display:table; height: 100%; width: 100%;">
+                                    <div style="display:table-cell; vertical-align: middle;">
+                                        <div style="display: flex; width: fit-content; margin-left: auto; margin-right: auto;">
+                                            <a  id="btn-add-window" class='enable-input-option grey-on-hover' style="color: #222;flex:1">
+                                                <div style="padding: 15px;">
+                                                    <div style="vertical-align:middle">
+                                                        <img src="/editor/images/window-query.svg" class="tool-image">
+                                                        <div style="text-align:center">
+                                                            Window Input
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <a  id="btn-add-function" class='enable-input-option grey-on-hover' style="color: #222;flex:1">
+                                                <div style="padding: 15px;">
+                                                    <div style="vertical-align:middle">
+                                                        <img src="/editor/images/function-query.svg" class="tool-image">
+                                                        <div style="text-align:center">
+                                                            Function Input
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </a>
                                         </div>
                                     </div>
-                                </a>
-                                <a  id="btn-add-function" class='enable-input-option grey-on-hover' style="color: #222;flex:1">
-                                    <div style="height: 100%; width: 100%; display: table">
-                                        <div style="display: table-cell; vertical-align:middle">
-                                            <img src="/editor/images/function-query.svg" class="tool-image">
-                                            <div style="text-align:center">
-                                                Function Input
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
+                                </div>
                             </div>
                         `
                 }

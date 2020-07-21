@@ -40,10 +40,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
             container.empty();
 
             container.append(`
-                <div style="font-size: 1.8rem">
+                <div style="font-size: 1.8rem; margin-bottom:15px">
                     Group output by fields<br/>
                     <small style="font-size: 1.3rem">Group the output records using a set of fields and filter them based on a condition</small>
                 </div>
+                Group by attributes
                 <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-groupby-field" type="button" data-toggle="dropdown">
                     <i class="fw fw-add"></i>
                 </button>

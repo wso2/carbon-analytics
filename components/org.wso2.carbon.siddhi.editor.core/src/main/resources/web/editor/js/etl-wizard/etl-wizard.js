@@ -138,6 +138,9 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var config = this.__propertyMap;
 
             wizardHeaderContent.find('input.etl-flow-name').val(config.appName);
+            setTimeout(function() {
+                self.__options.application.tabController.getActiveTab().getHeader().setText(self.__propertyMap.appName);
+            }, 300)
 
             wizardObj.find(`#step-${stepIndex}`).addClass('selected');
 
@@ -249,11 +252,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             wizardHeaderContent.find('.etl-flow-name')
                 .on('keyup', _.debounce(function (evt) {
                     config.appName = $(evt.currentTarget).val();
+                    self.__options.application.tabController.getActiveTab().getHeader().setText(config.appName);
                 }, 100, {}))
                 .on('focusout', function (evt) {
                     var appName = $(evt.currentTarget).val();
-                    if (!appName.length > 0 && config.appName.length > 0) {
+                    if (!(appName.length > 0 && config.appName.length > 0)) {
                         config.appName = 'UntitledETLTaskFlow';
+                        self.__options.application.tabController.getActiveTab().getHeader().setText(config.appName);
                         $(evt.currentTarget).val(config.appName);
                     }
                 });
