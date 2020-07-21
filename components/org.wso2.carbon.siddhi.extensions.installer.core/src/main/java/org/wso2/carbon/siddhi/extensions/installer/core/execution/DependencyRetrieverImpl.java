@@ -94,7 +94,7 @@ public class DependencyRetrieverImpl implements DependencyRetriever {
                 if (isDependencyInstalled(dependency)) {
                     installedDependenciesCount++;
                     // Whether the Siddhi jar of the extension itself has been installed or not.
-                    if (isSelfDependency(dependency)) {
+                    if (ExtensionsInstallerUtils.isSelfDependency(dependency)) {
                         isSelfDependencyInstalled = true;
                     }
                 }
@@ -103,13 +103,6 @@ public class DependencyRetrieverImpl implements DependencyRetriever {
                 isSelfDependencyInstalled, installedDependenciesCount, dependencies.size());
         }
         throw new ExtensionsInstallerException("No dependencies were specified.");
-    }
-
-    private boolean isSelfDependency(DependencyConfig dependency) {
-        if (dependency.getName() != null) {
-            return dependency.getName().toLowerCase().startsWith("siddhi-");
-        }
-        return false;
     }
 
     private boolean isDependencyInstalled(DependencyConfig dependency) throws ExtensionsInstallerException {
