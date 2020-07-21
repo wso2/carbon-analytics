@@ -1429,10 +1429,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 finalElementCount: 5,
             };
 
-            console.log('---------------------');
-            console.log(config);
-            console.log('---------------------');
-
             return {
                 siddhiAppConfig: config,
                 edgeList: []
@@ -1470,10 +1466,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         var updateButtonBar = function(wizardFooterContent, stepIndex) {
             wizardFooterContent.find('.btn').show();
             if (stepIndex == 5) {
-                console.log(stepIndex, 'hide next button');
                 wizardFooterContent.find('.next-btn').hide();
             } else {
-                console.log(stepIndex, 'hide save button');
                 wizardFooterContent.find('.save-btn').hide();
             }
         };
