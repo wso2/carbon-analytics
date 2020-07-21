@@ -489,8 +489,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                 },
 
                 renderServerDetails: function(errorContainer) {
-                    var self = this;
-                    var serverDetails = self.isServerConfigured ? this.generateServerConfiguredDisplay() :
+                    var serverDetails = this.isServerConfigured ? this.generateServerConfiguredDisplay() :
                         this.generateServerNotConfiguredDisplay();
                     errorContainer.append(serverDetails);
                 },
@@ -526,14 +525,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     serverConfiguredDisplay.append(
                         `<h5 class="description">${self.serverHost + ':' + self.serverPort}&nbsp;&nbsp;`+
                         `<a id="configureServer"><i class="fw fw-settings"></i></a></h5>`);
-                    serverConfiguredDisplay.append(
-                        '<button id="purgeErrorStore" type="button" class="btn btn-danger">Purge</button>');
 
                     serverConfiguredDisplay.find("#configureServer").click(function() {
                         self.renderServerConfigurations();
-                    });
-                    serverConfiguredDisplay.find("#purgeErrorStore").click(function() {
-                        self.renderPurgeSettings();
                     });
                     return serverConfiguredDisplay;
                 },
@@ -758,6 +752,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                 },
 
                 renderContent: function(errorContainer) {
+                    var self = this;
                     var container = errorContainer || this._errorHandlerModal.find("div").filter("#errorContainer");
                     if (this.isServerConfigured) {
                         this.fetchSiddhiApps(
@@ -769,7 +764,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     this.renderServerDetails(serverDetailsBlock);
                     var siddhiAppErrorEntriesBlock =
                         $('<div id="siddhiAppErrorEntriesBlock" class="error-handler-dialog-form-block" ' +
-                        'style="height: 50%; margin-bottom: 0; overflow: auto;"></div>');
+                        'style="height: 48%; overflow: auto;"></div>');
                     var siddhiAppSelection = $('<div style="margin-bottom: 20px"></div>');
                     this.renderSiddhiAppSelection(this.availableSiddhiApps, siddhiAppSelection);
                     siddhiAppErrorEntriesBlock.append(siddhiAppSelection);
@@ -785,7 +780,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     }
 
                     if (this.isServerConfigured && this.selectedSiddhiApp) {
-                        var self = this;
                         this.paginator.pagination({
                             dataSource: function(done) {
                                 var serviceUrl = self.app.config.services.errorHandler.endpoint;
@@ -823,12 +817,23 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     }
                     siddhiAppErrorEntriesBlock.append(this.errorEntriesDiv);
                     siddhiAppErrorEntriesBlock.append(this.paginator);
+
                     container.append(serverDetailsBlock);
                     container.append(siddhiAppErrorEntriesBlock);
+                    if (this.isServerConfigured) {
+                        var purgeBlock =
+                            $('<div id="purgeBlock" class="error-handler-dialog-form-block" style="margin-bottom: 0">' +
+                                '</div>');
+                        purgeBlock.append(
+                            '<button id="purgeErrorStore" type="button" class="btn btn-danger">Purge</button>');
+                        purgeBlock.find("#purgeErrorStore").click(function() {
+                            self.renderPurgeSettings();
+                        });
+                        container.append(purgeBlock);
+                    }
                 },
 
                 render: function() {
-                    var self = this;
                     if (!_.isNil(this._errorHandlerModal)) {
                         this._errorHandlerModal.remove();
                     }

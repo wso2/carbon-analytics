@@ -19,7 +19,7 @@
 package org.wso2.carbon.siddhi.editor.core.exception;
 
 /**
- * Exceptions related to SiddhiAppDeployerServiceStub.
+ * Exception related to ErrorHandlerServiceStub.
  */
 public class ErrorHandlerServiceStubException extends Exception {
 

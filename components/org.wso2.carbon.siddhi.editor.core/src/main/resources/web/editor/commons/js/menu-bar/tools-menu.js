@@ -25,24 +25,6 @@ define([],function (){
                 disabled: false
             },
             {
-                id: "errorHandler",
-                label: "Error Handler",
-                command: {
-                    id: "error-handler-dialog",
-                    // shortcuts: {
-                    //     mac: {
-                    //         key: "command+alt+i",
-                    //         label: "\u2318\u2325I"
-                    //     },
-                    //     other: {
-                    //         key: "ctrl+alt+i",
-                    //         label: "Ctrl+Alt+I"
-                    //     }
-                    // }
-                },
-                disabled: false
-            },
-            {
                 id: "extensionInstall",
                 label: "Extension Installer",
                 command: {
@@ -73,6 +55,24 @@ define([],function (){
                         other: {
                             key: "ctrl+shift+i",
                             label: "Ctrl+Shift+I"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
+                id: "errorHandler",
+                label: "Error Handler",
+                command: {
+                    id: "error-handler-dialog",
+                    shortcuts: {
+                        mac: {
+                            key: "command+alt+h",
+                            label: "\u2318\u2325H"
+                        },
+                        other: {
+                            key: "ctrl+alt+h",
+                            label: "Ctrl+Alt+H"
                         }
                     }
                 },
