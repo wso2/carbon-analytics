@@ -815,3 +815,4 @@ define(['ace/ace', 'jquery', 'lodash', 'log','dialogs','./service-client','welco
             app.commandManager.registerHandler('export-for-kubernetes', this.handleExportForKubernetes, this);
         }
     });
+
