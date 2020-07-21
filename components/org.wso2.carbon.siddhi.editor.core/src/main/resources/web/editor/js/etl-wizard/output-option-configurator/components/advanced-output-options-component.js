@@ -148,7 +148,14 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             container.find('.rate-container')
                                 .append(`
                                     <div>
-                                        <span>output events every</span>
+                                        <span>output type</span>
+                                        <select id="select-event-type">
+                                            <option value="every">every event</option>
+                                            <option value="first">first event</option>
+                                            <option value="last">last event</option>
+                                        </select>
+                                        </br>
+                                        <span style="margin-top: 5px">output time limit</span>
                                         <div>
                                             <input id="txt-rate-val" style="width: 75%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.ratelimit['value']}">
                                             <select id="select-granularity">
@@ -162,12 +169,31 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                         </div>
                                     </div>
                                 `);
-                            self.__container.find('.rate-container #select-granularity').val(config.query.advanced.ratelimit['granularity'] );
+                            
+                            if(!config.query.advanced.ratelimit['event-selection']) {
+                                config.query.advanced.ratelimit['event-selection'] = 'every';
+                            }
+                            self.__container.find('.rate-container #select-granularity').val(config.query.advanced.ratelimit['granularity']);
+                            self.__container.find('#select-event-type').val(config.query.advanced.ratelimit['event-selection']);
+                            
+                            if(config.query.advanced.ratelimit['event-selection'] && config.query.advanced.ratelimit['event-selection'].length > 0) {
+                                self.__container.find('.select-event-type').val(config.query.advanced.ratelimit['event-selection']);
+                            }
+                            self.__container.find('#select-event-type').on('change', function(evt) {
+                                config.query.advanced.ratelimit['event-selection'] = $(evt.currentTarget).val();
+                            });
                             break;
                         case 'no-of-events':
                             container.find('.rate-container')
                                 .append(`
                                     <div>
+                                        <span>output type</span>
+                                        <select id="select-event-type">
+                                            <option value="every">every event</option>
+                                            <option value="first">first event</option>
+                                            <option value="last">last event</option>
+                                        </select>
+                                        </br>
                                         <span>output events every</span>
                                         <div>
                                             <input id="txt-rate-val" style="width: 75%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.ratelimit['value']}">
@@ -175,6 +201,15 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                         </div>
                                     </div>
                                 `);
+                            
+                            if(!config.query.advanced.ratelimit['event-selection']) {
+                                config.query.advanced.ratelimit['event-selection'] = 'every';
+                            }
+                            
+                            self.__container.find('#select-event-type').val(config.query.advanced.ratelimit['event-selection']);
+                            self.__container.find('#select-event-type').on('change', function(evt) {
+                                config.query.advanced.ratelimit['event-selection'] = $(evt.currentTarget).val();
+                            });
                             break;
                         case 'snapshot':
                             container.find('.rate-container')
@@ -197,6 +232,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             self.__container.find('.rate-container #select-granularity').val(config.query.advanced.ratelimit['granularity'] );
                             break;
                     }
+
+                    if(!config.query.advanced.ratelimit['value']) {
+                        config.query.advanced.ratelimit['value'] = 0;
+                    }
+
                     container.find('.rate-container #txt-rate-val')
                         .on('keyup', function (evt) {
                             config.query.advanced.ratelimit['value'] = $(evt.currentTarget).val();
