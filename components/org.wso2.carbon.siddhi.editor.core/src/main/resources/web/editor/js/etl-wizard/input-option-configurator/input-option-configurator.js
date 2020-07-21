@@ -34,7 +34,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
 
             container.empty();
             container.append(`
-                <div style="max-height: ${self.__container.offsetHeight}; flex-direction: column; margin: 0" class="content-section">
+                <div style="max-height: ${self.__container.offsetHeight}; flex-direction: column; margin: 0;margin-right:5px; background: rgb(162 162 162)" class="content-section">
                     
                     ${
                         Object.keys(self.__config.query.filter).length > 0 ?
@@ -62,7 +62,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                             `
                     }
                 </div>
-                <div  style="max-height: ${self.__container.offsetHeight}; flex-direction: column; margin: 0" class="content-section">
+                <div  style="max-height: ${self.__container.offsetHeight}; flex-direction: column; margin: 0;margin-left:5px; background: rgb(162 162 162)" class="content-section">
                 ${
                     Object.keys(self.__config.query.window).length > 0 || Object.keys(self.__config.query.function).length > 0 ?
                         `
