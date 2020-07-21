@@ -19,9 +19,12 @@
 define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attributeModel', 'functionModel', 'operatorModel', 'customValueModel', 'dataMapperUtil'],
 
     function (require, $, _, log, Alerts, ScopeModel, AttributeModel, FunctionModel, OperatorModel, CustomValueModel, DataMapperUtil) {
-        var FilterInputOptionComponent = function (container, config) {
+        var inputOptionCallback;
+        
+        var FilterInputOptionComponent = function (container, config, callback) {
             this.__container = container;
             this.__config = config;
+            inputOptionCallback = callback;
 
             if(!config.query.filter['expression']) {
                 config.query.filter['expression'] = new ScopeModel(['bool']);
