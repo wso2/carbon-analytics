@@ -17,9 +17,9 @@
  *  * under the License.
  *
  */
-define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor/completion-engine', 'alerts', 'inputOutputMapper', 'inputOptionConfigurator', 'dataMapper', 'outputConfigurator', 'handlebar', 'etlWizardUtil'],
+define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor/completion-engine', 'alerts', 'inputOutputMapper', 'inputOptionConfigurator', 'dataMapper', 'outputConfigurator', 'handlebar', 'etlWizardUtil', 'dataMapperUtil'],
 
-    function (require, $, _, log, smartWizard, CompletionEngine, Alerts, InputOutputMapper, InputOptionConfigurator, DataMapper, OutputConfigurator, Handlebars, etlWizardUtil) {
+    function (require, $, _, log, smartWizard, CompletionEngine, Alerts, InputOutputMapper, InputOptionConfigurator, DataMapper, OutputConfigurator, Handlebars, etlWizardUtil, DataMapperUtil) {
 
         /**
          * Constants used by the wizard
@@ -57,21 +57,9 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             this.__propertyMap = generateUIDataModel(initOpts.dataModel);
             this.__stepIndex = 1;
             this.__substep = 0;
-            // this.__steps = [
-            //     {id: 1, description: 'Data source'},
-            //     {id: 2, description: 'Data Destination'},
-            //     {id: 3, description: 'Process Input Data'},
-            //     {id: 4, description: 'Data Mapping'},
-            //     {id: 5, description: 'Process Output Data'},
-            // ];
             if (this.__propertyMap.appName.length === 0) {
                 this.__propertyMap.appName = 'UntitledETLTaskFlow';
             }
-
-            console.log('================= property map =================');
-            console.log(this.__propertyMap);
-            console.log('================================================');
-
             this.__parentWizardForm = this.constructWizardHTMLElements($('#ETLWizardForm').clone());
         };
 
@@ -148,35 +136,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var wizardHeaderContent = wizardObj.find(constants.CLASS_WIZARD_MODAL_HEADER);
             var stepIndex = this.__stepIndex;
             var config = this.__propertyMap;
-            // var steps = this.__steps;
 
-            // wizardHeaderContent.empty();
-            // wizardFooterContent.empty();
-
-            // Define header for the wizard
-            // wizardHeaderContent.append(`
-            //     <input class="etl-flow-name" id="" type="text" value="${config.appName}"/>
-            //     <div class="header-steps"></div>
-            // `);
             wizardHeaderContent.find('input.etl-flow-name').val(config.appName);
-
-            // steps.forEach(function (step) {
-            //     wizardHeaderContent.find('.header-steps')
-            //         .append(`
-            //             <div id="step-${step.id}" class="step-item">
-            //                 Step ${step.id}
-            //                 <br/>
-            //                 <small>${step.description}</small>
-            //             </div>
-            //         `);
-            // });
-
-            // wizardFooterContent.append(`
-            //     <div style="position: relative" class="btn-tray">
-            //         <button style="position: absolute; left: 0" class="btn btn-default back-btn">Back</button>
-            //         <button style="position: absolute; right: 0" class="btn btn-default next-btn">Next</button>
-            //     </div>
-            // `);
 
             wizardObj.find(`#step-${stepIndex}`).addClass('selected');
 
@@ -279,9 +240,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             wizardObj.find('.save-btn').on('click', function () {
                 var dataModel = generateSourceGenDataModel(self.__propertyMap);
-                console.log('--------------------- source view model ---------------------');
-                console.log(dataModel);
-                console.log('-------------------------------------------------------------');
                 var result = saveSiddhiApp(dataModel);
                 wizardObj.find(`#step-${self.__stepIndex++}`).removeClass('selected');
                 wizardObj.find(`#step-${self.__stepIndex}`).addClass('selected');
@@ -910,8 +868,9 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         properties: {},
                         possibleProperties: {},
                         attributes: {},
+                        payload: '',
                         customEnabled: false,
-                        samplePayload: "",
+                        samplePayload: ''
                     }
                 },
                 output: {
@@ -945,12 +904,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     function: {
                         // enable: true,
                         // text: `rdbms:query("INFO", "Sample Event :", true)`
-                        "enable": true,
-                        "name": "str:tokenize",
-                        "parameters": {
-                            "input.string": { "value": "name", "type": ["STRING"] },
-                            "regex": { "value": "'-'", "type": ["STRING"] }
-                        }
                     },
                     mapping: {
                         // id: "id"
@@ -988,97 +941,63 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     streamProcessors: {}
                 }
 
-                // sources
                 self.__expressionData.extensions.source.sources.forEach((s) => {
                     var parameters = {};
-                    s.parameters.forEach((p) => {
-                        parameters[p.name] = {
-                            type: p.type
-                        };
-                    });
+                    s.parameters.forEach((p) => parameters[p.name] = { type: p.type });
                     self.__extensionDataMap.sources[s.name] = { parameters };
                 });
 
-                // sinks
                 self.__expressionData.extensions.sink.sinks.forEach((s) => {
                     var parameters = {};
-                    s.parameters.forEach((p) => {
-                        parameters[p.name] = {
-                            type: p.type
-                        };
-                    });
+                    s.parameters.forEach((p) => parameters[p.name] = { type: p.type });
                     self.__extensionDataMap.sinks[s.name] = { parameters };
                 });
 
-                // source mappers
                 self.__expressionData.extensions.sourceMapper.sourceMaps.forEach((s) => {
                     var parameters = {};
-                    (s.parameters || []).forEach((p) => {
-                        parameters[p.name] = {
-                            type: p.type
-                        };
-                    });
+                    (s.parameters || []).forEach((p) => parameters[p.name] = { type: p.type });
                     self.__extensionDataMap.sourceMappers[s.name] = { parameters };
                 });
 
-                // sink mappers
                 self.__expressionData.extensions.sinkMapper.sinkMaps.forEach((s) => {
                     var parameters = {};
-                    (s.parameters || []).forEach((p) => {
-                        parameters[p.name] = {
-                            type: p.type
-                        };
-                    });
+                    (s.parameters || []).forEach((p) => parameters[p.name] = { type: p.type });
                     self.__extensionDataMap.sinkMappers[s.name] = { parameters };
                 });
 
-                // window processors
                 self.__expressionData.inBuilt.windowProcessors.forEach((w) => {
-                    self.__extensionDataMap.windowProcessors[w.name] = {
-                        parameters: w.parameters || []
-                    };
+                    self.__extensionDataMap.windowProcessors[w.name] = { parameters: w.parameters || [] };
                 });
 
-                // stream processors
                 self.__expressionData.inBuilt.streamProcessors.forEach((s) => {
-                    self.__extensionDataMap.streamProcessors[s.name] = {
-                        parameters: s.parameters || []
-                    };
+                    self.__extensionDataMap.streamProcessors[s.name] = { parameters: s.parameters || [] };
                 });
 
                 Object.entries(self.__expressionData.extensions).forEach(ext => {
                     ext[1].streamProcessors.forEach(sp => {
-                        self.__extensionDataMap.streamProcessors[`${sp.namespace}:${sp.name}`] = {
-                            parameters: sp.parameters || []
-                        };
+                        var fqn = `${sp.namespace}:${sp.name}`;
+                        self.__extensionDataMap.streamProcessors[fqn] = { parameters: sp.parameters || [] };
                     })
                 });
             }
 
-            console.log('=============== source gen data model ===============');
-            console.log(o);
-            console.log('=====================================================');
             m = o.siddhiAppConfig;
-
             model.appName = m.siddhiAppName;
             model.appDescription = m.siddhiAppDescription;
 
-            // streams
-            m.streamList.forEach(function(stream) {
-                // input stream
+            m.streamList.forEach((stream) => {
                 if (m.sourceList[0].connectedElementName === stream.name) {
                     model.input.stream.name = stream.name;
-                    stream.attributeList.forEach(function(attr) {
+                    stream.attributeList.forEach((attr) => {
                         model.input.stream.attributes.push({
                             name: attr.name,
                             type: attr.type
                         });
                     });
                 }
-                // output stream
                 if (m.sinkList[0].connectedElementName === stream.name) {
                     model.output.stream.name = stream.name;
-                    stream.attributeList.forEach(function(attr) {
+                    stream.attributeList.forEach((attr) => {
                         model.output.stream.attributes.push({
                             name: attr.name,
                             type: attr.type
@@ -1087,47 +1006,68 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 }
             });
 
-            // source
             model.input.source.type = m.sourceList[0].type;
-            m.sourceList[0].options.forEach(function(option) {
+            m.sourceList[0].options.forEach((option) => {
                 var { key, value } = splitKeyValueByEqual(option);
                 var type = self.__extensionDataMap.sources[m.sourceList[0].type].parameters[key].type;
                 model.input.source.properties[key] = { value, type };
             });
 
-            // sink
             model.output.sink.type = m.sinkList[0].type;
-            m.sinkList[0].options.forEach(function(option) {
+            m.sinkList[0].options.forEach((option) => {
                 var { key, value } = splitKeyValueByEqual(option);
                 var type = self.__extensionDataMap.sinks[m.sinkList[0].type].parameters[key].type;
                 model.output.sink.properties[key] = { value, type };
             });
 
-            // source mapping
             if (m.sourceList[0].map) {
                 model.input.mapping.type = m.sourceList[0].map.type;
-                m.sourceList[0].map.options.forEach(function(option) {
+                m.sourceList[0].map.options.forEach((option) => {
                     var { key, value } = splitKeyValueByEqual(option);
                     var type = self.__extensionDataMap.sourceMappers[m.sourceList[0].map.type].parameters[key].type;
                     model.input.mapping.properties[key] = { value, type };
                 });
             }
 
-            // TODO: source map attributes
+            if (m.sourceList[0].map.payloadOrAttribute) {
+                switch(m.sourceList[0].map.payloadOrAttribute.annotationType) {
+                    case 'ATTRIBUTES':
+                        model.input.mapping.customEnabled = true;
+                        Object.entries(m.sourceList[0].map.payloadOrAttribute.value).forEach(a => {
+                            model.input.mapping.attributes[a[0]] = a[1];
+                        });
+                        break;
+                    case 'PAYLOAD':
+                        model.input.mapping.customEnabled = true;
+                        model.input.mapping.payload = m.sourceList[0].map.payloadOrAttribute.value[0];
+                        break;
+                }
+            }
 
-            // sink mapping
             if (m.sinkList[0].map) {
                 model.output.mapping.type = m.sinkList[0].map.type;
-                m.sinkList[0].map.options.forEach(function(option) {
+                m.sinkList[0].map.options.forEach((option) => {
                     var { key, value } = splitKeyValueByEqual(option);
                     var type = self.__extensionDataMap.sinkMappers[m.sinkList[0].map.type].parameters[key].type;
                     model.output.mapping.properties[key] = { value, type };
                 });
             }
 
-            // TODO: sink map attributes
+            if (m.sinkList[0].map.payloadOrAttribute) {
+                switch(m.sinkList[0].map.payloadOrAttribute.annotationType) {
+                    case 'ATTRIBUTES':
+                        model.output.mapping.customEnabled = true;
+                        Object.entries(m.sinkList[0].map.payloadOrAttribute.value).forEach(a => {
+                            model.output.mapping.attributes[a[0]] = a[1];
+                        });
+                        break;
+                    case 'PAYLOAD':
+                        model.output.mapping.customEnabled = true;
+                        model.output.mapping.payload = m.sinkList[0].map.payloadOrAttribute.value[0];
+                        break;
+                }
+            }
 
-            // query window
             m.queryLists.WINDOW_FILTER_PROJECTION[0].queryInput.streamHandlerList.forEach((h) => {
                 switch(h.type) {
                     case 'FILTER':
@@ -1143,7 +1083,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             parameters: {}
                         };
                         for (var i = 0; i < h.value.parameters.length; i++) {
-                            var { name, type } = self.__extensionDataMap.windowProcessors[h.value.function].parameters[i];
+                            var { name, type } = self.__extensionDataMap.windowProcessors[h.value.function]
+                                .parameters[i];
                             var value = h.value.parameters[i];
                             model.query.window.parameters[name] = { value, type }
                         }
@@ -1155,7 +1096,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             parameters: {}
                         };
                         for (var i = 0; i < h.value.parameters.length; i++) {
-                            var { name, type } = self.__extensionDataMap.streamProcessors[h.value.function].parameters[i];
+                            var { name, type } = self.__extensionDataMap.streamProcessors[h.value.function]
+                                .parameters[i];
                             var value = h.value.parameters[i];
                             model.query.function.parameters[name] = { value, type }
                         }
@@ -1205,19 +1147,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 var arr = m.queryLists.WINDOW_FILTER_PROJECTION[0].outputRateLimit.split(' ');
                 model.query.advanced.ratelimit = {
                     enabled: true,
-                    type: arr[1] === 'snapshot' ?
+                    type: arr[0] === 'snapshot' ?
                         'snapshot' : (arr[arr.length - 1] === 'events' ? 'no-of-events' : 'time-based'),
                     value: arr[arr.length - 2],
                     granularity: arr[arr.length - 1],
-                    eventselection: arr[1] === 'snapshot' ?
-                        '' : (arr.length === 4 ? arr[1] : `${arr[1]} ${arr[2]}`)
+                    'event-selection': arr[0] === 'snapshot' ? '' : arr[0]
                 };
             }
-
-            console.log('=============== result ===============');
-            console.log(model)
-            console.log('======================================');
-
             return model;
         }
 
@@ -1231,11 +1167,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         }
 
         var generateSourceGenDataModel = function(o) {
-            o.appName = 'UntitledETLTaskFlow';
-            // console.log('----------------- generatng code view from --------------');
-            // console.log(o);
-            // console.log('---------------------------------------------------------');
-
             var config = {
                 siddhiAppName: o.appName,
                 siddhiAppDescription: o.appDescription || '',
@@ -1264,44 +1195,74 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 sourceList: [
                     {
                         id: "source",
-                        // previousCommentSegment: {
-                        //     "content": "\n\n",
-                        //     "queryContextStartIndex": [3, 43],
-                        //     "queryContextEndIndex": [4, 1]
-                        // },
                         connectedElementName: o.input.stream.name,
                         annotationType: "SOURCE",
                         type: o.input.source.type,
                         options: Object.entries(o.input.source.properties).map(v => {
-                            return `${v[1].name} = "${v[1].value}"`;
+                            return `${v[0]} = "${v[1].value}"`;
                         }),
                         map: {
                             type: o.input.mapping.type,
                             options: Object.entries(o.input.mapping.properties).map(v => {
-                                return `${v[1].name} = "${v[1].value}"`
-                            })
+                                return `${v[0]} = "${v[1].value}"`
+                            }),
+                            payloadOrAttribute: (() => {
+                                if (!o.input.mapping.customEnabled) {
+                                    return {};
+                                }
+
+                                if (o.input.mapping.payload && o.input.mapping.payload.length > 0) {
+                                    return {
+                                        annotationType: 'PAYLOAD',
+                                        type: 'LIST',
+                                        value: [o.input.mapping.payload]
+                                    };
+                                }
+                                var attrList = {};
+                                Object.entries(o.input.mapping.attributes).forEach(a => attrList[a[0]] = a[1]);
+                                return {
+                                    annotationType: 'ATTRIBUTES',
+                                    type: 'MAP',
+                                    value: attrList
+                                };
+                            })()
                         }
                     }
                 ],
                 sinkList: [
                     {
                         id: "sink",
-                        // previousCommentSegment: {
-                        //     "content": "\n\n",
-                        //     "queryContextStartIndex": [7, 45],
-                        //     "queryContextEndIndex": [8, 1]
-                        // },
                         connectedElementName: o.output.stream.name,
                         annotationType: "SINK",
                         type: o.output.sink.type,
                         options: Object.entries(o.output.sink.properties).map(v => {
-                            return `${v[1].name} = "${v[1].value}"`;
+                            return `${v[0]} = "${v[1].value}"`;
                         }),
                         map: {
                             type: o.output.mapping.type,
                             options: Object.entries(o.output.mapping.properties).map(v => {
-                                return `${v[1].name} = "${v[1].value}"}`
-                            })
+                                return `${v[0]} = "${v[1].value}"`
+                            }),
+                            payloadOrAttribute: (() => {
+                                if (!o.output.mapping.customEnabled) {
+                                    return {};
+                                }
+
+                                if (o.output.mapping.payload && o.output.mapping.payload.length > 0) {
+                                    return {
+                                        annotationType: 'PAYLOAD',
+                                        type: 'LIST',
+                                        value: [o.output.mapping.payload]
+                                    };
+                                }
+                                var attrList = {};
+                                Object.entries(o.output.mapping.attributes).forEach(a => attrList[a[0]] = a[1]);
+                                return {
+                                    annotationType: 'ATTRIBUTES',
+                                    type: 'MAP',
+                                    value: attrList
+                                };
+                            })()
                         }
                     }
                 ],
@@ -1316,21 +1277,53 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         {
                             queryName: "query1",
                             id: "query1",
-                            // previousCommentSegment: {
-                            //     content: "\n\n",
-                            //     queryContextStartIndex: [11, 46],
-                            //     queryContextEndIndex: [12, 1]
-                            // },
                             queryInput: {
-                                type: 'PROJECTION',
+                                type: 'PROJECTION', // TODO:
                                 from: o.input.stream.name,
-                                streamHandlerList: []
+                                streamHandlerList: (() => {
+                                    var list = [];
+                                    if (o.query.window.enable) {
+                                        list.push({
+                                            type: 'WINDOW',
+                                            value: {
+                                                function: o.query.window.type,
+                                                parameters: Object.entries(o.query.window.parameters).map(p => {
+                                                    return p[1].value;
+                                                })
+                                            }
+                                        });
+                                    }
+                                    if (o.query.filter.enable) {
+                                        var expression = '';
+                                        if (typeof o.query.filter.expression === 'string') {
+                                            expression = o.query.filter.expression;
+                                        } else {
+                                            expression = $(DataMapperUtil.generateExpressionHTML2(o.query.filter.expression)).text()
+                                        }
+                                        list.push({
+                                            type: 'FILTER',
+                                            value: expression
+                                        })
+                                    }
+                                    if (o.query.function.enable) {
+                                        list.push({
+                                            type: 'FUNCTION',
+                                            value: {
+                                                function: o.query.function.type,
+                                                parameters: Object.entries(o.query.function.parameters).map(p => {
+                                                    return p[1].value;
+                                                })
+                                            }
+                                        });
+                                    }
+                                    return list;
+                                })()
                             },
                             select: {
                                 type: "USER_DEFINED",
                                 value: Object.entries(o.query.mapping).map(v => {
                                     return {
-                                        expression: v[1].rootNode.name,
+                                        expression: v[1],
                                         as: v[0]
                                     }
                                 })
@@ -1345,8 +1338,26 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             }),
                             limit: o.query.advanced.limit.value || 0,
                             offset: o.query.advanced.offset.value || 0,
-                            having: 'id + 1 < 100', // TODO:
-                            outputRateLimit: '',
+                            having: (() => {
+                                if (!o.query.groupby.havingFilter.enabled) {
+                                    return '';
+                                }
+                                if (typeof o.query.groupby.havingFilter.expression === 'string') {
+                                    return o.query.groupby.havingFilter.expression
+                                }
+                                return $(DataMapperUtil.generateExpressionHTML2(o.query.groupby.havingFilter.expression)).text()
+                            })(),
+                            outputRateLimit: (() => {
+                                if (!o.query.advanced.ratelimit.enabled) {
+                                    return '';
+                                }
+                                var { value, granularity } = o.query.advanced.ratelimit,
+                                    eventSelection = o.query.advanced.ratelimit['event-selection'];
+                                if (o.query.advanced.ratelimit.type === 'snapshot') {
+                                    return `snapshot every ${value} ${granularity}`;
+                                }
+                                return `${eventSelection} every ${value} ${granularity}`.trim();
+                            })(),
                             orderBy: (o.query.orderBy || { attributes: []}).attributes.map(v => {
                                 return {
                                     value: v.attribute.name,
@@ -1363,65 +1374,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 },
                 finalElementCount: 5,
             };
-
-            if (o.input.mapping.customEnabled) {
-                var attrMap = {};
-                Object.entries(o.input.mapping.attributes).forEach(v => {
-                    attrMap[v[1].attributeName] = v[1].value;
-                });
-
-                config.sourceList[0].map['payloadOrAttribute'] = {
-                    annotationType: 'ATTRIBUTES',
-                    type: 'MAP',
-                    value: attrMap
-                };
-            }
-
-            if (o.output.mapping.customEnabled) {
-                var attrMap = {};
-                Object.entries(o.output.mapping.attributes).forEach(v => {
-                    attrMap[v[1].attributeName] = v[1].value;
-                });
-
-                config.sinkList[0].map['payloadOrAttribute'] = {
-                    annotationType: 'ATTRIBUTES',
-                    type: 'MAP',
-                    value: attrMap
-                }
-            }
-
-            if (o.query.window.enable) {
-                var queryInput = {
-                    type: 'WINDOW',
-                    from: o.input.stream.name,
-                    streamHandlerList: []
-                };
-
-                if (o.query.window.enable) {
-                    queryInput.streamHandlerList.push({
-                        type: 'FILTER',
-                        value: 'id + 1 < 100' // TODO:
-                    });
-                }
-
-                queryInput.streamHandlerList.push({
-                    type: 'WINDOW',
-                    value: {
-                        function: o.query.window.type,
-                        parameters: Object.entries(o.query.window.parameters).map(v => {
-                            return v[1].value;
-                        })
-                    }
-                });
-                config.queryLists.WINDOW_FILTER_PROJECTION[0].queryInput = queryInput;
-            }
-
-            if (o.query.advanced.ratelimit.enable) {
-                var { type, value } = o.query.advanced.ratelimit;
-                if (type === 'time-based') {
-                    config.queryLists.WINDOW_FILTER_PROJECTION[0].outputRateLimit = `every ${value} sec`; // TODO:
-                }
-            }
 
             return {
                 siddhiAppConfig: config,

@@ -171,38 +171,11 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                                 sourceContainer.hide();
                                 etlWizardContainer.show();
-                                // console.log('======== switching to etl wizard ========');
-                                // console.log(self.JSONObject);
-
                                 var etlOptions = _.cloneDeep(self.options);
-                                // etlOptions.fileSource = 'hello, world';
                                 etlOptions.dataModel = self.JSONObject;
 
-                                // alert('init etlwizard');
                                 var etlWizard = new ETLWizard(etlOptions);
                                 etlWizard.render();
-                                // alert('init etlwizard: done');
-                                // // The following code has been added to the setTimeout() method because
-                                // // the code needs to run asynchronously for the loading screen
-                                // setTimeout(function () {
-                                //     var fileHashCode = application.tabController.getActiveTab().getFile().attributes.hashCode;
-                                //     var renderedAppContentHashCode = designView.getHashCode();
-                                //     if (fileHashCode != renderedAppContentHashCode || fileHashCode == undefined &&
-                                //         renderedAppContentHashCode == undefined) {
-                                //         designView.setHashCode(fileHashCode);
-                                //         designView.emptyDesignViewGridContainer();
-                                //         designContainer.show();
-                                //         designView.renderDesignGrid(self.JSONObject);
-                                //         loadingScreen.hide();
-                                //     } else {
-                                //         designContainer.show();
-                                //         loadingScreen.hide();
-                                //     }
-                                //     // NOTE - This trigger should be always handled at the end of setTimeout()
-                                //     self.trigger("view-switch", { view: 'design' });
-                                // }, 100);
-                                // toggleViewButton.html("<i class=\"fw fw-code\"></i>" +
-                                //     "<span class=\"toggle-button-text\">Source View</span>");
                             } else if (response.status === "fail") {
                                 loadingScreen.hide();
                                 DesignViewUtils.prototype.errorAlert(response.errorMessage);
@@ -367,8 +340,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                 },
 
                 canTranslateToWizard: function(model) {
-                    // TODO: validate if the siddhi app can be shown in a wizard mode.
-                    alert('I am going to return false :)');
                     return true;
                 },
 
