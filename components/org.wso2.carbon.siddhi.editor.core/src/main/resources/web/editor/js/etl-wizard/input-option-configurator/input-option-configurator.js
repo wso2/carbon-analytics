@@ -32,19 +32,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
             var container = self.__container;
             var config = self.__config;
 
-            //<div class="input-option-btn-group" style="display: flex;">
-            // <button id="btn-add-filter" style="min-width: 90px; background: input-option-section#ee6719" class="btn btn-default"><i class="fw ${Object.keys(config.query.filter).length > 0 ? 'fw-check': 'fw-error'}"></i>&nbsp;Filter</button>
-            // </div>
-            // <div class="input-option-btn-group" style="display: flex;">
-            //             <button id="btn-add-function" style="margin-left: auto; min-width: 90px; background: #ee6719" class="btn btn-default">
-            //                 <i class="fw ${Object.keys(config.query.function).length > 0 ? 'fw-check': 'fw-error'}"></i>&nbsp;Streaming Function
-            //             </button>
-            //             <button id="btn-add-window" style="margin-left: 15px; min-width: 90px; background: #ee6719" class="btn btn-default">
-            //                 <i class="fw ${Object.keys(config.query.window).length > 0 ? 'fw-check': 'fw-error'}"></i>&nbsp;Window
-            //             </button>
-            //         </div>
-
-
             container.empty();
             container.append(`
                 <div style="max-height: ${self.__container.offsetHeight}; flex-direction: column; margin: 0" class="content-section">
@@ -95,7 +82,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                                 <a  id="btn-add-window" class='enable-input-option grey-on-hover' style="color: #222;flex:1">
                                     <div style="height: 100%; width: 100%; display: table">
                                         <div style="display: table-cell; vertical-align:middle">
-                                            <img src="/editor/images/filter-query.svg" class="tool-image">
+                                            <img src="/editor/images/window-query.svg" class="tool-image">
                                             <div style="text-align:center">
                                                 Window Input
                                             </div>
@@ -105,7 +92,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                                 <a  id="btn-add-function" class='enable-input-option grey-on-hover' style="color: #222;flex:1">
                                     <div style="height: 100%; width: 100%; display: table">
                                         <div style="display: table-cell; vertical-align:middle">
-                                            <img src="/editor/images/filter-query.svg" class="tool-image">
+                                            <img src="/editor/images/function-query.svg" class="tool-image">
                                             <div style="text-align:center">
                                                 Function Input
                                             </div>

@@ -159,12 +159,12 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                         <div>
                                             <input id="txt-rate-val" style="width: 75%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.ratelimit['value']}">
                                             <select id="select-granularity">
-                                                <option>second</option>
-                                                <option>minute</option>
-                                                <option>hour</option>
-                                                <option>day</option>
-                                                <option>month</option>
-                                                <option>year</option>
+                                                <option value="sec">second</option>
+                                                <option value="min">minute</option>
+                                                <option value="hour">hour</option>
+                                                <option value="day">day</option>
+                                                <option value="month">month</option>
+                                                <option value="year">year</option>
                                             </select>    
                                         </div>
                                     </div>
@@ -173,7 +173,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             if(!config.query.advanced.ratelimit['event-selection']) {
                                 config.query.advanced.ratelimit['event-selection'] = 'every';
                             }
-                            self.__container.find('.rate-container #select-granularity').val(config.query.advanced.ratelimit['granularity']);
+                            self.__container.find('.rate-container #select-granularity').val(config.query.advanced.ratelimit['granularity'].toLowerCase());
                             self.__container.find('#select-event-type').val(config.query.advanced.ratelimit['event-selection']);
                             
                             if(config.query.advanced.ratelimit['event-selection'] && config.query.advanced.ratelimit['event-selection'].length > 0) {
@@ -219,17 +219,17 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                         <div>
                                             <input id="txt-rate-val" style="width: 75%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.ratelimit['value']}">
                                             <select id="select-granularity">
-                                                <option>second</option>
-                                                <option>minute</option>
-                                                <option>hour</option>
-                                                <option>day</option>
-                                                <option>month</option>
-                                                <option>year</option>
+                                                <option value="sec">second</option>
+                                                <option value="min">minute</option>
+                                                <option value="hour">hour</option>
+                                                <option value="day">day</option>
+                                                <option value="month">month</option>
+                                                <option value="year">year</option>
                                             </select>    
                                         </div>
                                     </div>
                                 `);
-                            self.__container.find('.rate-container #select-granularity').val(config.query.advanced.ratelimit['granularity'] );
+                            self.__container.find('.rate-container #select-granularity').val(config.query.advanced.ratelimit['granularity'].toLowerCase() );
                             break;
                     }
 
