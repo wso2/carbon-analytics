@@ -86,7 +86,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                             var paramData = config.query.function.parameters[key];
                             functionDataContainer.append(`
                                 <div style="width: 100%; padding-bottom: 10px" class="input-section">
-                                    <label style="margin-bottom: 0" class="${paramData.length > 0 ? '' : 'not-visible'}" id="label-function-param-${key.replaceAll(/\./g, '-')}" for="function-param-${key.replaceAll(/\./g, '-')}">${key}</label>
+                                    <label style="margin-bottom: 0" class="${paramData.value.length > 0 ? '' : 'not-visible'}" id="label-function-param-${key.replaceAll(/\./g, '-')}" for="function-param-${key.replaceAll(/\./g, '-')}">${key}</label>
                                     <input id="function-param-${key.replaceAll(/\./g, '-')}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #373737" placeholder="${key}" type="text" value="${paramData.value}">
                                 </div>
                             `);
