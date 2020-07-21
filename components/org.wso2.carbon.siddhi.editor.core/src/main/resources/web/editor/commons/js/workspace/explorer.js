@@ -72,6 +72,7 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
                     this.application.tabController.setActiveTab(currentTabForFile);
                     return;
                 }
+                alert('file is goint to be opened from the workspace explorer')
                 this.application.commandManager.dispatch("create-new-tab", {tabOptions: {file: file}});
             },
 

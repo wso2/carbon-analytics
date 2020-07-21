@@ -17,14 +17,14 @@
  *  * under the License.
  *
  */
-define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engine', 'alerts', 'inputOutputMapper', 'inputOptionConfigurator', 'dataMapper', 'outputConfigurator', 'etlWizardUtil'],
+define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor/completion-engine', 'alerts', 'inputOutputMapper', 'inputOptionConfigurator', 'dataMapper', 'outputConfigurator', 'handlebar', 'etlWizardUtil'],
 
-    function (require, $, _, log, CompletionEngine, Alerts, InputOutputMapper, InputOptionConfigurator, DataMapper, OutputConfigurator, etlWizardUtil) {
+    function (require, $, _, log, smartWizard, CompletionEngine, Alerts, InputOutputMapper, InputOptionConfigurator, DataMapper, OutputConfigurator, Handlebars, etlWizardUtil) {
 
         /**
          * Constants used by the wizard
          */
-        var constants = {
+        const constants = {
             CLASS_WIZARD_MODAL_HEADER: '.header-content',
             CLASS_WIZARD_MODAL_BODY: '.body-content',
             CLASS_WIZARD_MODAL_FOOTER: '.footer-content',
@@ -32,7 +32,17 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
             SERVER_URL: window.location.protocol + "//" + window.location.host + "/editor/",
             SOURCE_TYPE: 'source',
             SINK_TYPE: 'sink',
-            SUPPORTED_DATA_TYPES: ['INT', 'LONG', 'FLOAT', 'DOUBLE', 'STRING', 'BOOL']
+            SUPPORTED_DATA_TYPES: ['INT', 'LONG', 'FLOAT', 'DOUBLE', 'STRING', 'BOOL'],
+            commands: {
+                EXPORT_FOR_DOCKER: 'export-for-docker',
+                EXPORT_FOR_KUBERNETES: 'export-for-kubernetes',
+                DEPLOY_TO_SERVER: 'deploy-to-server',
+                TOGGLE_EVENT_SIMULATOR: 'toggle-event-simulator'
+            }
+        };
+
+        var templates = {
+            finalizeStep: Handlebars.compile($('#etl-wizard-finalize-template').html())
         };
 
         var ETLWizard = function (initOpts) {
@@ -44,96 +54,24 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
             this.__resetSchema = false;
 
             //object structure used to store data
-            this.__propertyMap = {
-                appName: '',
-                input: {
-                    source: {
-                        type: '',
-                        properties: {},
-                        possibleOptions: {},
-                    },
-                    stream: {
-                        name: "",
-                        attributes: [],
-                        addLog: false
-                    },
-                    mapping: {
-                        type: '',
-                        properties: {},
-                        possibleProperties: {},
-                        attributes: {},
-                        customEnabled: false,
-                        samplePayload: "",
-                    }
-                },
-                output: {
-                    sink: {
-                        type: '',
-                        properties: {},
-                        possibleOptions: {},
-                        addOnError: false
-                    },
-                    stream: {
-                        name: "",
-                        attributes: [],
-                        addLog: false
-                    },
-                    mapping: {
-                        type: '',
-                        properties: {},
-                        possibleProperties: {},
-                        attributes: {},
-                        payload: '',
-                        customEnabled: false,
-                        samplePayload: ''
-                    }
-                },
-                query: {
-                    window: {},
-                    filter: {
-                        // enable: true,
-                        // expression: 'haha'
-                    },
-                    function: {
-                        // enable: true,
-                        // text: `rdbms:query("INFO", "Sample Event :", true)`
-                        "enable": true,
-                        "name": "str:tokenize",
-                        "parameters": {
-                            "input.string": { "value": "name", "type": ["STRING"] },
-                            "regex": { "value": "'-'", "type": ["STRING"] }
-                        }
-                    },
-                    mapping: {
-                        // id: "id"
-                    },
-                    groupby: {
-                        attributes: [],
-                        havingFilter : {}
-                    },
-                    orderby: {
-                        attributes: []
-                    },
-                    advanced: {
-                        offset: {},
-                        limit: {},
-                        ratelimit: {}
-                    }
-                }
-            };
-
+            this.__propertyMap = generateUIDataModel(initOpts.dataModel);
             this.__stepIndex = 1;
             this.__substep = 0;
-            this.__steps = [
-                {id: 1, description: 'Data source'},
-                {id: 2, description: 'Data Destination'},
-                {id: 3, description: 'Process Input Data'},
-                {id: 4, description: 'Data Mapping'},
-                {id: 5, description: 'Process Output Data'},
-            ];
+            // this.__steps = [
+            //     {id: 1, description: 'Data source'},
+            //     {id: 2, description: 'Data Destination'},
+            //     {id: 3, description: 'Process Input Data'},
+            //     {id: 4, description: 'Data Mapping'},
+            //     {id: 5, description: 'Process Output Data'},
+            // ];
             if (this.__propertyMap.appName.length === 0) {
                 this.__propertyMap.appName = 'UntitledETLTaskFlow';
             }
+
+            console.log('================= property map =================');
+            console.log(this.__propertyMap);
+            console.log('================================================');
+
             this.__parentWizardForm = this.constructWizardHTMLElements($('#ETLWizardForm').clone());
         };
 
@@ -162,9 +100,9 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                 template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-content" style="display: flex; flex-direction: column"></div></div>',
                 placement: 'top',
             });
-        
+
             if(self.__previousSchemaDef.length > 0 && !_.isEqual(self.__previousSchemaDef, newSchemaDef)) {
-                
+
                 wizardObj.find('.next-btn').popover('show');
                 wizardObj.find(`#${wizardObj.find('.next-btn').attr('aria-describedby')} .popover-confirm-proceed`).on('click', function (e) {
                     e.stopPropagation();
@@ -183,7 +121,7 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                         };
                         self.__propertyMap.query.orderby.attributes = [];
                     }
-                    
+
                     wizardObj.find('.next-btn').popover('hide');
                     self.__previousSchemaDef = undefined;
                     self.incrementStep(wizardObj);
@@ -207,44 +145,40 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
         //Construct and return wizard skeleton
         ETLWizard.prototype.constructWizardHTMLElements = function (wizardObj) {
             var self = this;
-            var wizardFormContainer = wizardObj.find(constants.ID_ETL_WIZARD_BODY);
             var wizardHeaderContent = wizardObj.find(constants.CLASS_WIZARD_MODAL_HEADER);
-            var wizardFooterContent = wizardObj.find(constants.CLASS_WIZARD_MODAL_FOOTER);
             var stepIndex = this.__stepIndex;
-            var substep = this.__substep;
             var config = this.__propertyMap;
-            var steps = this.__steps;
+            // var steps = this.__steps;
 
-            wizardHeaderContent.empty();
-            wizardFooterContent.empty();
+            // wizardHeaderContent.empty();
+            // wizardFooterContent.empty();
 
             // Define header for the wizard
-            wizardHeaderContent.append(`
-                <input class="etl-flow-name" id="" type="text" value="${config.appName}"/>
-                <div class="header-steps"></div>
-            `);
+            // wizardHeaderContent.append(`
+            //     <input class="etl-flow-name" id="" type="text" value="${config.appName}"/>
+            //     <div class="header-steps"></div>
+            // `);
+            wizardHeaderContent.find('input.etl-flow-name').val(config.appName);
 
-            steps.forEach(function (step) {
-                wizardHeaderContent.find('.header-steps')
-                    .append(`
-                        <div id="step-${step.id}" class="step-item">
-                            Step ${step.id}
-                            <br/>
-                            <small>${step.description}</small>
-                        </div>
-                    `);
-            });
+            // steps.forEach(function (step) {
+            //     wizardHeaderContent.find('.header-steps')
+            //         .append(`
+            //             <div id="step-${step.id}" class="step-item">
+            //                 Step ${step.id}
+            //                 <br/>
+            //                 <small>${step.description}</small>
+            //             </div>
+            //         `);
+            // });
 
-            wizardFooterContent.append(`
-                <div style="position: relative" class="btn-tray">
-                    <button style="position: absolute; left: 0" class="btn btn-default back-btn">Back</button>
-                    <button style="position: absolute; right: 0" class="btn btn-default next-btn">Next</button>
-                </div>
-            `);
+            // wizardFooterContent.append(`
+            //     <div style="position: relative" class="btn-tray">
+            //         <button style="position: absolute; left: 0" class="btn btn-default back-btn">Back</button>
+            //         <button style="position: absolute; right: 0" class="btn btn-default next-btn">Next</button>
+            //     </div>
+            // `);
 
             wizardObj.find(`#step-${stepIndex}`).addClass('selected');
-
-
 
             wizardObj.find('.next-btn').on('click', function (evt) {
                 switch (self.__stepIndex) {
@@ -320,9 +254,7 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                             Alerts.error('Please recheck the output options before submitting');
                         }
                         break;
-
                 }
-
             });
 
             wizardObj.find('.back-btn').on('click', function () {
@@ -342,9 +274,18 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                     case 5:
                         self.decrementStep(wizardObj);
                         break;
-
                 }
+            });
 
+            wizardObj.find('.save-btn').on('click', function () {
+                var dataModel = generateSourceGenDataModel(self.__propertyMap);
+                console.log('--------------------- source view model ---------------------');
+                console.log(dataModel);
+                console.log('-------------------------------------------------------------');
+                var result = saveSiddhiApp(dataModel);
+                wizardObj.find(`#step-${self.__stepIndex++}`).removeClass('selected');
+                wizardObj.find(`#step-${self.__stepIndex}`).addClass('selected');
+                self.render(result);
             });
 
             wizardHeaderContent.find('.etl-flow-name')
@@ -364,7 +305,7 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
 
         ETLWizard.prototype.incrementStep = function (wizardObj) {
             var self = this;
-            if (self.__stepIndex < self.__steps.length) {
+            if (self.__stepIndex < 6) {
                 if (self.__stepIndex < 3 && self.__substep < 2) {
                     self.__substep++;
                 } else {
@@ -392,7 +333,7 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
             }
         }
 
-        ETLWizard.prototype.render = function () {
+        ETLWizard.prototype.render = function (viewData) {
             var self = this;
             var etlWizardContainer = this.__$parent_el_container.find(_.get(this.__options, 'etl_wizard.container'));
             var canvasContainer = this.__$parent_el_container.find(_.get(this.__options, 'canvas.container'));
@@ -401,14 +342,23 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
             var previewContainer = this.__$parent_el_container.find(_.get(this.__options, 'preview.container'));
             var toggleControlsContainer = this.__$parent_el_container.find('.toggle-controls-container');
             var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY)
-            
+
             this.__parentWizardForm.find('.next-btn').popover('destroy');
+
+            var wizardFooterContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_FOOTER)
+
             etlWizardContainer.append(this.__parentWizardForm);
 
-            canvasContainer.removeClass('show-div').addClass('hide-div');
-            previewContainer.removeClass('show-div').addClass('hide-div');
-            designContainer.removeClass('show-div').addClass('hide-div');
-            sourceContainer.removeClass('show-div').addClass('hide-div');
+            // canvasContainer.removeClass('show-div').addClass('hide-div');
+            // previewContainer.removeClass('show-div').addClass('hide-div');
+            // designContainer.removeClass('show-div').addClass('hide-div');
+            // sourceContainer.removeClass('show-div').addClass('hide-div');
+            // toggleControlsContainer.addClass('hide');
+
+            canvasContainer.addClass('hide-div');
+            previewContainer.addClass('hide-div');
+            designContainer.addClass('hide-div');
+            sourceContainer.addClass('hide-div');
             toggleControlsContainer.addClass('hide');
             etlWizardContainer.addClass('etl-wizard-view-enabled');
 
@@ -426,11 +376,11 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
             }
 
             if(!this.__previousSchemaDef && this.__stepIndex === 1) {
-                this.__previousSchemaDef = _.cloneDeep(this.__propertyMap.input.stream.attributes);    
+                this.__previousSchemaDef = _.cloneDeep(this.__propertyMap.input.stream.attributes);
             }
 
             if(!this.__previousSchemaDef && this.__stepIndex === 2) {
-                this.__previousSchemaDef = _.cloneDeep(this.__propertyMap.output.stream.attributes);    
+                this.__previousSchemaDef = _.cloneDeep(this.__propertyMap.output.stream.attributes);
             }
 
             wizardBodyContent.empty();
@@ -459,6 +409,12 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                 case 5:
                     var outputConfigurator = new OutputConfigurator(wizardBodyContent, self.__propertyMap);
                     outputConfigurator.render();
+                    // TODO Output option configurator
+                    break;
+                case 6:
+                    wizardBodyContent.empty();
+                    this.renderFinalize(viewData);
+                    break;
             }
 
             if(this.__stepIndex < 3) {
@@ -474,6 +430,8 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                     }
                 }
             }
+
+            updateButtonBar(wizardFooterContent, this.__stepIndex);
         };
 
         ETLWizard.prototype.renderSourceSinkConfigurator = function (type) {
@@ -490,7 +448,7 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                             .map(function(extension) {
                                 return extension.name;
                             }).indexOf('log');
-            
+
             if(logIndex > -1) {
                 extensionData.splice(logIndex, 1);
             }
@@ -505,12 +463,12 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                         type !== constants.SOURCE_TYPE ?
                             `<div style="display: flex; padding-top:15px">
                                 <div style="width: 100%;padding-top: 5px">
-                                    Store mapping errors                                      
+                                    Store mapping errors
                                 </div>
                                 <div>
                                     <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-enable-error-handling" type="button" data-toggle="dropdown">
                                         <i class="fw ${config.addOnError ? 'fw-check' : 'fw-minus'}"></i>
-                                    </button> 
+                                    </button>
                                 </div>
                             </div>` : ''
                     }
@@ -527,7 +485,7 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                                 `
                                     <div style="padding-top: 15px" class="extension-properties">
                                         <div>
-                                          ${type === constants.SOURCE_TYPE ? 'Source' : 'Sink'} properties: 
+                                          ${type === constants.SOURCE_TYPE ? 'Source' : 'Sink'} properties:
                                             <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-transport-property" type="button" data-toggle="dropdown">
                                                 <i class="fw fw-add"></i>
                                             </button>
@@ -546,6 +504,10 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
             wizardBodyContent.find('#btn-enable-error-handling').on('click', function(evt) {
                 config.addOnError = !config.addOnError;
                 self.render();
+            });
+
+            extensionData.sort(function(a, b) {
+                return (a.name < b.name) ? -1 : ((a.name > b.name) ? 1 : 0);
             });
 
             extensionData.forEach(function (extension) {
@@ -608,14 +570,14 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                             </div>
                             <div style="display: flex;padding-top: 20px; padding-left: 5px;" class="delete-section">
                                 <a style="margin-right: 5px; color: #333" title="${selectedOption.description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}">
-                                    <i class="fw fw-info"></i>    
-                                </a>  
+                                    <i class="fw fw-info"></i>
+                                </a>
                                 ${
                                     selectedOption.optional ?
                                         `<a style="color: #333">
-                                            <i id="extension-op-del-${name}" class="fw fw-delete"></i>    
+                                            <i id="extension-op-del-${name}" class="fw fw-delete"></i>
                                          </a>` : ''
-                                }                              
+                                }
                             </div>
                         </div>
                     `);
@@ -626,7 +588,7 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                     var selectedOption = selectedExtension.parameters.find(function(element) {
                         return element.name === optionName;
                     });
-                    
+
                     config.properties[optionName] = {};
                     config.properties[optionName].value = selectedOption.defaultValue;
                     config.properties[optionName].type = selectedOption.type;
@@ -697,12 +659,12 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                     </div>
                     <div style="display: flex; padding-top:15px">
                         <div style="width: 100%;padding-top: 5px">
-                            Add log sink for testing                                      
+                            Add log sink for testing
                         </div>
                         <div>
                             <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-enable-log-sink" type="button" data-toggle="dropdown">
                                 <i class="fw ${config.addLog ? 'fw-check' : 'fw-minus'}"></i>
-                            </button> 
+                            </button>
                         </div>
                     </div>
                     <div style="padding-top: 10px">
@@ -713,10 +675,10 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                         <div style="padding-top: 10px">
                             <div style="padding-top: 15px" class="attribute-list">
                                 <div>
-                                  ${type === constants.SOURCE_TYPE ? 'input' : 'output'} stream attributes: 
+                                  ${type === constants.SOURCE_TYPE ? 'input' : 'output'} stream attributes:
                                   <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-stream-attrib" type="button" data-toggle="dropdown">
                                     <i class="fw fw-add"></i>
-                                  </button> 
+                                  </button>
                                   <div id="stream-attribute-type-dropdown" style="left: 150px" class="dropdown-menu-style hidden" aria-labelledby="">
                                   </div>
                                 </div>
@@ -899,7 +861,606 @@ define(['require', 'jquery', 'lodash', 'log', 'app/source-editor/completion-engi
                 var inputOutputMapper = new InputOutputMapper(type, mapperContainer, extensionConfig, mapper);
                 inputOutputMapper.render();
             }
+        };
+
+        ETLWizard.prototype.renderFinalize = function(obj) {
+            var self = this;
+            var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY);
+            wizardBodyContent.empty();
+            wizardBodyContent.html(templates.finalizeStep(obj));
+
+            wizardBodyContent.find('#btn-test').on('click', function() {
+                var siddhiAppName = self.__propertyMap.appName;
+                var inputStreamName = self.__propertyMap.input.stream.name;
+                self.__app.commandManager.dispatch(constants.commands.TOGGLE_EVENT_SIMULATOR, siddhiAppName, inputStreamName);
+            });
+
+            wizardBodyContent.find('#btn-export-docker').on('click', function() {
+                var selectedFiles = [`${self.__propertyMap.appName}.siddhi`];
+                self.__app.commandManager.dispatch(constants.commands.EXPORT_FOR_DOCKER, selectedFiles);
+            });
+
+            wizardBodyContent.find('#btn-export-k8s').on('click', function() {
+                var selectedFiles = [`${self.__propertyMap.appName}.siddhi`];
+                self.__app.commandManager.dispatch(constants.commands.EXPORT_FOR_KUBERNETES, selectedFiles);
+            });
+
+            wizardBodyContent.find('#btn-deploy').on('click', function() {
+                var selectedFiles = [`${self.__propertyMap.appName}.siddhi`];
+                self.__app.commandManager.dispatch(constants.commands.DEPLOY_TO_SERVER, selectedFiles);
+            });
+        };
+
+        var generateUIDataModel = function(o) {
+            var model = {
+                appName: '',
+                input: {
+                    source: {
+                        type: '',
+                        properties: {},
+                        possibleOptions: {},
+                    },
+                    stream: {
+                        name: "",
+                        attributes: [],
+                        addLog: false
+                    },
+                    mapping: {
+                        type: '',
+                        properties: {},
+                        possibleProperties: {},
+                        attributes: {},
+                        customEnabled: false,
+                        samplePayload: "",
+                    }
+                },
+                output: {
+                    sink: {
+                        type: '',
+                        properties: {},
+                        possibleOptions: {},
+                        addOnError: false
+                    },
+                    stream: {
+                        name: "",
+                        attributes: [],
+                        addLog: false
+                    },
+                    mapping: {
+                        type: '',
+                        properties: {},
+                        possibleProperties: {},
+                        attributes: {},
+                        payload: '',
+                        customEnabled: false,
+                        samplePayload: ''
+                    }
+                },
+                query: {
+                    window: {},
+                    filter: {
+                        // enable: true,
+                        // expression: 'haha'
+                    },
+                    function: {
+                        // enable: true,
+                        // text: `rdbms:query("INFO", "Sample Event :", true)`
+                    },
+                    mapping: {
+                        // id: "id"
+                    },
+                    groupby: {
+                        attributes: [],
+                        havingFilter : {}
+                    },
+                    orderby: {
+                        attributes: []
+                    },
+                    advanced: {
+                        offset: {},
+                        limit: {},
+                        ratelimit: {}
+                    }
+                }
+            };
+
+            if (!o) {
+                return model;
+            }
+
+            if (!self.__expressionData) {
+                self.__expressionData = CompletionEngine.getRawMetadata();
+            }
+
+            if (!self.__extensionDataMap) {
+                self.__extensionDataMap = {
+                    sources: {},
+                    sinks: {},
+                    sourceMappers: {},
+                    sinkMappers: {},
+                    windowProcessors: {},
+                    streamProcessors: {}
+                }
+
+                // sources
+                self.__expressionData.extensions.source.sources.forEach((s) => {
+                    var parameters = {};
+                    s.parameters.forEach((p) => {
+                        parameters[p.name] = {
+                            type: p.type
+                        };
+                    });
+                    self.__extensionDataMap.sources[s.name] = { parameters };
+                });
+
+                // sinks
+                self.__expressionData.extensions.sink.sinks.forEach((s) => {
+                    var parameters = {};
+                    s.parameters.forEach((p) => {
+                        parameters[p.name] = {
+                            type: p.type
+                        };
+                    });
+                    self.__extensionDataMap.sinks[s.name] = { parameters };
+                });
+
+                // source mappers
+                self.__expressionData.extensions.sourceMapper.sourceMaps.forEach((s) => {
+                    var parameters = {};
+                    (s.parameters || []).forEach((p) => {
+                        parameters[p.name] = {
+                            type: p.type
+                        };
+                    });
+                    self.__extensionDataMap.sourceMappers[s.name] = { parameters };
+                });
+
+                // sink mappers
+                self.__expressionData.extensions.sinkMapper.sinkMaps.forEach((s) => {
+                    var parameters = {};
+                    (s.parameters || []).forEach((p) => {
+                        parameters[p.name] = {
+                            type: p.type
+                        };
+                    });
+                    self.__extensionDataMap.sinkMappers[s.name] = { parameters };
+                });
+
+                // window processors
+                self.__expressionData.inBuilt.windowProcessors.forEach((w) => {
+                    self.__extensionDataMap.windowProcessors[w.name] = {
+                        parameters: w.parameters || []
+                    };
+                });
+
+                // stream processors
+                self.__expressionData.inBuilt.streamProcessors.forEach((s) => {
+                    self.__extensionDataMap.streamProcessors[s.name] = {
+                        parameters: s.parameters || []
+                    };
+                });
+
+                Object.entries(self.__expressionData.extensions).forEach(ext => {
+                    ext[1].streamProcessors.forEach(sp => {
+                        self.__extensionDataMap.streamProcessors[`${sp.namespace}:${sp.name}`] = {
+                            parameters: sp.parameters || []
+                        };
+                    })
+                });
+            }
+
+            console.log('=============== source gen data model ===============');
+            console.log(o);
+            console.log('=====================================================');
+            m = o.siddhiAppConfig;
+
+            model.appName = m.siddhiAppName;
+            model.appDescription = m.siddhiAppDescription;
+
+            // streams
+            m.streamList.forEach(function(stream) {
+                // input stream
+                if (m.sourceList[0].connectedElementName === stream.name) {
+                    model.input.stream.name = stream.name;
+                    stream.attributeList.forEach(function(attr) {
+                        model.input.stream.attributes.push({
+                            name: attr.name,
+                            type: attr.type
+                        });
+                    });
+                }
+                // output stream
+                if (m.sinkList[0].connectedElementName === stream.name) {
+                    model.output.stream.name = stream.name;
+                    stream.attributeList.forEach(function(attr) {
+                        model.output.stream.attributes.push({
+                            name: attr.name,
+                            type: attr.type
+                        });
+                    });
+                }
+            });
+
+            // source
+            model.input.source.type = m.sourceList[0].type;
+            m.sourceList[0].options.forEach(function(option) {
+                var { key, value } = splitKeyValueByEqual(option);
+                var type = self.__extensionDataMap.sources[m.sourceList[0].type].parameters[key].type;
+                model.input.source.properties[key] = { value, type };
+            });
+
+            // sink
+            model.output.sink.type = m.sinkList[0].type;
+            m.sinkList[0].options.forEach(function(option) {
+                var { key, value } = splitKeyValueByEqual(option);
+                var type = self.__extensionDataMap.sinks[m.sinkList[0].type].parameters[key].type;
+                model.output.sink.properties[key] = { value, type };
+            });
+
+            // source mapping
+            if (m.sourceList[0].map) {
+                model.input.mapping.type = m.sourceList[0].map.type;
+                m.sourceList[0].map.options.forEach(function(option) {
+                    var { key, value } = splitKeyValueByEqual(option);
+                    var type = self.__extensionDataMap.sourceMappers[m.sourceList[0].map.type].parameters[key].type;
+                    model.input.mapping.properties[key] = { value, type };
+                });
+            }
+
+            // TODO: source map attributes
+
+            // sink mapping
+            if (m.sinkList[0].map) {
+                model.output.mapping.type = m.sinkList[0].map.type;
+                m.sinkList[0].map.options.forEach(function(option) {
+                    var { key, value } = splitKeyValueByEqual(option);
+                    var type = self.__extensionDataMap.sinkMappers[m.sinkList[0].map.type].parameters[key].type;
+                    model.output.mapping.properties[key] = { value, type };
+                });
+            }
+
+            // TODO: sink map attributes
+
+            // query window
+            m.queryLists.WINDOW_FILTER_PROJECTION[0].queryInput.streamHandlerList.forEach((h) => {
+                switch(h.type) {
+                    case 'FILTER':
+                        model.query.filter = {
+                            enable: true,
+                            expression: h.value
+                        };
+                        break;
+                    case 'WINDOW':
+                        model.query.window = {
+                            enable: true,
+                            type: h.value.function,
+                            parameters: {}
+                        };
+                        for (var i = 0; i < h.value.parameters.length; i++) {
+                            var { name, type } = self.__extensionDataMap.windowProcessors[h.value.function].parameters[i];
+                            var value = h.value.parameters[i];
+                            model.query.window.parameters[name] = { value, type }
+                        }
+                        break;
+                    case 'FUNCTION':
+                        model.query.function = {
+                            enable: true,
+                            type: h.value.function,
+                            parameters: {}
+                        };
+                        for (var i = 0; i < h.value.parameters.length; i++) {
+                            var { name, type } = self.__extensionDataMap.streamProcessors[h.value.function].parameters[i];
+                            var value = h.value.parameters[i];
+                            model.query.function.parameters[name] = { value, type }
+                        }
+                        break;
+                }
+            });
+
+            if (m.queryLists.WINDOW_FILTER_PROJECTION[0].select.type === 'USER_DEFINED') {
+                m.queryLists.WINDOW_FILTER_PROJECTION[0].select.value.forEach((s) => {
+                    model.query.mapping[s.as.length > 0 ? s.as : s.expression] = s.expression;
+                });
+            }
+
+            m.queryLists.WINDOW_FILTER_PROJECTION[0].groupBy.forEach((attr) => {
+                model.query.groupby.attributes.push({
+                    name: attr,
+                    type: model.input.stream.attributes.find(a => a.name === attr).type.toLowerCase()
+                });
+            });
+
+            if (m.queryLists.WINDOW_FILTER_PROJECTION[0].having.length > 0) {
+                model.query.groupby.havingFilter = {
+                    enabled: true,
+                    expression: m.queryLists.WINDOW_FILTER_PROJECTION[0].having
+                };
+            }
+
+            m.queryLists.WINDOW_FILTER_PROJECTION[0].orderBy.forEach((c) => {
+                model.query.orderby.attributes.push({
+                    attribute: {
+                        name: c.value,
+                        type: model.output.stream.attributes.find(a => a.name === c.value).type.toLowerCase()
+                    },
+                    sort: c.order.toLowerCase()
+                });
+            });
+
+            if (m.queryLists.WINDOW_FILTER_PROJECTION[0].offset > 0) {
+                model.query.advanced.offset = { value: m.queryLists.WINDOW_FILTER_PROJECTION[0].offset };
+            }
+
+            if (m.queryLists.WINDOW_FILTER_PROJECTION[0].limit > 0) {
+                model.query.advanced.limit = { value: m.queryLists.WINDOW_FILTER_PROJECTION[0].limit };
+            }
+
+            if (m.queryLists.WINDOW_FILTER_PROJECTION[0].outputRateLimit.length > 0) {
+                var arr = m.queryLists.WINDOW_FILTER_PROJECTION[0].outputRateLimit.split(' ');
+                model.query.advanced.ratelimit = {
+                    enabled: true,
+                    type: arr[1] === 'snapshot' ?
+                        'snapshot' : (arr[arr.length - 1] === 'events' ? 'no-of-events' : 'time-based'),
+                    value: arr[arr.length - 2],
+                    granularity: arr[arr.length - 1],
+                    eventselection: arr[1] === 'snapshot' ?
+                        '' : (arr.length === 4 ? arr[1] : `${arr[1]} ${arr[2]}`)
+                };
+            }
+
+            console.log('=============== result ===============');
+            console.log(model)
+            console.log('======================================');
+
+            return model;
         }
+
+        var splitKeyValueByEqual = function(str) {
+            var pos = str.indexOf('='),
+                trimmedValue = str.substr(pos + 1).trim();
+            return {
+                key: str.substr(0, pos).trim(),
+                value: trimmedValue.substr(1, trimmedValue.length - 2)
+            }
+        }
+
+        var generateSourceGenDataModel = function(o) {
+            o.appName = 'UntitledETLTaskFlow';
+            // console.log('----------------- generatng code view from --------------');
+            // console.log(o);
+            // console.log('---------------------------------------------------------');
+
+            var config = {
+                siddhiAppName: o.appName,
+                siddhiAppDescription: o.appDescription || '',
+                appAnnotationList: [],
+                appAnnotationListObjects: [],
+                streamList: [
+                    {
+                        id: 'inputStream',
+                        name: o.input.stream.name,
+                        annotationListObjects: [],
+                        attributeList: o.input.stream.attributes.map(v => {
+                            return { name: v.name, type: v.type }
+                        }),
+                        annotationList: []
+                    },
+                    {
+                        id: 'outputStream',
+                        name: o.output.stream.name,
+                        annotationListObjects: [],
+                        attributeList: o.output.stream.attributes.map(v => {
+                            return { name: v.name, type: v.type }
+                        }),
+                        annotationList: []
+                    }
+                ],
+                sourceList: [
+                    {
+                        id: "source",
+                        // previousCommentSegment: {
+                        //     "content": "\n\n",
+                        //     "queryContextStartIndex": [3, 43],
+                        //     "queryContextEndIndex": [4, 1]
+                        // },
+                        connectedElementName: o.input.stream.name,
+                        annotationType: "SOURCE",
+                        type: o.input.source.type,
+                        options: Object.entries(o.input.source.properties).map(v => {
+                            return `${v[1].name} = "${v[1].value}"`;
+                        }),
+                        map: {
+                            type: o.input.mapping.type,
+                            options: Object.entries(o.input.mapping.properties).map(v => {
+                                return `${v[1].name} = "${v[1].value}"`
+                            })
+                        }
+                    }
+                ],
+                sinkList: [
+                    {
+                        id: "sink",
+                        // previousCommentSegment: {
+                        //     "content": "\n\n",
+                        //     "queryContextStartIndex": [7, 45],
+                        //     "queryContextEndIndex": [8, 1]
+                        // },
+                        connectedElementName: o.output.stream.name,
+                        annotationType: "SINK",
+                        type: o.output.sink.type,
+                        options: Object.entries(o.output.sink.properties).map(v => {
+                            return `${v[1].name} = "${v[1].value}"`;
+                        }),
+                        map: {
+                            type: o.output.mapping.type,
+                            options: Object.entries(o.output.mapping.properties).map(v => {
+                                return `${v[1].name} = "${v[1].value}"}`
+                            })
+                        }
+                    }
+                ],
+                tableList: [],
+                windowList: [],
+                triggerList: [],
+                aggregationList: [],
+                functionList: [],
+                partitionList: [],
+                queryLists: {
+                    WINDOW_FILTER_PROJECTION: [
+                        {
+                            queryName: "query1",
+                            id: "query1",
+                            // previousCommentSegment: {
+                            //     content: "\n\n",
+                            //     queryContextStartIndex: [11, 46],
+                            //     queryContextEndIndex: [12, 1]
+                            // },
+                            queryInput: {
+                                type: 'PROJECTION',
+                                from: o.input.stream.name,
+                                streamHandlerList: []
+                            },
+                            select: {
+                                type: "USER_DEFINED",
+                                value: Object.entries(o.query.mapping).map(v => {
+                                    return {
+                                        expression: v[1].rootNode.name,
+                                        as: v[0]
+                                    }
+                                })
+                            },
+                            queryOutput: {
+                                type: "INSERT",
+                                output: { "eventType": "CURRENT_EVENTS" },
+                                target: o.output.stream.name
+                            },
+                            groupBy: o.query.groupby.attributes.map(v => {
+                                return v.name;
+                            }),
+                            limit: o.query.advanced.limit.value || 0,
+                            offset: o.query.advanced.offset.value || 0,
+                            having: 'id + 1 < 100', // TODO:
+                            outputRateLimit: '',
+                            orderBy: (o.query.orderBy || { attributes: []}).attributes.map(v => {
+                                return {
+                                    value: v.attribute.name,
+                                    order: v.sort
+                                };
+                            }),
+                            annotationList: [],
+                            annotationListObjects: []
+                        }
+                    ],
+                    PATTERN: [],
+                    SEQUENCE: [],
+                    JOIN: []
+                },
+                finalElementCount: 5,
+            };
+
+            if (o.input.mapping.customEnabled) {
+                var attrMap = {};
+                Object.entries(o.input.mapping.attributes).forEach(v => {
+                    attrMap[v[1].attributeName] = v[1].value;
+                });
+
+                config.sourceList[0].map['payloadOrAttribute'] = {
+                    annotationType: 'ATTRIBUTES',
+                    type: 'MAP',
+                    value: attrMap
+                };
+            }
+
+            if (o.output.mapping.customEnabled) {
+                var attrMap = {};
+                Object.entries(o.output.mapping.attributes).forEach(v => {
+                    attrMap[v[1].attributeName] = v[1].value;
+                });
+
+                config.sinkList[0].map['payloadOrAttribute'] = {
+                    annotationType: 'ATTRIBUTES',
+                    type: 'MAP',
+                    value: attrMap
+                }
+            }
+
+            if (o.query.window.enable) {
+                var queryInput = {
+                    type: 'WINDOW',
+                    from: o.input.stream.name,
+                    streamHandlerList: []
+                };
+
+                if (o.query.window.enable) {
+                    queryInput.streamHandlerList.push({
+                        type: 'FILTER',
+                        value: 'id + 1 < 100' // TODO:
+                    });
+                }
+
+                queryInput.streamHandlerList.push({
+                    type: 'WINDOW',
+                    value: {
+                        function: o.query.window.type,
+                        parameters: Object.entries(o.query.window.parameters).map(v => {
+                            return v[1].value;
+                        })
+                    }
+                });
+                config.queryLists.WINDOW_FILTER_PROJECTION[0].queryInput = queryInput;
+            }
+
+            if (o.query.advanced.ratelimit.enable) {
+                var { type, value } = o.query.advanced.ratelimit;
+                if (type === 'time-based') {
+                    config.queryLists.WINDOW_FILTER_PROJECTION[0].outputRateLimit = `every ${value} sec`; // TODO:
+                }
+            }
+
+            return {
+                siddhiAppConfig: config,
+                edgeList: []
+            };
+        }
+
+        var saveSiddhiApp = function(data) {
+            let result = {},
+                fileName = `${data.siddhiAppConfig.siddhiAppName}.siddhi`;
+            $.ajax({
+                type: 'POST',
+                url: `${window.location.protocol}//${window.location.host}/editor/etl-wizard/save`,
+                data: {
+                    configName: window.btoa(fileName),
+                    config: window.btoa(JSON.stringify(data)),
+                    overwrite: true
+                },
+                async: false,
+                success: function (response) {
+                    result = {
+                        status: true,
+                        fileName
+                    };
+                },
+                error: function (error) {
+                    result = {
+                        status: false,
+                        errorMessage: error.responseText || 'Error Occurred while saving the file.'
+                    };
+                }
+            });
+            return result;
+        };
+
+        var updateButtonBar = function(wizardFooterContent, stepIndex) {
+            wizardFooterContent.find('.btn').show();
+            if (stepIndex == 5) {
+                console.log(stepIndex, 'hide next button');
+                wizardFooterContent.find('.next-btn').hide();
+            } else {
+                console.log(stepIndex, 'hide save button');
+                wizardFooterContent.find('.save-btn').hide();
+            }
+        };
 
         return ETLWizard;
     });
