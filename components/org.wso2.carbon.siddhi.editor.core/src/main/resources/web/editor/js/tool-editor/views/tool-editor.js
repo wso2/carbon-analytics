@@ -165,7 +165,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 self.JSONObject = JSON.parse(response.responseString);
 
                                 if (!self.canTranslateToWizard(self.JSONObject)) {
-                                    DesignViewUtils.prototype.errorAlert('This Siddhi app cannot open in ETL Wizard mode');
+                                    DesignViewUtils.prototype.errorAlert('This Siddhi app cannot be opened in ETL Wizard mode');
                                     return;
                                 }
 
@@ -340,7 +340,19 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                 },
 
                 canTranslateToWizard: function(model) {
-                    return true;
+                    var config = model.siddhiAppConfig;
+                    return config.streamList.length == 2 &&
+                        config.sourceList.length == 1 &&
+                        config.sinkList.filter(s => s.type !== 'log').length == 1 &&
+                        config.aggregationList.length == 0 &&
+                        config.functionList.length == 0 &&
+                        config.partitionList.length == 0 &&
+                        config.tableList.length == 0 &&
+                        config.triggerList.length == 0 &&
+                        config.windowList.length == 0 &&
+                        config.queryLists.JOIN.length == 0 &&
+                        config.queryLists.PATTERN.length == 0 &&
+                        config.queryLists.SEQUENCE.length == 0;
                 },
 
                 getContent: function () {
