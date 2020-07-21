@@ -109,6 +109,10 @@ public class DependencyInstallerImpl implements DependencyInstaller {
                 URL downloadUrl = new URL(download.getUrl());
                 String fileName = FilenameUtils.getName(downloadUrl.getPath());
                 List<File> usageDestinations = generateUsageDestinations(dependency, fileName);
+                if (ExtensionsInstallerUtils.isSelfDependency(dependency)) {
+                    // Delete the jar of the self dependency if exists, to allow downloading latest version.
+                    unInstallUsagesFor(dependency);
+                }
                 downloadOrCopyFilesTo(usageDestinations, downloadUrl);
             } catch (MalformedURLException e) {
                 throw new ExtensionsInstallerException(

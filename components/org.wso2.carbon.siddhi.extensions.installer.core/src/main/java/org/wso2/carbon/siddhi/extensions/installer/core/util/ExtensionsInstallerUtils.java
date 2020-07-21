@@ -18,12 +18,13 @@
 
 package org.wso2.carbon.siddhi.extensions.installer.core.util;
 
+import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.DependencyConfig;
+import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.ExtensionConfig;
+import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.UsageConfig;
+import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.UsageType;
+import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.UsedByType;
 import org.wso2.carbon.siddhi.extensions.installer.core.constants.ExtensionsInstallerConstants;
 import org.wso2.carbon.siddhi.extensions.installer.core.exceptions.ExtensionsInstallerException;
-import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.ExtensionConfig;
-import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.UsageType;
-import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.UsageConfig;
-import org.wso2.carbon.siddhi.extensions.installer.core.config.mapping.models.UsedByType;
 import org.wso2.carbon.siddhi.extensions.installer.core.models.enums.ExtensionInstallationStatus;
 import org.wso2.carbon.siddhi.extensions.installer.core.models.enums.ExtensionUnInstallationStatus;
 
@@ -213,6 +214,13 @@ public class ExtensionsInstallerUtils {
             }
         }
         throw new ExtensionsInstallerException(String.format("Invalid value: %s for 'usedBy' property.", usage));
+    }
+
+    public static boolean isSelfDependency(DependencyConfig dependency) {
+        if (dependency.getName() != null) {
+            return dependency.getName().toLowerCase().startsWith("siddhi-");
+        }
+        return false;
     }
 
 }
