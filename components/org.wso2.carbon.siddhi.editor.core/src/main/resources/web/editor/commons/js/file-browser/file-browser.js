@@ -6,12 +6,6 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
     var FileBrowser = Backbone.View.extend({
 
         initialize: function (config) {
-            console.log('------------- file browser -------------');
-            console.log(config);
-            console.log('///////////// file browser /////////////');
-
-            let { selectedFiles } = config;
-
             var errMsg;
             if (!_.has(config, 'container')) {
                 errMsg = 'unable to find configuration for container';

@@ -990,26 +990,47 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             model.appName = m.siddhiAppName;
             model.appDescription = m.siddhiAppDescription;
 
-            m.streamList.forEach((stream) => {
+            m.streamList.forEach(stream => {
                 if (m.sourceList[0].connectedElementName === stream.name) {
-                    model.input.stream.name = stream.name;
-                    stream.attributeList.forEach((attr) => {
-                        model.input.stream.attributes.push({
-                            name: attr.name,
-                            type: attr.type
-                        });
-                    });
-                }
-                if (m.sinkList[0].connectedElementName === stream.name) {
-                    model.output.stream.name = stream.name;
-                    stream.attributeList.forEach((attr) => {
-                        model.output.stream.attributes.push({
-                            name: attr.name,
-                            type: attr.type
-                        });
-                    });
+                    model.input.stream = {
+                        name: stream.name,
+                        attributes: stream.attributeList.map(a => {
+                            return {
+                                name: a.name,
+                                type: a.type
+                            };
+                        }),
+                        addLog: false
+                    };
+                } else {
+                    model.output.stream = {
+                        name: stream.name,
+                        attributes: stream.attributeList.map(a => {
+                            return {
+                                name: a.name,
+                                type: a.type
+                            };
+                        }),
+                        addLog: false
+                    }
                 }
             });
+
+            model.input.stream.addLog = !!m.sinkList
+                .find(s => s.type.toLowerCase() === 'log' && s.connectedElementName === model.input.stream.name);
+
+            model.output.stream.addLog = !!m.sinkList
+                .find(s => s.type.toLowerCase() === 'log' && s.connectedElementName === model.output.stream.name);
+
+            var sinkIndex = 0;
+            if (m.sinkList.length > 1) {
+                for (var i = 0; i < m.sinkList.length; i++) {
+                    if (m.sinkList[i].type.toLowerCase() !== 'log') {
+                        sinkIndex = i;
+                        break;
+                    }
+                }
+            }
 
             model.input.source.type = m.sourceList[0].type;
             m.sourceList[0].options.forEach((option) => {
@@ -1018,10 +1039,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 model.input.source.properties[key] = { value, type };
             });
 
-            model.output.sink.type = m.sinkList[0].type;
-            m.sinkList[0].options.forEach((option) => {
+            model.output.sink.type = m.sinkList[sinkIndex].type;
+            m.sinkList[sinkIndex].options.forEach((option) => {
                 var { key, value } = splitKeyValueByEqual(option);
-                var type = self.__extensionDataMap.sinks[m.sinkList[0].type].parameters[key].type;
+                var type = self.__extensionDataMap.sinks[m.sinkList[sinkIndex].type].parameters[key].type;
                 model.output.sink.properties[key] = { value, type };
             });
 
@@ -1049,26 +1070,30 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 }
             }
 
-            if (m.sinkList[0].map) {
-                model.output.mapping.type = m.sinkList[0].map.type;
-                m.sinkList[0].map.options.forEach((option) => {
+            if (m.sinkList[sinkIndex].map) {
+                model.output.mapping.type = m.sinkList[sinkIndex].map.type;
+                m.sinkList[sinkIndex].map.options.forEach((option) => {
                     var { key, value } = splitKeyValueByEqual(option);
-                    var type = self.__extensionDataMap.sinkMappers[m.sinkList[0].map.type].parameters[key].type;
-                    model.output.mapping.properties[key] = { value, type };
+                    if (key.toLowerCase() === 'on.error' && value.toLowerCase() === 'store') {
+                        model.output.sink.addOnError = true;
+                    } else {
+                        var type = self.__extensionDataMap.sinkMappers[m.sinkList[sinkIndex].map.type].parameters[key].type;
+                        model.output.mapping.properties[key] = { value, type };
+                    }
                 });
             }
 
-            if (m.sinkList[0].map.payloadOrAttribute) {
-                switch(m.sinkList[0].map.payloadOrAttribute.annotationType) {
+            if (m.sinkList[sinkIndex].map.payloadOrAttribute) {
+                switch(m.sinkList[sinkIndex].map.payloadOrAttribute.annotationType) {
                     case 'ATTRIBUTES':
                         model.output.mapping.customEnabled = true;
-                        Object.entries(m.sinkList[0].map.payloadOrAttribute.value).forEach(a => {
+                        Object.entries(m.sinkList[sinkIndex].map.payloadOrAttribute.value).forEach(a => {
                             model.output.mapping.attributes[a[0]] = a[1];
                         });
                         break;
                     case 'PAYLOAD':
                         model.output.mapping.customEnabled = true;
-                        model.output.mapping.payload = m.sinkList[0].map.payloadOrAttribute.value[0];
+                        model.output.mapping.payload = m.sinkList[sinkIndex].map.payloadOrAttribute.value[0];
                         break;
                 }
             }
@@ -1097,7 +1122,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     case 'FUNCTION':
                         model.query.function = {
                             enable: true,
-                            type: h.value.function,
+                            name: h.value.function,
                             parameters: {}
                         };
                         for (var i = 0; i < h.value.parameters.length; i++) {
@@ -1234,43 +1259,72 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         }
                     }
                 ],
-                sinkList: [
-                    {
-                        id: "sink",
-                        connectedElementName: o.output.stream.name,
-                        annotationType: "SINK",
-                        type: o.output.sink.type,
-                        options: Object.entries(o.output.sink.properties).map(v => {
-                            return `${v[0]} = "${v[1].value}"`;
-                        }),
-                        map: {
-                            type: o.output.mapping.type,
-                            options: Object.entries(o.output.mapping.properties).map(v => {
-                                return `${v[0]} = "${v[1].value}"`
-                            }),
-                            payloadOrAttribute: (() => {
-                                if (!o.output.mapping.customEnabled) {
-                                    return {};
+                sinkList: (() => {
+                    var list = [
+                        {
+                            id: 'sink',
+                            connectedElementName: o.output.stream.name,
+                            annotationType: 'SINK',
+                            type: o.output.sink.type,
+                            options: (() => {
+                                var options = Object.entries(o.output.sink.properties).map(v => {
+                                    return `${v[0]} = "${v[1].value}"`;
+                                });
+                                if (o.output.sink.addOnError) {
+                                    options.push('on.error = "STORE"');
                                 }
+                                return options;
+                            })(),
+                            map: {
+                                type: o.output.mapping.type,
+                                options: Object.entries(o.output.mapping.properties).map(v => {
+                                    return `${v[0]} = "${v[1].value}"`
+                                }),
+                                payloadOrAttribute: (() => {
+                                    if (!o.output.mapping.customEnabled) {
+                                        return {};
+                                    }
 
-                                if (o.output.mapping.payload && o.output.mapping.payload.length > 0) {
+                                    if (o.output.mapping.payload && o.output.mapping.payload.length > 0) {
+                                        return {
+                                            annotationType: 'PAYLOAD',
+                                            type: 'LIST',
+                                            value: [o.output.mapping.payload]
+                                        };
+                                    }
+                                    var attrList = {};
+                                    Object.entries(o.output.mapping.attributes).forEach(a => attrList[a[0]] = a[1]);
                                     return {
-                                        annotationType: 'PAYLOAD',
-                                        type: 'LIST',
-                                        value: [o.output.mapping.payload]
+                                        annotationType: 'ATTRIBUTES',
+                                        type: 'MAP',
+                                        value: attrList
                                     };
-                                }
-                                var attrList = {};
-                                Object.entries(o.output.mapping.attributes).forEach(a => attrList[a[0]] = a[1]);
-                                return {
-                                    annotationType: 'ATTRIBUTES',
-                                    type: 'MAP',
-                                    value: attrList
-                                };
-                            })()
+                                })()
+                            }
                         }
+                    ];
+
+                    if (o.input.stream.addLog) {
+                        list.push({
+                            id: 'inputLogSink',
+                            connectedElementName: o.input.stream.name,
+                            annotationType: 'SINK',
+                            type: 'log',
+                            options: []
+                        })
                     }
-                ],
+
+                    if (o.output.stream.addLog) {
+                        list.push({
+                            id: 'outputLogSink',
+                            connectedElementName: o.output.stream.name,
+                            annotationType: 'SINK',
+                            type: 'log',
+                            options: []
+                        })
+                    }
+                    return list;
+                })(),
                 tableList: [],
                 windowList: [],
                 triggerList: [],
@@ -1314,7 +1368,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                         list.push({
                                             type: 'FUNCTION',
                                             value: {
-                                                function: o.query.function.type,
+                                                function: o.query.function.name,
                                                 parameters: Object.entries(o.query.function.parameters).map(p => {
                                                     return p[1].value;
                                                 })
@@ -1417,10 +1471,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         var updateButtonBar = function(wizardFooterContent, stepIndex) {
             wizardFooterContent.find('.btn').show();
             if (stepIndex == 5) {
-                console.log(stepIndex, 'hide next button');
                 wizardFooterContent.find('.next-btn').hide();
             } else {
-                console.log(stepIndex, 'hide save button');
                 wizardFooterContent.find('.save-btn').hide();
             }
         };

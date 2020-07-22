@@ -1198,7 +1198,7 @@ public class EditorMicroservice implements Microservice {
             String siddhiAppCode = new CodeGenerator().generateSiddhiAppCode(eventFlow);
 
             // Save the Siddhi app in the file system
-            Files.write(filePath, siddhiAppCode.getBytes());
+            Files.write(filePath, siddhiAppCode.getBytes(Charset.defaultCharset()));
 
             // Deploy Siddhi app
             WorkspaceDeployer.deployConfigFile(fileName, siddhiAppCode);
