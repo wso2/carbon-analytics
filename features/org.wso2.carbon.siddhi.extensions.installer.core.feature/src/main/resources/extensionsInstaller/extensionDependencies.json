@@ -3,7 +3,7 @@
     "extension": {
       "name": "kafka",
       "displayName": "Kafka",
-      "version": "5.0.8"
+      "version": "5.0.9"
     },
     "identifier": {
       "alternativeTypes": ["kafkaMultiDC"]
@@ -11,10 +11,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-kafka",
-        "version": "5.0.8",
+        "version": "5.0.9",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.8/siddhi-io-kafka-5.0.8.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.9/siddhi-io-kafka-5.0.9.jar"
         },
         "usages": [
           {
