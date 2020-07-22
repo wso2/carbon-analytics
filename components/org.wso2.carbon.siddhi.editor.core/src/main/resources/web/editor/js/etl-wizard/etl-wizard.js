@@ -1396,11 +1396,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             };
 
             if (o.output.mapping.customEnabled) {
-                config.sinkList[0]['payloadOrAttribute'] = (() => {
-                    if (!o.output.mapping.customEnabled) {
-                        return {};
-                    }
-
+                config.sinkList[0].map.payloadOrAttribute = (() => {
                     if (o.output.mapping.payload && o.output.mapping.payload.length > 0) {
                         return {
                             annotationType: 'PAYLOAD',
@@ -1419,11 +1415,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             }
 
             if (o.input.mapping.customEnabled) {
-                config.sourceList[0]['payloadOrAttribute'] = (() => {
-                    if (!o.input.mapping.customEnabled) {
-                        return {};
-                    }
-
+                config.sourceList[0].map.payloadOrAttribute = (() => {
                     if (o.input.mapping.payload && o.input.mapping.payload.length > 0) {
                         return {
                             annotationType: 'PAYLOAD',
