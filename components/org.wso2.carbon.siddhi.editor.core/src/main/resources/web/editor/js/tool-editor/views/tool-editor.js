@@ -19,7 +19,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                  * @param {Object} options Rendering options for the view
                  */
                 initialize: function (options) {
-                    console.log(options);
                     if (!_.has(options, 'container')) {
                         throw "container is not defined."
                     }
@@ -335,7 +334,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         designContainer.hide();
                         etlTaskViewContainer.show();
                         toggleViewButton.hide();
-                        this._etlTaskView = new ETLTaskView({}, etlTaskViewContainer, function() { console.log('haha') }, self._designView.getDesign(self.getContent()));
+                        this._etlTaskView = new ETLTaskView({}, etlTaskViewContainer, function() {}, self._designView.getDesign(self.getContent()));
                     }
                 },
 
