@@ -372,6 +372,7 @@ function (require, $, _, log) {
         }
 
         var generateExpressionHTML2 = function (node, id, highlightCoordinate) {
+            // console.log(node);
             var htmlContent = '';
 
             switch (node.type) {
@@ -399,7 +400,7 @@ function (require, $, _, log) {
                         if (!isFirst) {
                             htmlContent += ', '
                         }
-
+                        console.log(id);
                         htmlContent += `<span class="${param.rootNode ? 'ok-clear': ''}" title="${param.placeholder}" id="item${id}-${i}" >${generateExpressionHTML2(param, `${id}-${i}`, highlightCoordinate)}</span>`
 
                         isFirst = false;
@@ -414,6 +415,7 @@ function (require, $, _, log) {
                     if (id.length === 0 || /\d/.test(idComponents[idComponents.length-1])) {
                         htmlContent += `${node.rootNode ? generateExpressionHTML2(node.rootNode, '-n') : '...'}`
                     } else {
+                        console.log(id);
                         htmlContent += `
                             <span id="item${id}" >
                                 (&nbsp;${node.rootNode? generateExpressionHTML2(node.rootNode, `${id}-n`) : '...'}&nbsp;)

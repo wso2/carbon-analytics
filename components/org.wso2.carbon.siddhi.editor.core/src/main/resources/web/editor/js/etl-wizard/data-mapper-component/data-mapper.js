@@ -316,7 +316,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 } else {
                     expressionContainer.append(`
                       <div class="expression">
-                          ${DataMapperUtil.generateExpressionHTML2(tempExp, '', coordinates[i + 1])}
+                          ${DataMapperUtil.generateExpressionHTML2(tempExp, '', coordinates[i])}
                       </div>
                     `);
                 }
@@ -355,22 +355,36 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 });
 
             $(expressionContainer).find('.expression.target>.exp-content>span').on('click', function(evt) {
-                var pathIndex = evt.currentTarget.id.match('item-([a-zA-Z0-9\-]+)')[1].split('-');
-                coordinates.push(pathIndex[pathIndex.length - 1]);
-                switch (pathIndex[pathIndex.length - 1]) {
-                    case 'n':
-                        focusNodes.push(_.cloneDeep(tempExp.rootNode));
-                        break;
-                    case 'l':
-                        focusNodes.push(_.cloneDeep(tempExp.rootNode.leftNode));
-                        break;
-                    case 'r':
-                        focusNodes.push(_.cloneDeep(tempExp.rootNode.rightNode));
-                        break;
-                    default:
-                        focusNodes.push(_.cloneDeep(tempExp.parameters[Number(pathIndex[pathIndex.length - 1])]))
-                }
+                var pathIndex = evt.currentTarget.id.match('item-([a-zA-Z0-9\-]+)')[1];
+                var pathArray = pathIndex.split('-')
+                coordinates.push(pathIndex);
 
+                var addToFocusNode = function(exp, pathArray) {
+                    if(pathArray.length === 1) {
+                        if(pathArray[0] === 'n') {
+                            focusNodes.push(_.cloneDeep(exp.rootNode));
+                        } else if(pathArray[0] === 'l') {
+                            focusNodes.push(_.cloneDeep(exp.leftNode));
+                        } else if(pathArray[0] === 'r') {
+                            focusNodes.push(_.cloneDeep(exp.rightNode));
+                        } else {
+                            focusNodes.push(_.cloneDeep(exp.parameters[pathArray[0]]));
+                        }
+                    } else {
+                        var next = pathArray.splice(0, 1);
+                        if(next[0] === 'n') {
+                            addToFocusNode(exp.rootNode, pathArray);
+                        } else if(next[0] === 'l') {
+                            addToFocusNode(exp.leftNode, pathArray);
+                        } else if(next[0] === 'r') {
+                            addToFocusNode(exp.rightNode, pathArray);
+                        } else {
+                            addToFocusNode(exp.parameters[Number(next)], pathArray);
+                        }
+                    }
+                }
+                
+                addToFocusNode(tempExp, pathArray);
                 renderExpression();
             });
 
@@ -385,37 +399,36 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             }
 
             $(expressionContainer).find('.expression.target>.expression-merge').on('click', function(evt) {
-                var lastIndex = coordinates[coordinates.length - 1];
+                var path = coordinates[coordinates.length - 1].split('-');
 
-                switch(lastIndex) {
-                    case 'l':
-                        if(focusNodes[focusNodes.length - 2]) {
-                            focusNodes[focusNodes.length - 2].leftNode = focusNodes[focusNodes.length - 1];
+                var replaceInExpression = function (exp, pathArray) {
+                    if (pathArray.length === 1) {
+                        if (pathArray[0] === 'n') {
+                            exp.rootNode = focusNodes[focusNodes.length - 1];
+                        } else if (pathArray[0] === 'l') {
+                            exp.leftNode = focusNodes[focusNodes.length - 1];
+                        } else if(pathArray[0] === 'r') {
+                            exp.rightNode = focusNodes[focusNodes.length - 1];
                         } else {
-                            expression.leftNode = focusNodes[focusNodes.length - 1];
+                            exp.parameters[pathArray[0]] = focusNodes[focusNodes.length - 1];
                         }
-                        break;
-                    case 'r':
-                        if(focusNodes[focusNodes.length - 2]) {
-                            focusNodes[focusNodes.length - 2].rightNode = focusNodes[focusNodes.length - 1];
+                    } else {
+                        var next = pathArray.splice(0, 1);
+
+                        if (next[0] === 'n') {
+                            replaceInExpression(exp.rootNode, pathArray);
+                        } else if (next[0] === 'l') {
+                            replaceInExpression(exp.leftNode, pathArray);
+                        } else if(next[0] === 'r') {
+                            replaceInExpression(exp.rightNode, pathArray);
                         } else {
-                            expression.rightNode = focusNodes[focusNodes.length - 1];
+                            replaceInExpression(exp.parameters[Number(next[0])], pathArray);
                         }
-                        break;
-                    case 'n':
-                        if(focusNodes[focusNodes.length - 2]) {
-                            focusNodes[focusNodes.length - 2].rootNode = focusNodes[focusNodes.length - 1];
-                        } else {
-                            expression.rootNode = focusNodes[focusNodes.length - 1];
-                        }
-                        break;
-                    default:
-                        if(focusNodes[focusNodes.length - 2]) {
-                            focusNodes[focusNodes.length - 2].parameters[Number(lastIndex)] = focusNodes[focusNodes.length - 1];
-                        } else {
-                            expression.parameters[Number(lastIndex)] = focusNodes[focusNodes.length - 1];
-                        }
+                    }
                 }
+
+                replaceInExpression(focusNodes.length > 1 ? focusNodes[focusNodes.length - 2] : expression, path);
+
                 focusNodes.pop();
                 coordinates.pop();
                 renderExpression();

@@ -1303,7 +1303,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                         if (typeof o.query.filter.expression === 'string') {
                                             expression = o.query.filter.expression;
                                         } else {
-                                            expression = $(DataMapperUtil.generateExpressionHTML2(o.query.filter.expression)).text()
+                                            expression = $(DataMapperUtil.generateExpressionHTML2(o.query.filter.expression,'', null)).text()
                                         }
                                         list.push({
                                             type: 'FILTER',
@@ -1350,7 +1350,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 if (typeof o.query.groupby.havingFilter.expression === 'string') {
                                     return o.query.groupby.havingFilter.expression
                                 }
-                                return $(DataMapperUtil.generateExpressionHTML2(o.query.groupby.havingFilter.expression)).text()
+                                return $(DataMapperUtil.generateExpressionHTML2(o.query.groupby.havingFilter.expression, '', null)).text()
                             })(),
                             outputRateLimit: (() => {
                                 if (!o.query.advanced.ratelimit.enabled) {

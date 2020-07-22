@@ -437,6 +437,10 @@
     cursor: pointer;
 }
 
+.expression.focus .expression-content span.selected {
+    color: #ee6719;
+}
+
 .grey-on-hover:hover {
     background: rgba(0,0,0,0.1);
 }

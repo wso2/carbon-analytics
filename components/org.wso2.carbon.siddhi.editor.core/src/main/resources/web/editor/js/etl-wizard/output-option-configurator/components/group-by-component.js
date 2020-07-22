@@ -164,10 +164,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             ${
                                 typeof config.query.groupby.havingFilter !=='string'?
                                     `<div class="operand-section" style="display: flex; flex: 1; flex-direction: column">
-                                        <div class="operand-category-select" style="display: flex;">
+                                        <div class="operand-category-select" style="display: flex;background: rgb(162,162,162)">
                                             
                                         </div>
-                                        <div class="operand-select-section" style="background: #6a6a6a; overflow: auto">
+                                        <div class="operand-select-section" style="background: lightgray; overflow: auto">
                                             <ul>
                                             </ul>
                                         </div>
@@ -179,8 +179,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
 
                 container.find('.expression-section')
                     .append(`
-                        <div style="display: flex; padding: ${focusNodes.length === 0 ? '15px' : '5px'} 0;" class="expression ${focusNodes.length === 0 ? 'focus' : ''}">
-                            <div style="width: 95%" class="expression-content">
+                        <div style="display: flex; padding: ${focusNodes.length === 0 ? '15px' : '5px'} 0; background: ${focusNodes.length === 0 ? 'lightgray' : '#c3c3c3'}" class="expression ${focusNodes.length === 0 ? 'focus' : ''}">
+                            <div style="width: 95%; color: #323232" class="expression-content">
                                 ${
                                     typeof expression !== 'string' ?
                                         DataMapperUtil.generateExpressionHTML2(expression, '')
@@ -189,11 +189,27 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             </div>    
                             ${
                                 focusNodes.length === 0 ?
-                                    `<div style="padding: 5px;" class="icon-section"><a><i class="fw fw-clear"></i></a></div>`
+                                    `<div style="padding: 5px;" class="icon-section"><a style="color: #323232"><i class="fw fw-clear"></i></a></div>`
                                     : ''
                             }
                         </div>
                     `);
+
+                if (focusNodes.length > 0) {
+                    focusNodes.forEach(function (node, i) {
+                        container.find('.expression-section')
+                            .append(`
+                                <div style="display: flex; padding: ${focusNodes.length - 1 === i ? '15px' : '5px'} 0; color: #323232" class="expression ${focusNodes.length - 1 === i ? 'focus' : ''}">
+                                    <div style="width: 95%" class="expression-content">${DataMapperUtil.generateExpressionHTML2(node, '')}</div>    
+                                    ${
+                                        focusNodes.length - 1 === i ?
+                                            '<div style="width: 5%;padding: 5px;" class="icon-section"><a><i class="fw fw-up"></i></a></div>'
+                                            : ''
+                                        }
+                                </div>
+                            `);
+                    });
+                }
 
                 container.find('.expression-section .fw-clear')
                     .on('click', function () {
@@ -209,20 +225,33 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                 var tempExpression = focusNodes.length > 0 ? focusNodes[focusNodes.length - 1] : expression;
 
                 if (typeof tempExpression !== 'string') {
-
                     if (tempExpression.rootNode) {
                         switch (tempExpression.rootNode.type) {
                             case 'function':
                             case 'attribute':
                             case 'customValue':
                             case 'scope':
-                                Object.keys(DataMapperUtil.OperatorMap2)
-                                    .filter(function (key) {
-                                        return DataMapperUtil.OperatorMap2[key].hasLeft && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
-                                    })
-                                    .forEach(function (key) {
-                                        allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
-                                    });
+    
+                                if (tempExpression.genericReturnTypes.indexOf('bool') > -1) {
+                                    Object.keys(DataMapperUtil.OperatorMap2)
+                                        .filter(function (key) {
+                                            return DataMapperUtil.OperatorMap2[key].hasLeft
+                                                && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
+                                        })
+                                        .forEach(function (key) {
+                                            allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                        });
+                                } else {
+                                    Object.keys(DataMapperUtil.OperatorMap2)
+                                        .filter(function (key) {
+                                            return DataMapperUtil.OperatorMap2[key].hasLeft
+                                                && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
+                                                && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.genericReturnTypes).length > 0
+                                        })
+                                        .forEach(function (key) {
+                                            allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                        });
+                                }
                                 break;
                             case 'operator':
                                 if (tempExpression.rootNode.hasRight && !tempExpression.rootNode.rightNode) {
@@ -233,43 +262,74 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                         .forEach(function (attr) {
                                             allowedAttributes[attr.name] = attr;
                                         });
-
+    
                                     allowedAttributes['$custom_val_properties'] = {
                                         genericDataTypes: tempExpression.rootNode.rightTypes,
                                     };
+    
+                                    if (tempExpression.rootNode.type !== 'scope') {
+                                        allowedOperators = {
+                                            bracket: {
+                                                returnTypes: ['bool', 'text', 'number'],
+                                                leftTypes: ['bool', 'text', 'number'],
+                                                rightTypes: ['bool', 'text', 'number'],
+                                                symbol: '()',
+                                                description: 'Bracket',
+                                                isFirst: true,
+                                                scope: true
+                                            }
+                                        };
+                                    }
+                                } else {
+                                    Object.keys(DataMapperUtil.OperatorMap2)
+                                        .filter(function (key) {
+                                            return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
+                                            // && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.genericReturnTypes).length > 0;
+                                        })
+                                        .forEach(function (key) {
+                                            allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                        });
                                 }
-
-                                Object.keys(DataMapperUtil.OperatorMap2)
-                                    .filter(function (key) {
-                                        return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
-                                    })
-                                    .forEach(function (key) {
-                                        allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
-                                    });
+    
                                 break;
                         }
                     } else {
-                        config.query.groupby.attributes
-                            .forEach(function (attr) {
-                                allowedAttributes[attr.name] = attr;
-                            });
-
+    
+                        var customDataTypes = []
+                        if (tempExpression.returnTypes.indexOf('bool') > -1) {
+                            config.query.groupby.attributes
+                                .forEach(function (attr) {
+                                    allowedAttributes[attr.name] = attr;
+                                });
+                            customDataTypes = ['text', 'number', 'bool'];
+    
+                        } else {
+                            config.query.groupby.attributes
+                                .filter(function (attr) {
+                                    return tempExpression.returnTypes.indexOf(attr.type) > -1;
+                                }).forEach(function (attr) {
+                                    allowedAttributes[attr.name] = attr;
+                                });
+    
+                            tempExpression.returnTypes.forEach(function (type) {
+                                customDataTypes.push(DataMapperUtil.getGenericDataType(type));
+                            })
+                        }
+    
                         allowedAttributes['$custom_val_properties'] = {
-                            genericDataTypes: ['text', 'number', 'bool']
+                            genericDataTypes: customDataTypes
                         };
-
-                        allowedOperators = {
-                            bracket: {
-                                returnTypes: ['bool', 'text', 'number'],
-                                leftTypes: ['bool', 'text', 'number'],
-                                rightTypes: ['bool', 'text', 'number'],
-                                symbol: '()',
-                                description: 'Bracket',
-                                isFirst: true,
-                                scope: true
-                            }
-                        };
-
+    
+                        allowedOperators['bracket'] = {
+                            returnTypes: ['bool', 'text', 'number'],
+                            leftTypes: ['bool', 'text', 'number'],
+                            rightTypes: ['bool', 'text', 'number'],
+                            symbol: '()',
+                            description: 'Bracket',
+                            isFirst: true,
+                            scope: true
+                        }
+    
                         Object.keys(DataMapperUtil.OperatorMap2)
                             .filter(function (key) {
                                 return DataMapperUtil.OperatorMap2[key].isFirst &&
@@ -278,15 +338,14 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             .forEach(function (key) {
                                 allowedOperators[key] = DataMapperUtil.OperatorMap2[key];
                             });
-
                     }
                 }
 
                 if (Object.keys(allowedAttributes).length > 0) {
                     container.find('.operand-category-select')
                         .append(`
-                            <a id="operand-type-attribute" >
-                                <div style="padding: 15px; border-bottom: 1px solid rgba(102, 102, 102, 0.6);">
+                            <a style="color:#323232" id="operand-type-attribute" >
+                                <div style="padding: 15px; border-right: 1px solid rgba(102, 102, 102, 0.6);">
                                     Attribute
                                 </div>
                             </a>    
@@ -296,8 +355,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                 if (Object.keys(allowedOperators).length > 0) {
                     container.find('.operand-category-select')
                         .append(`
-                            <a id="operand-type-operator">
-                                <div style="padding: 15px; border-bottom: 1px solid rgba(102, 102, 102, 0.6);">
+                            <a style="color:#323232" id="operand-type-operator">
+                                <div style="padding: 15px; border-right: 1px solid rgba(102, 102, 102, 0.6);">
                                     Operator
                                 </div>
                             </a>    
@@ -319,7 +378,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                 if (key === '$custom_val_properties') {
                                     container.find('.operand-select-section>ul').append(`
                                     <li class="custom" id="attribute-${key}">
-                                        <a>
+                                        <a style="color: #323232">
                                             <div class="attribute" style="display: flex; flex-wrap: wrap; padding-bottom: 5px; padding-left: 5px">
                                                 <div class="description" style="width: 100%;">
                                                     Add a custom value to the expression 
@@ -418,7 +477,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                 } else {
                                     container.find('.operand-select-section>ul').append(`
                                     <li class="not-custom" id="attribute-${key}">
-                                        <a>
+                                        <a style="color: #323232">
                                             <div style="padding: 10px 15px;border-bottom: 1px solid rgba(255, 255, 255, 0.2);" >
                                                 <b>${key}</b>
                                                 <br/><small>${allowedAttributes[key].type}</small>
@@ -433,7 +492,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             Object.keys(allowedOperators).forEach(function (key) {
                                 container.find('.operand-select-section>ul').append(`
                                 <li class="not-custom" id="operator-${key}">
-                                    <a>
+                                    <a style="color: #323232">
                                         <div style="padding: 10px 15px;border-bottom: 1px solid rgba(255, 255, 255, 0.2);" >
                                             <b>${allowedOperators[key].symbol}</b>&nbsp;-&nbsp;${allowedOperators[key].description}
                                         </div>
@@ -466,6 +525,71 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                         self.render();
                     });
 
+                });
+
+                container.find('.expression.focus .expression-content>span').on('click', function (evt) {
+                    var pathIndex = evt.currentTarget.id.match('item-([a-z-]+)')[1];
+                    self.__indexArray.push(pathIndex);
+    
+                    var path = pathIndex.split('-');
+    
+                    var addToFocus = function (exp, pathArray) {
+                        if (pathArray.length === 1) {
+                            if (pathArray[0] === 'n') {
+                                self.__focusNodes.push(_.cloneDeep(exp.rootNode));
+                            } else if (pathArray[0] === 'l') {
+                                self.__focusNodes.push(_.cloneDeep(exp.leftNode));
+                            } else {
+                                self.__focusNodes.push(_.cloneDeep(exp.rightNode));
+                            }
+                        } else {
+                            var next = pathArray.splice(0, 1);
+    
+                            if (next[0] === 'n') {
+                                addToFocus(exp.rootNode, pathArray);
+                            } else if (next[0] === 'l') {
+                                addToFocus(exp.leftNode, pathArray);
+                            } else {
+                                addToFocus(exp.rightNode, pathArray);
+                            }
+                        }
+                    }
+    
+                    addToFocus(tempExpression, path);
+    
+                    console.log(self.__indexArray, self.__focusNodes);
+                    self.render();
+                });
+
+                container.find('.expression.focus .fw-up').on('click', function (evt) {
+                    var path = self.__indexArray[self.__indexArray.length - 1].split('-');
+    
+                    var replaceInExpression = function (exp, pathArray) {
+                        if (pathArray.length === 1) {
+                            if (pathArray[0] === 'n') {
+                                exp.rootNode = focusNodes[focusNodes.length - 1];
+                            } else if (pathArray[0] === 'l') {
+                                exp.leftNode = focusNodes[focusNodes.length - 1];
+                            } else {
+                                exp.rightNode = focusNodes[focusNodes.length - 1];
+                            }
+                        } else {
+                            var next = pathArray.splice(0, 1);
+    
+                            if (next[0] === 'n') {
+                                replaceInExpression(exp.rootNode, pathArray);
+                            } else if (next[0] === 'l') {
+                                replaceInExpression(exp.leftNode, pathArray);
+                            } else {
+                                replaceInExpression(exp.rightNode, pathArray);
+                            }
+                        }
+                    }
+    
+                    replaceInExpression(focusNodes.length > 1 ? focusNodes[focusNodes.length - 2] : expression, path);
+                    focusNodes.pop();
+                    self.__indexArray.pop();
+                    self.render();
                 });
 
                 $(container.find('.operand-category-select>a')[0]).click();

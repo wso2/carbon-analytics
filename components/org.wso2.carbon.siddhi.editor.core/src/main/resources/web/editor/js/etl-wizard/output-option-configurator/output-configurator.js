@@ -33,13 +33,13 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'groupByConfigurator', '
             var config = self.__config;
 
             container.append(`
-                <div style="max-height: ${self.__container.offsetHeight}; flex-direction: column" class="content-section">
+                <div style="max-height: ${container[0].offsetHeight}; flex-direction: column; overflow-y:auto" class="content-section">
                     <!-- Group by section -->
                 </div>
-                <div style="max-height: ${self.__container.offsetHeight}; flex-direction: column" class="content-section">
+                <div style="max-height: ${container[0].offsetHeight}; flex-direction: column" class="content-section">
                     <!-- Order by section -->
                 </div>
-                <div style="max-height: ${self.__container.offsetHeight}; flex-direction: column" class="content-section">
+                <div style="max-height: ${container[0].offsetHeight}; flex-direction: column" class="content-section">
                     Advanced Output Options
                 </div>
             `);

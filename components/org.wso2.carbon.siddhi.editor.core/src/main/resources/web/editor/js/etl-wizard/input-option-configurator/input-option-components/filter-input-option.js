@@ -20,16 +20,16 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
 
     function (require, $, _, log, Alerts, ScopeModel, AttributeModel, FunctionModel, OperatorModel, CustomValueModel, DataMapperUtil) {
         var inputOptionCallback;
-        
+
         var FilterInputOptionComponent = function (container, config, callback) {
             this.__container = container;
             this.__config = config;
             inputOptionCallback = callback;
 
-            if(!config.query.filter['expression']) {
+            if (!config.query.filter['expression']) {
                 config.query.filter['expression'] = new ScopeModel(['bool']);
                 config.query.filter['reverseFilter'] = false;
-            }            
+            }
 
             this.__expression = config.query.filter.expression;
 
@@ -53,13 +53,13 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                     <div style="flex: 1">
                         <h3 style="margin-top: 0; color: #373737">Filter condition</h3>
                     </div>
-                    <button id="btn-reverse-filter" class="btn btn-default"><i class="fw ${config.query.filter.reverseFilter ? 'fw-check': 'fw-error'}"></i>&nbsp;Reverse Condition</button>    
+                    <button id="btn-reverse-filter" class="btn btn-default"><i class="fw ${config.query.filter.reverseFilter ? 'fw-check' : 'fw-error'}"></i>&nbsp;Reverse Condition</button>    
                 </div>
                 <div style="color: #373737" class="expression-section">
                 </div>
                 ${
-                    typeof expression !== 'string' ?
-                        `<div class="operand-section" style="display: flex; flex: 1; margin-top: 15px">
+                typeof expression !== 'string' ?
+                    `<div class="operand-section" style="display: flex; flex: 1; margin-top: 15px">
                             <div class="operand-category-select" style="width: 20%">
                                 <ul>
                                 </ul>
@@ -77,16 +77,16 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                     <div style="display: flex; padding: ${focusNodes.length === 0 ? '15px' : '5px'} 0;" class="expression ${focusNodes.length === 0 ? 'focus' : ''}">
                         <div style="width: 95%" class="expression-content">
                             ${
-                                typeof expression !== 'string' ?
-                                    DataMapperUtil.generateExpressionHTML2(expression, '')
-                                    : expression
-                            }
+                    typeof expression !== 'string' ?
+                        DataMapperUtil.generateExpressionHTML2(expression, '')
+                        : expression
+                    }
                         </div>    
                         ${
-                        focusNodes.length === 0 ?
-                            `<div style="width: 5%;padding: 5px;" class="icon-section"><a style="color: #373737"><i class="fw fw-clear"></i></a></div>`
-                            : ''
-                        }
+                    focusNodes.length === 0 ?
+                        `<div style="width: 5%;padding: 5px;" class="icon-section"><a style="color: #373737"><i class="fw fw-clear"></i></a></div>`
+                        : ''
+                    }
                     </div>
                 `);
 
@@ -97,10 +97,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                             <div style="display: flex; padding: ${focusNodes.length - 1 === i ? '15px' : '5px'} 0;" class="expression ${focusNodes.length - 1 === i ? 'focus' : ''}">
                                 <div style="width: 95%" class="expression-content">${DataMapperUtil.generateExpressionHTML2(node, '')}</div>    
                                 ${
-                                    focusNodes.length - 1 === i ?
-                                        '<div style="width: 5%;padding: 5px;" class="icon-section"><a><i class="fw fw-up"></i></a></div>'
-                                        : ''
-                                }
+                            focusNodes.length - 1 === i ?
+                                '<div style="width: 5%;padding: 5px;" class="icon-section"><a><i class="fw fw-up"></i></a></div>'
+                                : ''
+                            }
                             </div>
                         `);
                 });
@@ -171,7 +171,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                                 Object.keys(DataMapperUtil.OperatorMap2)
                                     .filter(function (key) {
                                         return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
-                                            && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.genericReturnTypes).length > 0;
+                                        // && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.genericReturnTypes).length > 0;
                                     })
                                     .forEach(function (key) {
                                         allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
@@ -195,8 +195,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                             .filter(function (attr) {
                                 return tempExpression.returnTypes.indexOf(attr.type) > -1;
                             }).forEach(function (attr) {
-                            allowedAttributes[attr.name] = attr;
-                        });
+                                allowedAttributes[attr.name] = attr;
+                            });
 
                         tempExpression.returnTypes.forEach(function (type) {
                             customDataTypes.push(DataMapperUtil.getGenericDataType(type));
@@ -420,22 +420,37 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
 
             $(container.find('.operand-category-select>ul>li')[0]).click();
 
-            container.find('.expression.focus .expression-content span').on('click', function (evt) {
-                var pathIndex = evt.currentTarget.id.substr(evt.currentTarget.id.length - 1);
+            container.find('.expression.focus .expression-content>span').on('click', function (evt) {
+                var pathIndex = evt.currentTarget.id.match('item-([a-z-]+)')[1];
                 self.__indexArray.push(pathIndex);
 
-                switch (pathIndex) {
-                    case 'n':
-                        self.__focusNodes.push(_.cloneDeep(tempExpression.rootNode));
-                        break;
-                    case 'l':
-                        self.__focusNodes.push(_.cloneDeep(tempExpression.rootNode.leftNode));
-                        break;
-                    case 'r':
-                        self.__focusNodes.push(_.cloneDeep(tempExpression.rootNode.rightNode));
-                        break;
+                var path = pathIndex.split('-');
+
+                var addToFocus = function (exp, pathArray) {
+                    if (pathArray.length === 1) {
+                        if (pathArray[0] === 'n') {
+                            self.__focusNodes.push(_.cloneDeep(exp.rootNode));
+                        } else if (pathArray[0] === 'l') {
+                            self.__focusNodes.push(_.cloneDeep(exp.leftNode));
+                        } else {
+                            self.__focusNodes.push(_.cloneDeep(exp.rightNode));
+                        }
+                    } else {
+                        var next = pathArray.splice(0, 1);
+
+                        if (next[0] === 'n') {
+                            addToFocus(exp.rootNode, pathArray);
+                        } else if (next[0] === 'l') {
+                            addToFocus(exp.leftNode, pathArray);
+                        } else {
+                            addToFocus(exp.rightNode, pathArray);
+                        }
+                    }
                 }
 
+                addToFocus(tempExpression, path);
+
+                console.log(self.__indexArray, self.__focusNodes);
                 self.render();
             });
 
@@ -444,38 +459,39 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                 self.render();
             })
 
-            container.find('.expression.focus .fw-clear').on('click', function(evt) {
+            container.find('.expression.focus .fw-clear').on('click', function (evt) {
                 self.__config.query.filter.expression = new ScopeModel(['bool']);
                 self.render();
             });
 
-            container.find('.expression.focus .fw-up').on('click', function(evt) {
-                var lastIndex = self.__indexArray[self.__indexArray.length - 1];
-                
-                switch(lastIndex) {
-                    case 'l':
-                        if(focusNodes[focusNodes.length - 2]) {
-                            focusNodes[focusNodes.length - 2].leftNode = focusNodes[focusNodes.length - 1];
+            container.find('.expression.focus .fw-up').on('click', function (evt) {
+                var path = self.__indexArray[self.__indexArray.length - 1].split('-');
+
+                var replaceInExpression = function (exp, pathArray) {
+                    if (pathArray.length === 1) {
+                        if (pathArray[0] === 'n') {
+                            exp.rootNode = focusNodes[focusNodes.length - 1];
+                        } else if (pathArray[0] === 'l') {
+                            exp.leftNode = focusNodes[focusNodes.length - 1];
                         } else {
-                            self.__expression.rootNode.leftNode = focusNodes[focusNodes.length - 1];
+                            exp.rightNode = focusNodes[focusNodes.length - 1];
                         }
-                        break;
-                    case 'r':
-                        if(focusNodes[focusNodes.length - 2]) {
-                            focusNodes[focusNodes.length - 2].rightNode = focusNodes[focusNodes.length - 1];
+                    } else {
+                        var next = pathArray.splice(0, 1);
+
+                        if (next[0] === 'n') {
+                            replaceInExpression(exp.rootNode, pathArray);
+                        } else if (next[0] === 'l') {
+                            replaceInExpression(exp.leftNode, pathArray);
                         } else {
-                            self.__expression.rootNode.rightNode = focusNodes[focusNodes.length - 1];
+                            replaceInExpression(exp.rightNode, pathArray);
                         }
-                        break;
-                    case 'n':
-                        if(focusNodes[focusNodes.length - 2]) {
-                            focusNodes[focusNodes.length - 2].rootNode = focusNodes[focusNodes.length - 1];
-                        } else {
-                            self.__expression.rootNode = focusNodes[focusNodes.length - 1];
-                        }
-                        break;
+                    }
                 }
+
+                replaceInExpression(focusNodes.length > 1 ? focusNodes[focusNodes.length - 2] : expression, path);
                 focusNodes.pop();
+                self.__indexArray.pop();
                 self.render();
             });
 
