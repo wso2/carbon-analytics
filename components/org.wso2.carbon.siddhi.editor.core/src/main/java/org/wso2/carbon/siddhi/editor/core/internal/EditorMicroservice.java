@@ -1178,7 +1178,6 @@ public class EditorMicroservice implements Microservice {
             @FormDataParam("configName") String configName,
             @FormDataParam("config") String encodedEventFlowJson,
             @FormDataParam("overwrite") boolean overwrite) {
-
         String fileName = new String(Base64.getDecoder().decode(configName), Charset.defaultCharset());
         java.nio.file.Path filePath = Paths.get(Constants.RUNTIME_PATH, Constants.DIRECTORY_DEPLOYMENT,
                 Constants.DIRECTORY_WORKSPACE, fileName).toAbsolutePath();
@@ -1215,12 +1214,12 @@ public class EditorMicroservice implements Microservice {
                     .entity(e.getMessage())
                     .build();
         } catch (IOException e) {
-            log.error("Unable to read/write the Siddhi app.", e);
+            log.error(String.format("Error occurred when trying to read/write the %s app.", fileName), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())
                     .build();
         } catch (Exception e) {
-            log.error("Error occurred while saving the Siddhi app.", e);
+            log.error(String.format("Error occurred while saving the %s app.", fileName), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())
                     .build();

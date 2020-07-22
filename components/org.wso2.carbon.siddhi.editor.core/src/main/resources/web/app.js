@@ -77,7 +77,6 @@ requirejs.config({
         service_console: "js/output-console/service-console-manager",
         debugger_console: "js/debugger/debugger",
         design_view: "js/design-view/design-view",
-        etl_task_view: "js/etl-task-view/etl-task-view",
         initialiseData: "js/design-view/initialise-data",
         jsonValidator: "js/design-view/JSON-validator",
         designViewGrid: "js/design-view/design-grid",

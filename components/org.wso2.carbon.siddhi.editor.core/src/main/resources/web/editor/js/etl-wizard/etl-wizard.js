@@ -312,12 +312,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             etlWizardContainer.append(this.__parentWizardForm);
 
-            // canvasContainer.removeClass('show-div').addClass('hide-div');
-            // previewContainer.removeClass('show-div').addClass('hide-div');
-            // designContainer.removeClass('show-div').addClass('hide-div');
-            // sourceContainer.removeClass('show-div').addClass('hide-div');
-            // toggleControlsContainer.addClass('hide');
-
             canvasContainer.addClass('hide-div');
             previewContainer.addClass('hide-div');
             designContainer.addClass('hide-div');

@@ -109,13 +109,13 @@ public class SourceSinkCodeGenerator {
                     .equalsIgnoreCase(CodeGeneratorConstants.ATTRIBUTE)) {
                 mapperStringBuilder
                         .append(SiddhiCodeBuilderConstants.NEW_LINE)
-                        .append("\t\t")
+                        .append(SiddhiCodeBuilderConstants.INDENT+SiddhiCodeBuilderConstants.INDENT)
                         .append(SiddhiCodeBuilderConstants.ATTRIBUTES_ANNOTATION);
             } else if (mapper.getPayloadOrAttribute().getAnnotationType()
                     .equalsIgnoreCase(CodeGeneratorConstants.PAYLOAD)) {
                 mapperStringBuilder
                         .append(SiddhiCodeBuilderConstants.NEW_LINE)
-                        .append("\t\t")
+                        .append(SiddhiCodeBuilderConstants.INDENT+SiddhiCodeBuilderConstants.INDENT)
                         .append(SiddhiCodeBuilderConstants.PAYLOAD_ANNOTATION);
             }
             mapperStringBuilder.append(generateMapperPayloadOrAttribute(mapper.getPayloadOrAttribute()))

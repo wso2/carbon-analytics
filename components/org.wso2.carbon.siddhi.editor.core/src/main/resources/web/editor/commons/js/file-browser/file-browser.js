@@ -208,7 +208,6 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             }
 
             files.forEach(function(file) {
-                // TODO:
                 var nodeId = `wso2/server/deployment/workspace/${file}`;
                 self._$parent_el.jstree(true).select_node(nodeId);
             });

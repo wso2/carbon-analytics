@@ -383,7 +383,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                         }
                     }
                 }
-                
+
                 addToFocusNode(tempExp, pathArray);
                 renderExpression();
             });
@@ -684,9 +684,6 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
                         supportedInputAttributes[key].genericDataTypes.forEach(function(type) {
                             var customOptionList = attributeContainer.find('.attrib-selector-containers').find('#custom_val_type')
-                            // .append(`
-                            //     <option>${dataType}</option>
-                            // `);
 
                             switch (type) {
                                 case 'text':
@@ -852,14 +849,6 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     if (evt.currentTarget.id.split('operator-')[1] === 'bracket') {
                         tempExp.addNode(new ScopeModel(tempExp.returnTypes));
                     } else {
-                        // nodeData = {
-                        //     symbol: supportedOperators[evt.currentTarget.id.split('operator-')[1]].symbol,
-                        //     dataTypes: supportedOperators[evt.currentTarget.id.split('operator-')[1]].returnTypes,
-                        //     isEnd: supportedOperators[evt.currentTarget.id.split('operator-')[1]].isEnd,
-                        //     afterTypes: supportedOperators[evt.currentTarget.id.split('operator-')[1]].afterTypes,
-                        //     beforeTypes: supportedOperators[evt.currentTarget.id.split('operator-')[1]].beforeTypes,
-                        // }
-
                         tempExp.addNode(new OperatorModel(supportedOperators[evt.currentTarget.id.split('operator-')[1]]));
                     }
 

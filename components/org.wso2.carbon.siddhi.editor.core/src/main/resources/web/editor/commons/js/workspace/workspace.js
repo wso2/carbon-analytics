@@ -51,19 +51,11 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
                 app.outputController.makeInactiveActivateButton();
             };
 
-            this.createNewETLTaskTab = function createNewETLTaskTab(options) {
-                var editorId = app.config.container;
-                $(editorId).css("display", "block");
-                //Showing menu bar
-
-                app.tabController.newTab({tabOptions: {isETLTask: true}});
-            }
             this.createNewETLFlowTab = function createNewETLFlowTab() {
                 var editorId = app.config.container;
                 var options = {};
                 $(editorId).css("display", "block");
                 //Showing menu bar
-
                 _.set(options, "view", app.utils.getGlobalConstnts().VIEW_ETL_FLOW_WIZARD);
                 app.tabController.newTab(options);
                 app.outputController.makeInactiveActivateButton();
@@ -539,13 +531,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
             };
 
             this.handleDeploy = function handleDeploy(selectedFiles) {
-                // if (_.isNil(this._handleDeploy)) {
-                //     this._handleDeploy = new Dialogs.deploy_file_dialog(app);
-                // }
-                // if (!_.isNil(this._handleDeploy)) {
-                //     this._handleDeploy.clear();
-                // }
-
                 let opts = _.cloneDeep(app);
                 opts.selectedFiles = selectedFiles || [];
 
@@ -585,7 +570,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
                 let opts = _.cloneDeep(app);
                 app.selectedFiles = selectedFiles || [];
                 opts.isExportDockerFlow = false;
-
                 this._handleExport = new Dialogs.export_dialog(opts);
                 this._handleExport.render();
                 this._handleExport.show();
@@ -766,7 +750,6 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
             };
 
             app.commandManager.registerHandler('create-new-tab', this.createNewTab);
-            app.commandManager.registerHandler('create-new-etl-task-tab', this.createNewETLTaskTab);
 
             app.commandManager.registerHandler('create-new-etl-flow', this.createNewETLFlowTab);
 

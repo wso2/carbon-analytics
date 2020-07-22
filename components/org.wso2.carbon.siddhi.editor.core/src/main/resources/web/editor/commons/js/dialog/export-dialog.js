@@ -300,7 +300,6 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                     exportContainer.on('show.bs.modal', function(e) {
                         var handler = setInterval(function() {
-                            // fileBrowser.selectFiles(self.app.selectedFiles);
                             self._siddhiAppSelector.selectFiles(self._options.selectedFiles);
                             clearInterval(handler);
                         }, 200);

@@ -231,7 +231,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             case 'attribute':
                             case 'customValue':
                             case 'scope':
-    
                                 if (tempExpression.genericReturnTypes.indexOf('bool') > -1) {
                                     Object.keys(DataMapperUtil.OperatorMap2)
                                         .filter(function (key) {
@@ -255,7 +254,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                 break;
                             case 'operator':
                                 if (tempExpression.rootNode.hasRight && !tempExpression.rootNode.rightNode) {
-                                    config.query.groupby.attributes
+                                    config.output.stream.attributes
                                         .filter(function (attr) {
                                             return tempExpression.rootNode.rightTypes.indexOf(DataMapperUtil.getGenericDataType(attr.type)) > -1;
                                         })
@@ -284,7 +283,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                     Object.keys(DataMapperUtil.OperatorMap2)
                                         .filter(function (key) {
                                             return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes, tempExpression.rootNode.genericReturnTypes).length > 0
-                                            // && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.genericReturnTypes).length > 0;
+                                                && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.genericReturnTypes).length > 0;
                                         })
                                         .forEach(function (key) {
                                             allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
@@ -297,14 +296,14 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
     
                         var customDataTypes = []
                         if (tempExpression.returnTypes.indexOf('bool') > -1) {
-                            config.query.groupby.attributes
+                            config.output.stream.attributes
                                 .forEach(function (attr) {
                                     allowedAttributes[attr.name] = attr;
                                 });
                             customDataTypes = ['text', 'number', 'bool'];
     
                         } else {
-                            config.query.groupby.attributes
+                            config.output.stream.attributes
                                 .filter(function (attr) {
                                     return tempExpression.returnTypes.indexOf(attr.type) > -1;
                                 }).forEach(function (attr) {
