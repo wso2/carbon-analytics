@@ -1236,26 +1236,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             options: Object.entries(o.input.mapping.properties).map(v => {
                                 return `${v[0]} = "${v[1].value}"`
                             }),
-                            payloadOrAttribute: (() => {
-                                if (!o.input.mapping.customEnabled) {
-                                    return {};
-                                }
 
-                                if (o.input.mapping.payload && o.input.mapping.payload.length > 0) {
-                                    return {
-                                        annotationType: 'PAYLOAD',
-                                        type: 'LIST',
-                                        value: [o.input.mapping.payload]
-                                    };
-                                }
-                                var attrList = {};
-                                Object.entries(o.input.mapping.attributes).forEach(a => attrList[a[0]] = a[1]);
-                                return {
-                                    annotationType: 'ATTRIBUTES',
-                                    type: 'MAP',
-                                    value: attrList
-                                };
-                            })()
                         }
                     }
                 ],
@@ -1280,26 +1261,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 options: Object.entries(o.output.mapping.properties).map(v => {
                                     return `${v[0]} = "${v[1].value}"`
                                 }),
-                                payloadOrAttribute: (() => {
-                                    if (!o.output.mapping.customEnabled) {
-                                        return {};
-                                    }
-
-                                    if (o.output.mapping.payload && o.output.mapping.payload.length > 0) {
-                                        return {
-                                            annotationType: 'PAYLOAD',
-                                            type: 'LIST',
-                                            value: [o.output.mapping.payload]
-                                        };
-                                    }
-                                    var attrList = {};
-                                    Object.entries(o.output.mapping.attributes).forEach(a => attrList[a[0]] = a[1]);
-                                    return {
-                                        annotationType: 'ATTRIBUTES',
-                                        type: 'MAP',
-                                        value: attrList
-                                    };
-                                })()
                             }
                         }
                     ];
@@ -1357,7 +1318,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                         if (typeof o.query.filter.expression === 'string') {
                                             expression = o.query.filter.expression;
                                         } else {
-                                            expression = $(DataMapperUtil.generateExpressionHTML2(o.query.filter.expression,'', null)).text()
+                                            expression = $(`<div>${DataMapperUtil.generateExpressionHTML2(o.query.filter.expression,'', null)}</div>`).text()
                                         }
                                         list.push({
                                             type: 'FILTER',
@@ -1382,7 +1343,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 type: "USER_DEFINED",
                                 value: Object.entries(o.query.mapping).map(v => {
                                     return {
-                                        expression: v[1],
+                                        expression: $(`<div>${DataMapperUtil.generateExpressionHTML2(v[1], '', null)}</div>`).text(),
                                         as: v[0]
                                     }
                                 })
@@ -1404,7 +1365,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 if (typeof o.query.groupby.havingFilter.expression === 'string') {
                                     return o.query.groupby.havingFilter.expression
                                 }
-                                return $(DataMapperUtil.generateExpressionHTML2(o.query.groupby.havingFilter.expression, '', null)).text()
+                                return $(`<div>${DataMapperUtil.generateExpressionHTML2(o.query.groupby.havingFilter.expression, '', null)}</div>`).text()
                             })(),
                             outputRateLimit: (() => {
                                 if (!o.query.advanced.ratelimit.enabled) {
@@ -1433,6 +1394,52 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 },
                 finalElementCount: 5,
             };
+
+            if (o.output.mapping.customEnabled) {
+                config.sinkList[0]['payloadOrAttribute'] = (() => {
+                    if (!o.output.mapping.customEnabled) {
+                        return {};
+                    }
+
+                    if (o.output.mapping.payload && o.output.mapping.payload.length > 0) {
+                        return {
+                            annotationType: 'PAYLOAD',
+                            type: 'LIST',
+                            value: [o.output.mapping.payload]
+                        };
+                    }
+                    var attrList = {};
+                    Object.entries(o.output.mapping.attributes).forEach(a => attrList[a[0]] = a[1]);
+                    return {
+                        annotationType: 'ATTRIBUTES',
+                        type: 'MAP',
+                        value: attrList
+                    };
+                })()
+            }
+
+            if (o.input.mapping.customEnabled) {
+                config.sourceList[0]['payloadOrAttribute'] = (() => {
+                    if (!o.input.mapping.customEnabled) {
+                        return {};
+                    }
+
+                    if (o.input.mapping.payload && o.input.mapping.payload.length > 0) {
+                        return {
+                            annotationType: 'PAYLOAD',
+                            type: 'LIST',
+                            value: [o.input.mapping.payload]
+                        };
+                    }
+                    var attrList = {};
+                    Object.entries(o.input.mapping.attributes).forEach(a => attrList[a[0]] = a[1]);
+                    return {
+                        annotationType: 'ATTRIBUTES',
+                        type: 'MAP',
+                        value: attrList
+                    };
+                })()
+            }
 
             return {
                 siddhiAppConfig: config,
