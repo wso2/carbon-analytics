@@ -61,6 +61,24 @@ define([],function (){
                 disabled: false
             },
             {
+                id: "errorHandler",
+                label: "Error Store Explorer",
+                command: {
+                    id: "error-handler-dialog",
+                    shortcuts: {
+                        mac: {
+                            key: "command+alt+h",
+                            label: "\u2318\u2325H"
+                        },
+                        other: {
+                            key: "ctrl+alt+h",
+                            label: "Ctrl+Alt+H"
+                        }
+                    }
+                },
+                disabled: false
+            },
+            {
                 id: "toggleConsole",
                 label: "Console",
                 command: {

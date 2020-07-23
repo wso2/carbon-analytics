@@ -372,6 +372,9 @@ define(['app/main', 'jquery'],
             },
             extensionsInstallation: {
                 endpoint: window.location.protocol + "//" + window.location.host + '/siddhi-extensions'
+            },
+            errorHandler: {
+                endpoint: window.location.protocol + "//" + window.location.host + '/editor/error-handler'
             }
         },
         alerts: {

@@ -74,6 +74,7 @@ import org.wso2.carbon.siddhi.editor.core.commons.response.MetaDataResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
 import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResponse;
 import org.wso2.carbon.siddhi.editor.core.exception.DockerGenerationException;
+import org.wso2.carbon.siddhi.editor.core.exception.ErrorHandlerServiceStubException;
 import org.wso2.carbon.siddhi.editor.core.exception.InvalidExecutionStateException;
 import org.wso2.carbon.siddhi.editor.core.exception.KubernetesGenerationException;
 import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppDeployerServiceStubException;
@@ -98,6 +99,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.Deserial
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.errorhandler.ErrorHandlerApiHelper;
 import org.wso2.carbon.siddhi.editor.core.util.metainforetriever.beans.CSVConfig;
 import org.wso2.carbon.siddhi.editor.core.util.metainforetriever.beans.JSONConfig;
 import org.wso2.carbon.siddhi.editor.core.util.metainforetriever.beans.XMLConfig;
@@ -145,6 +147,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -1885,6 +1888,177 @@ public class EditorMicroservice implements Microservice {
         } else {
             return response;
         }
+    }
+
+    @GET
+    @Path("/error-handler/server/siddhi-apps")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSiddhiAppList(@HeaderParam("serverHost") String host, @HeaderParam("serverPort") String port,
+                                     @HeaderParam("username") String username,
+                                     @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        try {
+            return Response.ok()
+                .entity(errorHandlerApiHelper.getSiddhiAppList(hostAndPort, username, password)).build();
+        } catch (ErrorHandlerServiceStubException e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/error-handler/error-entries/count")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTotalErrorEntriesCount(@HeaderParam("serverHost") String host,
+                                              @HeaderParam("serverPort") String port,
+                                              @HeaderParam("username") String username,
+                                              @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        try {
+            return Response.ok()
+                .entity(errorHandlerApiHelper.getTotalErrorEntriesCount(hostAndPort, username, password)).build();
+        } catch (ErrorHandlerServiceStubException e) {
+            return Response.serverError().entity(e).build();
+        }
+    }
+
+    @GET
+    @Path("/error-handler/error-entries/count")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getErrorEntriesCount(@QueryParam("siddhiApp") String siddhiAppName,
+                                         @HeaderParam("serverHost") String host, @HeaderParam("serverPort") String port,
+                                         @HeaderParam("username") String username,
+                                         @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        try {
+            return Response.ok().entity(
+                errorHandlerApiHelper.getErrorEntriesCount(siddhiAppName, hostAndPort, username, password)).build();
+        } catch (ErrorHandlerServiceStubException e) {
+            return Response.serverError().entity(e).build();
+        }
+    }
+
+    @GET
+    @Path("/error-handler/error-entries")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMinimalErrorEntries(@QueryParam("siddhiApp") String siddhiAppName,
+                                           @QueryParam("limit") String limit, @QueryParam("offset") String offset,
+                                           @HeaderParam("serverHost") String host,
+                                           @HeaderParam("serverPort") String port,
+                                           @HeaderParam("username") String username,
+                                           @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        try {
+            JsonArray jsonArray = errorHandlerApiHelper.getMinimalErrorEntries(siddhiAppName, limit, offset,
+                hostAndPort, username, password);
+            return Response.ok().entity(jsonArray).build();
+        } catch (ErrorHandlerServiceStubException e) {
+            return Response.serverError().entity(e).build();
+        }
+    }
+
+    @GET
+    @Path("/error-handler/error-entries/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDescriptiveErrorEntry(@PathParam("id") String id, @HeaderParam("serverHost") String host,
+                                             @HeaderParam("serverPort") String port,
+                                             @HeaderParam("username") String username,
+                                             @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        try {
+            JsonObject jsonObject = errorHandlerApiHelper.getDescriptiveErrorEntry(id, hostAndPort, username, password);
+            return Response.ok().entity(jsonObject).build();
+        } catch (ErrorHandlerServiceStubException e) {
+            return Response.serverError().entity(e).build();
+        }
+    }
+
+    @POST
+    @Path("/error-handler")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response replayErrorEntry(JsonArray payload, @HeaderParam("serverHost") String host,
+                                     @HeaderParam("serverPort") String port, @HeaderParam("username") String username,
+                                     @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        try {
+            boolean isSuccess = errorHandlerApiHelper.replay(payload, hostAndPort, username, password);
+            if (isSuccess) {
+                return Response.ok().entity(new Gson().toJson("{}")).build();
+            }
+            return Response.serverError().entity("There were failures during the replay.").build();
+        } catch (ErrorHandlerServiceStubException e) {
+            return Response.serverError().entity(e).build();
+        }
+    }
+
+    @DELETE
+    @Path("/error-handler/error-entries/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response discardErrorEntry(@PathParam("id") String id, @HeaderParam("serverHost") String host,
+                                      @HeaderParam("serverPort") String port, @HeaderParam("username") String username,
+                                      @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        try {
+            boolean isSuccess = errorHandlerApiHelper.discardErrorEntry(id, hostAndPort, username, password);
+            if (isSuccess) {
+                return Response.ok().entity(new Gson().toJson("{}")).build();
+            }
+            return Response.serverError().entity(String.format("Failed to discard error entry: %s.", id)).build();
+        } catch (ErrorHandlerServiceStubException e) {
+            return Response.serverError().entity(e).build();
+        }
+    }
+
+    @DELETE
+    @Path("/error-handler/error-entries")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response discardErrorEntries(@QueryParam("siddhiApp") String siddhiAppName,
+                                        @QueryParam("retentionDays") String retentionDays,
+                                        @HeaderParam("serverHost") String host, @HeaderParam("serverPort") String port,
+                                        @HeaderParam("username") String username,
+                                        @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        if (siddhiAppName != null && retentionDays == null) {
+            try {
+                boolean isSuccess =
+                    errorHandlerApiHelper.discardErrorEntries(siddhiAppName, hostAndPort, username, password);
+                if (isSuccess) {
+                    return Response.ok().entity(new Gson().toJson("{}")).build();
+                }
+                return Response.serverError().entity(
+                    String.format("Failed to discard error entries for Siddhi app: %s.", siddhiAppName)).build();
+            } catch (ErrorHandlerServiceStubException e) {
+                return Response.serverError().entity(e).build();
+            }
+        } else if (retentionDays != null && siddhiAppName == null) {
+            try {
+                boolean isSuccess =
+                    errorHandlerApiHelper.doPurge(Integer.parseInt(retentionDays), hostAndPort, username, password);
+                if (isSuccess) {
+                    return Response.ok().entity(new Gson().toJson("{}")).build();
+                }
+                return Response.serverError().entity("Failed to purge the error store.").build();
+            } catch (ErrorHandlerServiceStubException e) {
+                return Response.serverError().entity(e).build();
+            }
+        }
+        return Response.status(Response.Status.BAD_REQUEST)
+            .entity("Exactly one of the following query parameters is required: 'siddhiApp', 'retentionDays'.").build();
     }
 
     /**
