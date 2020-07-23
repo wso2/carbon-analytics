@@ -52,7 +52,7 @@ define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator', './feed
             isActive: function () {
                 return this._activateBtn.parent('li').hasClass('active');
             },
-            toggleEventSimulator: function () {
+            toggleEventSimulator: function (siddhiApp, streamName) {
                 if (this.isActive()) {
                     this._$parent_el.parent().width('0px');
                     this._containerToAdjust.css('padding-left', _.get(this._options, 'leftOffset'));
@@ -67,6 +67,7 @@ define(['jquery', 'backbone', 'lodash', 'log', 'dialogs', './simulator', './feed
                     this._containerToAdjust.css('padding-left', width);
                     this._verticalSeparator.css('left', width - _.get(this._options, 'separatorOffset'));
                     feedSimulator.updateFeedCreationButtonAndNotification();
+                    singleEventSimulator.updateSelected(siddhiApp, streamName);
                 }
             },
             getFeedSimulator: function () {

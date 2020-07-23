@@ -142,7 +142,7 @@ public class CodeGenerator {
             appNameStringBuilder.append(SiddhiCodeBuilderConstants.DEFAULT_APP_NAME_ANNOTATION);
         }
 
-        return appNameStringBuilder.toString();
+        return appNameStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE).toString();
     }
 
     /**
@@ -164,7 +164,10 @@ public class CodeGenerator {
             appDescriptionStringBuilder.append(SiddhiCodeBuilderConstants.DEFAULT_APP_DESCRIPTION_ANNOTATION);
         }
 
-        return appDescriptionStringBuilder.toString();
+        return appDescriptionStringBuilder
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .toString();
     }
 
     /**
@@ -188,7 +191,6 @@ public class CodeGenerator {
         sourcesAndSinks.addAll(sinkList);
 
         StringBuilder streamListStringBuilder = new StringBuilder();
-        streamListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
         SourceSinkCodeGenerator sourceSinkCodeGenerator = new SourceSinkCodeGenerator();
         StreamCodeGenerator streamCodeGenerator = new StreamCodeGenerator();
@@ -202,6 +204,7 @@ public class CodeGenerator {
                 continue;
             }
 
+            streamListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
             for (SourceSinkConfig sourceSink : sourcesAndSinks) {
                 if (stream.getName().equals(sourceSink.getConnectedElementName())) {
                     streamListStringBuilder.append(sourceSinkCodeGenerator.generateSourceSink(sourceSink,
@@ -209,10 +212,10 @@ public class CodeGenerator {
                 }
             }
 
-            streamListStringBuilder.append(streamCodeGenerator.generateStream(stream, false));
+            streamListStringBuilder
+                    .append(streamCodeGenerator.generateStream(stream, false))
+                    .append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
-
-        streamListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
 
         return streamListStringBuilder.toString();
     }

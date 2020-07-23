@@ -16,9 +16,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                  * @constructs
                  * @class ExportDialog
                  * @param {Object} options exportContainerModal
-                 * @param {boolean} isExportDockerFlow  is Docker File Export
                  */
-                initialize: function (options, isExportDockerFlow) {
+                initialize: function (options) {
                     this._options = options;
                     var exportDialog = _.cloneDeep(_.get(options.config, 'export_dialog'));
                     this._exportContainer = $(_.get(exportDialog, 'selector')).clone();
@@ -35,7 +34,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this._exportDockerStep5Container = $(_.get(exportDockerStep5, 'selector')).clone();
                     this._exportDockerStep6Container = $(_.get(exportConfigCommonStep, 'selector')).clone();
 
-                    this._isExportDockerFlow = isExportDockerFlow;
+                    this._isExportDockerFlow = options.isExportDockerFlow;
+
                     this._payload = {
                         templatedSiddhiApps: [],
                         configuration: '',
@@ -59,11 +59,7 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     this._isSkippedTemplateAppsStep = false;
                     this._isSkippedDockerConfigSteps = false;
 
-                    if (isExportDockerFlow) {
-                        this._exportType = 'docker';
-                    } else {
-                        this._exportType = 'kubernetes';
-                    }
+                    this._exportType = this._isExportDockerFlow ? 'docker' : 'kubernetes';
                     this._baseUrl = options.config.baseUrl;
                     this._exportUrl = options.config.baseUrl + "/export?exportType=" + this._exportType;
                     this._btnExportForm =  $('' +
@@ -79,14 +75,13 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                 render: function () {
                     var self = this;
-                    var isExportDockerFlow = this._isExportDockerFlow;
                     var options = this._options;
 
                     var exportContainer = this._exportContainer;
                     var heading = exportContainer.find('#initialHeading');
                     var form = exportContainer.find('#export-form');
-                    
-                    if (isExportDockerFlow) {
+
+                    if (this._isExportDockerFlow) {
                         heading.text('Export Siddhi Apps for Docker image');
                         var dockerStepWidth = 100.0/6;
                         var formSteps = form.find('#form-steps');
@@ -301,6 +296,13 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 form.smartWizard("goToStep", 4);
                             }
                         }
+                    });
+
+                    exportContainer.on('show.bs.modal', function(e) {
+                        var handler = setInterval(function() {
+                            self._siddhiAppSelector.selectFiles(self._options.selectedFiles);
+                            clearInterval(handler);
+                        }, 200);
                     });
 
                     this._exportContainer = exportContainer;

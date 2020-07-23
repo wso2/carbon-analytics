@@ -16,9 +16,9 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser', 'works
                     this.app = options;
                     this.pathSeparator = this.app.getPathSeperator();
                     this.dialog_container = $(_.get(options.config.dialog, 'container'));
-                    this.notification_container = _.get(options.config.tab_controller.tabs.tab.das_editor.notifications,
+                    this.notification_container = _.get(options.config.tab_controller.tabs.tab.editor.notifications,
                         'container');
-                    this.source_view_container = _.get(options.config.tab_controller.tabs.tab.das_editor,
+                    this.source_view_container = _.get(options.config.tab_controller.tabs.tab.editor,
                         'source_view.container');
                 },
 

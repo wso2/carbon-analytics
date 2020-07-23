@@ -48,6 +48,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 var buttonWrap = $('<div></div>');
                 var productNameWrap = $('<div></div>');
                 var newButton = $('<button id="newButton"></button>');
+                var createNewETLFlowButton = $('<button id="createETLFlowBtnId"></button>');
                 var openButton = $('<button></button>');
 
                 var contentPane = $('<div></div>');
@@ -63,6 +64,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 buttonWrap.addClass(_.get(this._options, 'cssClass.buttonWrap'));
                 productNameWrap.addClass(_.get(this._options, 'cssClass.productNameWrap'));
                 newButton.addClass(_.get(this._options, 'cssClass.buttonNew'));
+                createNewETLFlowButton.addClass(_.get(this._options, 'cssClass.buttonCreateNewETLFlow'));
                 openButton.addClass(_.get(this._options, 'cssClass.buttonOpen'));
                 contentPane.addClass(_.get(this._options, 'cssClass.contentPane'));
                 recentFilesPane.addClass(_.get(this._options, 'cssClass.recentFilesPane'));
@@ -70,8 +72,10 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 quickLinksPane.addClass(_.get(this._options, 'cssClass.quickLinksPane'));
 
                 newButton.text("New");
+                createNewETLFlowButton.text("New ETL Flow");
                 openButton.text("Open");
                 buttonWrap.append(newButton);
+                buttonWrap.append(createNewETLFlowButton);
                 buttonWrap.append(openButton);
 
                 $('#query-guide-link-container').append('<a href="https://siddhi.io/en/v'+Version.MINOR_VERSION+
@@ -196,6 +200,12 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 // When "new" is clicked, open up an empty workspace.
                 $(newButton).on('click', function () {
                     command.dispatch("create-new-tab");
+                    browserStorage.put("pref:passedFirstLaunch", true);
+                });
+
+                // When "Create New ETL Flow" is clicked, open up an new ETL flow.
+                $(createNewETLFlowButton).on('click', function () {
+                    command.dispatch("create-new-etl-flow");
                     browserStorage.put("pref:passedFirstLaunch", true);
                 });
 

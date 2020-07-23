@@ -55,6 +55,7 @@
     <link rel="stylesheet" type="text/css" href="editor/commons/css/welcome-screen.css"/>
 
     <link rel="stylesheet" type="text/css" href="editor/css/design-view.css"/>
+    <link rel="stylesheet" type="text/css" href="editor/css/etl-task-view.css"/>
     <link rel="stylesheet" type="text/css" href="editor/css/tool-palette.css"/>
 
     <!-- CSS For The Design View -->
@@ -285,6 +286,10 @@
         <div id="siddhi-editor" class="source-container">
         </div>
         <!-- End Source Container -->
+        <!-- Start: ETL Wizard Container -->
+        <div id="etl-wizard-container" class="etl-wizard-container">
+        </div>
+        <!-- End: ETL Wizard Container -->
         <!-- Start: design view container -->
         <div class="design-view-container" style="display: none">
             <!-- Start: tool-palette -->
@@ -310,12 +315,100 @@
             <!-- End: design-view-grid-container -->
         </div>
         <!-- End: design view container -->
+
+        <!--    Start:  ETL Task View Container    -->
+        <div class="etl-task-wizard-container" style="display: none;">
+            <div class="popup-backdrop" style="display: none">
+                <!--    Start:  function parameter popover template etl task wizard    -->
+                <div class="hide function-param-popover">
+                    <div class="popover" role="tooltip">
+                        <div class="arrow"></div>
+                        <h3 class="hide popover-header"></h3>
+                        <div class="popover-body"></div>
+                    </div>
+                </div>
+                <!--    Stop:  function parameter popover template etl task wizard    -->
+                <div style="" class="mapping-generation-dialog" >
+                    <div  class="dialog-heading" style="">
+
+                    </div>
+                    <div class="dialog-body" style="">
+                        <div class="hide">
+                            <div class="popover-content">
+                                <a href="#">
+                                    <i class="fw fw-clear"></i> Clear expression
+                                </a>
+                            </div>
+                        </div>
+                        <div class="expression-container">
+
+                        </div>
+                        <div class="generation-content" style="">
+                            <div style="width: 100%; margin-bottom: 10px;">
+                                Select operand to add to expression
+                            </div>
+                            <div class="node-container" style="">
+                                <ul class="node-category">
+
+                                </ul>
+                            </div>
+                            <div class="att-fun-op-container" style="">
+                                <div class="select-function-operator-attrib" style="display: none">
+                                    <div style="border-bottom: 1px solid #333;" class="input-group">
+                                        <input placeholder="Type here to search" class="att-fun-op-search-box" style="background-color: #fff; color: #555; border-color: #c5c5c5; width: 100%; border: none; outline: none; background-color: transparent; line-height: 30px;" type="text" class="form-control"/>
+                                        <span style="background: transparent; padding: 3px 12px; border: none;" class="input-group-addon">
+                                            <i class="fw fw-search"></i>
+                                        </span>
+                                    </div>
+                                    <div class="attrib-selector-containers" style="">
+                                    </div>
+                                </div>
+                                <div class="select-function-format-container" style="display: none">
+                                    <ul>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: right" class="btn-tray">
+                        <button style="" class="btn btn-default">Cancel</button>
+                        <button style="" class="btn btn-primary btn-expression-submit">Submit</button>
+                    </div>
+                </div>
+            </div>
+            <div class="etl-task-wizard-canvas">
+                <div class="listContainer inputs" style="">
+                    <div class="heading" style="">
+                        Input Attributes
+                    </div>
+                    <div>
+                        <ul class="attributeList">
+                        </ul>
+                    </div>
+                </div>
+                <div class="listContainer outputs" style="">
+                    <div class="heading" style="">
+                        <div style="width: 100%">
+                            Output Attributes
+                        </div>
+                        <div class="btn-select-all" style="display: none">
+                            Select *
+                        </div>
+                    </div>
+                    <ul class="attributeList">
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--    End:  ETL Task View Container    -->
+
         <!-- Start: Toggle Controls Container -->
         <div class="toggle-controls-container">
             <div class="btn toggle-view-button">
                 <i class="fw fw-design-view fw-rotate-90"></i>
                 <span class="toggle-button-text" id="design_view_btn">Design View</span>
             </div>
+            <button class="btn wizard-view-button" id="btn-wizard-view">Wizard View</button>
         </div>
         <!-- End: Toggle Controls Container  -->
     </div>
@@ -1052,7 +1145,7 @@
                 </button>
                 <button type="button" class="btn btn-default" data-dismiss="modal" name="cancel">Cancel</button>
             </div>
-        </div>
+            </div>
     </div>
 </div>
 
@@ -2536,6 +2629,30 @@
     </div>
 </script>
 
+<script id="etl-wizard-finalize-template" type="text/x-handlebars-template">
+    <div style="padding: 15px;">
+        {{#if status}}
+        <h2>Successful!</h2>
+
+        <p style="margin-bottom: 15px;">The Siddhi app saved as '{{fileName}}'!</p>
+        <p>Click follow options if you want to test and proceed with deploying the Siddhi app.</p>
+
+        <div class="etl-wizard-final-actions">
+            <button class="btn btn-default" id="btn-test">Test...</button>
+            <button class="btn btn-default" id="btn-export-docker">Export as Docker...</button>
+            <button class="btn btn-default" id="btn-export-k8s">Export to Kubernetes...</button>
+            <button class="btn btn-default" id="btn-deploy">Deploy to Worker...</button>
+        </div>
+        {{else}}
+        <h2>Unable to save the Siddhi app!</h2>
+
+        <p>The following error occurred while saving the Siddhi app.</p>
+        <p>{{errorMessage}}</p>
+        {{/if}}
+
+    </div>
+</script>
+
 <!-- Export Dialog -->
 <div class='modal fade' id='openExportModal' tabindex='-1' role='dialog'>
     <div class='modal-dialog' role='document'>
@@ -2750,6 +2867,72 @@
         <div class='form-group'>
             <div class='export-dialog-form-scrollable-block-list'>
                 <div id='docker-path-bundles-tree'></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form Dialog -->
+<div id="FormWizard" tabindex="-1">
+    <div class="modal-content form-wizard">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <i class="fw fw-cancel about-dialog-close"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="form-modal" class="clearfix sw-main sw-theme-default">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form Dialog -->
+<div id="ETLWizardForm" tabindex="-1">
+    <div class="wizard-form-content">
+        <div class="header-content">
+            <input class="etl-flow-name" id="" type="text" value="UntitledETLTaskFlow"/>
+            <div class="header-steps">
+                <div id="step-1" class="step-item">
+                    Step 1
+                    <br/>
+                    <small>Data Source</small>
+                </div>
+                <div id="step-2" class="step-item">
+                    Step 2
+                    <br/>
+                    <small>Data Destination</small>
+                </div>
+                <div id="step-3" class="step-item">
+                    Step 3
+                    <br/>
+                    <small>Process Input Data</small>
+                </div>
+                <div id="step-4" class="step-item">
+                    Step 4
+                    <br/>
+                    <small>Data Mapping</small>
+                </div>
+                <div id="step-5" class="step-item">
+                    Step 5
+                    <br/>
+                    <small>Process Output Data</small>
+                </div>
+                <div id="step-6" class="step-item">
+                    Step 6
+                    <br/>
+                    <small>Finish</small>
+                </div>
+            </div>
+        </div>
+        <div style="" class="body-content">
+        </div>
+        <div class="footer-content">
+            <hr style="padding-bottom: 5px" class="form-wizard-hr">
+            <div style="position: relative; display: flex;" class="btn-tray">
+                <button class="btn btn-default back-btn">Back</button>
+                <button class="btn btn-default next-btn" style="margin-left: auto;">Next</button>
+                <button class="btn btn-default save-btn" style="margin-left: auto;">Save</button>
             </div>
         </div>
     </div>

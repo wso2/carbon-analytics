@@ -98,6 +98,7 @@ public class Constants {
     public static final String DATA_TYPE = "type";
     public static final String TABLE_NAME = "tableName";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
+    static final String ATTRIBUTE_AGGREGATOR_EXECUTOR = "AttributeAggregatorExecutor";
     static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregatorExecutor";
     static final String INCREMENTAL_AGGREGATOR = "IncrementalAggregator";
     static final String WINDOW_PROCESSOR = "WindowProcessor";

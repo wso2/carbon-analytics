@@ -2,10 +2,10 @@
  * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
 define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./source", '../constants',
-        'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils'],
+        'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils', 'etlWizard'],
 
     function (require, $, Backbone, _, log, DesignView, SourceView, constants, UndoManager, Launcher,
-              DebugManager, DesignViewUtils) {
+              DebugManager, DesignViewUtils, ETLWizard) {
 
         const ENTER_KEY = 13;
 
@@ -41,6 +41,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var previewContainer = this._$parent_el.find(_.get(this.options, 'preview.container'));
                     var loadingScreen = this._$parent_el.find(_.get(this.options, 'loading_screen.container'));
                     var sourceContainer = this._$parent_el.find(_.get(this.options, 'source.container'));
+                    var etlWizardContainer = this._$parent_el.find(_.get(this.options, 'etl_wizard.container'));
                     var designContainer = this._$parent_el.find(_.get(this.options, 'design_view.container'));
                     var debugContainer = this._$parent_el.find(_.get(this.options, 'debug.container'));
                     var tabContentContainer = $(_.get(this.options, 'tabs_container'));
@@ -145,6 +146,41 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     this._designView = designView;
                     designView.setRawExtensions(this._sourceView.getRawExtensions())
                     designView.renderToolPalette();
+
+                    $('.toggle-controls-container #btn-wizard-view').on('click', function(e) {
+                        e.preventDefault();
+                        // e.stopPropagation();
+
+                        // assume this is from the source view
+                        if (application.tabController.getActiveTab().getFile().isDirty()) {
+                            DesignViewUtils.prototype.warnAlert("Please save the file before switching to the Design View");
+                            return;
+                        }
+
+                        setTimeout(function(){
+                            var response = self._designView.getDesign(self.getContent());
+                            if (response.status === "success") {
+                                self.JSONObject = JSON.parse(response.responseString);
+
+                                if (!self.canTranslateToWizard(self.JSONObject)) {
+                                    DesignViewUtils.prototype.errorAlert('This Siddhi app cannot be opened in ETL Wizard mode');
+                                    return;
+                                }
+
+                                sourceContainer.hide();
+                                etlWizardContainer.show();
+                                var etlOptions = _.cloneDeep(self.options);
+                                etlOptions.dataModel = self.JSONObject;
+
+                                var etlWizard = new ETLWizard(etlOptions);
+                                etlWizard.render();
+                            } else if (response.status === "fail") {
+                                loadingScreen.hide();
+                                DesignViewUtils.prototype.errorAlert(response.errorMessage);
+                            }
+                        }, 100);
+
+                    });
 
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
                     var toggleViewButtonDynamicId = "toggle-view-button-" + this._$parent_el.attr('id');
@@ -290,6 +326,29 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     toggleViewButton.focusout(function () {
                         toggleViewButton.removeClass("selected-button");
                     });
+
+                    // for ETL Task view
+                    if(this.options.isETLTask) {
+                        sourceContainer.hide();
+                        designContainer.hide();
+                        toggleViewButton.hide();
+                    }
+                },
+
+                canTranslateToWizard: function(model) {
+                    var config = model.siddhiAppConfig;
+                    return config.streamList.length == 2 &&
+                        config.sourceList.length == 1 &&
+                        config.sinkList.filter(s => s.type !== 'log').length == 1 &&
+                        config.aggregationList.length == 0 &&
+                        config.functionList.length == 0 &&
+                        config.partitionList.length == 0 &&
+                        config.tableList.length == 0 &&
+                        config.triggerList.length == 0 &&
+                        config.windowList.length == 0 &&
+                        config.queryLists.JOIN.length == 0 &&
+                        config.queryLists.PATTERN.length == 0 &&
+                        config.queryLists.SEQUENCE.length == 0;
                 },
 
                 getContent: function () {
@@ -338,6 +397,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                 isInSourceView: function () {
                     return this._sourceView.isVisible();
                 }
+
+
 
             });
 

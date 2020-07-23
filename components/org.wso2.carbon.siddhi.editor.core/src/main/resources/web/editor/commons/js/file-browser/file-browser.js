@@ -201,10 +201,22 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             return this._$parent_el.jstree(true).get_bottom_selected(true);
         },
 
+        selectFiles: function(files) {
+            var self = this;
+            if (!files || files.length == 0) {
+                return;
+            }
+
+            files.forEach(function(file) {
+                var nodeId = `wso2/server/deployment/workspace/${file}`;
+                self._$parent_el.jstree(true).select_node(nodeId);
+            });
+        },
+
         render: function () {
             var self = this;
-            this._$parent_el
-                .jstree(self._treeConfig).on('changed.jstree', function (e, data) {
+            this._$parent_el.jstree(self._treeConfig)
+            .on('changed.jstree', function (e, data) {
                 if (data && data.selected && data.selected.length) {
                     if (self._multiSelect) {
                         self.selected = data.selected;
@@ -240,6 +252,7 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
                 node.id = "workspace" + self.application.getPathSeperator() + fileName;
                 self.trigger("double-click-node", node);
             });
+
             return this;
         }
     });

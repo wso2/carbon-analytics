@@ -153,7 +153,34 @@ requirejs.config({
         dockerConfigDialog: "js/export-deployment-artifacts/docker-config-dialog",
         dockerImageTypeDialog: "js/export-deployment-artifacts/docker-image-type-dialog",
         fillTemplateValueDialog: "js/export-deployment-artifacts/fill-template-value-dialog",
-        kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog"
+        kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog",
+        // ETL Wizard Components  <-- start
+        etlWizard: "js/etl-wizard/etl-wizard",
+        etlWizardUtil: "js/etl-wizard/etl-wizard-util",
+        inputOptionConfigurator: "js/etl-wizard/input-option-configurator/input-option-configurator",
+        filterInputOptionComponent: "js/etl-wizard/input-option-configurator/input-option-components/filter-input-option",
+        windowInputOptionComponent: "js/etl-wizard/input-option-configurator/input-option-components/window-input-option",
+        functionInputOptionComponent: "js/etl-wizard/input-option-configurator/input-option-components/function-input-option",
+        csvMapper: "js/etl-wizard/source-sink-mappers/csv-mapper",
+        xmlMapper: "js/etl-wizard/source-sink-mappers/xml-mapper",
+        jsonMapper: "js/etl-wizard/source-sink-mappers/json-mapper",
+        textMapper: "js/etl-wizard/source-sink-mappers/text-mapper",
+        avroMapper: "js/etl-wizard/source-sink-mappers/avro-mapper",
+        inputOutputMapper: "js/etl-wizard/source-sink-mappers/source-sink-mapper",
+        // Datamapper components
+        scopeModel: "js/etl-wizard/data-mapper-component/models/ScopeModel",
+        operatorModel: "js/etl-wizard/data-mapper-component/models/OperatorModel",
+        functionModel: "js/etl-wizard/data-mapper-component/models/FunctionModel",
+        customValueModel: "js/etl-wizard/data-mapper-component/models/CustomValueModel",
+        attributeModel: "js/etl-wizard/data-mapper-component/models/AttributeModel",
+        dataMapper: "js/etl-wizard/data-mapper-component/data-mapper",
+        dataMapperUtil: "js/etl-wizard/data-mapper-component/util/data-mapper-util",
+        // output option configurator components for ETL Wizard
+        outputConfigurator: "js/etl-wizard/output-option-configurator/output-configurator",
+        groupByConfigurator:"js/etl-wizard/output-option-configurator/components/group-by-component",
+        orderByConfigurator:"js/etl-wizard/output-option-configurator/components/order-by-component",
+        advancedOutputConfiguration:"js/etl-wizard/output-option-configurator/components/advanced-output-options-component",
+        // ETL Wizard Components  <-- end
     },
     map: {
         "*": {

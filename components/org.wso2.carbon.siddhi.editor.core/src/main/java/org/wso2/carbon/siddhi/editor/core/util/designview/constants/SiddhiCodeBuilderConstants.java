@@ -38,6 +38,7 @@ public class SiddhiCodeBuilderConstants {
     public static final char SPACE = ' ';
     public static final char HASH = '#';
     public static final String MULTI_DOUBLE_QUOTE_REGEX = "(.*)\"(.*)\"(.*)\"";
+    public static final String INDENT = "\t";
     // Brackets
     public static final char OPEN_BRACKET = '(';
     public static final char CLOSE_BRACKET = ')';
