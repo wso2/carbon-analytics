@@ -37,19 +37,24 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'csvMapper', 'xmlMapper'
             this.__container.empty();
             switch (this.__config.mapping.type) {
                 case 'csv':
-                    mapper = new CSVMapper(this.__sourceOrSinkType, this.__container, this.__config, selectedExtension);
+                    mapper = new CSVMapper(this.__sourceOrSinkType,
+                        this.__container, this.__config, selectedExtension);
                     break;
                 case 'xml':
-                    mapper = new XMLMapper(this.__sourceOrSinkType, this.__container, this.__config, selectedExtension);
+                    mapper = new XMLMapper(this.__sourceOrSinkType,
+                        this.__container, this.__config, selectedExtension);
                     break;
                 case 'json':
-                    mapper = new JSONMapper(this.__sourceOrSinkType, this.__container, this.__config, selectedExtension);
+                    mapper = new JSONMapper(this.__sourceOrSinkType,
+                        this.__container, this.__config, selectedExtension);
                     break;
                 case 'text':
-                    mapper = new TextMapper(this.__sourceOrSinkType, this.__container, this.__config, selectedExtension);
+                    mapper = new TextMapper(this.__sourceOrSinkType,
+                        this.__container, this.__config, selectedExtension);
                     break;
                 case 'avro':
-                    mapper = new AvroMapper(this.__sourceOrSinkType, this.__container, this.__config, selectedExtension);
+                    mapper = new AvroMapper(this.__sourceOrSinkType,
+                        this.__container, this.__config, selectedExtension);
                     break;
             }
 

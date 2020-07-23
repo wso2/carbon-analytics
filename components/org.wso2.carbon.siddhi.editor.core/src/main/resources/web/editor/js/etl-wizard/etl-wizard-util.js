@@ -39,13 +39,17 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'app/source-edit
                         if (hasMatchingType) {
                             switch (DataMapperUtil.getGenericDataType(type.toLowerCase())) {
                                 case 'text':
-                                    hasMatchingType = sourceConfig.properties[key].value.length > 0 && typeof sourceConfig.properties[key].value === 'string';
+                                    hasMatchingType = sourceConfig.properties[key].value.length > 0
+                                        && typeof sourceConfig.properties[key].value === 'string';
                                     break;
                                 case 'number':
-                                    hasMatchingType = sourceConfig.properties[key].value.length > 0 && /[-.0-9]+/.test(sourceConfig.properties[key].value);
+                                    hasMatchingType = sourceConfig.properties[key].value.length > 0
+                                        && /[-.0-9]+/.test(sourceConfig.properties[key].value);
                                     break;
                                 case 'bool':
-                                    hasMatchingType = sourceConfig.properties[key].value.length > 0 && (sourceConfig.properties[key].value === 'true' || sourceConfig.properties[key].value === 'false');
+                                    hasMatchingType = sourceConfig.properties[key].value.length > 0
+                                        && (sourceConfig.properties[key].value === 'true' 
+                                            || sourceConfig.properties[key].value === 'false');
                                     break;
                             }
                         }
@@ -94,13 +98,17 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'app/source-edit
                         if (hasMatchingType) {
                             switch (DataMapperUtil.getGenericDataType(type.toLowerCase())) {
                                 case 'text':
-                                    hasMatchingType = inputConfig.mapping.properties[key].value.length > 0 && typeof inputConfig.mapping.properties[key].value === 'string';
+                                    hasMatchingType = inputConfig.mapping.properties[key].value.length > 0
+                                        && typeof inputConfig.mapping.properties[key].value === 'string';
                                     break;
                                 case 'number':
-                                    hasMatchingType = inputConfig.mapping.properties[key].value.length > 0 && /[-.0-9]+/.test(inputConfig.mapping.properties[key].value);
+                                    hasMatchingType = inputConfig.mapping.properties[key].value.length > 0
+                                        && /[-.0-9]+/.test(inputConfig.mapping.properties[key].value);
                                     break;
                                 case 'bool':
-                                    hasMatchingType = inputConfig.mapping.properties[key].value.length > 0 && (inputConfig.mapping.properties[key].value === 'true' || sourceConfig.properties[key].value === 'false');
+                                    hasMatchingType = inputConfig.mapping.properties[key].value.length > 0
+                                        && (inputConfig.mapping.properties[key].value === 'true' 
+                                                || sourceConfig.properties[key].value === 'false');
                                     break;
                             }
                         }
@@ -127,13 +135,17 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'app/source-edit
                         if (hasMatchingType) {
                             switch (DataMapperUtil.getGenericDataType(type.toLowerCase())) {
                                 case 'text':
-                                    hasMatchingType = outputConfig.mapping.properties[key].value.length > 0 && typeof outputConfig.mapping.properties[key].value === 'string';
+                                    hasMatchingType = outputConfig.mapping.properties[key].value.length > 0
+                                        && typeof outputConfig.mapping.properties[key].value === 'string';
                                     break;
                                 case 'number':
-                                    hasMatchingType = outputConfig.mapping.properties[key].value.length > 0 && /[-.0-9]+/.test(outputConfig.mapping.properties[key].value);
+                                    hasMatchingType = outputConfig.mapping.properties[key].value.length > 0
+                                        && /[-.0-9]+/.test(outputConfig.mapping.properties[key].value);
                                     break;
                                 case 'bool':
-                                    hasMatchingType = outputConfig.mapping.properties[key].value.length > 0 && (outputConfig.mapping.properties[key].value === 'true' || sourceConfig.properties[key].value === 'false');
+                                    hasMatchingType = outputConfig.mapping.properties[key].value.length > 0
+                                        && (outputConfig.mapping.properties[key].value === 'true'
+                                            || sourceConfig.properties[key].value === 'false');
                                     break;
                             }
                         }
@@ -176,13 +188,17 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'app/source-edit
                             if (windowValidity) {
                                 switch (DataMapperUtil.getGenericDataType(type.toLowerCase())) {
                                     case 'text':
-                                        windowValidity = queryConfig.window.parameters[key].value.length > 0 && typeof queryConfig.window.parameters[key].value === 'string';
+                                        windowValidity = queryConfig.window.parameters[key].value.length > 0
+                                            && typeof queryConfig.window.parameters[key].value === 'string';
                                         break;
                                     case 'number':
-                                        windowValidity = queryConfig.window.parameters[key].value.length > 0 && /[-.0-9]+/.test(queryConfig.window.parameters[key].value);
+                                        windowValidity = queryConfig.window.parameters[key].value.length > 0
+                                            && /[-.0-9]+/.test(queryConfig.window.parameters[key].value);
                                         break;
                                     case 'bool':
-                                        windowValidity = queryConfig.window.parameters[key].value.length > 0 && (queryConfig.window.parameters[key].value === 'true' || sourceConfig.properties[key].value === 'false');
+                                        windowValidity = queryConfig.window.parameters[key].value.length > 0
+                                            && (queryConfig.window.parameters[key].value === 'true'
+                                                || sourceConfig.properties[key].value === 'false');
                                         break;
                                 }
                             }
@@ -201,13 +217,17 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'app/source-edit
                             if (functionValidity) {
                                 switch (DataMapperUtil.getGenericDataType(type.toLowerCase())) {
                                     case 'text':
-                                        functionValidity = queryConfig.function.parameters[key].value.length > 0 && typeof queryConfig.function.parameters[key].value === 'string';
+                                        functionValidity = queryConfig.function.parameters[key].value.length > 0 
+                                            && typeof queryConfig.function.parameters[key].value === 'string';
                                         break;
                                     case 'number':
-                                        functionValidity = queryConfig.function.parameters[key].value.length > 0 && /[-.0-9]+/.test(queryConfig.function.parameters[key].value);
+                                        functionValidity = queryConfig.function.parameters[key].value.length > 0
+                                            && /[-.0-9]+/.test(queryConfig.function.parameters[key].value);
                                         break;
                                     case 'bool':
-                                        functionValidity = queryConfig.function.parameters[key].value.length > 0 && (queryConfig.function.parameters[key].value === 'true' || sourceConfig.properties[key].value === 'false');
+                                        functionValidity = queryConfig.function.parameters[key].value.length > 0 
+                                            && (queryConfig.function.parameters[key].value === 'true' 
+                                                || sourceConfig.properties[key].value === 'false');
                                         break;
                                 }
                             }

@@ -41,7 +41,8 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'scopeNode'],
             var allowRepetitive = false;
             var repetitiveDataTypes = [];
 
-            functionParameterRegexp.exec(syntax.syntax) ? functionParameterRegexp.exec(syntax.syntax)[1].split(',').forEach(function(param) {
+            functionParameterRegexp.exec(syntax.syntax) ? functionParameterRegexp.exec(syntax.syntax)[1]
+                .split(',').forEach(function(param) {
                 var temp = param.trim().split(' ');
 
                 var dataTypes = temp[0].match(/<(.*?)>/)[1].split('|').map(function(type) {

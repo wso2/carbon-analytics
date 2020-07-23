@@ -86,15 +86,30 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                             var paramData = config.query.function.parameters[key];
                             functionDataContainer.append(`
                                 <div style="width: 100%; padding-bottom: 10px" class="input-section">
-                                    <label style="margin-bottom: 0" class="${paramData.value.length > 0 ? '' : 'not-visible'}" id="label-function-param-${key.replaceAll(/\./g, '-')}" for="function-param-${key.replaceAll(/\./g, '-')}">${key}</label>
-                                    <input id="function-param-${key.replaceAll(/\./g, '-')}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #373737" placeholder="${key}" type="text" value="${paramData.value}">
+                                    <label 
+                                        style="margin-bottom: 0" class="${paramData.value.length > 0 ? 
+                                                                                        '' : 'not-visible'}" 
+                                        id="label-function-param-${key.replaceAll(/\./g, '-')}" 
+                                        for="function-param-${key.replaceAll(/\./g, '-')}"
+                                    >
+                                        ${key}
+                                    </label>
+                                    <input 
+                                        id="function-param-${key.replaceAll(/\./g, '-')}" 
+                                        style="width: 100%; border: none; background-color: transparent; 
+                                            border-bottom: 1px solid #373737" placeholder="${key}" 
+                                            type="text" 
+                                            value="${paramData.value}"
+                                    >
                                 </div>
                             `);
                         });
                     
                     if(self.__allowRepetitiveParameters) {
                         functionDataContainer.append(`
-                            <button id="btn-add-repetitive-param" class="btn btn-default">Add repetitive parameter</button>
+                            <button id="btn-add-repetitive-param" class="btn btn-default">
+                                Add repetitive parameter
+                            </button>
                         `);
 
                         functionDataContainer.find('#btn-add-repetitive-param')
@@ -125,11 +140,13 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                             var inputId = evt.currentTarget.id.match('function-param-([a-zA-Z\-\.0-9]+)')[1];
                             if ($(evt.currentTarget).val().length === 0) {
                                 container.find(`#label-function-param-${inputId}`).addClass('not-visible');
-                                $(evt.currentTarget).attr('placeholder', container.find(`#label-function-param-${inputId}`).html());
+                                $(evt.currentTarget)
+                                    .attr('placeholder', container.find(`#label-function-param-${inputId}`).html());
                             }
                         })
                         .on('keyup', _.debounce(function (evt) {
-                            var inputId = evt.currentTarget.id.match('function-param-([a-zA-Z\-\.0-9]+)')[1].replaceAll(/-/g, '.');
+                            var inputId = evt.currentTarget.id
+                                .match('function-param-([a-zA-Z\-\.0-9]+)')[1].replaceAll(/-/g, '.');
                             config.query.function.parameters[inputId].value = $(evt.currentTarget).val();
                         }, 100, {}))
                 }
@@ -145,7 +162,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                     if (functionData.syntax.length > 1) {
                         var functionDataContainer = container.find('.function-parameter-section');
                         functionDataContainer.empty();
-                        functionDataContainer.append('<h6 style="color: #373737">Select function syntax to proceed</h6>');
+                        functionDataContainer
+                            .append('<h6 style="color: #373737">Select function syntax to proceed</h6>');
                         var functionList = $('<ul></ul>');
 
                         functionData.syntax.forEach(function (syntax, i) {
@@ -153,7 +171,12 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                                     <li class="" id="syntax-id-${i}">
                                         <a style="color:#333">
                                             <div style="padding: 10px 15px;border-bottom: 1px solid #373737" >
-                                                <b>${syntax.syntax.replaceAll(/</g, '&lt;').replaceAll(/>/g, '&gt;')}</b>
+                                                <b>
+                                                ${
+                                                    syntax.syntax
+                                                        .replaceAll(/</g, '&lt;')
+                                                        .replaceAll(/>/g, '&gt;')
+                                                }</b>
                                             </div>
                                         </a>    
                                     </li>
@@ -209,28 +232,31 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
             var allowRepetitive = false;
             var repetitiveDataTypes = [];
 
-            functionParameterRegexp.exec(syntax.syntax) ? functionParameterRegexp.exec(syntax.syntax)[1].split(',').forEach(function (param) {
-                var temp = param.trim().split(' ');
+            functionParameterRegexp.exec(syntax.syntax) ? functionParameterRegexp
+                                                            .exec(syntax.syntax)[1]
+                                                            .split(',')
+                .forEach(function (param) {
+                    var temp = param.trim().split(' ');
 
-                var dataTypes = temp[0].match(/<(.*?)>/)[1].split('|').map(function (type) {
-                    return type.toLowerCase();
-                });
+                    var dataTypes = temp[0].match(/<(.*?)>/)[1].split('|').map(function (type) {
+                        return type.toLowerCase();
+                    });
 
-                var placeHolder = syntax.parameterData[temp[1]];
+                    var placeHolder = syntax.parameterData[temp[1]];
 
-                if (!(temp[1].indexOf('...') > -1)) {
-                    var paramNode = {};
-                    paramNode.name = temp[1];
-                    paramNode.dataTypes = dataTypes;
-                    paramNode.placeholder = placeHolder;
-                    paramNode.value = '';
+                    if (!(temp[1].indexOf('...') > -1)) {
+                        var paramNode = {};
+                        paramNode.name = temp[1];
+                        paramNode.dataTypes = dataTypes;
+                        paramNode.placeholder = placeHolder;
+                        paramNode.value = '';
 
-                    parameters.push(paramNode);
-                } else {
-                    allowRepetitive = true;
-                    repetitiveDataTypes = dataTypes;
-                }
-            }) : null;
+                        parameters.push(paramNode);
+                    } else {
+                        allowRepetitive = true;
+                        repetitiveDataTypes = dataTypes;
+                    }
+                }) : null;
 
             this.__allowRepetitiveParameters = allowRepetitive;
             this.__repetitiveParameterTypes = repetitiveDataTypes;
