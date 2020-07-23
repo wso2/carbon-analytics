@@ -36,11 +36,11 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'scopeModel'],
 
         FunctionModel.prototype.generateParameters = function(syntax) {
             var parameters = [];
-            var regExp = /\(([^)]+)\)/;
+            var functionParameterRegExp = /\(([^)]+)\)/;
             var allowRepetitive = false;
             var repetitiveDataTypes = [];
 
-            regExp.exec(syntax.syntax) ? regExp.exec(syntax.syntax)[1].split(',').forEach(function(param) {
+            functionParameterRegExp.exec(syntax.syntax) ? functionParameterRegExp.exec(syntax.syntax)[1].split(',').forEach(function(param) {
                 var temp = param.trim().split(' ');
 
                 var dataTypes = temp[0].match(/<(.*?)>/)[1].split('|').map(function(type) {

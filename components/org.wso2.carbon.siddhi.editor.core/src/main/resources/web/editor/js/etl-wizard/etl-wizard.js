@@ -560,10 +560,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 });
 
                 config.properties = {};
-                // config.possibleOptions = {};
                 sourceData.parameters
                     .filter(function (el) {
-                        // config.possibleOptions[el.name] = el;
                         return !el.optional;
                     })
                     .forEach(function (param) {
@@ -785,7 +783,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
                 config.type = $(evt.currentTarget).val();
                 config.properties = {};
-                // config.possibleProperties = {};
                 config.attributes = {};
                 config.payload = '';
                 config.customEnabled = false;
@@ -794,11 +791,9 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 if(mapper.parameters) {
                     mapper.parameters
                     .filter(function (el) {
-                        // config.possibleProperties[el.name] = el;
                         return !el.optional;
                     })
                     .forEach(function (el) {
-                        // el['value'] = el.defaultValue;
                         var mapperData = {};
                         mapperData.value = el.defaultValue;
                         mapperData.type = el.type;
@@ -897,15 +892,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 query: {
                     window: {},
                     filter: {
-                        // enable: true,
-                        // expression: 'haha'
                     },
                     function: {
-                        // enable: true,
-                        // text: `rdbms:query("INFO", "Sample Event :", true)`
                     },
                     mapping: {
-                        // id: "id"
                     },
                     groupby: {
                         attributes: [],

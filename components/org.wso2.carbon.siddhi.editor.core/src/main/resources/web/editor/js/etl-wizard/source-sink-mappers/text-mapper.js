@@ -145,7 +145,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     return param.name === optionName;
                 })
 
-                // config.properties[optionName] = config.possibleProperties[optionName];
                 config.properties[optionName] = {}
                 config.properties[optionName].value = extensionData.defaultValue;
                 config.properties[optionName].type = extensionData.type;
@@ -214,8 +213,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     Attribute mappings:
                 </div>
             `);
-
-            
 
             container.find('.sample-payload-submit-section').append(`
                 <div style="display: flex; width: 100%" >

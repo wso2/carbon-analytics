@@ -174,8 +174,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
         FunctionInputOptionComponent.prototype.renderParametersFromSyntax = function (functionData, syntax) {
             var self = this;
             var config = this.__config;            
-            var regExp = /\(([^)]+)\)/;
-            var parameters = regExp.exec(syntax.syntax)[1].split(',');
+            var functionParameterRegexp = /\(([^)]+)\)/;
+            var parameters = functionParameterRegexp.exec(syntax.syntax)[1].split(',');
             config.query.function['parameters'] = {}
             parameters.forEach(function (param) {
                 var parameterName = param.trim().split(' ')[1];
@@ -205,11 +205,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
 
         FunctionInputOptionComponent.prototype.generateParameters = function (syntax) {
             var parameters = [];
-            var regExp = /\(([^)]+)\)/;
+            var functionParameterRegexp = /\(([^)]+)\)/;
             var allowRepetitive = false;
             var repetitiveDataTypes = [];
 
-            regExp.exec(syntax.syntax) ? regExp.exec(syntax.syntax)[1].split(',').forEach(function (param) {
+            functionParameterRegexp.exec(syntax.syntax) ? functionParameterRegexp.exec(syntax.syntax)[1].split(',').forEach(function (param) {
                 var temp = param.trim().split(' ');
 
                 var dataTypes = temp[0].match(/<(.*?)>/)[1].split('|').map(function (type) {

@@ -293,7 +293,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                 break;
                         }
                     } else {
-    
                         var customDataTypes = []
                         if (tempExpression.returnTypes.indexOf('bool') > -1) {
                             config.output.stream.attributes
@@ -301,7 +300,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                     allowedAttributes[attr.name] = attr;
                                 });
                             customDataTypes = ['text', 'number', 'bool'];
-    
                         } else {
                             config.output.stream.attributes
                                 .filter(function (attr) {
@@ -593,8 +591,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
 
                 $(container.find('.operand-category-select>a')[0]).click();
             }
-
-
         }
 
         return QueryGroupByComponent;

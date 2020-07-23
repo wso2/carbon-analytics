@@ -258,8 +258,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                         }
                         self.render();
                     });
-
-
             }
 
         }

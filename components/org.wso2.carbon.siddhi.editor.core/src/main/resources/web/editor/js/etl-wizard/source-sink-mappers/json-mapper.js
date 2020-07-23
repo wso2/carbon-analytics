@@ -231,8 +231,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 }
             }
 
-            
-
             container.find('.btn-clear-mapping')
                 .on('click', function(evt) {
                     config.mapping.samplePayload = '';
@@ -242,17 +240,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     }
                     self.render();
                 });
-
-            // container.append(`
-            //     <div style="display: flex; padding-top: 10px" class="sample-payload-submit-section">
-            //         <input id="sample-payload-submit-input" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Enter the sample payload here" type="text" value="">
-            //         <button style="background-color: #ee6719" class="btn btn-default btn-add-sample-payload">Submit</button>
-            //     </div>
-            // `);
-
-            // console.log('real-payload', config.mapping.payload);
-            // console.log('sample-payload', config.mapping.payload);
-
 
             if (config.mapping.samplePayload.length > 0 || config.mapping.payload.length > 0) {
                 var jsonObject = config.mapping.samplePayload.length > 0 ?
