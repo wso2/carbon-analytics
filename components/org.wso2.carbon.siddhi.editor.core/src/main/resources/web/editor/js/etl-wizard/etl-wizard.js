@@ -52,6 +52,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             this.__expressionData = undefined;
             this.__previousSchemaDef = undefined;
             this.__resetSchema = false;
+            this.__parentDimension = {
+                height: 0,
+                width: 0
+            }
 
             //object structure used to store data
             this.__propertyMap = generateUIDataModel(initOpts.dataModel);
@@ -163,7 +167,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 }
                                 break;
                             case 2:
-                                // wizardObj.find('.next-btn').popover({});
                                 if(etlWizardUtil.isInputMappingValid(config.input)) {
                                     self.incrementStep(wizardObj);
                                 } else {
@@ -173,6 +176,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         }
                         break;
                     case 2:
+                        if(etlWizardUtil.areInputOptionsValid(config.query)) {
+                            self.incrementStep(wizardObj);
+                        } else {
+                            Alerts.error('Invalid input option configuration please check the mapping configuration');
+                        }
+                        break;
+                    case 3:
                         switch (self.__substep) {
                             case 0:
                                 if (etlWizardUtil.isSourceSinkConfigValid(config.output.sink)) {
@@ -197,25 +207,18 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 break;
                         }
                         break;
-                    case 3:
-                        if(etlWizardUtil.areInputOptionsValid(config.query)) {
-                            self.incrementStep(wizardObj);
-                        } else {
-                            Alerts.error('Invalid input option configuration please check the mapping configuration');
-                        }
-                        break;
                     case 4:
-                        if(etlWizardUtil.validateDataMapping(config)) {
-                            self.incrementStep(wizardObj);
-                        } else {
-                            Alerts.error('Please perform the attribute mapping for all the output attributes');
-                        }
-                        break;
-                    case 5:
                         if(etlWizardUtil.validateGroupBy(config.query.groupby) && etlWizardUtil.validateAdvancedOutputOptions(config.query.advanced)) {
                             self.incrementStep(wizardObj);
                         } else {
                             Alerts.error('Please recheck the output options before submitting');
+                        }
+                        break;
+                    case 5:
+                        if(etlWizardUtil.validateDataMapping(config)) {
+                            self.incrementStep(wizardObj);
+                        } else {
+                            Alerts.error('Please perform the attribute mapping for all the output attributes');
                         }
                         break;
                 }
@@ -269,7 +272,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         ETLWizard.prototype.incrementStep = function (wizardObj) {
             var self = this;
             if (self.__stepIndex < 6) {
-                if (self.__stepIndex < 3 && self.__substep < 2) {
+                if ((self.__stepIndex === 1 || self.__stepIndex===3) && self.__substep < 2) {
                     self.__substep++;
                 } else {
                     wizardObj.find(`#step-${self.__stepIndex++}`).removeClass('selected');
@@ -349,24 +352,22 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     this.renderInputOutputMapper(constants.SOURCE_TYPE);
                     break;
                 case 2:
+                    var inputOptionConfigurator = new InputOptionConfigurator(wizardBodyContent, self.__propertyMap);
+                    inputOptionConfigurator.render();
+                    break;
+                case 3:
                     this.renderSourceSinkConfigurator(constants.SINK_TYPE);
                     this.renderSchemaConfigurator(constants.SINK_TYPE);
                     this.renderInputOutputMapper(constants.SINK_TYPE);
                     break;
-                case 3:
-                    var inputOptionConfigurator = new InputOptionConfigurator(wizardBodyContent, self.__propertyMap);
-                    inputOptionConfigurator.render();
-                    break;
                 case 4:
+                    var outputConfigurator = new OutputConfigurator(wizardBodyContent, self.__propertyMap);
+                    outputConfigurator.render();
+                    break;
+                case 5:
                     var dataMapperContainer = self.__$parent_el_container.find('.etl-task-wizard-container').clone();
                     wizardBodyContent.append(dataMapperContainer);
                     new DataMapper(dataMapperContainer, self.__propertyMap);
-
-                    break;
-                case 5:
-                    var outputConfigurator = new OutputConfigurator(wizardBodyContent, self.__propertyMap);
-                    outputConfigurator.render();
-                    // TODO Output option configurator
                     break;
                 case 6:
                     wizardBodyContent.empty();
@@ -374,7 +375,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     break;
             }
 
-            if(this.__stepIndex < 3) {
+            if(this.__stepIndex === 1 || this.__stepIndex === 3) {
                 var containers = wizardBodyContent.find('.content-section');
                 for (let i = 0; i < containers.length; i++) {
                     if(i!==this.__substep) {
@@ -389,6 +390,24 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             }
 
             updateButtonBar(wizardFooterContent, this.__stepIndex);
+
+            // handle parent container resizing
+            var observer = new ResizeObserver(_.debounce((e) => {
+                if (self.__parentDimension.height === 0 && self.__parentDimension.width === 0) {
+                    self.__parentDimension.height = e[0].contentRect.height;
+                    self.__parentDimension.width = e[0].contentRect.width
+                }
+
+                console.log(e[0].contentRect.height, self.__parentDimension);
+                console.log(e[0].contentRect.width, self.__parentDimension);
+
+                if(e[0].contentRect.height !== self.__parentDimension.height || e[0].contentRect.width !== self.__parentDimension.width) {
+                    self.__parentDimension.height = e[0].contentRect.height;
+                    self.__parentDimension.width = e[0].contentRect.width
+                    self.render();
+                }
+            }, 300, {}));
+            observer.observe(self.__$parent_el_container[0]);
         };
 
         ETLWizard.prototype.renderSourceSinkConfigurator = function (type) {
