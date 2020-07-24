@@ -59,8 +59,7 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil'],
         ScopeModel.prototype.constructor = ScopeModel;
 
         ScopeModel.prototype.isValid = function () {
-            return this.rootNode && _.intersection(this.rootNode.genericReturnTypes,
-                                                        this.genericReturnTypes).length > 0;
+            return this.rootNode && _.intersection(this.rootNode.genericReturnTypes, this.genericReturnTypes).length > 0;
         }
 
         return ScopeModel;

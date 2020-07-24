@@ -35,47 +35,26 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
             container.append(`
                 <div style="font-size: 1.8rem; margin-bottom: 15px">
                     Configure output rate & limits<br/>
-                    <small style="font-size: 1.3rem">
-                        Advanced options to configure output rate and limit where data will be published 
-                        to the destination
-                    </small>
+                    <small style="font-size: 1.3rem">Advanced options to configure output rate and limit where data will be published to the destination</small>
                 </div>
                 <div class="offset-container">
                     Set offset for batch outputs
                     <span title="When events are emitted as a batch, offset allows you to offset beginning of the output event batch"><i class="fw fw-info"></i></span>
-                    <button 
-                        style="background-color: #ee6719"
-                        class="btn btn-default btn-circle btn-enable" 
-                        id="allow-offset"
-                        type="button" 
-                        data-toggle="dropdown"
-                    >
+                    <button style="background-color: #ee6719" class="btn btn-default btn-circle btn-enable" id="allow-offset" type="button" data-toggle="dropdown">
                         <i class="fw ${Object.keys(config.query.advanced.offset).length > 0 ? 'fw-check' : 'fw-minus'}"></i>
                     </button>
                 </div>
                 <div class="limit-container" style="margin-top: 15px;">
                     Set limit to batch outputs 
-                    <span 
-                        title="When events are emitted as a batch, limit allows you to 
-                        limit the number of events in the batch from the defined offset(default=0)">
-                        <i class="fw fw-info"></i>
-                    </span>
-                    <button 
-                        style="background-color: #ee6719" 
-                        class="btn btn-default btn-circle btn-enable" 
-                        id="allow-limit" type="button" data-toggle="dropdown">
-                            <i class="fw ${
-                                            Object.keys(config.query.advanced.limit).length > 0 ? 
-                                                'fw-check' : 'fw-minus'}"></i>
+                    <span title="When events are emitted as a batch, limit allows you to limit the number of events in the batch from the defined offset(default=0)"><i class="fw fw-info"></i></span>
+                    <button style="background-color: #ee6719" class="btn btn-default btn-circle btn-enable" id="allow-limit" type="button" data-toggle="dropdown">
+                        <i class="fw ${Object.keys(config.query.advanced.limit).length > 0 ? 'fw-check' : 'fw-minus'}"></i>
                     </button>
                 </div>
                 <div class="rate-container" style="margin-top: 15px;">
                     Set rate of output events
-                    <span title="Output rate limiting allows queries to output events 
-                        periodically based on a specified condition."><i class="fw fw-info"></i></span>
-                    <button style="background-color: #ee6719" 
-                        class="btn btn-default btn-circle btn-enable" 
-                        id="allow-rate" type="button" data-toggle="dropdown">
+                    <span title="Output rate limiting allows queries to output events periodically based on a specified condition."><i class="fw fw-info"></i></span>
+                    <button style="background-color: #ee6719" class="btn btn-default btn-circle btn-enable" id="allow-rate" type="button" data-toggle="dropdown">
                         <i class="fw ${Object.keys(config.query.advanced.ratelimit).length > 0 ? 'fw-check' : 'fw-minus'}"></i>
                     </button>
                 </div>
@@ -122,13 +101,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                     .append(`
                         <div>
                             <label style="margin-bottom: 0" class="" for="txt-offset">offset index</label>
-                            <input 
-                                id="txt-offset" 
-                                style="width: 100%; border: none; background-color: transparent;
-                                 border-bottom: 1px solid #333" placeholder="Type here to enter"
-                                type="number" 
-                                value="${config.query.advanced.offset.value}"
-                            >
+                            <input id="txt-offset" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.offset.value}">
                         </div>
                     `);
 
@@ -143,14 +116,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                     .append(`
                         <div>
                             <label style="margin-bottom: 0" class="" for="txt-limit">event limit</label>
-                            <input 
-                                id="txt-limit" 
-                                style="width: 100%; border: none; background-color: transparent; 
-                                    border-bottom: 1px solid #333" 
-                                placeholder="Type here to enter" 
-                                type="number" 
-                                value="${config.query.advanced.limit.value}"
-                            >
+                            <input id="txt-limit" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.limit.value}">
                         </div>
                     `);
 
@@ -191,13 +157,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                         </br>
                                         <span style="margin-top: 5px">output time limit</span>
                                         <div>
-                                            <input 
-                                                id="txt-rate-val" 
-                                                style="width: 75%; border: none; background-color: transparent; 
-                                                    border-bottom: 1px solid #333" placeholder="Type here to enter" 
-                                                type="number" 
-                                                value="${config.query.advanced.ratelimit['value']}"
-                                            >
+                                            <input id="txt-rate-val" style="width: 75%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.ratelimit['value']}">
                                             <select id="select-granularity">
                                                 <option value="sec">second</option>
                                                 <option value="min">minute</option>
@@ -213,15 +173,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             if(!config.query.advanced.ratelimit['event-selection']) {
                                 config.query.advanced.ratelimit['event-selection'] = 'every';
                             }
-                            self.__container.find('.rate-container #select-granularity')
-                                .val(config.query.advanced.ratelimit['granularity'].toLowerCase());
-                            self.__container.find('#select-event-type')
-                                .val(config.query.advanced.ratelimit['event-selection']);
+                            self.__container.find('.rate-container #select-granularity').val(config.query.advanced.ratelimit['granularity'].toLowerCase());
+                            self.__container.find('#select-event-type').val(config.query.advanced.ratelimit['event-selection']);
                             
-                            if(config.query.advanced.ratelimit['event-selection']
-                                && config.query.advanced.ratelimit['event-selection'].length > 0) {
-                                self.__container.find('.select-event-type')
-                                    .val(config.query.advanced.ratelimit['event-selection']);
+                            if(config.query.advanced.ratelimit['event-selection'] && config.query.advanced.ratelimit['event-selection'].length > 0) {
+                                self.__container.find('.select-event-type').val(config.query.advanced.ratelimit['event-selection']);
                             }
                             self.__container.find('#select-event-type').on('change', function(evt) {
                                 config.query.advanced.ratelimit['event-selection'] = $(evt.currentTarget).val();
@@ -240,14 +196,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                         </br>
                                         <span>output events every</span>
                                         <div>
-                                            <input 
-                                                id="txt-rate-val" 
-                                                style="width: 75%; border: none; background-color: transparent; 
-                                                    border-bottom: 1px solid #333" 
-                                                placeholder="Type here to enter" 
-                                                type="number" 
-                                                value="${config.query.advanced.ratelimit['value']}"
-                                            >
+                                            <input id="txt-rate-val" style="width: 75%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.ratelimit['value']}">
                                             <span>&nbsp;events</span>    
                                         </div>
                                     </div>
@@ -257,8 +206,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                 config.query.advanced.ratelimit['event-selection'] = 'every';
                             }
                             
-                            self.__container.find('#select-event-type')
-                                .val(config.query.advanced.ratelimit['event-selection']);
+                            self.__container.find('#select-event-type').val(config.query.advanced.ratelimit['event-selection']);
                             self.__container.find('#select-event-type').on('change', function(evt) {
                                 config.query.advanced.ratelimit['event-selection'] = $(evt.currentTarget).val();
                             });
@@ -269,12 +217,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                     <div>
                                         <span>output events every</span>
                                         <div>
-                                            <input 
-                                                id="txt-rate-val" 
-                                                style="width: 75%; border: none; background-color: transparent; 
-                                                    border-bottom: 1px solid #333" placeholder="Type here to enter" 
-                                                    type="number" value="${config.query.advanced.ratelimit['value']}"
-                                            >
+                                            <input id="txt-rate-val" style="width: 75%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.ratelimit['value']}">
                                             <select id="select-granularity">
                                                 <option value="sec">second</option>
                                                 <option value="min">minute</option>

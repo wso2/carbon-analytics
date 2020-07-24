@@ -333,17 +333,12 @@ function (require, $, _, log) {
                             htmlContent += ` ${childNode.symbol} `;
                             break;
                         case 'function':
-                            htmlContent += `<span class="item-${i} 
-                                                ${highlightIndex != null ? 
-                                                    (highlightIndex === i ? 'selected' : '') : ''}">`;
+                            htmlContent += `<span class="item-${i} ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''}">`;
                             htmlContent += generateExpressionHTML(highlightIndex, childNode);
                             htmlContent += '</span>';
                             break;
                         case 'scope':
-                            htmlContent += `<span class="item-${i} ${highlightIndex != null ? 
-                                                (highlightIndex === i ? 'selected' : '') : ''} 
-                                                ${childNode.children.length > 0 ? 'ok-clear' : ''}">
-                                                (${generateExpressionHTML(null, childNode)})</span>`;
+                            htmlContent += `<span class="item-${i} ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''} ${childNode.children.length > 0 ? 'ok-clear' : ''}">(${generateExpressionHTML(null, childNode)})</span>`;
                             break;
                     }
                     i++;
@@ -359,19 +354,13 @@ function (require, $, _, log) {
 
                         if (parameterNode.nodeType === 'scope') {
                             // title="${parameterNode.placeholder}"
-                            htmlContent += `<span title="${parameterNode.placeholder}" 
-                                        class="param-${i} 
-                                            ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''} 
-                                            ${parameterNode.children.length > 0 ? 'ok-clear' : ''}"
-                                        >
-                                            ${generateExpressionHTML(null, parameterNode)}</span>`;
+                            htmlContent += `<span title="${parameterNode.placeholder}" class="param-${i} ${highlightIndex != null ? (highlightIndex === i ? 'selected' : '') : ''} ${parameterNode.children.length > 0 ? 'ok-clear' : ''}">${generateExpressionHTML(null, parameterNode)}</span>`;
                         }
                         isFirst = false;
                         i++;
                     });
                     if (node.allowRepetitiveParameters) {
-                        htmlContent += `<span title="Add parameter" style="display: none;" class="add-param">
-                            <i style="font-size: 1.3rem; padding-left: 1rem;" class="fw fw-import"></i></span>`
+                        htmlContent += `<span title="Add parameter" style="display: none;" class="add-param"><i style="font-size: 1.3rem; padding-left: 1rem;" class="fw fw-import"></i></span>`
                     }
                     htmlContent += `)`;
 
@@ -397,13 +386,11 @@ function (require, $, _, log) {
                     break;
                 case 'operator':
                     if (node.hasLeft) {
-                        node.leftNode ? htmlContent +=
-                            generateExpressionHTML2(node.leftNode, `${id}-l`, highlightCoordinate) : '...'
+                        node.leftNode ? htmlContent += generateExpressionHTML2(node.leftNode, `${id}-l`, highlightCoordinate) : '...'
                     }
                     htmlContent += ` ${node.symbol} `
                     if (node.hasRight) {
-                        node.rightNode ? htmlContent +=
-                            generateExpressionHTML2(node.rightNode, `${id}-r`, highlightCoordinate) : '...'
+                        node.rightNode ? htmlContent += generateExpressionHTML2(node.rightNode, `${id}-r`, highlightCoordinate) : '...'
                     }
                     break;
                 case 'function':
@@ -413,19 +400,12 @@ function (require, $, _, log) {
                         if (!isFirst) {
                             htmlContent += ', '
                         }
-                        htmlContent += `<span class="${param.rootNode ? 'ok-clear': ''}" 
-                                              title="${param.placeholder}" 
-                                              id="item${id}-${i}" 
-                                        >
-                                            ${generateExpressionHTML2(param, `${id}-${i}`, highlightCoordinate)}
-                                        </span>`
+                        htmlContent += `<span class="${param.rootNode ? 'ok-clear': ''}" title="${param.placeholder}" id="item${id}-${i}" >${generateExpressionHTML2(param, `${id}-${i}`, highlightCoordinate)}</span>`
 
                         isFirst = false;
                     })
                     if (node.allowRepetitiveParameters) {
-                        htmlContent += `<span title="Add parameter" style="display: none;" class="add-param">
-                                            <i style="font-size: 1.3rem; padding-left: 1rem;" class="fw fw-import"></i>
-                                        </span>`
+                        htmlContent += `<span title="Add parameter" style="display: none;" class="add-param"><i style="font-size: 1.3rem; padding-left: 1rem;" class="fw fw-import"></i></span>`
                     }
                     htmlContent += `)${id.length > 0 ? `</span>`: ''}`;
                     break;
@@ -436,8 +416,7 @@ function (require, $, _, log) {
                     } else {
                         htmlContent += `
                             <span id="item${id}" >
-                                (&nbsp;${node.rootNode? 
-                                        generateExpressionHTML2(node.rootNode, `${id}-n`) : '...'}&nbsp;)
+                                (&nbsp;${node.rootNode? generateExpressionHTML2(node.rootNode, `${id}-n`) : '...'}&nbsp;)
                             </span>`;
                     }
                     break;
@@ -478,8 +457,5 @@ function (require, $, _, log) {
             return errorsFound === 0;
         }
 
-        return {
-            getGenericDataType, OperatorMap, OperatorMap2, generateExpressionHTML, generateExpressionHTML2,
-            validateExpressionTree
-        };
+        return { getGenericDataType, OperatorMap, OperatorMap2, generateExpressionHTML, generateExpressionHTML2, validateExpressionTree };
     });
