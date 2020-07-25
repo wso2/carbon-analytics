@@ -59,7 +59,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                                                     <div style="padding: 15px;">
                                                         <img src="/editor/images/filter-query.svg" class="tool-image">
                                                         <div style="text-align:center">
-                                                            Filter Input
+                                                            Apply Filter
                                                         </div>
                                                     </div>
                                                 </a>
@@ -95,7 +95,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                                                     <div style="vertical-align:middle">
                                                         <img src="/editor/images/window-query.svg" class="tool-image">
                                                         <div style="text-align:center">
-                                                            Window Input
+                                                            Aggregate Input
                                                         </div>
                                                     </div>
                                                 </div>
@@ -105,7 +105,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                                                     <div style="vertical-align:middle">
                                                         <img src="/editor/images/function-query.svg" class="tool-image">
                                                         <div style="text-align:center">
-                                                            Function Input
+                                                            Apply Stream Processor Function
                                                         </div>
                                                     </div>
                                                 </div>

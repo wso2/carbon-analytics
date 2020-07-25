@@ -57,6 +57,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 width: 0
             }
 
+            this.__saved = null;
+
             //object structure used to store data
             this.__propertyMap = generateUIDataModel(initOpts.dataModel);
             this.__stepIndex = 1;
@@ -93,7 +95,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 placement: 'top',
             });
 
-            if(self.__previousSchemaDef.length > 0 && !_.isEqual(self.__previousSchemaDef, newSchemaDef)) {
+            if(self.__previousSchemaDef && self.__previousSchemaDef.length > 0 && !_.isEqual(self.__previousSchemaDef, newSchemaDef)) {
 
                 wizardObj.find('.next-btn').popover('show');
                 wizardObj.find(`#${wizardObj.find('.next-btn').attr('aria-describedby')} .popover-confirm-proceed`).on('click', function (e) {
@@ -246,7 +248,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             wizardObj.find('.save-btn').on('click', function () {
                 var dataModel = generateSourceGenDataModel(self.__propertyMap);
-                var result = saveSiddhiApp(dataModel);
+                var result  = self.__saved = saveSiddhiApp(dataModel);
+
+                if (result.status) {
+                    self.__options.application.commandManager.dispatch("open-folder", "workspace");
+                    self.__options.application.workspaceManager.updateMenuItems();
+                }
+
                 wizardObj.find(`#step-${self.__stepIndex++}`).removeClass('selected');
                 wizardObj.find(`#step-${self.__stepIndex}`).addClass('selected');
                 self.render(result);
@@ -287,7 +295,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         ETLWizard.prototype.decrementStep = function (wizardObj) {
             var self = this;
             if (self.__stepIndex > 0) {
-                if (self.__stepIndex < 3 && self.__substep > 0) {
+                if ((self.__stepIndex == 1 || self.__stepIndex == 3) && self.__substep > 0) {
                     self.__substep--;
                 } else {
                     wizardObj.find(`#step-${self.__stepIndex--}`).removeClass('selected');
@@ -365,6 +373,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     outputConfigurator.render();
                     break;
                 case 5:
+                    this.__saved = null;
                     var dataMapperContainer = self.__$parent_el_container.find('.etl-task-wizard-container').clone();
                     wizardBodyContent.append(dataMapperContainer);
                     new DataMapper(dataMapperContainer, self.__propertyMap);
@@ -398,13 +407,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     self.__parentDimension.width = e[0].contentRect.width
                 }
 
-                console.log(e[0].contentRect.height, self.__parentDimension);
-                console.log(e[0].contentRect.width, self.__parentDimension);
-
-                if(e[0].contentRect.height !== self.__parentDimension.height || e[0].contentRect.width !== self.__parentDimension.width) {
+                if(e[0].contentRect.height !== self.__parentDimension.height
+                    || e[0].contentRect.width !== self.__parentDimension.width) {
                     self.__parentDimension.height = e[0].contentRect.height;
                     self.__parentDimension.width = e[0].contentRect.width
-                    self.render();
+                    self.render(self.__saved);
                 }
             }, 300, {}));
             observer.observe(self.__$parent_el_container[0]);
@@ -504,7 +511,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 <div>
                                     <div class="option-title">${param.name}</div><br/>
                                     <small style="opacity: 0.8">${param.description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}</small><br/>
-                                    <small style="opacity: 0.8"><b>Default Value</b>: ${param.defaultValue}</small>
+                                    <small style="opacity: 0.8"><b>Default Value</b>: ${param.defaultValue.replaceAll(/\`/g, '')}</small>
                                 </div>
                             </a>
                         `)
@@ -566,7 +573,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     });
 
                     config.properties[optionName] = {};
-                    config.properties[optionName].value = selectedOption.defaultValue;
+                    config.properties[optionName].value = selectedOption.defaultValue.replaceAll(/`/g, '');
                     config.properties[optionName].type = selectedOption.type;
                     self.render();
                 });

@@ -46,6 +46,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             this.outputAttributeEndpoints = {};
             this.connectionMapRef = {};
             this.expressionMap = config.query.mapping;
+            console.log(this.expressionMap);
             this.coordinate = [];
             this.focusNode = [];
             this.selectedCategory = null;
@@ -268,7 +269,8 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
 
             $(this.container).find('.dialog-heading').text('');
             $(this.container).find('.dialog-heading')
-                .append(`Create expression for: <b>${this.currenOutputElement}</b>`);
+                .append(`Create expression for 
+                            <b>${this.currenOutputElement}</b> of <b>${config.output.stream.name}</b>`);
 
             // render the main Expression
             expressionContainer.empty();
@@ -279,7 +281,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 expressionContainer.append(`
                     <div class="expression target" style="display: flex">
                         <div class="exp-content" style="width: 100%;">
-                        <i style="color: #808080">expression: </i>
+                        <i style="color: #808080">${config.output.stream.name}.${this.currenOutputElement} = </i>
                             ${
                                 typeof expression !== 'string' ?
                                     DataMapperUtil.generateExpressionHTML2(expression, '', null)
@@ -605,7 +607,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     <li>
                         <a>
                              <div class="attribute-category">
-                                 Attribute
+                                 Input Attributes
                              </div>
                          </a>
                      </li>
@@ -665,7 +667,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             <a id="custom_val_input_container" style="color: #333">
                                 <div class="attribute" style="display: flex; flex-wrap: wrap;">
                                     <div class="description" style="width: 100%;">
-                                       Add a custom value to the expression
+                                       Add constant to the expression
                                     </div>
                                     <div style="width: 100%;">
                                         Custom Value
