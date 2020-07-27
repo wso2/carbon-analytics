@@ -78,16 +78,27 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
 
                 if (config.query.function['parameters'] && Object.keys(config.query.function['parameters']).length > 0) {
                     var functionDataContainer = container.find('.function-parameter-section');
+                    var functionData = self.__functionData[config.query.function.name];
+
                     functionDataContainer.empty();
-                    functionDataContainer.append('<h6 style="color: #373737">Select function syntax to proceed</h6>');
+                    functionDataContainer.append('<h6 style="color: #373737">Function Parameters:</h6>');
 
                     Object.keys(config.query.function.parameters)
                         .forEach(function(key, i) {
                             var paramData = config.query.function.parameters[key];
+                            var paramDescription = functionData.parameters
+                                .filter((datum) => datum.name === key)[0].description;
                             functionDataContainer.append(`
-                                <div style="width: 100%; padding-bottom: 10px" class="input-section">
-                                    <label style="margin-bottom: 0" class="${paramData.value.length > 0 ? '' : 'not-visible'}" id="label-function-param-${key.replaceAll(/\./g, '-')}" for="function-param-${key.replaceAll(/\./g, '-')}">${key}</label>
-                                    <input id="function-param-${key.replaceAll(/\./g, '-')}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #373737" placeholder="${key}" type="text" value="${paramData.value}">
+                                <div style="display: flex">
+                                    <div style="flex:1; padding-bottom: 10px" class="input-section">
+                                        <label style="margin-bottom: 0" class="${paramData.value.length > 0 ? '' : 'not-visible'}" id="label-function-param-${key.replaceAll(/\./g, '-')}" for="function-param-${key.replaceAll(/\./g, '-')}">${key}</label>
+                                        <input id="function-param-${key.replaceAll(/\./g, '-')}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #373737" placeholder="${key}" type="text" value="${paramData.value}">
+                                    </div>
+                                    <div>
+                                        <a style="color: #323232">
+                                            <i title="${paramDescription}" class="fw fw-info"></i>
+                                        </a>
+                                    </div>
                                 </div>
                             `);
                         });
