@@ -9,6 +9,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
             this.__allowRepetitiveParameters = false;
             this.__repetitiveParameterTypes = [];
             this.__repetitiveParamName = '';
+            this.__repetitiveParameterDescription = '';
 
             var extensionData = CompletionEngine.getRawMetadata().extensions;
 
@@ -88,7 +89,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                         .forEach(function(key, i) {
                             var paramData = config.query.function.parameters[key];
                             var paramDescription = functionData.parameters
-                                .filter((datum) => datum.name === key)[0].description;
+                                .filter(datum => datum.name === key);
                             functionDataContainer.append(`
                                 <div style="display: flex">
                                     <div style="flex:1; padding-bottom: 10px" class="input-section">
@@ -105,9 +106,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                                             border-bottom: 1px solid #373737" placeholder="${key}" 
                                             type="text" value="${paramData.value}">
                                     </div>
-                                    <div>
+                                    <div style="padding: 20px 0">
                                         <a style="color: #323232">
-                                            <i title="${paramDescription}" class="fw fw-info"></i>
+                                            <i title="${paramDescription[0] ? 
+                                                paramDescription[0].description 
+                                                : self.__repetitiveParameterDescription}" class="fw fw-info"></i>
                                         </a>
                                     </div>
                                 </div>
@@ -165,6 +168,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                 .on('change', function (evt) {
                     var functionID = $(evt.currentTarget).val();
                     var functionData = self.__functionData[functionID];
+                    self.__allowRepetitiveParameters = false;
                     var syntax = null;
                     config.query.function = {enable: true, name: functionID}
 
@@ -224,6 +228,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                         self.__allowRepetitiveParameters = true;
                         self.__repetitiveParameterTypes = functionData.parameters[paramDataIndex].type;
                         self.__repetitiveParamName = functionData.parameters[paramDataIndex].name;
+                        self.__repetitiveParameterDescription = functionData.parameters[paramDataIndex].description;
                     }
                 }
             });
