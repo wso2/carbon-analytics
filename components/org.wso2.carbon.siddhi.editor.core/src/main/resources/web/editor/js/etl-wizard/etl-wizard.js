@@ -445,13 +445,28 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     ${
                         type !== constants.SOURCE_TYPE ?
                             `<div style="display: flex; padding-top:15px">
-                                <div style="width: 100%;padding-top: 5px">
+                                <div style="padding-top: 5px">
                                     Store mapping errors
                                 </div>
-                                <div>
-                                    <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-enable-error-handling" type="button" data-toggle="dropdown">
-                                        <i class="fw ${config.addOnError ? 'fw-check' : 'fw-minus'}"></i>
-                                    </button>
+                                <div style="margin-left: 15px">
+                                    <div id="btn-group-enable-on-error" class="btn-group btn-group-toggle" data-toggle="buttons">
+                                        <label class="btn" 
+                                                style="${
+                                                    config.addOnError ?
+                                                        "background-color: rgb(91,203,92); color: white;"
+                                                        : "background-color: rgb(100,109,118); color: white;"}" 
+                                         >
+                                            <input type="radio" name="options" id="enable" autocomplete="off"> <i class="fw fw-check"></i>
+                                        </label>
+                                        <label class="btn" 
+                                                style="${
+                                                    !config.addOnError ?
+                                                        "background-color: red; color: white;"
+                                                        : "background-color: rgb(100,109,118); color: white;"}" 
+                                        >
+                                            <input type="radio" name="options" id="disable" autocomplete="off"> <i class="fw fw-cancel"></i>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>` : ''
                     }
@@ -484,7 +499,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 </div>
             `);
 
-            wizardBodyContent.find('#btn-enable-error-handling').on('click', function(evt) {
+            wizardBodyContent.find('#btn-group-enable-on-error .btn').on('click', function(evt) {
                 config.addOnError = !config.addOnError;
                 self.render();
             });
@@ -638,14 +653,30 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         Configure Schema<br/>
                         <small style="font-size: 1.3rem">Configure ${type === constants.SOURCE_TYPE ? 'input' : 'output'} stream definition</small>
                     </div>
+                    
                     <div style="display: flex; padding-top:15px">
-                        <div style="width: 100%;padding-top: 5px">
+                        <div style="padding-top: 5px">
                             Add log sink for testing
                         </div>
-                        <div>
-                            <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-enable-log-sink" type="button" data-toggle="dropdown">
-                                <i class="fw ${config.addLog ? 'fw-check' : 'fw-minus'}"></i>
-                            </button>
+                        <div style="margin-left: 15px">
+                            <div id="btn-group-enable-log-sink" class="btn-group btn-group-toggle" data-toggle="buttons">
+                                <label class="btn" 
+                                        style="${
+                                            config.addLog ?
+                                                "background-color: rgb(91,203,92); color: white;"
+                                                : "background-color: rgb(100,109,118); color: white;"}" 
+                                 >
+                                    <input type="radio" name="options" id="enable" autocomplete="off"> <i class="fw fw-check"></i>
+                                </label>
+                                <label class="btn" 
+                                        style="${
+                                            !config.addLog ?
+                                                "background-color: red; color: white;"
+                                                : "background-color: rgb(100,109,118); color: white;"}" 
+                                >
+                                    <input type="radio" name="options" id="disable" autocomplete="off"> <i class="fw fw-cancel"></i>
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <div style="padding-top: 10px">
@@ -671,10 +702,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 </div>
             `);
 
-            wizardBodyContent.find('#btn-enable-log-sink').on('click', function(evt) {
+            wizardBodyContent.find('#btn-group-enable-log-sink .btn').on('click', (evt) => {
                 config.addLog = !config.addLog;
                 self.render();
-            });
+            })
+
             var attributeTypeDiv = wizardBodyContent.find('#stream-attribute-type-dropdown');
 
             constants.SUPPORTED_DATA_TYPES.forEach(function (dataType) {

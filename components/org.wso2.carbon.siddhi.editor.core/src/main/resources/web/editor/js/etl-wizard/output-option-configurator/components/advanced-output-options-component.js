@@ -38,25 +38,91 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                     <small style="font-size: 1.3rem">Advanced options to configure output rate and limit where data will be published to the destination</small>
                 </div>
                 <div class="offset-container">
-                    Set offset for batch outputs
-                    <span title="When events are emitted as a batch, offset allows you to offset beginning of the output event batch"><i class="fw fw-info"></i></span>
-                    <button style="background-color: #ee6719" class="btn btn-default btn-circle btn-enable" id="allow-offset" type="button" data-toggle="dropdown">
-                        <i class="fw ${Object.keys(config.query.advanced.offset).length > 0 ? 'fw-check' : 'fw-minus'}"></i>
-                    </button>
+                    <div style="display: flex">
+                        <div>
+                            Set offset for batch outputs
+                            <span title="When events are emitted as a batch, offset allows you to offset beginning of the output event batch"><i class="fw fw-info"></i></span>
+                        </div>
+                        <div style="margin-left: 15px">
+                            <div id="allow-offset" class="btn-group btn-group-toggle btn-enable" data-toggle="buttons">
+                                <label class="btn" 
+                                        style="${
+                                        Object.keys(config.query.advanced.offset).length > 0 ?
+                                            "background-color: rgb(91,203,92); color: white;"
+                                            : "background-color: rgb(100,109,118); color: white;"}" 
+                                 >
+                                    <input type="radio" name="options" id="enable" autocomplete="off"> <i class="fw fw-check"></i>
+                                </label>
+                                <label class="btn" 
+                                        style="${
+                                        !(Object.keys(config.query.advanced.offset).length > 0) ?
+                                            "background-color: red; color: white;"
+                                            : "background-color: rgb(100,109,118); color: white;"}" 
+                                >
+                                    <input type="radio" name="options" id="disable" autocomplete="off"> <i class="fw fw-cancel"></i>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
                 </div>
                 <div class="limit-container" style="margin-top: 15px;">
-                    Set limit to batch outputs 
-                    <span title="When events are emitted as a batch, limit allows you to limit the number of events in the batch from the defined offset(default=0)"><i class="fw fw-info"></i></span>
-                    <button style="background-color: #ee6719" class="btn btn-default btn-circle btn-enable" id="allow-limit" type="button" data-toggle="dropdown">
-                        <i class="fw ${Object.keys(config.query.advanced.limit).length > 0 ? 'fw-check' : 'fw-minus'}"></i>
-                    </button>
+                    <div style="display: flex">
+                        <div>
+                            Set limit to batch outputs 
+                            <span title="When events are emitted as a batch, limit allows you to limit the number of events in the batch from the defined offset(default=0)"><i class="fw fw-info"></i></span>
+                        </div>
+                        <div style="margin-left: 15px">
+                            <div id="allow-limit" class="btn-group btn-group-toggle btn-enable" data-toggle="buttons">
+                                <label class="btn" 
+                                        style="${
+                                            Object.keys(config.query.advanced.limit).length > 0 ?
+                                                "background-color: rgb(91,203,92); color: white;"
+                                                : "background-color: rgb(100,109,118); color: white;"}" 
+                                 >
+                                    <input type="radio" name="options" id="enable" autocomplete="off"> <i class="fw fw-check"></i>
+                                </label>
+                                <label class="btn" 
+                                        style="${
+                                            !(Object.keys(config.query.advanced.limit).length > 0) ?
+                                                "background-color: red; color: white;"
+                                                : "background-color: rgb(100,109,118); color: white;"}" 
+                                >
+                                    <input type="radio" name="options" id="disable" autocomplete="off"> <i class="fw fw-cancel"></i>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
                 </div>
                 <div class="rate-container" style="margin-top: 15px;">
-                    Set rate of output events
-                    <span title="Output rate limiting allows queries to output events periodically based on a specified condition."><i class="fw fw-info"></i></span>
-                    <button style="background-color: #ee6719" class="btn btn-default btn-circle btn-enable" id="allow-rate" type="button" data-toggle="dropdown">
-                        <i class="fw ${Object.keys(config.query.advanced.ratelimit).length > 0 ? 'fw-check' : 'fw-minus'}"></i>
-                    </button>
+                    <div style="display: flex">
+                        <div>
+                            Set rate of output events
+                            <span title="Output rate limiting allows queries to output events periodically based on a specified condition."><i class="fw fw-info"></i></span>
+                        </div>
+                        <div style="margin-left: 15px">
+                            <div id="allow-rate" class="btn-group btn-group-toggle btn-enable" data-toggle="buttons">
+                                <label class="btn" 
+                                        style="${
+                                            Object.keys(config.query.advanced.ratelimit).length > 0 ?
+                                                "background-color: rgb(91,203,92); color: white;"
+                                                : "background-color: rgb(100,109,118); color: white;"}"
+                                 >
+                                    <input type="radio" name="options" id="enable" autocomplete="off"> <i class="fw fw-check"></i>
+                                </label>
+                                <label class="btn" 
+                                        style="${
+                                            !(Object.keys(config.query.advanced.ratelimit).length > 0) ?
+                                                "background-color: red; color: white;"
+                                                : "background-color: rgb(100,109,118); color: white;"}" 
+                                >
+                                    <input type="radio" name="options" id="disable" autocomplete="off"> <i class="fw fw-cancel"></i>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `);
 

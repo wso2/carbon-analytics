@@ -134,15 +134,36 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
             if(config.query.groupby.attributes.length > 0) {
                 container.find('#having-option-container')
                     .append(`
-                        <div style="margin-top: 15px">
-                            <span>Set having condition : </span>
-                            <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-enable-groupby-filter" type="button" data-toggle="dropdown">
-                                ${Object.keys(config.query.groupby.havingFilter).length === 0 ? '<i class="fw fw-minus"></i>' : '<i class="fw fw-check"></i>'} 
-                            </button>
+                        <div style="margin-top: 15px; display: flex">
+                            <div style="">
+                                <span>Set having condition : </span>
+                            </div>
+                            <div>
+                               <div style="margin-left: 15px">
+                                    <div id="btn-group-enable-groupby-filter" class="btn-group btn-group-toggle" data-toggle="buttons">
+                                        <label class="btn" 
+                                                style="${
+                                                    Object.keys(config.query.groupby.havingFilter).length !== 0 ?
+                                                            "background-color: rgb(91,203,92); color: white;"
+                                                            : "background-color: rgb(100,109,118); color: white;"}" 
+                                         >
+                                            <input type="radio" name="options" id="enable" autocomplete="off"> <i class="fw fw-check"></i>
+                                        </label>
+                                        <label class="btn" 
+                                                style="${
+                                                    Object.keys(config.query.groupby.havingFilter).length === 0 ?
+                                                            "background-color: red; color: white;"
+                                                            : "background-color: rgb(100,109,118); color: white;"}" 
+                                        >
+                                            <input type="radio" name="options" id="disable" autocomplete="off"> <i class="fw fw-cancel"></i>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     `);
                 
-                container.find('#btn-enable-groupby-filter').on('click', function(evt) {
+                container.find('#btn-group-enable-groupby-filter .btn').on('click', function(evt) {
                     if(config.query.groupby.havingFilter['enabled']) {
                         config.query.groupby.havingFilter = {};
                     } else {
