@@ -504,7 +504,13 @@ public class ExportUtils {
                     "Readme file " + filePath.toString() + " is not readable."
             );
         }
+
         byte[] readmeContent = Files.readAllBytes(filePath);
+
+        if(filePath.getFileName().toString().equals(KUBERNETES_FILE_NAME)) {
+            readmeContent = getKubernetesFile(filePath);
+        }
+
         zipOutputStream.write(readmeContent, 0, readmeContent.length);
         zipOutputStream.closeEntry();
     }

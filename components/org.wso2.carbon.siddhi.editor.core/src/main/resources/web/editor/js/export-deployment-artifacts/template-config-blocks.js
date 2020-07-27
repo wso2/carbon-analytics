@@ -4,7 +4,7 @@
 
  define(function() {
      var TemplateConfigBlocks = function () {
-        this.sampleDatasourceConfig =  'dataSources: \n' +
+        this.sampleDatasourceConfig =  'wso2.dataSources: \n' +
            '  - name: SIDDHI_TEST_DB \n' +
            '    description: The datasource used for test database \n' +
            '    jndiConfig: \n' +
@@ -21,7 +21,7 @@
            '        connectionTestQuery: SELECT 1 \n' +
            '        validationTimeout: 30000 \n' +
            '        isAutoCommit: false \n';
-        this.sampleMetricsConfig =  'metrics: \n' +
+        this.sampleMetricsConfig =  'wso2.metrics: \n' +
            '  enabled: true \n' +
            'metrics.prometheus: \n' +
            '  reporting: \n' +
@@ -29,13 +29,14 @@
            '      - name: prometheus \n' +
            '        enabled: true \n' +
            '        serverURL: "http://0.0.0.0:9005" \n';
-        this.sampleExtensionsConfig =  'extensions: \n' +
-           '  - \n' +
-           '    extension: \n' +
-           '      name: extension_name \n' +
-           '      namespace: extension_namespace \n' +
-           '      properties: \n' +
-           '        key: value \n';
+        this.sampleExtensionsConfig =  'siddhi:' +
+           '  extensions: \n' +
+           '    - \n' +
+           '      extension: \n' +
+           '        name: extension_name \n' +
+           '        namespace: extension_namespace \n' +
+           '        properties: \n' +
+           '          key: value \n';
         this.sampleRefsConfig = 'refs: \n' +
            '  - \n' +
            '    ref: \n' +
