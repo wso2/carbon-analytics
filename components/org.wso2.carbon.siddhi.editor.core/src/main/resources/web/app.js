@@ -156,7 +156,6 @@ requirejs.config({
         dockerImageTypeDialog: "js/export-deployment-artifacts/docker-image-type-dialog",
         fillTemplateValueDialog: "js/export-deployment-artifacts/fill-template-value-dialog",
         kubernetesConfigDialog: "js/export-deployment-artifacts/kubernetes-config-dialog",
-<<<<<<< HEAD
         // ETL Wizard Components  <-- start
         etlWizard: "js/etl-wizard/etl-wizard",
         etlWizardUtil: "js/etl-wizard/etl-wizard-util",
@@ -184,9 +183,7 @@ requirejs.config({
         orderByConfigurator:"js/etl-wizard/output-option-configurator/components/order-by-component",
         advancedOutputConfiguration:"js/etl-wizard/output-option-configurator/components/advanced-output-options-component",
         // ETL Wizard Components  <-- end
-=======
         cronGenerator: "js/design-view/cron-generator/cron-generator"
->>>>>>> 674307b462070413f13899c5fc10093b14c8751c
     },
     map: {
         "*": {
