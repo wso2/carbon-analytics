@@ -34,12 +34,16 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
 
             container.empty();
             container.append(`
-                <div style="max-height: ${self.__container.offsetHeight}; flex-direction: column; margin: 0;margin-right:5px; background: rgb(162 162 162)" class="content-section">
+                <div style="max-height: ${self.__container.offsetHeight}; 
+                    flex-direction: column; margin: 0;margin-right:5px; background: rgb(162 162 162)" 
+                    class="content-section">
                     
                     ${
                         Object.keys(self.__config.query.filter).length > 0 ?
                             `                    
-                            <div class="input-option-container-filter" style="display: flex; height: calc(100%); flex-direction: column" >
+                            <div 
+                                class="input-option-container-filter" 
+                                style="display: flex; height: calc(100%); flex-direction: column" >
                                 <div style="display:flex;">
                                     <div style="flex:1;color: transparent">placeholder</div>
                                     <div class="grey-on-hover" style="padding: 5px; text-align: center;">
@@ -54,10 +58,13 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                                 <div style="height: 100%; width: 100%;">
                                     <div style="display:table; height: 100%; width: 100%;">
                                         <div style="display:table-cell; vertical-align: middle;">
-                                            <div style="display: flex; width: fit-content; margin-left: auto; margin-right: auto;">
-                                                <a  id="btn-add-filter" class='enable-input-option grey-on-hover' style="color: #222;">
+                                            <div style="display: flex; width: fit-content; 
+                                                margin-left: auto; margin-right: auto;">
+                                                <a  id="btn-add-filter" 
+                                                    class='enable-input-option grey-on-hover' style="color: #222;">
                                                     <div style="padding: 15px;">
-                                                        <img src="/editor/images/filter-query.svg" class="tool-image">
+                                                        <img src="/editor/images/filter-query.svg" 
+                                                            class="tool-image">
                                                         <div style="text-align:center">
                                                             Apply Filter
                                                         </div>
@@ -74,11 +81,14 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                 ${
                     Object.keys(self.__config.query.window).length > 0 || Object.keys(self.__config.query.function).length > 0 ?
                         `
-                            <div class="input-option-container-${Object.keys(config.query.window).length > 0 ? 'window' : 'function'}" style="display: flex; height: calc(100% - 15px); flex-direction: column" >
+                            <div class="input-option-container-${Object.keys(config.query.window).length > 0 ? 
+                                'window' : 'function'}" 
+                                style="display: flex; height: calc(100% - 15px); flex-direction: column" >
                                 <div style="display:flex;">
                                     <div style="flex:1;color: transparent">placeholder</div>
                                     <div class="grey-on-hover" style="padding: 5px; text-align: center;">
-                                        <a id="btn-add-${Object.keys(config.query.window).length > 0 ? 'window' : 'function'}" class="enable-input-option" style="color: #222">
+                                        <a id="btn-add-${Object.keys(config.query.window).length > 0 ? 
+                                            'window' : 'function'}" class="enable-input-option" style="color: #222">
                                             <div><i class="fw fw-cancel"></i></div
                                             <div>Cancel</div>
                                         </a>
@@ -89,8 +99,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                             <div style="height: 100%; width: 100%; display:flex; flex-direction:column">
                                 <div style="display:table; height: 100%; width: 100%;">
                                     <div style="display:table-cell; vertical-align: middle;">
-                                        <div style="display: flex; width: fit-content; margin-left: auto; margin-right: auto;">
-                                            <a  id="btn-add-window" class='enable-input-option grey-on-hover' style="color: #222;flex:1">
+                                        <div style="display: flex; width: fit-content; 
+                                            margin-left: auto; margin-right: auto;">
+                                            <a  id="btn-add-window" 
+                                                class='enable-input-option grey-on-hover' style="color: #222;flex:1">
                                                 <div style="padding: 15px;">
                                                     <div style="vertical-align:middle">
                                                         <img src="/editor/images/window-query.svg" class="tool-image">
@@ -100,7 +112,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                                                     </div>
                                                 </div>
                                             </a>
-                                            <a  id="btn-add-function" class='enable-input-option grey-on-hover' style="color: #222;flex:1">
+                                            <a  id="btn-add-function" 
+                                                class='enable-input-option grey-on-hover' style="color: #222;flex:1">
                                                 <div style="padding: 15px;">
                                                     <div style="vertical-align:middle">
                                                         <img src="/editor/images/function-query.svg" class="tool-image">
@@ -120,7 +133,9 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'filterInputOptionCompon
                 </div>
             `);
 
-            var inputOptionSection = $('<div class="input-option-section" style="width: 100%;display: flex;flex: 1;flex-direction: column;padding:15px;background-color: rgba(162,162,162,1);"></div>');
+            var inputOptionSection = $('<div class="input-option-section" ' +
+                'style="width: 100%;display: flex;flex: 1;flex-direction: column;' +
+                'padding:15px;background-color: rgba(162,162,162,1);"></div>');
 
             self.__container.find('.enable-input-option')
                 .on('click', function (evt) {

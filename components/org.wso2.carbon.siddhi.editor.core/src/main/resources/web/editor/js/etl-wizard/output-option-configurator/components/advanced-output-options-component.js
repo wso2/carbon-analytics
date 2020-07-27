@@ -16,9 +16,11 @@
  * under the License.
  */
 
-define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorModel', 'attributeModel', 'customValueModel', 'dataMapperUtil'],
+define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorModel',
+        'attributeModel', 'customValueModel', 'dataMapperUtil'],
 
-    function (require, $, _, log, Alerts, ScopeModel, OperatorModel, AttributeModel, CustomValueModel, DataMapperUtil) {
+    function (require, $, _, log, Alerts, ScopeModel, OperatorModel, AttributeModel,
+              CustomValueModel, DataMapperUtil) {
         var AdvancedOutputConfigurationComponent = function (container, config) {
             this.__container = container;
             this.__config = config;
@@ -31,17 +33,29 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
             var config = this.__config;
             var container = this.__container;
 
+            var offsetDescription = "When events are emitted as a batch, offset allows you to offset " +
+                "beginning of the output event batch";
+            var limitDescription = "When events are emitted as a batch, limit allows you to limit the " +
+                "number of events in the batch from the defined offset(default=0)"
+            var rateDescription = "Output rate limiting allows queries to output events periodically based on " +
+                "a specified condition."
+
             container.empty();
             container.append(`
                 <div style="font-size: 1.8rem; margin-bottom: 15px">
                     Configure output rate & limits<br/>
-                    <small style="font-size: 1.3rem">Advanced options to configure output rate and limit where data will be published to the destination</small>
+                    <small style="font-size: 1.3rem">
+                        Advanced options to configure output rate and limit where data will be published to 
+                        the destination
+                    </small>
                 </div>
                 <div class="offset-container">
                     <div style="display: flex">
                         <div>
                             Set offset for batch outputs
-                            <span title="When events are emitted as a batch, offset allows you to offset beginning of the output event batch"><i class="fw fw-info"></i></span>
+                            <span title="${offsetDescription}">
+                                <i class="fw fw-info"></i>
+                            </span>
                         </div>
                         <div style="margin-left: 15px">
                             <div id="allow-offset" class="btn-group btn-group-toggle btn-enable" data-toggle="buttons">
@@ -51,7 +65,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                             "background-color: rgb(91,203,92); color: white;"
                                             : "background-color: rgb(100,109,118); color: white;"}" 
                                  >
-                                    <input type="radio" name="options" id="enable" autocomplete="off"> <i class="fw fw-check"></i>
+                                    <input type="radio" name="options" id="enable" autocomplete="off"> 
+                                    <i class="fw fw-check"></i>
                                 </label>
                                 <label class="btn" 
                                         style="${
@@ -59,7 +74,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                             "background-color: red; color: white;"
                                             : "background-color: rgb(100,109,118); color: white;"}" 
                                 >
-                                    <input type="radio" name="options" id="disable" autocomplete="off"> <i class="fw fw-cancel"></i>
+                                    <input type="radio" name="options" id="disable" autocomplete="off"> 
+                                    <i class="fw fw-cancel"></i>
                                 </label>
                             </div>
                         </div>
@@ -71,7 +87,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                     <div style="display: flex">
                         <div>
                             Set limit to batch outputs 
-                            <span title="When events are emitted as a batch, limit allows you to limit the number of events in the batch from the defined offset(default=0)"><i class="fw fw-info"></i></span>
+                            <span title="${limitDescription}"><i class="fw fw-info"></i></span>
                         </div>
                         <div style="margin-left: 15px">
                             <div id="allow-limit" class="btn-group btn-group-toggle btn-enable" data-toggle="buttons">
@@ -81,7 +97,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                                 "background-color: rgb(91,203,92); color: white;"
                                                 : "background-color: rgb(100,109,118); color: white;"}" 
                                  >
-                                    <input type="radio" name="options" id="enable" autocomplete="off"> <i class="fw fw-check"></i>
+                                    <input type="radio" name="options" id="enable" autocomplete="off"> 
+                                    <i class="fw fw-check"></i>
                                 </label>
                                 <label class="btn" 
                                         style="${
@@ -89,7 +106,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                                 "background-color: red; color: white;"
                                                 : "background-color: rgb(100,109,118); color: white;"}" 
                                 >
-                                    <input type="radio" name="options" id="disable" autocomplete="off"> <i class="fw fw-cancel"></i>
+                                    <input type="radio" name="options" id="disable" autocomplete="off"> 
+                                    <i class="fw fw-cancel"></i>
                                 </label>
                             </div>
                         </div>
@@ -100,7 +118,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                     <div style="display: flex">
                         <div>
                             Set rate of output events
-                            <span title="Output rate limiting allows queries to output events periodically based on a specified condition."><i class="fw fw-info"></i></span>
+                            <span title="${rateDescription}"><i class="fw fw-info"></i></span>
                         </div>
                         <div style="margin-left: 15px">
                             <div id="allow-rate" class="btn-group btn-group-toggle btn-enable" data-toggle="buttons">
@@ -110,7 +128,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                                 "background-color: rgb(91,203,92); color: white;"
                                                 : "background-color: rgb(100,109,118); color: white;"}"
                                  >
-                                    <input type="radio" name="options" id="enable" autocomplete="off"> <i class="fw fw-check"></i>
+                                    <input type="radio" name="options" id="enable" autocomplete="off"> 
+                                    <i class="fw fw-check"></i>
                                 </label>
                                 <label class="btn" 
                                         style="${
@@ -118,7 +137,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                                 "background-color: red; color: white;"
                                                 : "background-color: rgb(100,109,118); color: white;"}" 
                                 >
-                                    <input type="radio" name="options" id="disable" autocomplete="off"> <i class="fw fw-cancel"></i>
+                                    <input type="radio" name="options" id="disable" autocomplete="off"> 
+                                    <i class="fw fw-cancel"></i>
                                 </label>
                             </div>
                         </div>
@@ -167,7 +187,9 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                     .append(`
                         <div>
                             <label style="margin-bottom: 0" class="" for="txt-offset">offset index</label>
-                            <input id="txt-offset" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.offset.value}">
+                            <input id="txt-offset" style="width: 100%; border: none; background-color: transparent; 
+                            border-bottom: 1px solid #333" placeholder="Type here to enter" 
+                            type="number" value="${config.query.advanced.offset.value}">
                         </div>
                     `);
 
@@ -182,7 +204,9 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                     .append(`
                         <div>
                             <label style="margin-bottom: 0" class="" for="txt-limit">event limit</label>
-                            <input id="txt-limit" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.limit.value}">
+                            <input id="txt-limit" style="width: 100%; border: none; background-color: transparent; 
+                                border-bottom: 1px solid #333" placeholder="Type here to enter" 
+                            type="number" value="${config.query.advanced.limit.value}">
                         </div>
                     `);
 
@@ -223,7 +247,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                         </br>
                                         <span style="margin-top: 5px">output time limit</span>
                                         <div>
-                                            <input id="txt-rate-val" style="width: 75%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.ratelimit['value']}">
+                                            <input id="txt-rate-val" style="width: 75%; border: none; 
+                                            background-color: transparent; border-bottom: 1px solid #333" 
+                                            placeholder="Type here to enter" type="number" 
+                                            value="${config.query.advanced.ratelimit['value']}">
                                             <select id="select-granularity">
                                                 <option value="sec">second</option>
                                                 <option value="min">minute</option>
@@ -239,11 +266,15 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             if(!config.query.advanced.ratelimit['event-selection']) {
                                 config.query.advanced.ratelimit['event-selection'] = 'every';
                             }
-                            self.__container.find('.rate-container #select-granularity').val(config.query.advanced.ratelimit['granularity'].toLowerCase());
-                            self.__container.find('#select-event-type').val(config.query.advanced.ratelimit['event-selection']);
+                            self.__container.find('.rate-container #select-granularity')
+                                .val(config.query.advanced.ratelimit['granularity'].toLowerCase());
+                            self.__container.find('#select-event-type')
+                                .val(config.query.advanced.ratelimit['event-selection']);
                             
-                            if(config.query.advanced.ratelimit['event-selection'] && config.query.advanced.ratelimit['event-selection'].length > 0) {
-                                self.__container.find('.select-event-type').val(config.query.advanced.ratelimit['event-selection']);
+                            if(config.query.advanced.ratelimit['event-selection']
+                                && config.query.advanced.ratelimit['event-selection'].length > 0) {
+                                self.__container.find('.select-event-type')
+                                    .val(config.query.advanced.ratelimit['event-selection']);
                             }
                             self.__container.find('#select-event-type').on('change', function(evt) {
                                 config.query.advanced.ratelimit['event-selection'] = $(evt.currentTarget).val();
@@ -262,7 +293,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                         </br>
                                         <span>output events every</span>
                                         <div>
-                                            <input id="txt-rate-val" style="width: 75%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.ratelimit['value']}">
+                                            <input id="txt-rate-val" style="width: 75%; border: none; 
+                                                background-color: transparent; border-bottom: 1px solid #333" 
+                                                placeholder="Type here to enter" type="number" 
+                                                value="${config.query.advanced.ratelimit['value']}">
                                             <span>&nbsp;events</span>    
                                         </div>
                                     </div>
@@ -272,7 +306,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                 config.query.advanced.ratelimit['event-selection'] = 'every';
                             }
                             
-                            self.__container.find('#select-event-type').val(config.query.advanced.ratelimit['event-selection']);
+                            self.__container.find('#select-event-type')
+                                .val(config.query.advanced.ratelimit['event-selection']);
                             self.__container.find('#select-event-type').on('change', function(evt) {
                                 config.query.advanced.ratelimit['event-selection'] = $(evt.currentTarget).val();
                             });
@@ -283,7 +318,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                     <div>
                                         <span>output events every</span>
                                         <div>
-                                            <input id="txt-rate-val" style="width: 75%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="Type here to enter" type="number" value="${config.query.advanced.ratelimit['value']}">
+                                            <input id="txt-rate-val" style="width: 75%; border: none; 
+                                            background-color: transparent; border-bottom: 1px solid #333" 
+                                            placeholder="Type here to enter" type="number" 
+                                            value="${config.query.advanced.ratelimit['value']}">
                                             <select id="select-granularity">
                                                 <option value="sec">second</option>
                                                 <option value="min">minute</option>
@@ -295,7 +333,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                         </div>
                                     </div>
                                 `);
-                            self.__container.find('.rate-container #select-granularity').val(config.query.advanced.ratelimit['granularity'].toLowerCase() );
+                            self.__container.find('.rate-container #select-granularity')
+                                .val(config.query.advanced.ratelimit['granularity'].toLowerCase() );
                             break;
                     }
 

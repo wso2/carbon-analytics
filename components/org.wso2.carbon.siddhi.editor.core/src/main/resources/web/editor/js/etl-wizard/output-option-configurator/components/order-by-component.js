@@ -35,11 +35,14 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             container.append(`
                 <div style="font-size: 1.8rem; margin-bottom:15px">
                     Order output records<br/>
-                    <small style="font-size: 1.3rem">Sort output records based on fields in ascending or descending order</small>
+                    <small style="font-size: 1.3rem">
+                        Sort output records based on fields in ascending or descending order
+                    </small>
                 </div>
                 Order by attributes:
-                <button style="background-color: #ee6719" class="btn btn-default btn-circle" id="btn-add-orderby-property" type="button" data-toggle="dropdown">
-                    <i class="fw fw-add"></i>
+                <button style="background-color: #ee6719" class="btn btn-default btn-circle" 
+                    id="btn-add-orderby-property" type="button" data-toggle="dropdown">
+                        <i class="fw fw-add"></i>
                 </button>
                 <div id="orderby-options-dropdown" class="dropdown-menu-style hidden" aria-labelledby="">
                 </div>
@@ -102,14 +105,20 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             config.query.orderby.attributes.forEach(function (orderByOption) {
                 container.find('#orderby-attribute-list')
                     .append(`
-                        <div style="display: flex; background-color: #888; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.15);">
-                            <div style="width: 60%; padding: 5px; text-align: center; color: white">${orderByOption.attribute.name}</div>
+                        <div style="display: flex; background-color: #888; padding: 10px 0; 
+                            border-bottom: 1px solid rgba(255,255,255,.15);">
+                            <div style="width: 60%; padding: 5px; text-align: center; color: white">
+                                ${orderByOption.attribute.name}
+                            </div>
                             <div style="width: 40%">
-                                <button id="${orderByOption.attribute.name}-sort" style="background: #555; min-width: 70px" class="btn btn-default btn-sort">
+                                <button id="${orderByOption.attribute.name}-sort" 
+                                    style="background: #555; min-width: 70px" class="btn btn-default btn-sort">
                                     ${orderByOption.sort === 'asc' ? `ASC&nbsp;<i class="fw fw-down">` : `DESC&nbsp;<i class="fw fw-up">`}</i>
                                 </button>
-                                <button id="${orderByOption.attribute.name}-delete" style="background: #555; min-width: 70px; padding: 8px 12px;" class="btn btn-default btn-del">
-                                    <i class="fw fw-delete"></i>
+                                <button id="${orderByOption.attribute.name}-delete" 
+                                    style="background: #555; min-width: 70px; padding: 8px 12px;" 
+                                    class="btn btn-default btn-del">
+                                        <i class="fw fw-delete"></i>
                                 </button>
                             </div>
                         </div>

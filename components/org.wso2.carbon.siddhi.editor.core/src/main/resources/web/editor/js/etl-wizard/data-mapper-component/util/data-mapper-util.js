@@ -457,5 +457,5 @@ function (require, $, _, log) {
             return errorsFound === 0;
         }
 
-        return { getGenericDataType, OperatorMap, OperatorMap2, generateExpressionHTML, generateExpressionHTML2, validateExpressionTree };
+        return { getGenericDataType, OperatorMap2, generateExpressionHTML2, validateExpressionTree };
     });

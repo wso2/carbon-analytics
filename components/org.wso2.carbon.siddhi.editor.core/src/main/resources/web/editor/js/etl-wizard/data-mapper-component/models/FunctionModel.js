@@ -40,25 +40,26 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'scopeModel'],
             var allowRepetitive = false;
             var repetitiveDataTypes = [];
 
-            functionParameterRegExp.exec(syntax.syntax) ? functionParameterRegExp.exec(syntax.syntax)[1].split(',').forEach(function(param) {
-                var temp = param.trim().split(' ');
+            functionParameterRegExp.exec(syntax.syntax) ?
+                functionParameterRegExp.exec(syntax.syntax)[1].split(',').forEach(function(param) {
+                    var temp = param.trim().split(' ');
 
-                var dataTypes = temp[0].match(/<(.*?)>/)[1].split('|').map(function(type) {
-                    return type.toLowerCase();
-                });
+                    var dataTypes = temp[0].match(/<(.*?)>/)[1].split('|').map(function(type) {
+                        return type.toLowerCase();
+                    });
 
-                var placeHolder = syntax.parameterData[temp[1]];
+                    var placeHolder = syntax.parameterData[temp[1]];
 
-                if (!(temp[1].indexOf('...') > -1)) {
-                    var paramNode = new ScopeModel(dataTypes);
-                    paramNode.placeholder = placeHolder;
+                    if (!(temp[1].indexOf('...') > -1)) {
+                        var paramNode = new ScopeModel(dataTypes);
+                        paramNode.placeholder = placeHolder;
 
-                    parameters.push(paramNode);
-                } else {
-                    allowRepetitive = true;
-                    repetitiveDataTypes = dataTypes;
-                }
-            }) : null;
+                        parameters.push(paramNode);
+                    } else {
+                        allowRepetitive = true;
+                        repetitiveDataTypes = dataTypes;
+                    }
+                }) : null;
 
             this.allowRepetitiveParameters = allowRepetitive;
             this.repetitiveParameterTypes = repetitiveDataTypes;
