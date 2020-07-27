@@ -20,17 +20,9 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'app/source-edit
 
     function (require, $, _, log, DataMapperUtil, CompletionEngine) {
         var isSourceSinkConfigValid = function (sourceConfig) {
-            
-            
             if (sourceConfig.type.length === 0) {
                 return false;
             }
-
-            // var selectedData = selectedExtension = extensionData.find(function (el) {
-            //     return el.name === sourceConfig.type;
-            // });
-
-            // console.log(selectedData);
 
             var hasMatchingType = true;
             Object.keys(sourceConfig.properties)
@@ -48,7 +40,7 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'app/source-edit
                                     break;
                                 case 'bool':
                                     hasMatchingType = sourceConfig.properties[key].value.length > 0
-                                        && (sourceConfig.properties[key].value === 'true' 
+                                        && (sourceConfig.properties[key].value === 'true'
                                             || sourceConfig.properties[key].value === 'false');
                                     break;
                             }
@@ -107,8 +99,8 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'app/source-edit
                                     break;
                                 case 'bool':
                                     hasMatchingType = inputConfig.mapping.properties[key].value.length > 0
-                                        && (inputConfig.mapping.properties[key].value === 'true' 
-                                                || sourceConfig.properties[key].value === 'false');
+                                        && (inputConfig.mapping.properties[key].value === 'true'
+                                            || sourceConfig.properties[key].value === 'false');
                                     break;
                             }
                         }
@@ -217,7 +209,7 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'app/source-edit
                             if (functionValidity) {
                                 switch (DataMapperUtil.getGenericDataType(type.toLowerCase())) {
                                     case 'text':
-                                        functionValidity = queryConfig.function.parameters[key].value.length > 0 
+                                        functionValidity = queryConfig.function.parameters[key].value.length > 0
                                             && typeof queryConfig.function.parameters[key].value === 'string';
                                         break;
                                     case 'number':
@@ -225,8 +217,8 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'app/source-edit
                                             && /[-.0-9]+/.test(queryConfig.function.parameters[key].value);
                                         break;
                                     case 'bool':
-                                        functionValidity = queryConfig.function.parameters[key].value.length > 0 
-                                            && (queryConfig.function.parameters[key].value === 'true' 
+                                        functionValidity = queryConfig.function.parameters[key].value.length > 0
+                                            && (queryConfig.function.parameters[key].value === 'true'
                                                 || sourceConfig.properties[key].value === 'false');
                                         break;
                                 }
@@ -285,7 +277,9 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'app/source-edit
 
         var validateGroupBy = function (groupBy) {
             var isValid = true;
-            if (groupBy.attributes.length > 0 && typeof groupBy.havingFilter.expression !== 'string') {
+            if (groupBy.attributes.length > 0
+                    && groupBy.havingFilter.expression
+                                && typeof groupBy.havingFilter.expression !== 'string') {
                 isValid = validateExpression(groupBy.havingFilter.expression);
 
                 if (isValid) {

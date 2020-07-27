@@ -47,13 +47,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                     </small>
                 </div>
                 Group by attributes
-                <button 
-                    style="background-color: #ee6719" 
-                    class="btn btn-default btn-circle" 
-                    id="btn-add-groupby-field" 
-                    type="button" 
-                    data-toggle="dropdown"
-                >
+                <button style="background-color: #ee6719" class="btn btn-default btn-circle" 
+                    id="btn-add-groupby-field" type="button" data-toggle="dropdown">
                     <i class="fw fw-add"></i>
                 </button>
                 <div id="groupby-options-dropdown" class="dropdown-menu-style hidden" aria-labelledby="">
@@ -145,24 +140,39 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
             if(config.query.groupby.attributes.length > 0) {
                 container.find('#having-option-container')
                     .append(`
-                        <div style="margin-top: 15px">
-                            <span>Set having condition : </span>
-                            <button 
-                                style="background-color: #ee6719" 
-                                class="btn btn-default btn-circle"
-                                id="btn-enable-groupby-filter" 
-                                type="button" 
-                                data-toggle="dropdown"
-                            >
-                                ${
-                                    Object.keys(config.query.groupby.havingFilter).length === 0 ?
-                                        '<i class="fw fw-minus"></i>' : '<i class="fw fw-check"></i>'
-                                } 
-                            </button>
+                        <div style="margin-top: 15px; display: flex">
+                            <div style="">
+                                <span>Set having condition : </span>
+                            </div>
+                            <div>
+                               <div style="margin-left: 15px">
+                                    <div id="btn-group-enable-groupby-filter" 
+                                        class="btn-group btn-group-toggle" data-toggle="buttons">
+                                        <label class="btn" 
+                                                style="${
+                                                    Object.keys(config.query.groupby.havingFilter).length !== 0 ?
+                                                            "background-color: rgb(91,203,92); color: white;"
+                                                            : "background-color: rgb(100,109,118); color: white;"}" 
+                                         >
+                                            <input type="radio" name="options" id="enable" autocomplete="off"> 
+                                            <i class="fw fw-check"></i>
+                                        </label>
+                                        <label class="btn" 
+                                                style="${
+                                                    Object.keys(config.query.groupby.havingFilter).length === 0 ?
+                                                            "background-color: red; color: white;"
+                                                            : "background-color: rgb(100,109,118); color: white;"}" 
+                                        >
+                                            <input type="radio" name="options" id="disable" autocomplete="off"> 
+                                            <i class="fw fw-cancel"></i>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     `);
                 
-                container.find('#btn-enable-groupby-filter').on('click', function(evt) {
+                container.find('#btn-group-enable-groupby-filter .btn').on('click', function(evt) {
                     if(config.query.groupby.havingFilter['enabled']) {
                         config.query.groupby.havingFilter = {};
                     } else {
@@ -184,15 +194,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             ${
                                 typeof config.query.groupby.havingFilter !=='string'?
                                     `<div class="operand-section" style="display: flex; flex: 1; flex-direction: column">
-                                        <div 
-                                            class="operand-category-select"
-                                            style="display: flex;background: rgb(162,162,162)"
-                                        >
+                                        <div class="operand-category-select" style="display: flex;background: rgb(162,162,162)">
+                                            
                                         </div>
-                                        <div 
-                                            class="operand-select-section" 
-                                            style="background: lightgray; overflow: auto"
-                                        >
+                                        <div class="operand-select-section" style="background: lightgray; overflow: auto">
                                             <ul>
                                             </ul>
                                         </div>
@@ -207,22 +212,20 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                         <div 
                             style="display: flex; padding: ${focusNodes.length === 0 ? '15px' : '5px'} 0; 
                                 background: ${focusNodes.length === 0 ? 'lightgray' : '#c3c3c3'}" 
-                            class="expression ${focusNodes.length === 0 ? 'focus' : ''}"
-                        >
+                            class="expression ${focusNodes.length === 0 ? 'focus' : ''}">
                             <div style="width: 95%; color: #323232" class="expression-content">
                                 ${
                                     typeof expression !== 'string' ?
-                                        DataMapperUtil.generateExpressionHTML2(expression, '')
+                                        DataMapperUtil.generateExpressionHTML(expression, '')
                                         : expression
                                 }
                             </div>    
                             ${
                                 focusNodes.length === 0 ?
                                     `<div style="padding: 5px;" class="icon-section">
-                                        <a style="color: #323232">
-                                            <i class="fw fw-clear"></i>
-                                        </a>
-                                    </div>` : ''
+                                        <a style="color: #323232"><i class="fw fw-clear"></i></a>
+                                    </div>`
+                                    : ''
                             }
                         </div>
                     `);
@@ -231,11 +234,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                     focusNodes.forEach(function (node, i) {
                         container.find('.expression-section')
                             .append(`
-                                <div 
-                                    style="display: flex; padding: ${focusNodes.length - 1 === i ? '15px' : '5px'} 0; 
-                                    color: #323232" class="expression ${focusNodes.length - 1 === i ? 'focus' : ''}">
+                                <div style="display: flex; padding: ${focusNodes.length - 1 === i ? '15px' : '5px'} 0; 
+                                color: #323232" class="expression ${focusNodes.length - 1 === i ? 'focus' : ''}">
                                     <div style="width: 95%" class="expression-content">
-                                        ${DataMapperUtil.generateExpressionHTML2(node, '')}
+                                        ${DataMapperUtil.generateExpressionHTML(node, '')}
                                     </div>    
                                     ${
                                         focusNodes.length - 1 === i ?
@@ -270,26 +272,28 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             case 'customValue':
                             case 'scope':
                                 if (tempExpression.genericReturnTypes.indexOf('bool') > -1) {
-                                    Object.keys(DataMapperUtil.OperatorMap2)
+                                    Object.keys(DataMapperUtil.OperatorMap)
                                         .filter(function (key) {
-                                            return DataMapperUtil.OperatorMap2[key].hasLeft
-                                                && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes,
-                                                    tempExpression.rootNode.genericReturnTypes).length > 0
+                                            return DataMapperUtil.OperatorMap[key].hasLeft
+                                                && _.intersection(
+                                                        DataMapperUtil.OperatorMap[key].leftTypes,
+                                                        tempExpression.rootNode.genericReturnTypes
+                                                ).length > 0
                                         })
                                         .forEach(function (key) {
-                                            allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                            allowedOperators[key] = DataMapperUtil.OperatorMap[key]
                                         });
                                 } else {
-                                    Object.keys(DataMapperUtil.OperatorMap2)
+                                    Object.keys(DataMapperUtil.OperatorMap)
                                         .filter(function (key) {
-                                            return DataMapperUtil.OperatorMap2[key].hasLeft
-                                                && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes,
+                                            return DataMapperUtil.OperatorMap[key].hasLeft
+                                                && _.intersection(DataMapperUtil.OperatorMap[key].leftTypes,
                                                     tempExpression.rootNode.genericReturnTypes).length > 0
-                                                && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes,
+                                                && _.intersection(DataMapperUtil.OperatorMap[key].returnTypes,
                                                     tempExpression.genericReturnTypes).length > 0
                                         })
                                         .forEach(function (key) {
-                                            allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                            allowedOperators[key] = DataMapperUtil.OperatorMap[key]
                                         });
                                 }
                                 break;
@@ -297,8 +301,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                 if (tempExpression.rootNode.hasRight && !tempExpression.rootNode.rightNode) {
                                     config.output.stream.attributes
                                         .filter(function (attr) {
-                                            return tempExpression.rootNode.rightTypes
-                                                    .indexOf(DataMapperUtil.getGenericDataType(attr.type)) > -1;
+                                            return tempExpression.rootNode
+                                                .rightTypes.indexOf(DataMapperUtil.getGenericDataType(attr.type)) > -1;
                                         })
                                         .forEach(function (attr) {
                                             allowedAttributes[attr.name] = attr;
@@ -322,16 +326,15 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                         };
                                     }
                                 } else {
-                                    Object.keys(DataMapperUtil.OperatorMap2)
+                                    Object.keys(DataMapperUtil.OperatorMap)
                                         .filter(function (key) {
-                                            return _.intersection(
-                                                    DataMapperUtil.OperatorMap2[key].leftTypes,
-                                                    tempExpression.rootNode.genericReturnTypes).length > 0
-                                                && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes,
+                                            return _.intersection(DataMapperUtil.OperatorMap[key].leftTypes,
+                                                tempExpression.rootNode.genericReturnTypes).length > 0
+                                                && _.intersection(DataMapperUtil.OperatorMap[key].returnTypes,
                                                     tempExpression.genericReturnTypes).length > 0;
                                         })
                                         .forEach(function (key) {
-                                            allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                            allowedOperators[key] = DataMapperUtil.OperatorMap[key]
                                         });
                                 }
     
@@ -372,14 +375,14 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             scope: true
                         }
     
-                        Object.keys(DataMapperUtil.OperatorMap2)
+                        Object.keys(DataMapperUtil.OperatorMap)
                             .filter(function (key) {
-                                return DataMapperUtil.OperatorMap2[key].isFirst &&
-                                    _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes,
+                                return DataMapperUtil.OperatorMap[key].isFirst &&
+                                    _.intersection(DataMapperUtil.OperatorMap[key].returnTypes,
                                         tempExpression.returnTypes).length > 0;
                             })
                             .forEach(function (key) {
-                                allowedOperators[key] = DataMapperUtil.OperatorMap2[key];
+                                allowedOperators[key] = DataMapperUtil.OperatorMap[key];
                             });
                     }
                 }
@@ -431,25 +434,15 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                                     Custom Value
                                                     <select name="" id="custom-val-type">
                                                     </select>
-                                                    <input 
-                                                        style="display: none; 
-                                                        width: 45%" 
-                                                        id="custom_value_input_txt" 
-                                                        type="text"
-                                                    >
-                                                    <select 
-                                                        style="display: none; width: 45%" 
-                                                        id="custom_value_input_bool" 
-                                                    >
+                                                    <input style="display: none; width: 45%" 
+                                                        id="custom_value_input_txt" type="text">
+                                                    <select style="display: none; width: 45%" 
+                                                        id="custom_value_input_bool" >
                                                         <option value="true">True</option>
                                                         <option value="false">false</option>
                                                     </select>
-                                                    <button 
-                                                        style="background-color: #f47b20; padding: 0 6px 0 6px;" 
-                                                        class="btn btn-primary btn-custom-val-submit"
-                                                    >
-                                                        Add
-                                                    </button>
+                                                    <button style="background-color: #f47b20; padding: 0 6px 0 6px;" 
+                                                        class="btn btn-primary btn-custom-val-submit">Add</button>
                                                 </div>
                                             </div>
                                         </a>    
@@ -507,29 +500,27 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                     });
 
                                     switch (DataMapperUtil
-                                                .getGenericDataType(
-                                                    container.find('.operand-select-section #custom-val-type').val())) {
+                                        .getGenericDataType(container
+                                            .find('.operand-select-section #custom-val-type').val())) {
                                         case 'text':
                                         case 'number':
-                                            var textFieldElement =
-                                                container.find('.operand-select-section #custom_value_input_txt');
+                                            var textFieldElement = container.find('.operand-select-section #custom_value_input_txt');
                                             textFieldElement.show();
-                                            textFieldElement.attr(
-                                                'type',
+                                            textFieldElement.attr('type',
                                                 container.find('.operand-select-section #custom-val-type')
                                                     .val().toLowerCase());
                                             break;
                                         case 'bool':
-                                            var booleanFieldElement =
-                                                container.find('.operand-select-section #custom_value_input_bool');
+                                            var booleanFieldElement = container
+                                                .find('.operand-select-section #custom_value_input_bool');
                                             booleanFieldElement.show();
                                             break;
                                     }
 
                                     container.find('.operand-select-section .btn-custom-val-submit')
                                         .on('click', function (evt) {
-                                            var dataType =
-                                                container.find('.operand-select-section #custom-val-type').val();
+                                            var dataType = container
+                                                .find('.operand-select-section #custom-val-type').val();
                                             var value = dataType === 'bool' ?
                                                 container
                                                     .find('.operand-select-section #custom_value_input_bool').val()
@@ -538,9 +529,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
 
                                             var nodeData = {
                                                 dataType,
-                                                value: DataMapperUtil
-                                                            .getGenericDataType(dataType) === 'number' ?
-                                                                        Number(value) : value
+                                                value: DataMapperUtil.getGenericDataType(dataType) === 'number' ?
+                                                    Number(value) : value
                                             };
 
                                             tempExpression.addNode(new CustomValueModel(nodeData));
@@ -551,7 +541,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                     <li class="not-custom" id="attribute-${key}">
                                         <a style="color: #323232">
                                             <div style="padding: 10px 15px;
-                                                    border-bottom: 1px solid rgba(255, 255, 255, 0.2);" >
+                                            border-bottom: 1px solid rgba(255, 255, 255, 0.2);" >
                                                 <b>${key}</b>
                                                 <br/><small>${allowedAttributes[key].type}</small>
                                             </div>
@@ -567,7 +557,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                 <li class="not-custom" id="operator-${key}">
                                     <a style="color: #323232">
                                         <div style="padding: 10px 15px;
-                                                    border-bottom: 1px solid rgba(255, 255, 255, 0.2);" >
+                                        border-bottom: 1px solid rgba(255, 255, 255, 0.2);" >
                                             <b>${allowedOperators[key].symbol}</b>
                                             &nbsp;-&nbsp;${allowedOperators[key].description}
                                         </div>
@@ -661,8 +651,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                         }
                     }
     
-                    replaceInExpression(focusNodes.length > 1 ?
-                            focusNodes[focusNodes.length - 2] : expression, path);
+                    replaceInExpression(
+                        focusNodes.length > 1 ? focusNodes[focusNodes.length - 2] : expression, path);
                     focusNodes.pop();
                     self.__indexArray.pop();
                     self.render();

@@ -48,36 +48,45 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                                         class="btn btn-default btn-circle" 
                                         id="btn-add-source-mapper-property" 
                                         type="button" 
-                                        data-toggle="dropdown"
-                                    >
-                                        <i class="fw fw-add"></i>
+                                        data-toggle="dropdown">
+                                            <i class="fw fw-add"></i>
                                     </button>`
                                     : ''}
                                 <div 
                                     id="source-mapper-option-dropdown" 
                                     style="left: 150px" 
-                                    class="dropdown-menu-style hidden" 
-                                    aria-labelledby=""
-                                >
+                                    class="dropdown-menu-style hidden" aria-labelledby="">
                                 </div>
                             </div>
                             <div style="" class="source-mapper-options">
                             </div>
                             <div class="custom-mapping-section">
                                 <div style="display: flex; padding-top:15px">
-                                    <div style="width: 100%;padding-top: 5px">
+                                    <div style="padding-top: 5px">
                                         Enable custom attribute mapping                                        
                                     </div>
-                                    <div>
-                                        <button
-                                            style="background-color: #ee6719"
-                                            class="btn btn-default btn-circle"
-                                            id="btn-enable-custom-map" 
-                                            type="button" 
-                                            data-toggle="dropdown"
-                                        >
-                                            <i class="fw ${config.customEnabled ? 'fw-check' : 'fw-minus'}"></i>
-                                        </button> 
+                                    <div style="margin-left: 15px">
+                                        <div id="btn-group-enable-custom-map" class="btn-group btn-group-toggle" 
+                                            data-toggle="buttons">
+                                            <label class="btn" 
+                                                    style="${
+                                                        config.customEnabled ?
+                                                            "background-color: rgb(91,203,92); color: white;"
+                                                            : "background-color: rgb(100,109,118); color: white;"}" 
+                                             >
+                                                <input type="radio" name="options" id="enable" autocomplete="off"> 
+                                                <i class="fw fw-check"></i>
+                                            </label>
+                                            <label class="btn" 
+                                                    style="${
+                                                        !config.customEnabled ?
+                                                            "background-color: red; color: white;"
+                                                            : "background-color: rgb(100,109,118); color: white;"}" 
+                                            >
+                                                <input type="radio" name="options" id="disable" autocomplete="off"> 
+                                                <i class="fw fw-cancel"></i>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="attrib-section">
@@ -96,12 +105,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                         <a title="" class="dropdown-item" href="#">
                             <div class="mapper-option">${param.name}</div><br/>
                             <small style="opacity: 0.8">
-                                ${
-                                    param.description.replaceAll('<', '&lt;')
-                                            .replaceAll('>', '&gt;').replaceAll('`', '')
-                                }
+                                ${param.description.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}
                             </small><br/>
-                            <small style="opacity: 0.8"><b>Default value</b>: ${param.defaultValue}</small>
+                            <small style="opacity: 0.8">
+                                <b>Default value</b>: ${param.defaultValue}
+                            </small>
                         </a>
                     `);
                 })
@@ -115,29 +123,18 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                             <div style="width: 100%" class="input-section">
                                 <label 
                                     style="margin-bottom: 0" 
-                                    class="${optionData.value.length > 0 ? '' : 'not-visible'}" 
-                                    id="label-mapper-op-${name}" 
-                                    for="mapper-op-${name}"
-                                >
-                                    ${key}
-                                </label>
-                                <input 
-                                    id="mapper-op-${name}"
+                                    class="${optionData.value.length > 0 ? 
+                                                '' : 'not-visible'}" 
+                                    id="label-mapper-op-${name}" for="mapper-op-${name}">${key}</label>
+                                <input id="mapper-op-${name}" 
                                     style="width: 100%; border: none; 
                                         background-color: transparent; border-bottom: 1px solid #333" 
-                                    placeholder="${key}" 
-                                    type="text" 
-                                    value="${optionData.value}"
-                                >
+                                    placeholder="${key}" type="text" value="${optionData.value}">
                             </div>
                             <div style="display: flex;padding-top: 20px; padding-left: 5px;" class="delete-section">
-                                <a 
-                                    style="margin-right: 5px; color: #333"
-                                    title="${
-                                        selectedOption.description.replaceAll('<', '&lt;')
-                                            .replaceAll('>', '&gt;').replaceAll('`', '')
-                                    }"
-                                >
+                                <a style="margin-right: 5px; color: #333" 
+                                title="${selectedOption.description.replaceAll('<', '&lt;')
+                                            .replaceAll('>', '&gt;').replaceAll('`', '')}">
                                     <i class="fw fw-info"></i>    
                                 </a>  
                                 ${
@@ -205,7 +202,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 self.render();
             });
 
-            container.find('#btn-enable-custom-map').on('click', function (evt) {
+            container.find('#btn-group-enable-custom-map .btn').on('click', function (evt) {
                 config.customEnabled = !config.customEnabled;
 
                 if (!config.customEnabled) {
@@ -222,22 +219,12 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     config.attributes[attrib.name] = i;
                     container.find('.custom-mapping-section>.attrib-section').append(`
                         <div style="width: 100%; padding-bottom: 5px" class="attribute-map">
-                            <label
-                                style="margin-bottom: 0"
-                                class=""
-                                id=""
-                                for="index-${attrib.name}"
-                            >
-                                ${attrib.name}
-                            </label>
+                            <label style="margin-bottom: 0" 
+                                class="" id="" for="index-${attrib.name}">${attrib.name}</label>
                             <input 
-                                id="index-${attrib.name}"
+                                id="index-${attrib.name}" 
                                 style="width: 100%; border: none; background-color: transparent; 
-                                    border-bottom: 1px solid #333" 
-                                placeholder="" 
-                                type="text" 
-                                value="${i}"
-                            >
+                                border-bottom: 1px solid #333" placeholder="" type="text" value="${i}">
                         </div>
                     `);
 

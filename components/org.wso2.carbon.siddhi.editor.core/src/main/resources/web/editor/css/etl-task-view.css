@@ -150,7 +150,7 @@
 
 /* Direct Mapping Dialog */
 .etl-task-wizard-container .popup-backdrop .mapping-generation-dialog {
-    background: #333;
+    background: rgb(169, 169, 169);
     height: fit-content;
     width: 70%;
     margin-left: 15%;
@@ -167,6 +167,7 @@
 .mapping-generation-dialog .dialog-heading {
     height: 50px;
     font-size: 19px;
+    color: rgb(71, 71, 71);
 }
 
 .mapping-generation-dialog .dialog-body .expression-container {
@@ -178,17 +179,19 @@
     font-size: 1.8rem;
     padding-bottom: 5px;
     padding-top: 5px;
-    background-color: #2c2c2c;
-    border-bottom: 1px solid #555;
+    background-color: rgb(185, 185, 185);;
+    /*border-bottom: 1px solid #555;*/
+    color: rgb(91, 91, 91);
 }
 
 .mapping-generation-dialog .dialog-body .expression-container .expression.target {
     padding-top: 12px;
     padding-bottom: 12px;
     font-size: 2.0rem;
-    background-color: #232323;
+    background-color: rgb(201, 201, 201);
     border-left: 3px solid #ee6719;
     box-shadow: 0 2px #77777761;
+    color: rgb(41, 41, 41);
 }
 
 .mapping-generation-dialog .dialog-body .expression-container .expression.target .exp-content {
@@ -236,8 +239,7 @@
 }
 
 .mapping-generation-dialog .dialog-body .generation-content .node-container ul {
-    border-top: 1px #d3d3d33b solid;
-
+    border-top: 1px rgba(0, 0, 0, 0.2) solid;
 }
 
 .mapping-generation-dialog .dialog-body .generation-content .node-container ul li a div.selected {
@@ -247,9 +249,9 @@
 }
 
 .mapping-generation-dialog .dialog-body .generation-content .node-container ul li a div {
-    border-bottom: 1px #d3d3d33b solid;
+    border-bottom: 1px rgba(0, 0, 0, 0.2) solid;
     font-weight: 400;
-    color: white;
+    color: rgb(71, 71, 71);
     text-align: left;
     padding: 15px;
 }
@@ -442,7 +444,7 @@
 }
 
 .grey-on-hover:hover {
-    background: rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.1);
 }
 
 /*.window-option-section .input-section label {*/
@@ -452,7 +454,6 @@
 /*.window-option-section .input-section input {*/
 /*    color: rgba(255, 255, 255, 0.8);*/
 /*}*/
-
 
 
 /*.function-parameter-section .input-section label {*/

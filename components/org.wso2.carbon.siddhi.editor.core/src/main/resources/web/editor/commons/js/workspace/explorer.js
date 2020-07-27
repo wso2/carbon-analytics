@@ -156,8 +156,9 @@ define(['log', 'jquery', 'backbone', 'lodash', './explorer-item', './service-cli
                     e.preventDefault();
                     e.stopPropagation();
                     self.application.commandManager.dispatch(_.get(self._options, 'command.id'));
-                    if (self.application.tabController.activeTab._title != "welcome-page") {
-                        if (self.application.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
+                    if (self.application.tabController.activeTab._title !== "welcome-page") {
+                        if (self.application.tabController.activeTab.getSiddhiFileEditor()
+                            && self.application.tabController.activeTab.getSiddhiFileEditor().isInSourceView()) {
                             self.application.tabController.activeTab.getSiddhiFileEditor().getSourceView().editorResize();
                         }
                     }

@@ -44,31 +44,48 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                             <div>
                               Source Mapper configuration
                               ${extensionData.parameters.length !== config.properties.length ? 
-                                `<button style="background-color: #ee6719" class="btn btn-default btn-circle" 
-                                        id="btn-add-source-mapper-property" type="button" data-toggle="dropdown">
-                                    <i class="fw fw-add"></i>
+                                `<button 
+                                    style="background-color: #ee6719" 
+                                    class="btn btn-default btn-circle" 
+                                    id="btn-add-source-mapper-property" 
+                                    type="button" data-toggle="dropdown">
+                                        <i class="fw fw-add"></i>
                                 </button>`
                                 : ''}
-                              <div id="source-mapper-option-dropdown" style="left: 150px"
-                                class="dropdown-menu-style hidden" aria-labelledby="">
+                              <div 
+                                id="source-mapper-option-dropdown" 
+                                style="left: 150px" class="dropdown-menu-style hidden" aria-labelledby="">
                               </div>
                             </div>
                             <div style="" class="source-mapper-options">
                             </div>
                             <div class="custom-mapping-section">
                                 <div style="display: flex; padding-top:15px">
-                                    <div style="width: 100%;padding-top: 5px">
+                                    <div style="padding-top: 5px">
                                         Enable custom attribute mapping                                        
                                     </div>
-                                    <div>
-                                        <button 
-                                            style="background-color: #ee6719" 
-                                            class="btn btn-default btn-circle"
-                                            id="btn-enable-custom-map" 
-                                            type="button" data-toggle="dropdown"
-                                        >
-                                            <i class="fw ${config.customEnabled ? 'fw-check' : 'fw-minus'}"></i>
-                                        </button> 
+                                    <div style="margin-left: 15px">
+                                        <div id="btn-group-enable-custom-map" class="btn-group btn-group-toggle" 
+                                            data-toggle="buttons">
+                                            <label class="btn" 
+                                                    style="${
+                                                        config.customEnabled ?
+                                                            "background-color: rgb(91,203,92); color: white;"
+                                                            : "background-color: rgb(100,109,118); color: white;"}" 
+                                             >
+                                                <input type="radio" name="options" id="enable" autocomplete="off"> 
+                                                <i class="fw fw-check"></i>
+                                            </label>
+                                            <label class="btn" 
+                                                    style="${
+                                                        !config.customEnabled ?
+                                                            "background-color: red; color: white;"
+                                                            : "background-color: rgb(100,109,118); color: white;"}" 
+                                            >
+                                                <input type="radio" name="options" id="disable" autocomplete="off"> 
+                                                <i class="fw fw-cancel"></i>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="attrib-section">
@@ -91,9 +108,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                             <a title="" class="dropdown-item" href="#">
                                 <div class="mapper-option">${property.name}</div><br/>
                                 <small style="opacity: 0.8">
-                                    ${
-                                        property.description
-                                            .replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('`', '')}
+                                    ${property.description.replaceAll('<', '&lt;')
+                                        .replaceAll('>', '&gt;').replaceAll('`', '')}
                                 </small><br/>
                                 <small style="opacity: 0.8"><b>Default value</b>: ${property.defaultValue}</small>
                             </a>
@@ -114,30 +130,18 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                         <div style="display: flex; margin-bottom: 15px" class="mapper-option">
                                 <div style="width: 100%" class="input-section">
                                     <label 
-                                        style="margin-bottom: 0"
-                                        class="${optionData.value.length > 0 ? '' : 'not-visible'}"
-                                        id="label-mapper-op-${name}" for="mapper-op-${name}"
-                                    >
-                                        ${key}
-                                    </label>
-                                    <input 
-                                        id="mapper-op-${name}" 
+                                        style="margin-bottom: 0" 
+                                        class="${optionData.value.length > 0 ? '' : 'not-visible'}" 
+                                        id="label-mapper-op-${name}" for="mapper-op-${name}">${key}</label>
+                                    <input id="mapper-op-${name}" 
                                         style="width: 100%; border: none; background-color: transparent; 
-                                            border-bottom: 1px solid #333"
-                                        placeholder="${key}"
-                                        type="text"
-                                        value="${optionData.value}"
-                                    >
+                                        border-bottom: 1px solid #333" placeholder="${key}" 
+                                        type="text" value="${optionData.value}">
                                 </div>
                                 <div style="display: flex;padding-top: 20px; padding-left: 5px;" class="delete-section">
-                                    <a 
-                                        style="margin-right: 5px; color: #333" 
-                                        title="${
-                                            optionFullData.description
-                                                    .replaceAll('<', '&lt;')
-                                                    .replaceAll('>', '&gt;')
-                                                    .replaceAll('`', '')}"
-                                    >
+                                    <a style="margin-right: 5px; color: #333" 
+                                    title="${optionFullData.description.replaceAll('<', '&lt;')
+                                                .replaceAll('>', '&gt;').replaceAll('`', '')}">
                                         <i class="fw fw-info"></i>    
                                     </a>  
                                     ${
@@ -202,17 +206,21 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 }, 100, {}));
 
             container.find('.mapper-option>.delete-section>a>.fw-delete').on('click', function (evt) {
-                var attribName = evt.currentTarget.id
-                    .match('mapper-op-del-([a-zA-Z0-9\-]+)')[1].replaceAll(/-/g, '.');
+                var attribName = evt.currentTarget.id.match('mapper-op-del-([a-zA-Z0-9\-]+)')[1].replaceAll(/-/g, '.');
                 delete config.properties[attribName];
                 self.render();
             });
 
-            container.find('#btn-enable-custom-map').on('click', function (evt) {
+            container.find('#btn-group-enable-custom-map .btn').on('click', function (evt) {
                 config.customEnabled = !config.customEnabled;
 
                 if (!config.customEnabled) {
                     config.attributes = {};
+                    Object.keys(config.properties)
+                        .filter((key) => key.startsWith('regex\.'))
+                        .forEach(key => {
+                           delete config.properties[key];
+                        });
                 }
 
                 self.render();
@@ -220,8 +228,9 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
             if (config.customEnabled) {
                 container.append(`
-                    <div style="display: flex; padding-top: 10px; flex-direction: column" 
-                    class="sample-payload-submit-section">
+                    <div 
+                        style="display: flex; padding-top: 10px; flex-direction: column" 
+                        class="sample-payload-submit-section">
                     </div>
                 `);
                 if (self.__mapperType === 'sink') {
@@ -250,16 +259,14 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
 
             container.find('.sample-payload-submit-section').append(`
                 <div style="display: flex; width: 100%" >
-                    <span style="width: 100%">
-                        Regex Groups
+                    <span style="width: 100%">Regex Groups
                         <i style="padding: 0 10px;" title="${regexIDOption.description}" class="fw fw-info"></i>
                     </span>
                     ${
                         self.__regexGroupNumber < 26 ? 
                             `<button 
-                                style="padding: 2px 12px; background: #607c8b;"
-                                class="btn btn-default" 
-                                id="btn-add-regex-group" 
+                                style="padding: 2px 12px; background: #607c8b;" 
+                                class="btn btn-default" id="btn-add-regex-group" 
                                 type="button"
                             >
                                 Add Regex Group
@@ -276,29 +283,32 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     container.find('.regex-group-section').append(`
                         <div style="display: flex; padding-bottom: 15px">
                             <div style="width: 30%" class="input-section">
-                                <label style="margin-bottom: 0; font-size: 1.2rem" class="" id="" 
-                                for="regex-id-${key.replaceAll(/\./g,'-')}">Regex GroupID</label>
+                                <label 
+                                    style="margin-bottom: 0; 
+                                    font-size: 1.2rem" 
+                                    class="" id="" for="regex-id-${key.replaceAll(/\./g,'-')}"
+                                >
+                                    Regex GroupID
+                                </label>
                                 <input id="regex-id-${key.replaceAll(/\./g,'-')}" 
-                                style="width: 100%; border: none;
-                                 background-color: transparent; border-bottom: 1px solid #333" 
-                                 placeholder="" type="text" value="${key}" disabled>
+                                    style="width: 100%; border: none; background-color: transparent; 
+                                        border-bottom: 1px solid #333" 
+                                    placeholder="" type="text" value="${key}" disabled>
                             </div>
                             <div style="width: 70%; margin-left: 15px" class="input-section">
                                 <label 
-                                    style="margin-bottom: 0; font-size: 1.2rem"
-                                    class=""
-                                    id=""
+                                    style="margin-bottom: 0; font-size: 1.2rem" 
+                                    class="" id="" 
                                     for="regex-inp-${key.replaceAll(/\./g,'-')}"
                                 >
                                     Regex Expression
                                 </label>
-                                <input 
-                                    id="regex-inp-${key.replaceAll(/\./g,'-')}"
-                                        class="regex-input-field" style="width: 100%; border: none; 
-                                        background-color: transparent; border-bottom: 1px solid #333" 
-                                        placeholder="Type regex expression here" 
-                                        type="text" value="${config.mapping.properties[key].value}"
-                                >
+                                <input id="regex-inp-${key.replaceAll(/\./g,'-')}" 
+                                    class="regex-input-field" 
+                                    style="width: 100%; border: none; background-color: transparent; 
+                                        border-bottom: 1px solid #333" 
+                                    placeholder="Type regex expression here" 
+                                    type="text" value="${config.mapping.properties[key].value}">
                             </div>
                             <div style="cursor: pointer;" class="regex-group-del-section">
                                 <i id="delete-regex-${key.replaceAll(/\./g,'-')}" 
@@ -352,10 +362,11 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     config.mapping.attributes[attrib.name] = '';
                     container.find('.custom-attribute-section').append(`
                         <div style="width: 100%; padding-bottom: 5px" class="attribute-map">
-                            <label style="margin-bottom: 0" class="" id="" for="index-${attrib.name}">
-                                ${attrib.name}
-                            </label>
-                            <input id="index-${attrib.name}" style="width: 100%; border: none; background-color: transparent; border-bottom: 1px solid #333" placeholder="" type="text" value="">
+                            <label style="margin-bottom: 0" class="" id="" 
+                                for="index-${attrib.name}">${attrib.name}</label>
+                            <input id="index-${attrib.name}" 
+                                style="width: 100%; border: none; background-color: transparent; 
+                                    border-bottom: 1px solid #333" placeholder="" type="text" value="">
                         </div>
                     `);
 
@@ -380,13 +391,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     </div>
                     <div class="components" style="display: flex; width: 100%">
                         <div class="add-attribute-section">
-                            <button 
-                                style="background-color: #ee6719" 
-                                class="btn btn-default btn-circle" 
-                                id="btn-add-map-attribute" 
-                                type="button" 
-                                data-toggle="dropdown"
-                            >
+                            <button style="background-color: #ee6719" class="btn btn-default btn-circle" 
+                                id="btn-add-map-attribute" type="button" data-toggle="dropdown">
                                 <i class="fw fw-add"></i>
                             </button>    
                             <div class="dropdown-menu-style hidden"></div>
@@ -398,8 +404,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 `);
 
             config.stream.attributes.forEach(function (attribute) {
-                container
-                    .find('.sample-payload-submit-section>.components>.add-attribute-section>.dropdown-menu-style')
+                container.find('.sample-payload-submit-section>.components>.add-attribute-section>.dropdown-menu-style')
                     .append(
                         `
                             <a id="attr-map-${attribute.name}" title="" class="dropdown-item" href="#">

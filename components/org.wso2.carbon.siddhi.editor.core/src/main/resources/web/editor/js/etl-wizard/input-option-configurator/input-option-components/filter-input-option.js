@@ -54,8 +54,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                         <h3 style="margin-top: 0; color: #373737">Filter condition</h3>
                     </div>
                     <button id="btn-reverse-filter" class="btn btn-default">
-                        <i class="fw ${config.query.filter.reverseFilter ? 'fw-check' : 'fw-error'}"></i>
-                        &nbsp;Reverse Condition
+                        <i class="fw ${config.query.filter.reverseFilter ? 'fw-check' : 'fw-error'}"></i>&nbsp;
+                        Exclude events
                     </button>    
                 </div>
                 <div style="color: #373737" class="expression-section">
@@ -77,18 +77,19 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
 
             container.find('.expression-section')
                 .append(`
-                    <div style="display: flex; padding: ${focusNodes.length === 0 ? '15px' : '5px'} 0;" 
-                        class="expression ${focusNodes.length === 0 ? 'focus' : ''}">
+                    <div style="display: flex; padding: ${focusNodes.length === 0 ? '15px' : '5px'} 0;" class="expression ${focusNodes.length === 0 ? 'focus' : ''}">
                         <div style="width: 95%" class="expression-content">
                             ${
                     typeof expression !== 'string' ?
-                        DataMapperUtil.generateExpressionHTML2(expression, '')
+                        DataMapperUtil.generateExpressionHTML(expression, '')
                         : expression
                     }
                         </div>    
                         ${
                     focusNodes.length === 0 ?
-                        `<div style="width: 5%;padding: 5px;" class="icon-section"><a style="color: #373737"><i class="fw fw-clear"></i></a></div>`
+                        `<div style="width: 5%;padding: 5px;" class="icon-section">
+                            <a style="color: #373737"><i class="fw fw-clear"></i></a>
+                        </div>`
                         : ''
                     }
                     </div>
@@ -101,16 +102,16 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                             <div style="display: flex; padding: ${focusNodes.length - 1 === i ? '15px' : '5px'} 0;" 
                                 class="expression ${focusNodes.length - 1 === i ? 'focus' : ''}">
                                 <div style="width: 95%" class="expression-content">
-                                    ${DataMapperUtil.generateExpressionHTML2(node, '')}
+                                    ${DataMapperUtil.generateExpressionHTML(node, '')}
                                 </div>    
-                                    ${
-                                        focusNodes.length - 1 === i ?
-                                            '<div style="width: 5%;padding: 5px;" class="icon-section">' +
-                                            '   <a><i class="fw fw-up"></i></a>' +
-                                            '</div>'
-                                            : ''
-                                    }
-                                </div>
+                                ${
+                            focusNodes.length - 1 === i ?
+                                '<div style="width: 5%;padding: 5px;" class="icon-section">' +
+                                '   <a><i class="fw fw-up"></i></a>' +
+                                '</div>'
+                                : ''
+                            }
+                            </div>
                         `);
                 });
             }
@@ -127,27 +128,28 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                         case 'attribute':
                         case 'customValue':
                         case 'scope':
+
                             if (tempExpression.genericReturnTypes.indexOf('bool') > -1) {
-                                Object.keys(DataMapperUtil.OperatorMap2)
+                                Object.keys(DataMapperUtil.OperatorMap)
                                     .filter(function (key) {
-                                        return DataMapperUtil.OperatorMap2[key].hasLeft
-                                            && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes,
+                                        return DataMapperUtil.OperatorMap[key].hasLeft
+                                            && _.intersection(DataMapperUtil.OperatorMap[key].leftTypes,
                                                 tempExpression.rootNode.genericReturnTypes).length > 0
                                     })
                                     .forEach(function (key) {
-                                        allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                        allowedOperators[key] = DataMapperUtil.OperatorMap[key]
                                     });
                             } else {
-                                Object.keys(DataMapperUtil.OperatorMap2)
+                                Object.keys(DataMapperUtil.OperatorMap)
                                     .filter(function (key) {
-                                        return DataMapperUtil.OperatorMap2[key].hasLeft
-                                            && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes,
+                                        return DataMapperUtil.OperatorMap[key].hasLeft
+                                            && _.intersection(DataMapperUtil.OperatorMap[key].leftTypes,
                                                 tempExpression.rootNode.genericReturnTypes).length > 0
-                                            && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes,
+                                            && _.intersection(DataMapperUtil.OperatorMap[key].returnTypes,
                                                 tempExpression.genericReturnTypes).length > 0
                                     })
                                     .forEach(function (key) {
-                                        allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                        allowedOperators[key] = DataMapperUtil.OperatorMap[key]
                                     });
                             }
                             break;
@@ -180,18 +182,20 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                                     };
                                 }
                             } else {
-                                Object.keys(DataMapperUtil.OperatorMap2)
+                                Object.keys(DataMapperUtil.OperatorMap)
                                     .filter(function (key) {
-                                        return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes,
+                                        return _.intersection(DataMapperUtil.OperatorMap[key].leftTypes,
                                             tempExpression.rootNode.genericReturnTypes).length > 0
                                     })
                                     .forEach(function (key) {
-                                        allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                        allowedOperators[key] = DataMapperUtil.OperatorMap[key]
                                     });
                             }
+
                             break;
                     }
                 } else {
+
                     var customDataTypes = []
                     if (tempExpression.returnTypes.indexOf('bool') > -1) {
                         config.input.stream.attributes
@@ -199,6 +203,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                                 allowedAttributes[attr.name] = attr;
                             });
                         customDataTypes = ['text', 'number', 'bool'];
+
                     } else {
                         config.input.stream.attributes
                             .filter(function (attr) {
@@ -226,13 +231,14 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                         scope: true
                     }
 
-                    Object.keys(DataMapperUtil.OperatorMap2)
+                    Object.keys(DataMapperUtil.OperatorMap)
                         .filter(function (key) {
-                            return DataMapperUtil.OperatorMap2[key].isFirst &&
-                                _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes, tempExpression.returnTypes).length > 0;
+                            return DataMapperUtil.OperatorMap[key].isFirst &&
+                                _.intersection(DataMapperUtil.OperatorMap[key].returnTypes,
+                                    tempExpression.returnTypes).length > 0;
                         })
                         .forEach(function (key) {
-                            allowedOperators[key] = DataMapperUtil.OperatorMap2[key];
+                            allowedOperators[key] = DataMapperUtil.OperatorMap[key];
                         });
                 }
             }
@@ -279,10 +285,9 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                                 container.find('.operand-select-section>ul').append(`
                                     <li class="custom" id="attribute-${key}">
                                         <a style="color: #373737">
-                                            <div 
-                                                class="attribute" 
-                                                style="display: flex; flex-wrap: wrap; padding: 5px;
-                                                 border-bottom: 1px solid rgba(0,0,0,.075);">
+                                            <div class="attribute" 
+                                                style="display: flex; flex-wrap: wrap; padding: 5px; 
+                                                border-bottom: 1px solid rgba(0,0,0,.075);">
                                                 <div class="description" style="width: 100%;">
                                                     Add a custom value to the expression 
                                                 </div>
@@ -297,12 +302,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                                                         <option value="true">True</option>
                                                         <option value="false">false</option>
                                                     </select>
-                                                    <button 
-                                                        style="background-color: #f47b20; padding: 0 6px 0 6px;" 
-                                                        class="btn btn-primary btn-custom-val-submit"
-                                                    >
-                                                        Add
-                                                    </button>
+                                                    <button style="background-color: #f47b20; padding: 0 6px 0 6px;"
+                                                        class="btn btn-primary btn-custom-val-submit">Add</button>
                                                 </div>
                                             </div>
                                         </a>    
@@ -315,19 +316,19 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
 
                                         switch (customValueType.toLowerCase()) {
                                             case 'text':
-                                                var textFieldElement = container
-                                                    .find('.operand-select-section #custom_value_input_txt');
+                                                var textFieldElement =
+                                                    container.find('.operand-select-section #custom_value_input_txt');
                                                 textFieldElement.show();
                                                 break;
                                             case 'number':
-                                                var textFieldElement = container
-                                                    .find('.operand-select-section #custom_value_input_txt');
+                                                var textFieldElement =
+                                                    container.find('.operand-select-section #custom_value_input_txt');
                                                 textFieldElement.show();
                                                 textFieldElement.attr('type', 'number');
                                                 break;
                                             case 'bool':
-                                                var booleanFieldElement = container
-                                                    .find('.operand-select-section #custom_value_input_bool');
+                                                var booleanFieldElement =
+                                                    container.find('.operand-select-section #custom_value_input_bool');
                                                 booleanFieldElement.show();
                                                 break;
                                         }
@@ -359,9 +360,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                                     }
                                 });
 
-                                switch (DataMapperUtil
-                                    .getGenericDataType(container.find('.operand-select-section #custom-val-type')
-                                        .val())) {
+                                switch (DataMapperUtil.getGenericDataType(
+                                    container.find('.operand-select-section #custom-val-type').val())) {
                                     case 'text':
                                     case 'number':
                                         var textFieldElement =
@@ -380,7 +380,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
 
                                 container.find('.operand-select-section .btn-custom-val-submit')
                                     .on('click', function (evt) {
-                                        var dataType = container.find('.operand-select-section #custom-val-type').val();
+                                        var dataType =
+                                            container.find('.operand-select-section #custom-val-type').val();
                                         var value = dataType === 'bool' ?
                                             container.find('.operand-select-section #custom_value_input_bool').val()
                                             : container.find('.operand-select-section #custom_value_input_txt').val();
@@ -388,7 +389,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                                         var nodeData = {
                                             dataType,
                                             value: DataMapperUtil.getGenericDataType(dataType) === 'number' ?
-                                                    Number(value) : value
+                                                Number(value) : value
                                         };
 
                                         tempExpression.addNode(new CustomValueModel(nodeData));
@@ -399,7 +400,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                                     <li class="not-custom" id="attribute-${key}">
                                         <a>
                                             <div style="padding: 10px 15px;color: #373737; 
-                                            border-bottom: 1px solid rgba(0,0,0,.075);" >
+                                                border-bottom: 1px solid rgba(0,0,0,.075);" >
                                                 <b>${key}</b>
                                                 <br/><small>${allowedAttributes[key].type}</small>
                                             </div>
@@ -414,10 +415,10 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                             container.find('.operand-select-section>ul').append(`
                                 <li class="not-custom" id="operator-${key}">
                                     <a>
-                                        <div style="color: #373737; padding: 10px 15px; border-bottom: 1px solid rgba(0,0,0,.075);" >
-                                            <b>
-                                                ${allowedOperators[key].symbol}
-                                            </b>&nbsp;-&nbsp;${allowedOperators[key].description}
+                                        <div style="color: #373737; padding: 10px 15px; 
+                                            border-bottom: 1px solid rgba(0,0,0,.075);" >
+                                            <b>${allowedOperators[key].symbol}</b>
+                                            &nbsp;-&nbsp;${allowedOperators[key].description}
                                         </div>
                                     </a>    
                                 </li>

@@ -9,6 +9,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
             this.__allowRepetitiveParameters = false;
             this.__repetitiveParameterTypes = [];
             this.__repetitiveParamName = '';
+            this.__repetitiveParameterDescription = '';
 
             var extensionData = CompletionEngine.getRawMetadata().extensions;
 
@@ -76,31 +77,42 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                     container.find('#function-name').val(config.query.function.name);
                 }
 
-                if (config.query.function['parameters'] && Object.keys(config.query.function['parameters']).length > 0) {
+                if (config.query.function['parameters']
+                    && Object.keys(config.query.function['parameters']).length > 0) {
                     var functionDataContainer = container.find('.function-parameter-section');
+                    var functionData = self.__functionData[config.query.function.name];
+
                     functionDataContainer.empty();
-                    functionDataContainer.append('<h6 style="color: #373737">Select function syntax to proceed</h6>');
+                    functionDataContainer.append('<h6 style="color: #373737">Function Parameters:</h6>');
 
                     Object.keys(config.query.function.parameters)
                         .forEach(function(key, i) {
                             var paramData = config.query.function.parameters[key];
+                            var paramDescription = functionData.parameters
+                                .filter(datum => datum.name === key);
                             functionDataContainer.append(`
-                                <div style="width: 100%; padding-bottom: 10px" class="input-section">
-                                    <label 
-                                        style="margin-bottom: 0" class="${paramData.value.length > 0 ? 
-                                                                                        '' : 'not-visible'}" 
-                                        id="label-function-param-${key.replaceAll(/\./g, '-')}" 
-                                        for="function-param-${key.replaceAll(/\./g, '-')}"
-                                    >
-                                        ${key}
-                                    </label>
-                                    <input 
-                                        id="function-param-${key.replaceAll(/\./g, '-')}" 
-                                        style="width: 100%; border: none; background-color: transparent; 
+                                <div style="display: flex">
+                                    <div style="flex:1; padding-bottom: 10px" class="input-section">
+                                        <label 
+                                            style="margin-bottom: 0" 
+                                            class="${paramData.value.length > 0 ? '' : 'not-visible'}" 
+                                            id="label-function-param-${key.replaceAll(/\./g, '-')}" 
+                                            for="function-param-${key.replaceAll(/\./g, '-')}"
+                                        >
+                                            ${key}
+                                        </label>
+                                        <input id="function-param-${key.replaceAll(/\./g, '-')}" 
+                                            style="width: 100%; border: none; background-color: transparent; 
                                             border-bottom: 1px solid #373737" placeholder="${key}" 
-                                            type="text" 
-                                            value="${paramData.value}"
-                                    >
+                                            type="text" value="${paramData.value}">
+                                    </div>
+                                    <div style="padding: 20px 0">
+                                        <a style="color: #323232">
+                                            <i title="${paramDescription[0] ? 
+                                                paramDescription[0].description 
+                                                : self.__repetitiveParameterDescription}" class="fw fw-info"></i>
+                                        </a>
+                                    </div>
                                 </div>
                             `);
                         });
@@ -156,14 +168,15 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                 .on('change', function (evt) {
                     var functionID = $(evt.currentTarget).val();
                     var functionData = self.__functionData[functionID];
+                    self.__allowRepetitiveParameters = false;
                     var syntax = null;
                     config.query.function = {enable: true, name: functionID}
 
                     if (functionData.syntax.length > 1) {
                         var functionDataContainer = container.find('.function-parameter-section');
                         functionDataContainer.empty();
-                        functionDataContainer
-                            .append('<h6 style="color: #373737">Select function syntax to proceed</h6>');
+                        functionDataContainer.append('<h6 style="color: #373737">' +
+                            'Select function syntax to proceed</h6>');
                         var functionList = $('<ul></ul>');
 
                         functionData.syntax.forEach(function (syntax, i) {
@@ -171,12 +184,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                                     <li class="" id="syntax-id-${i}">
                                         <a style="color:#333">
                                             <div style="padding: 10px 15px;border-bottom: 1px solid #373737" >
-                                                <b>
-                                                ${
-                                                    syntax.syntax
-                                                        .replaceAll(/</g, '&lt;')
-                                                        .replaceAll(/>/g, '&gt;')
-                                                }</b>
+                                                <b>${syntax.syntax.replaceAll(/</g, '&lt;')
+                                                            .replaceAll(/>/g, '&gt;')}</b>
                                             </div>
                                         </a>    
                                     </li>
@@ -219,6 +228,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                         self.__allowRepetitiveParameters = true;
                         self.__repetitiveParameterTypes = functionData.parameters[paramDataIndex].type;
                         self.__repetitiveParamName = functionData.parameters[paramDataIndex].name;
+                        self.__repetitiveParameterDescription = functionData.parameters[paramDataIndex].description;
                     }
                 }
             });
@@ -232,31 +242,29 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
             var allowRepetitive = false;
             var repetitiveDataTypes = [];
 
-            functionParameterRegexp.exec(syntax.syntax) ? functionParameterRegexp
-                                                            .exec(syntax.syntax)[1]
-                                                            .split(',')
-                .forEach(function (param) {
-                    var temp = param.trim().split(' ');
+            functionParameterRegexp.exec(syntax.syntax) ?
+                functionParameterRegexp.exec(syntax.syntax)[1].split(',').forEach(function (param) {
+                var temp = param.trim().split(' ');
 
-                    var dataTypes = temp[0].match(/<(.*?)>/)[1].split('|').map(function (type) {
-                        return type.toLowerCase();
-                    });
+                var dataTypes = temp[0].match(/<(.*?)>/)[1].split('|').map(function (type) {
+                    return type.toLowerCase();
+                });
 
-                    var placeHolder = syntax.parameterData[temp[1]];
+                var placeHolder = syntax.parameterData[temp[1]];
 
-                    if (!(temp[1].indexOf('...') > -1)) {
-                        var paramNode = {};
-                        paramNode.name = temp[1];
-                        paramNode.dataTypes = dataTypes;
-                        paramNode.placeholder = placeHolder;
-                        paramNode.value = '';
+                if (!(temp[1].indexOf('...') > -1)) {
+                    var paramNode = {};
+                    paramNode.name = temp[1];
+                    paramNode.dataTypes = dataTypes;
+                    paramNode.placeholder = placeHolder;
+                    paramNode.value = '';
 
-                        parameters.push(paramNode);
-                    } else {
-                        allowRepetitive = true;
-                        repetitiveDataTypes = dataTypes;
-                    }
-                }) : null;
+                    parameters.push(paramNode);
+                } else {
+                    allowRepetitive = true;
+                    repetitiveDataTypes = dataTypes;
+                }
+            }) : null;
 
             this.__allowRepetitiveParameters = allowRepetitive;
             this.__repetitiveParameterTypes = repetitiveDataTypes;

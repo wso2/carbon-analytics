@@ -83,25 +83,23 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                 }
 
                 Object.keys(config.query.window.parameters).forEach(function (key) {
-                    paramData = extensionData[config.query.window.type].parameters.find(function(param) { return key === param.name; })
+                    paramData = extensionData[config.query.window.type]
+                        .parameters.find(function(param) { return key === param.name; })
 
                     container.find('.window-option-section').append(`
                         <div style="width: 100%; padding-bottom: 10px; display: flex" class="input-section">
                             <div style="flex:1">
-                                <label 
-                                    style="margin-bottom: 0; color: #373737" 
+                                <label style="margin-bottom: 0; color: #373737" 
                                     class="${config.query.window.parameters[key].value.length > 0 ? '' : 'not-visible'}" 
-                                    id="label-window-op-${key.replaceAll(/\./g,'-')}" 
-                                    for="window-op-${key.replaceAll(/\./g,'-')}"
-                                >
-                                    ${key}
+                                    id="label-window-op-${key.replaceAll(/\./g,'-')}"
+                                     for="window-op-${key.replaceAll(/\./g,'-')}">
+                                        ${key}
                                 </label>
                                 <input 
                                     id="window-op-${key.replaceAll(/\./g, '-')}" 
-                                    style="width: 100%; border: none; background-color: transparent;
-                                        border-bottom: 1px solid #373737" placeholder="${key}" type="text" 
-                                    value="${config.query.window.parameters[key].value}"
-                                >
+                                    style="width: 100%; border: none; background-color: transparent; 
+                                    border-bottom: 1px solid #373737" placeholder="${key}" 
+                                    type="text" value="${config.query.window.parameters[key].value}">
                             </div>
                             <div style="padding-top:20px; cursor: pointer">
                                 <i title="${paramData.description}" class="fw fw-info"></i>
@@ -125,8 +123,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                     })
                     .on('keyup', _.debounce(function (evt) {
                         var inputId = evt.currentTarget.id.match('window-op-([a-zA-Z\-]+)')[1];
-                        config.query.window.parameters[inputId.replaceAll(/-/g, '.')].value =
-                            $(evt.currentTarget).val();
+                        config.query.window.parameters[inputId.replaceAll(/-/g, '.')].value = $(evt.currentTarget).val();
                     }, 100, {}))
             }
         }
