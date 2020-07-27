@@ -85,7 +85,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             var outputAttributeEndpoints = this.outputAttributeEndpoints;
             var generatedExpression = this.expressionMap[outputAttribute]
             && typeof this.expressionMap[outputAttribute] !== 'string' ?
-                '= ' + DataMapperUtil.generateExpressionHTML2(this.expressionMap[outputAttribute], '', null)
+                '= ' + DataMapperUtil.generateExpressionHTML(this.expressionMap[outputAttribute], '', null)
                 : this.expressionMap[outputAttribute] ? `= ${this.expressionMap[outputAttribute]}` : '';
 
             $(outputAttributeEndpoints[outputAttribute].element).find('.mapped-expression').empty();
@@ -292,7 +292,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                         <i style="color: #808080">${config.output.stream.name}.${this.currenOutputElement} = </i>
                             ${
                                 typeof expression !== 'string' ?
-                                    DataMapperUtil.generateExpressionHTML2(expression, '', null)
+                                    DataMapperUtil.generateExpressionHTML(expression, '', null)
                                     : expression
                             }
                         </div>
@@ -302,7 +302,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 expressionContainer.append(`
                     <div class="expression" style="">
                         <i style="color: #808080">expression: </i>
-                        ${DataMapperUtil.generateExpressionHTML2(expression, '', coordinates[0])}
+                        ${DataMapperUtil.generateExpressionHTML(expression, '', coordinates[0])}
                     </div>
                 `);
             }
@@ -315,7 +315,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                     expressionContainer.append(`
                       <div class="expression target" style="display: flex; flex-wrap: wrap">
                           <div class="exp-content">
-                              ${DataMapperUtil.generateExpressionHTML2(tempExp, '', null)}
+                              ${DataMapperUtil.generateExpressionHTML(tempExp, '', null)}
                           </div>
                           <div class="expression-merge">
                               <a href="#">
@@ -327,7 +327,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 } else {
                     expressionContainer.append(`
                       <div class="expression">
-                          ${DataMapperUtil.generateExpressionHTML2(tempExp, '', coordinates[i])}
+                          ${DataMapperUtil.generateExpressionHTML(tempExp, '', coordinates[i])}
                       </div>
                     `);
                 }
@@ -461,16 +461,16 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                         case 'attribute':
                         case 'customValue':
                         case 'scope':
-                            Object.keys(DataMapperUtil.OperatorMap2)
+                            Object.keys(DataMapperUtil.OperatorMap)
                                 .filter(function (key) {
-                                    return DataMapperUtil.OperatorMap2[key].hasLeft
-                                        && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes,
+                                    return DataMapperUtil.OperatorMap[key].hasLeft
+                                        && _.intersection(DataMapperUtil.OperatorMap[key].leftTypes,
                                             tempExp.rootNode.genericReturnTypes).length > 0
-                                        && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes,
+                                        && _.intersection(DataMapperUtil.OperatorMap[key].returnTypes,
                                             tempExp.genericReturnTypes).length > 0
                                 })
                                 .forEach(function (key) {
-                                    supportedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                    supportedOperators[key] = DataMapperUtil.OperatorMap[key]
                                 });
                             break;
                         case 'operator':
@@ -513,15 +513,15 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                                     };
                                 }
                             } else {
-                                Object.keys(DataMapperUtil.OperatorMap2)
+                                Object.keys(DataMapperUtil.OperatorMap)
                                     .filter(function (key) {
-                                        return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes,
+                                        return _.intersection(DataMapperUtil.OperatorMap[key].leftTypes,
                                             tempExp.rootNode.genericReturnTypes).length > 0
-                                            && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes,
+                                            && _.intersection(DataMapperUtil.OperatorMap[key].returnTypes,
                                                 tempExp.genericReturnTypes).length > 0;
                                     })
                                     .forEach(function (key) {
-                                        supportedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                        supportedOperators[key] = DataMapperUtil.OperatorMap[key]
                                     });
                             }
 
@@ -567,14 +567,14 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                         scope: true
                     }
 
-                    Object.keys(DataMapperUtil.OperatorMap2)
+                    Object.keys(DataMapperUtil.OperatorMap)
                         .filter(function (key) {
-                            return DataMapperUtil.OperatorMap2[key].isFirst &&
-                                _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes,
+                            return DataMapperUtil.OperatorMap[key].isFirst &&
+                                _.intersection(DataMapperUtil.OperatorMap[key].returnTypes,
                                     tempExp.returnTypes).length > 0;
                         })
                         .forEach(function (key) {
-                            supportedOperators[key] = DataMapperUtil.OperatorMap2[key];
+                            supportedOperators[key] = DataMapperUtil.OperatorMap[key];
                         });
                 }
 
@@ -1062,7 +1062,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
         }
 
         DataMapper.prototype.displayExpression = function(outputAttrName) {
-            var htmlContent = DataMapperUtil.generateExpressionHTML2(
+            var htmlContent = DataMapperUtil.generateExpressionHTML(
                     this.expressionMap[outputAttrName],
                 '',
                 null);

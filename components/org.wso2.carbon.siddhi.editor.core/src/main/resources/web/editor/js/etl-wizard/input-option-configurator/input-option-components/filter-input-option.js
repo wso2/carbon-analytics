@@ -55,7 +55,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                     </div>
                     <button id="btn-reverse-filter" class="btn btn-default">
                         <i class="fw ${config.query.filter.reverseFilter ? 'fw-check' : 'fw-error'}"></i>&nbsp;
-                        Reverse Condition
+                        Exclude events
                     </button>    
                 </div>
                 <div style="color: #373737" class="expression-section">
@@ -81,7 +81,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                         <div style="width: 95%" class="expression-content">
                             ${
                     typeof expression !== 'string' ?
-                        DataMapperUtil.generateExpressionHTML2(expression, '')
+                        DataMapperUtil.generateExpressionHTML(expression, '')
                         : expression
                     }
                         </div>    
@@ -102,7 +102,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                             <div style="display: flex; padding: ${focusNodes.length - 1 === i ? '15px' : '5px'} 0;" 
                                 class="expression ${focusNodes.length - 1 === i ? 'focus' : ''}">
                                 <div style="width: 95%" class="expression-content">
-                                    ${DataMapperUtil.generateExpressionHTML2(node, '')}
+                                    ${DataMapperUtil.generateExpressionHTML(node, '')}
                                 </div>    
                                 ${
                             focusNodes.length - 1 === i ?
@@ -130,26 +130,26 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                         case 'scope':
 
                             if (tempExpression.genericReturnTypes.indexOf('bool') > -1) {
-                                Object.keys(DataMapperUtil.OperatorMap2)
+                                Object.keys(DataMapperUtil.OperatorMap)
                                     .filter(function (key) {
-                                        return DataMapperUtil.OperatorMap2[key].hasLeft
-                                            && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes,
+                                        return DataMapperUtil.OperatorMap[key].hasLeft
+                                            && _.intersection(DataMapperUtil.OperatorMap[key].leftTypes,
                                                 tempExpression.rootNode.genericReturnTypes).length > 0
                                     })
                                     .forEach(function (key) {
-                                        allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                        allowedOperators[key] = DataMapperUtil.OperatorMap[key]
                                     });
                             } else {
-                                Object.keys(DataMapperUtil.OperatorMap2)
+                                Object.keys(DataMapperUtil.OperatorMap)
                                     .filter(function (key) {
-                                        return DataMapperUtil.OperatorMap2[key].hasLeft
-                                            && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes,
+                                        return DataMapperUtil.OperatorMap[key].hasLeft
+                                            && _.intersection(DataMapperUtil.OperatorMap[key].leftTypes,
                                                 tempExpression.rootNode.genericReturnTypes).length > 0
-                                            && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes,
+                                            && _.intersection(DataMapperUtil.OperatorMap[key].returnTypes,
                                                 tempExpression.genericReturnTypes).length > 0
                                     })
                                     .forEach(function (key) {
-                                        allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                        allowedOperators[key] = DataMapperUtil.OperatorMap[key]
                                     });
                             }
                             break;
@@ -182,13 +182,13 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                                     };
                                 }
                             } else {
-                                Object.keys(DataMapperUtil.OperatorMap2)
+                                Object.keys(DataMapperUtil.OperatorMap)
                                     .filter(function (key) {
-                                        return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes,
+                                        return _.intersection(DataMapperUtil.OperatorMap[key].leftTypes,
                                             tempExpression.rootNode.genericReturnTypes).length > 0
                                     })
                                     .forEach(function (key) {
-                                        allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                        allowedOperators[key] = DataMapperUtil.OperatorMap[key]
                                     });
                             }
 
@@ -231,14 +231,14 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                         scope: true
                     }
 
-                    Object.keys(DataMapperUtil.OperatorMap2)
+                    Object.keys(DataMapperUtil.OperatorMap)
                         .filter(function (key) {
-                            return DataMapperUtil.OperatorMap2[key].isFirst &&
-                                _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes,
+                            return DataMapperUtil.OperatorMap[key].isFirst &&
+                                _.intersection(DataMapperUtil.OperatorMap[key].returnTypes,
                                     tempExpression.returnTypes).length > 0;
                         })
                         .forEach(function (key) {
-                            allowedOperators[key] = DataMapperUtil.OperatorMap2[key];
+                            allowedOperators[key] = DataMapperUtil.OperatorMap[key];
                         });
                 }
             }

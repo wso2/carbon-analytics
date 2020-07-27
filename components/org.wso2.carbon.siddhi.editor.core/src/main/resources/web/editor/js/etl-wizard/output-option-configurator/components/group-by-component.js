@@ -216,7 +216,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             <div style="width: 95%; color: #323232" class="expression-content">
                                 ${
                                     typeof expression !== 'string' ?
-                                        DataMapperUtil.generateExpressionHTML2(expression, '')
+                                        DataMapperUtil.generateExpressionHTML(expression, '')
                                         : expression
                                 }
                             </div>    
@@ -237,7 +237,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                 <div style="display: flex; padding: ${focusNodes.length - 1 === i ? '15px' : '5px'} 0; 
                                 color: #323232" class="expression ${focusNodes.length - 1 === i ? 'focus' : ''}">
                                     <div style="width: 95%" class="expression-content">
-                                        ${DataMapperUtil.generateExpressionHTML2(node, '')}
+                                        ${DataMapperUtil.generateExpressionHTML(node, '')}
                                     </div>    
                                     ${
                                         focusNodes.length - 1 === i ?
@@ -272,28 +272,28 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             case 'customValue':
                             case 'scope':
                                 if (tempExpression.genericReturnTypes.indexOf('bool') > -1) {
-                                    Object.keys(DataMapperUtil.OperatorMap2)
+                                    Object.keys(DataMapperUtil.OperatorMap)
                                         .filter(function (key) {
-                                            return DataMapperUtil.OperatorMap2[key].hasLeft
+                                            return DataMapperUtil.OperatorMap[key].hasLeft
                                                 && _.intersection(
-                                                        DataMapperUtil.OperatorMap2[key].leftTypes,
+                                                        DataMapperUtil.OperatorMap[key].leftTypes,
                                                         tempExpression.rootNode.genericReturnTypes
                                                 ).length > 0
                                         })
                                         .forEach(function (key) {
-                                            allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                            allowedOperators[key] = DataMapperUtil.OperatorMap[key]
                                         });
                                 } else {
-                                    Object.keys(DataMapperUtil.OperatorMap2)
+                                    Object.keys(DataMapperUtil.OperatorMap)
                                         .filter(function (key) {
-                                            return DataMapperUtil.OperatorMap2[key].hasLeft
-                                                && _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes,
+                                            return DataMapperUtil.OperatorMap[key].hasLeft
+                                                && _.intersection(DataMapperUtil.OperatorMap[key].leftTypes,
                                                     tempExpression.rootNode.genericReturnTypes).length > 0
-                                                && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes,
+                                                && _.intersection(DataMapperUtil.OperatorMap[key].returnTypes,
                                                     tempExpression.genericReturnTypes).length > 0
                                         })
                                         .forEach(function (key) {
-                                            allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                            allowedOperators[key] = DataMapperUtil.OperatorMap[key]
                                         });
                                 }
                                 break;
@@ -326,15 +326,15 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                         };
                                     }
                                 } else {
-                                    Object.keys(DataMapperUtil.OperatorMap2)
+                                    Object.keys(DataMapperUtil.OperatorMap)
                                         .filter(function (key) {
-                                            return _.intersection(DataMapperUtil.OperatorMap2[key].leftTypes,
+                                            return _.intersection(DataMapperUtil.OperatorMap[key].leftTypes,
                                                 tempExpression.rootNode.genericReturnTypes).length > 0
-                                                && _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes,
+                                                && _.intersection(DataMapperUtil.OperatorMap[key].returnTypes,
                                                     tempExpression.genericReturnTypes).length > 0;
                                         })
                                         .forEach(function (key) {
-                                            allowedOperators[key] = DataMapperUtil.OperatorMap2[key]
+                                            allowedOperators[key] = DataMapperUtil.OperatorMap[key]
                                         });
                                 }
     
@@ -375,14 +375,14 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                             scope: true
                         }
     
-                        Object.keys(DataMapperUtil.OperatorMap2)
+                        Object.keys(DataMapperUtil.OperatorMap)
                             .filter(function (key) {
-                                return DataMapperUtil.OperatorMap2[key].isFirst &&
-                                    _.intersection(DataMapperUtil.OperatorMap2[key].returnTypes,
+                                return DataMapperUtil.OperatorMap[key].isFirst &&
+                                    _.intersection(DataMapperUtil.OperatorMap[key].returnTypes,
                                         tempExpression.returnTypes).length > 0;
                             })
                             .forEach(function (key) {
-                                allowedOperators[key] = DataMapperUtil.OperatorMap2[key];
+                                allowedOperators[key] = DataMapperUtil.OperatorMap[key];
                             });
                     }
                 }

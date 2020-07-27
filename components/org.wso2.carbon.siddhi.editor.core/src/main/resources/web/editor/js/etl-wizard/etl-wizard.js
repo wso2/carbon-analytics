@@ -1423,7 +1423,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                             expression = o.query.filter.expression;
                                         } else {
                                             expression = $('<div>'+
-                                                DataMapperUtil.generateExpressionHTML2(
+                                                DataMapperUtil.generateExpressionHTML(
                                                     o.query.filter.expression,'', null)
                                                 +'</div>').text()
                                         }
@@ -1453,7 +1453,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                         expression: typeof v[1] === 'string' ?
                                         v[1]
                                         :$('<div>'
-                                        + DataMapperUtil.generateExpressionHTML2(v[1], '', null)
+                                        + DataMapperUtil.generateExpressionHTML(v[1], '', null)
                                         + '</div>').text(),
                                         as: v[0]
                                     }
@@ -1477,7 +1477,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                     return o.query.groupby.havingFilter.expression
                                 }
                                 return $('<div>'
-                                    + DataMapperUtil.generateExpressionHTML2(
+                                    + DataMapperUtil.generateExpressionHTML(
                                         o.query.groupby.havingFilter.expression, '', null)
                                     +'</div>').text()
                             })(),
