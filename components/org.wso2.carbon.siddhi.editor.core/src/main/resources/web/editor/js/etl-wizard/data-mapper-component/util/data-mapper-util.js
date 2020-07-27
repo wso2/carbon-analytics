@@ -189,7 +189,6 @@ function (require, $, _, log) {
         };
 
         var generateExpressionHTML = function (node, id, highlightCoordinate) {
-            // console.log(node);
             var htmlContent = '';
 
             switch (node.type) {
