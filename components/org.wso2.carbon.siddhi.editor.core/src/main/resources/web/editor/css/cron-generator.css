@@ -1,0 +1,145 @@
+/**
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+/** contains css for cron generator dialog **/
+.cron-generator-form-scrollable-block {
+    padding: 20px 20px;
+    overflow: auto;
+    height: 50%;
+    width: 90%;
+    background-color: #2C2C2C;
+    margin-left: 30px;
+}
+
+.errors-container {
+    margin: 50px 20px 20px 20px;
+}
+
+hr.style1 {
+    border-top: 1px solid #2C2C2C;
+    width: 100%;
+    padding: 0 0 5px;
+}
+
+.cron-generator {
+    width: 700px;
+}
+
+.cron-generator .form-group {
+    margin: 10px 0;
+}
+
+.cron-generator .modal-body {
+}
+
+.cron-generator-title {
+    padding:0 0 10px 10px;
+}
+
+.cron-generator-label {
+    margin-top: 8px;
+    margin-left: 20px;
+    font-weight: 300;
+}
+
+hr.cron-generator-hr {
+    border-top: 1px solid #2C2C2C;
+    width: 100%;
+}
+
+.cron-generator-form-label {
+    margin-top: 8px;
+    font-weight: 300;
+}
+
+.cron-generator-form-divider {
+    height: 10px;
+}
+
+.cron-generator-container {
+    padding: 10px 0 10px 0;
+    background-color: transparent;
+    color: white;
+    width: 100%;
+}
+
+.cron-generator-form-scrollable-block-list {
+    padding: 0px 10px;
+    overflow: auto;
+    width: 100%;
+    background-color: #2C2C2C;
+}
+
+.label-description {
+    padding-top: 2px;
+    padding-left: 8px;
+}
+
+.error-field {
+    border: 1px solid red;
+    color: red;
+}
+
+.cron-generator .error-message {
+    color: red;
+    font-weight:bold;
+    text-align:center;
+}
+
+.cron-generator .fw-info {
+    font-size: 10px;
+    margin-left: 3px;
+    color: #b7f1eb;
+}
+
+.cron-generator .fw-info > span {
+    font-family: Arial;
+    background: rgb(37, 36, 36);
+    width: 250px;
+    color: #eee;
+    text-align: left;
+    border-radius: 6px;
+    padding: 5 5px;
+    position: absolute;
+    z-index: 1;
+}
+
+.cron-generator label {
+    margin: 10px 0px;
+    font-size: 11px;
+    text-align:center;
+}
+
+.cron-generator input {
+    text-align:center;
+}
+
+.cron-generator input[type="checkbox"],
+.cron-generator input[type="radio"] {
+    margin: 4px 4px 0px 0px;
+    vertical-align: text-bottom;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus{
+    background-color: #757474;
+    border-color: #3d3d3d;
+    color: #f1e9e9;
+}
+

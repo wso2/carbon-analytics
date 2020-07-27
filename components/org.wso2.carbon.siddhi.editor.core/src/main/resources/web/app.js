@@ -39,6 +39,7 @@ requirejs.config({
         enjoyhint: "commons/lib/enjoyhint/enjoyhint.min",
         smart_wizard: "commons/lib/smartWizard/js/jquery.smartWizard.min",
         pagination: "commons/lib/pagination/pagination.min",
+        cronstrue: "commons/lib/cronstrue/cronstrue.min",
         //beautify: "commons/lib/beautify",
         ///////////////////////
         // custom modules ////
@@ -182,6 +183,7 @@ requirejs.config({
         orderByConfigurator:"js/etl-wizard/output-option-configurator/components/order-by-component",
         advancedOutputConfiguration:"js/etl-wizard/output-option-configurator/components/advanced-output-options-component",
         // ETL Wizard Components  <-- end
+        cronGenerator: "js/design-view/cron-generator/cron-generator"
     },
     map: {
         "*": {
