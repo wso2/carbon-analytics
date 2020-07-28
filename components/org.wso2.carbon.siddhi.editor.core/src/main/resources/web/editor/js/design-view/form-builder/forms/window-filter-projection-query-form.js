@@ -22,6 +22,7 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                 this.toggleViewButton = $('#toggle-view-button-' + currentTabId);
             }
         };
+        let queryID = 1;
 
         /**
          * @function to validate on load of the form
@@ -290,8 +291,9 @@ define(['require', 'log', 'jquery', 'lodash', 'querySelect', 'queryWindowOrFunct
                         if (queryName != "") {
                             queryObject.addQueryName(queryName);
                         } else {
-                            queryName = "Query";
-                            queryObject.addQueryName('query');
+                            queryName = "Query"+queryID;
+                            queryObject.addQueryName(queryName.toLocaleLowerCase());
+                            queryID++;
                         }
 
                         if ($('.group-by-checkbox').is(':checked')) {
