@@ -301,11 +301,13 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
             } else {
                 expressionContainer.append(`
                     <div class="expression" style="">
-                        <i style="color: #808080">expression: </i>
+                        <i style="color: #808080">${config.output.stream.name}.${this.currenOutputElement} = </i>
                         ${DataMapperUtil.generateExpressionHTML(expression, '', coordinates[0])}
                     </div>
                 `);
             }
+
+            console.log(coordinates);
 
             // render expression when one attribute/function/scope is selected in drill down form
             coordinates.forEach(function(index, i) {
@@ -327,7 +329,7 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 } else {
                     expressionContainer.append(`
                       <div class="expression">
-                          ${DataMapperUtil.generateExpressionHTML(tempExp, '', coordinates[i])}
+                          ${DataMapperUtil.generateExpressionHTML(tempExp, '', coordinates[i+1] || null)}
                       </div>
                     `);
                 }

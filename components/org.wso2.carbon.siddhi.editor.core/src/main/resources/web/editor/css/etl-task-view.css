@@ -439,29 +439,10 @@
     cursor: pointer;
 }
 
-.expression.focus .expression-content span.selected {
+.expression .expression-content span.selected {
     color: #ee6719;
 }
 
 .grey-on-hover:hover {
     background: rgba(0, 0, 0, 0.1);
 }
-
-/*.window-option-section .input-section label {*/
-/*    color: rgba(255, 255, 255, 0.6);*/
-/*}*/
-
-/*.window-option-section .input-section input {*/
-/*    color: rgba(255, 255, 255, 0.8);*/
-/*}*/
-
-
-/*.function-parameter-section .input-section label {*/
-/*    color: rgba(255, 255, 255, 0.6);*/
-/*}*/
-
-/*.function-parameter-section .input-section input {*/
-/*    color: rgba(255, 255, 255, 0.8);*/
-/*}*/
-
-

@@ -81,7 +81,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                         <div style="width: 95%" class="expression-content">
                             ${
                     typeof expression !== 'string' ?
-                        DataMapperUtil.generateExpressionHTML(expression, '')
+                        DataMapperUtil.generateExpressionHTML(expression, '', indexArray[0] || null)
                         : expression
                     }
                         </div>    
@@ -102,7 +102,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'attribute
                             <div style="display: flex; padding: ${focusNodes.length - 1 === i ? '15px' : '5px'} 0;" 
                                 class="expression ${focusNodes.length - 1 === i ? 'focus' : ''}">
                                 <div style="width: 95%" class="expression-content">
-                                    ${DataMapperUtil.generateExpressionHTML(node, '')}
+                                    ${DataMapperUtil.generateExpressionHTML(node, '', indexArray[i+1] || null)}
                                 </div>    
                                 ${
                             focusNodes.length - 1 === i ?

@@ -190,7 +190,7 @@ function (require, $, _, log) {
 
         var generateExpressionHTML = function (node, id, highlightCoordinate) {
             var htmlContent = '';
-
+            console.log(highlightCoordinate);
             switch (node.type) {
                 case 'attribute':
                     htmlContent += node.name;
@@ -210,13 +210,13 @@ function (require, $, _, log) {
                     }
                     break;
                 case 'function':
-                    htmlContent += `${id.length > 0 ? `<span id="item${id}">`: ''}${node.displayName.slice(0, -1)}`;
+                    htmlContent += `${id.length > 0 ? `<span class="${id.substr(1)===highlightCoordinate ? 'selected' : ''}" id="item${id}">`: ''}${node.displayName.slice(0, -1)}`;
                     var isFirst = true;
                     node.parameters.forEach(function (param, i) {
                         if (!isFirst) {
                             htmlContent += ', '
                         }
-                        htmlContent += `<span class="${param.rootNode ? 'ok-clear': ''}" title="${param.placeholder}" id="item${id}-${i}" >${generateExpressionHTML(param, `${id}-${i}`, highlightCoordinate)}</span>`
+                        htmlContent += `<span class="${param.rootNode ? 'ok-clear': ''} ${`${i}` === highlightCoordinate ? 'selected' : ''}" title="${param.placeholder}" id="item${id}-${i}" >${generateExpressionHTML(param, `${id}-${i}`, highlightCoordinate)}</span>`
 
                         isFirst = false;
                     })
@@ -228,11 +228,11 @@ function (require, $, _, log) {
                 case 'scope':
                     var idComponents = id.split('-');
                     if (id.length === 0 || /\d/.test(idComponents[idComponents.length-1])) {
-                        htmlContent += `${node.rootNode ? generateExpressionHTML(node.rootNode, '-n') : '...'}`
+                        htmlContent += `${node.rootNode ? generateExpressionHTML(node.rootNode, '-n', highlightCoordinate) : '...'}`
                     } else {
                         htmlContent += `
-                            <span id="item${id}" >
-                                (&nbsp;${node.rootNode? generateExpressionHTML(node.rootNode, `${id}-n`) : '...'}&nbsp;)
+                            <span class="${id.substr(1)===highlightCoordinate ? 'selected' : ''}" id="item${id}" >
+                                (&nbsp;${node.rootNode? generateExpressionHTML(node.rootNode, `${id}-n`, highlightCoordinate) : '...'}&nbsp;)
                             </span>`;
                     }
                     break;
