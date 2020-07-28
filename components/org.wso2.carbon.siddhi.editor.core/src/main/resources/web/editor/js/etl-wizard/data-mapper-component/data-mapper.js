@@ -307,8 +307,6 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                 `);
             }
 
-            console.log(coordinates);
-
             // render expression when one attribute/function/scope is selected in drill down form
             coordinates.forEach(function(index, i) {
                 tempExp = focusNodes[i];

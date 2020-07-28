@@ -190,7 +190,6 @@ function (require, $, _, log) {
 
         var generateExpressionHTML = function (node, id, highlightCoordinate) {
             var htmlContent = '';
-            console.log(highlightCoordinate);
             switch (node.type) {
                 case 'attribute':
                     htmlContent += node.name;
