@@ -51,7 +51,6 @@ define(['require', 'log', 'jquery', 'lodash', './tab','workspace','toolEditor','
 
                 if (this.getFile().getView() === this.app.utils.getGlobalConstnts().VIEW_ETL_FLOW_WIZARD) {
                     var etlWizard = new ETLWizard(initOpts);
-                    etlWizard.render();
                 } else if (this.getFile().getView() === undefined) {
                     var toolEditor = new ToolEditor.Views.ToolEditor(initOpts);
                     this._fileEditor = toolEditor;

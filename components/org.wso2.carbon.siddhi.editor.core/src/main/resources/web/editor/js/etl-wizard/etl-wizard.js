@@ -45,11 +45,17 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             finalizeStep: Handlebars.compile($('#etl-wizard-finalize-template').html())
         };
 
+        var loadExtensionData = function(response, status, jqXHR) {
+            this.__expressionData = response;
+        }
+
         var ETLWizard = function (initOpts) {
+            var self = this;
             this.__options = initOpts;
             this.__app = initOpts.application;
+            this.__tab = initOpts.application.tabController.getActiveTab();
             this.__$parent_el_container = $(initOpts.container);
-            this.__expressionData = undefined;
+            this.__expressionData = null;
             this.__previousSchemaDef = undefined;
             this.__resetSchema = false;
             this.__parentDimension = {
@@ -66,7 +72,22 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             if (this.__propertyMap.appName.length === 0) {
                 this.__propertyMap.appName = 'UntitledETLTaskFlow';
             }
-            this.__parentWizardForm = this.constructWizardHTMLElements($('#ETLWizardForm').clone());
+            this.loadExtensionData = loadExtensionData.bind(this);
+            CompletionEngine.loadMetaData(this.loadExtensionData,
+                () => {console.error("Error occurred when trying to load extension data")});
+
+            // Extension data loading does an async request therefore it is required to wait before proceeding with the
+            // rendering
+            var checkreadyToRender = function () {
+                if(self.__expressionData) {
+                    self.__parentWizardForm = self.constructWizardHTMLElements($('#ETLWizardForm').clone());
+                    self.render();
+                } else {
+                    setTimeout(checkreadyToRender, 200);
+                }
+            }
+
+            checkreadyToRender();
         };
 
         //Constructor for the ETLWizard
@@ -149,10 +170,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var config = this.__propertyMap;
 
             wizardHeaderContent.find('input.etl-flow-name').val(config.appName);
-            setTimeout(function() {
-                self.__options.application.tabController.getActiveTab().getHeader()
-                    .setText(self.__propertyMap.appName);
-            }, 300)
+            self.__tab.getHeader().setText(self.__propertyMap.appName);
 
             wizardObj.find(`#step-${stepIndex}`).addClass('selected');
 
@@ -276,13 +294,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             wizardHeaderContent.find('.etl-flow-name')
                 .on('keyup', _.debounce(function (evt) {
                     config.appName = $(evt.currentTarget).val();
-                    self.__options.application.tabController.getActiveTab().getHeader().setText(config.appName);
+                    self.__tab.getHeader().setText(config.appName);
                 }, 100, {}))
                 .on('focusout', function (evt) {
                     var appName = $(evt.currentTarget).val();
                     if (!(appName.length > 0 && config.appName.length > 0)) {
                         config.appName = 'UntitledETLTaskFlow';
-                        self.__options.application.tabController.getActiveTab().getHeader().setText(config.appName);
+                        self.__tab.getHeader().setText(config.appName);
                         $(evt.currentTarget).val(config.appName);
                     }
                 });
@@ -344,7 +362,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             etlWizardContainer.addClass('etl-wizard-view-enabled');
 
             if (!self.__expressionData) {
-                self.__expressionData = CompletionEngine.getRawMetadata();
+                CompletionEngine.loadMetaData(this.loadExtensionData,
+                    () => {console.error('Error occurred when trying to connect to the server')});
             }
 
             if(self.__resetSchema) {
@@ -419,16 +438,19 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             // handle parent container resizing
             var observer = new ResizeObserver(_.debounce((e) => {
-                if (self.__parentDimension.height === 0 && self.__parentDimension.width === 0) {
-                    self.__parentDimension.height = e[0].contentRect.height;
-                    self.__parentDimension.width = e[0].contentRect.width
-                }
+                if(_.isEqual(self.__app.tabController.getActiveTab(), self.__tab)) {
+                    if (self.__parentDimension.height === 0 && self.__parentDimension.width === 0) {
+                        self.__parentDimension.height = e[0].contentRect.height;
+                        self.__parentDimension.width = e[0].contentRect.width
+                        self.render(self.__saved);
+                    }
 
-                if(e[0].contentRect.height !== self.__parentDimension.height
-                    || e[0].contentRect.width !== self.__parentDimension.width) {
-                    self.__parentDimension.height = e[0].contentRect.height;
-                    self.__parentDimension.width = e[0].contentRect.width
-                    self.render(self.__saved);
+                    if(e[0].contentRect.height !== self.__parentDimension.height
+                        || e[0].contentRect.width !== self.__parentDimension.width) {
+                        self.__parentDimension.height = e[0].contentRect.height;
+                        self.__parentDimension.width = e[0].contentRect.width
+                        self.render(self.__saved);
+                    }
                 }
             }, 300, {}));
             observer.observe(self.__$parent_el_container[0]);
@@ -1036,7 +1058,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             }
 
             if (!self.__expressionData) {
-                self.__expressionData = CompletionEngine.getRawMetadata();
+                self.__expressionData = CompletionEngine.loadMetaData(this.loadExtensionData,
+                    () => {console.error('Error occurred when trying to connect to the server')});
             }
 
             if (!self.__extensionDataMap) {
