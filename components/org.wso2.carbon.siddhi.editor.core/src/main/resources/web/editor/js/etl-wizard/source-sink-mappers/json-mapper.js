@@ -514,10 +514,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
             var value = id.substr(1).replaceAll(/-/g,'.');
             var attribIndex = Object.values(config.mapping.attributes).indexOf(value);
 
-            if(id.length === 0) {
-                content += '"""';
-            }
-
             switch (typeof jsonObject) {
                 case 'object':
                     if ( Array.isArray(jsonObject)) {
@@ -546,16 +542,12 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     break;
                 case "number":
                     content += `${attribIndex > -1 ? 
-                        Object.keys(config.mapping.attributes)[attribIndex] : jsonObject }`
+                        `{{${Object.keys(config.mapping.attributes)[attribIndex]}}}` : jsonObject }`
                     break;
                 case "string":
                     content += `"${attribIndex > -1 ? 
-                        `{{${Object.keys(config.mapping.attributes)[attribIndex]}}` : jsonObject }"`
+                        `{{${Object.keys(config.mapping.attributes)[attribIndex]}}}` : jsonObject }"`
                     break;
-            }
-
-            if(id.length === 0) {
-                content += '"""';
             }
 
             return content;
