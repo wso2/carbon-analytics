@@ -1139,8 +1139,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             }
 
             if (!self.__expressionData) {
-                // self.__expressionData = CompletionEngine.loadMetaData(this.loadExtensionData,
-                //     () => {console.error('Error occurred when trying to connect to the server')});
                 return model;
             }
 
