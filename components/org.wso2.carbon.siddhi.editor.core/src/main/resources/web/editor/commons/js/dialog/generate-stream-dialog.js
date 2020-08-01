@@ -166,6 +166,7 @@ define(['require', 'lodash', 'jquery', 'log'],
                     }
                     self.retrieveTableColumnNames(requestBody, function (data) {
                         constants.streamJsonObj.attributes = data.attributes;
+                        constants.streamJsonObj.tableName = requestBody.tableName;
                         self.callback(constants.streamJsonObj, self.ref, self.streamObj);
                         generateStreamModal.modal('hide');
                     }, function (err) {
