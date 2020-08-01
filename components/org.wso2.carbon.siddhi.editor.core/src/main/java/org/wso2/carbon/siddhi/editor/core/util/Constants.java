@@ -57,6 +57,8 @@ public class Constants {
     public static final String TYPE_JSON = "json";
     public static final String TYPE_TEXT = "text";
     public static final String TYPE_CSV = "csv";
+    public static final String TYPE_NUMBER = "number";
+    public static final String TYPE_DECIMAL = "decimal";
     public static final String SAMPLE_EVENTS_PARENT_TAG = "events";
     public static final String SAMPLE_EVENT_PARENT_TAG = "event";
     public static final String ATTR_TYPE_FLOAT = "float";
@@ -65,6 +67,7 @@ public class Constants {
     public static final String ATTR_TYPE_LONG = "long";
     public static final String ATTR_TYPE_STRING = "string";
     public static final String ATTR_TYPE_BOOL = "bool";
+    public static final String ATTR_TYPE_OBJECT = "object";
     public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
     public static final String FAULT_STREAM_PREFIX = "!";
     public static final String EXPORT_PROPERTIES_NAMESPACE = "exportConfigs";
@@ -90,6 +93,8 @@ public class Constants {
     public static final String TRUE = "true";
     public static final String FALSE = "false";
     public static final String COLUMN_NAME = "COLUMN_NAME";
+    public static final String DECIMAL_DIGITS = "DECIMAL_DIGITS";
+    public static final String COLUMN_SIZE = "COLUMN_SIZE";
     public static final String TYPE_NAME = "TYPE_NAME";
     public static final String DATASOURCE_NAME = "dataSourceName";
     public static final String ATTRIBUTES = "attributes";
