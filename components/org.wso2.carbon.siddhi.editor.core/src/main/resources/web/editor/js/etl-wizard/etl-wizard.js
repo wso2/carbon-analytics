@@ -86,11 +86,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             // rendering
             var checkreadyToRender = function () {
                 if(self.__expressionData) {
+                    self.__propertyMap = self.generateUIDataModel(self.__options.dataModel);
                     if (self.__propertyMap.appName.length === 0) {
                         self.__propertyMap.appName = 'UntitledETLTaskFlow';
                     }
                     self.__parentWizardForm = self.constructWizardHTMLElements($('#ETLWizardForm').clone());
-                    self.__propertyMap = self.generateUIDataModel(self.__options.dataModel);
                     self.render();
                 } else {
                     setTimeout(checkreadyToRender, 200);
@@ -789,33 +789,38 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 </button>
                             </div>` : ''
                     }
-                    <div style="display: flex; padding-top:15px">
-                        <div style="padding-top: 5px">
-                            Add log sink for testing
-                        </div>
-                        <div style="margin-left: 15px">
-                            <div id="btn-group-enable-log-sink" class="btn-group btn-group-toggle" data-toggle="buttons">
-                                <label class="btn" 
-                                        style="${
+                    ${
+                        !(type === constants.SINK_TYPE && self.__propertyMap.output.isStore) ?
+                            `
+                                <div style="display: flex; padding-top:15px">
+                                    <div style="padding-top: 5px">
+                                        Add log sink for testing
+                                    </div>
+                                    <div style="margin-left: 15px">
+                                        <div id="btn-group-enable-log-sink" class="btn-group btn-group-toggle" data-toggle="buttons">
+                                            <label class="btn" 
+                                                    style="${
                                             config.addLog ?
                                                 "background-color: rgb(91,203,92); color: white;"
                                                 : "background-color: rgb(100,109,118); color: white;"}" 
-                                 >
-                                    <input type="radio" name="options" id="enable" autocomplete="off"> 
-                                    <i class="fw fw-check"></i>
-                                </label>
-                                <label class="btn" 
-                                        style="${
+                                             >
+                                                <input type="radio" name="options" id="enable" autocomplete="off"> 
+                                                <i class="fw fw-check"></i>
+                                            </label>
+                                            <label class="btn" 
+                                                    style="${
                                             !config.addLog ?
                                                 "background-color: red; color: white;"
                                                 : "background-color: rgb(100,109,118); color: white;"}" 
-                                >
-                                    <input type="radio" name="options" id="disable" autocomplete="off"> 
-                                    <i class="fw fw-cancel"></i>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
+                                            >
+                                                <input type="radio" name="options" id="disable" autocomplete="off"> 
+                                                <i class="fw fw-cancel"></i>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            `: ''
+                    }
                     <div style="padding-top: 10px">
                         <div>
                             <label for="stream-name-txt">
