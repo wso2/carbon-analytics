@@ -2488,8 +2488,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 if (predefinedFunction.name.toLowerCase() === savedType) {
                     if (predefinedFunction.parameterOverloads) {
                         var nameWithUniqueOverload = predefinedFunction.name + "(";
+                        var overload;
                         for (var i = 0; i < predefinedFunction.parameterOverloads.length; i++) {
-                            var overload = predefinedFunction.parameterOverloads[i];
+                            overload = predefinedFunction.parameterOverloads[i];
                             var lengthOfSavedParameters = savedParameters.length;
                             var noOfOverloadParameters = overload.length;
                             for (var k = 0; k < overload.length; k++) {
@@ -2507,7 +2508,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                                 nameWithUniqueOverload += overload;
                             }
                         }
-                        nameWithUniqueOverload += ")";
+                        nameWithUniqueOverload += overload + ")";
                         functionName = nameWithUniqueOverload;
                     } else {
                         var nameWithAllParameters = predefinedFunction.name + "(";
