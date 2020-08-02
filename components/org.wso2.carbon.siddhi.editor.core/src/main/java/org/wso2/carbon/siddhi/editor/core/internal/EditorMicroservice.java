@@ -1868,7 +1868,21 @@ public class EditorMicroservice implements Microservice {
                 while (rsColumns.next()) {
                     JsonObject object = new JsonObject();
                     object.addProperty(Constants.NAME, rsColumns.getString(Constants.COLUMN_NAME));
-                    object.addProperty(Constants.DATA_TYPE, rsColumns.getString(Constants.TYPE_NAME));
+                    if (rsColumns.getString(Constants.TYPE_NAME).equalsIgnoreCase(Constants.TYPE_NUMBER) ||
+                            rsColumns.getString(Constants.TYPE_NAME).equalsIgnoreCase(Constants.TYPE_DECIMAL)) {
+                        if (rsColumns.getInt(Constants.DECIMAL_DIGITS) > 0) {
+                            object.addProperty(Constants.DATA_TYPE, Constants.ATTR_TYPE_DOUBLE);
+                        } else if (rsColumns.getInt(Constants.COLUMN_SIZE) > 10) {
+                            object.addProperty(Constants.DATA_TYPE, Constants.ATTR_TYPE_LONG);
+                        } else if (rsColumns.getInt(Constants.COLUMN_SIZE) == 1) {
+                            object.addProperty(Constants.DATA_TYPE, Constants.ATTR_TYPE_BOOL);
+                        } else {
+                            object.addProperty(Constants.DATA_TYPE, Constants.ATTR_TYPE_INTEGER);
+                        }
+                    } else {
+                        object.addProperty(Constants.DATA_TYPE, MetaInfoRetrieverUtils.
+                                getSiddhiDataType(rsColumns.getString(Constants.TYPE_NAME)));
+                    }
                     tableNamesArray.add(object);
                 }
                 jsonResponse.add(Constants.ATTRIBUTES, tableNamesArray);
@@ -1901,7 +1915,7 @@ public class EditorMicroservice implements Microservice {
         String hostAndPort = host + ":" + port;
         try {
             return Response.ok()
-                .entity(errorHandlerApiHelper.getSiddhiAppList(hostAndPort, username, password)).build();
+                    .entity(errorHandlerApiHelper.getSiddhiAppList(hostAndPort, username, password)).build();
         } catch (ErrorHandlerServiceStubException e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
@@ -1919,7 +1933,7 @@ public class EditorMicroservice implements Microservice {
         String hostAndPort = host + ":" + port;
         try {
             return Response.ok()
-                .entity(errorHandlerApiHelper.getTotalErrorEntriesCount(hostAndPort, username, password)).build();
+                    .entity(errorHandlerApiHelper.getTotalErrorEntriesCount(hostAndPort, username, password)).build();
         } catch (ErrorHandlerServiceStubException e) {
             return Response.serverError().entity(e).build();
         }
@@ -1937,7 +1951,7 @@ public class EditorMicroservice implements Microservice {
         String hostAndPort = host + ":" + port;
         try {
             return Response.ok().entity(
-                errorHandlerApiHelper.getErrorEntriesCount(siddhiAppName, hostAndPort, username, password)).build();
+                    errorHandlerApiHelper.getErrorEntriesCount(siddhiAppName, hostAndPort, username, password)).build();
         } catch (ErrorHandlerServiceStubException e) {
             return Response.serverError().entity(e).build();
         }
@@ -1957,7 +1971,7 @@ public class EditorMicroservice implements Microservice {
         String hostAndPort = host + ":" + port;
         try {
             JsonArray jsonArray = errorHandlerApiHelper.getMinimalErrorEntries(siddhiAppName, limit, offset,
-                hostAndPort, username, password);
+                    hostAndPort, username, password);
             return Response.ok().entity(jsonArray).build();
         } catch (ErrorHandlerServiceStubException e) {
             return Response.serverError().entity(e).build();
@@ -2036,19 +2050,19 @@ public class EditorMicroservice implements Microservice {
         if (siddhiAppName != null && retentionDays == null) {
             try {
                 boolean isSuccess =
-                    errorHandlerApiHelper.discardErrorEntries(siddhiAppName, hostAndPort, username, password);
+                        errorHandlerApiHelper.discardErrorEntries(siddhiAppName, hostAndPort, username, password);
                 if (isSuccess) {
                     return Response.ok().entity(new Gson().toJson("{}")).build();
                 }
                 return Response.serverError().entity(
-                    String.format("Failed to discard error entries for Siddhi app: %s.", siddhiAppName)).build();
+                        String.format("Failed to discard error entries for Siddhi app: %s.", siddhiAppName)).build();
             } catch (ErrorHandlerServiceStubException e) {
                 return Response.serverError().entity(e).build();
             }
         } else if (retentionDays != null && siddhiAppName == null) {
             try {
                 boolean isSuccess =
-                    errorHandlerApiHelper.doPurge(Integer.parseInt(retentionDays), hostAndPort, username, password);
+                        errorHandlerApiHelper.doPurge(Integer.parseInt(retentionDays), hostAndPort, username, password);
                 if (isSuccess) {
                     return Response.ok().entity(new Gson().toJson("{}")).build();
                 }
@@ -2058,7 +2072,7 @@ public class EditorMicroservice implements Microservice {
             }
         }
         return Response.status(Response.Status.BAD_REQUEST)
-            .entity("Exactly one of the following query parameters is required: 'siddhiApp', 'retentionDays'.").build();
+                .entity("Exactly one of the following query parameters is required: 'siddhiApp', 'retentionDays'.").build();
     }
 
     /**

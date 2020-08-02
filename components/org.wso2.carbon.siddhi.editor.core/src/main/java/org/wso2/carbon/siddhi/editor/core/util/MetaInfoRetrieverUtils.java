@@ -55,13 +55,13 @@ public class MetaInfoRetrieverUtils {
             JsonObject attribute = new JsonObject();
             if (attributeNameArray != null) {
                 attribute.addProperty("name", attributeNameArray[count].
-                        replaceAll("\\s",""));
+                        replaceAll("\\s", ""));
             } else {
                 attribute.addProperty("name", "attr" + (count + 1));
             }
             attribute.addProperty("type", findDataTypeFromString(value));
             attributes.add(attribute);
-            count ++;
+            count++;
         }
         response.addProperty("attributes", attributes.toString());
         return response;
@@ -73,7 +73,7 @@ public class MetaInfoRetrieverUtils {
         Map map = (LinkedHashMap) obj;
         StringBuilder warningMessage = new StringBuilder("");
         Iterator it = map.entrySet().iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             JsonObject attribute = new JsonObject();
             Map.Entry entry = (Map.Entry) it.next();
             if (entry.getValue() instanceof JSONArray || entry.getValue() instanceof LinkedHashMap) {
@@ -81,7 +81,7 @@ public class MetaInfoRetrieverUtils {
                         "\".");
             } else {
                 attribute.addProperty("name", ((String) entry.getKey()).
-                        replaceAll("\\s",""));
+                        replaceAll("\\s", ""));
 
                 attribute.addProperty("type", findDataTypeFromString(entry.getValue().toString()));
                 attributes.add(attribute);
@@ -218,4 +218,32 @@ public class MetaInfoRetrieverUtils {
         return new String[]{dataSource.getJdbcUrl(), dataSource.getUsername(), dataSource.getPassword()};
     }
 
+    public static String getSiddhiDataType(String databaseDataType) {
+        switch (databaseDataType) {
+            case "TINYINT":
+            case "NUMBER":
+            case "BIT":
+            case "BOOLEAN":
+            case "SMALLINT":
+                return Constants.ATTR_TYPE_BOOL;
+            case "BLOB":
+            case "VARBINARY":
+            case "BYTEA":
+                return Constants.ATTR_TYPE_OBJECT;
+            case "INTEGER":
+            case "INT":
+                return Constants.ATTR_TYPE_INTEGER;
+            case "FLOAT":
+            case "REAL":
+                return Constants.ATTR_TYPE_FLOAT;
+            case "BIGINT":
+            case "LONG":
+                return Constants.ATTR_TYPE_LONG;
+            case "DOUBLE":
+            case "DOUBLE PRECISION":
+                return Constants.ATTR_TYPE_DOUBLE;
+            default:
+                return Constants.ATTR_TYPE_STRING;
+        }
+    }
 }
