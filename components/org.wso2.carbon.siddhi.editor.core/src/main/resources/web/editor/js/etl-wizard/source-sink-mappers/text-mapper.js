@@ -429,7 +429,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     var finish = textAreaElement[0].selectionEnd;
                     var allText = textAreaElement[0].value;
 
-                    var newText = `${allText.substring(0, start)}{{ ${attributeName} }}${allText.substring(finish)}`;
+                    var newText = `${allText.substring(0, start)}{{${attributeName}}}${allText.substring(finish)}`;
 
                     textAreaElement.val(newText);
                     config.mapping.payload = textAreaElement.val();
