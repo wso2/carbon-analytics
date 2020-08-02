@@ -57,8 +57,6 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                 `);
             });
 
-
-
             container.find('#window-type').on('change', function (evt) {
                 var windowExtensionType = $(evt.currentTarget).val();
 

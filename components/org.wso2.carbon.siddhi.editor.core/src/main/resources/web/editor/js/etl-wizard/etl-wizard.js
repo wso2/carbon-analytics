@@ -1738,7 +1738,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
         var updateButtonBar = function(wizardFooterContent, stepIndex) {
             wizardFooterContent.find('.btn').show();
-            if (stepIndex == 5) {
+            if(stepIndex === 1) {
+                wizardFooterContent.find('.back-btn').hide();
+            }
+            if (stepIndex === 6 || stepIndex === 5) {
                 wizardFooterContent.find('.next-btn').hide();
             } else {
                 wizardFooterContent.find('.save-btn').hide();
