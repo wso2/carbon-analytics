@@ -297,6 +297,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 if (result.status) {
                     self.__options.application.commandManager.dispatch("open-folder", "workspace");
                     self.__options.application.workspaceManager.updateMenuItems();
+                    self.__options.application.commandManager.dispatch('remove-unwanted-streams-single-simulation', self.__propertyMap.appName);
                 }
 
                 wizardObj.find(`#step-${self.__stepIndex++}`).removeClass('selected');
