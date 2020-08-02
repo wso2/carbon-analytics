@@ -501,30 +501,16 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     ${
                         type !== constants.SOURCE_TYPE ?
                             `<div style="display: flex; padding-top:15px">
-                                <div style="padding-top: 5px">
-                                   Use store extension 
-                                </div>
-                                <div style="margin-left: 15px">
-                                    <div id="btn-group-enable-store-extension" class="btn-group btn-group-toggle" 
-                                        data-toggle="buttons">
-                                        <label class="btn" 
-                                                style="${
-                                                    isStore ?
-                                                        "background-color: rgb(91,203,92); color: white;"
-                                                        : "background-color: rgb(100,109,118); color: white;"}" 
-                                         >
-                                            <input type="radio" name="options" id="enable" autocomplete="off"> 
-                                            <i class="fw fw-check"></i>
-                                        </label>
-                                        <label class="btn" 
-                                                style="${
-                                                    !isStore ?
-                                                        "background-color: red; color: white;"
-                                                        : "background-color: rgb(100,109,118); color: white;"}" 
-                                        >
-                                            <input type="radio" name="options" id="disable" autocomplete="off"> 
-                                            <i class="fw fw-cancel"></i>
-                                        </label>
+                                <div class="extension-option" style="display: flex">
+                                    <div style="">
+                                        <input class="extension-type" type="radio" id="enableSink" name="extensionOption" 
+                                            value="sinkOption">
+                                        <label for="enableSink">Use Sink</label><br>
+                                    </div>
+                                    <div style="margin-left: 15px">
+                                        <input class="extension-type" type="radio" id="enableStore" name="extensionOption" 
+                                            value="storeOption" >
+                                        <label for="enableStore">Use Data Store</label><br>
                                     </div>
                                 </div>
                             </div>` : ''
@@ -601,8 +587,21 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 self.render();
             });
 
-            wizardBodyContent.find('#btn-group-enable-store-extension .btn').on('click', function(evt) {
-                self.__propertyMap.output.isStore = !self.__propertyMap.output.isStore;
+            if (self.__propertyMap.output.isStore) {
+                wizardBodyContent.find('.extension-option #enableStore').attr('checked', true);
+            } else {
+                wizardBodyContent.find('.extension-option #enableSink').attr('checked', true);
+            }
+
+            wizardBodyContent.find('.extension-option input').on('click', evt => {
+                if(evt.currentTarget.id === 'enableStore') {
+                    self.__propertyMap.output.isStore = true;
+                }
+
+                if (evt.currentTarget.id === 'enableSink') {
+                    self.__propertyMap.output.isStore = false;
+                }
+
                 self.__propertyMap.output.sink = {
                     type: '',
                     properties: {},
