@@ -78,8 +78,8 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 buttonWrap.append(createNewETLFlowButton);
                 buttonWrap.append(openButton);
 
-                $('#query-guide-link-container').append('<a href="https://siddhi.io/en/v'+Version.MINOR_VERSION+
-                    '/docs/query-guide/" target="_blank"><i class="fw-info"></i> Siddhi Query Guide</a>');
+                $('#query-guide-link-container').append('<a href="https://siddhi.io/en/v5.1/docs/query-guide/"
+                target="_blank"><i class="fw-info"></i> Siddhi Query Guide</a>');
                 $('#step-2 > div.step-description-text').append('Use ${...} format to template siddhi apps');
                 $('#step-3 > div.step-description-text').append('Use ${...} format to template the configurations');
 
@@ -115,13 +115,13 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 quickLinksPane.append(quickLinkHeader);
 
                 var bodyUlQuickLinkContent = $('<ul class="quick-links col-md-12 col-lg-8">' +
-                    '<li class="col-md-4"><a href="https://ei.docs.wso2.com/en/latest/streaming-integrator/quick-start-guide/getting-started-with-si/"' +
+                    '<li class="col-md-4"><a href="https://ei.docs.wso2.com/en/latest/streaming-integrator/quick-start-guide/quick-start-guide/"' +
                     'target="_blank"><i class="fw fw-list"></i>Quick Start Guide</a></li>' +
                     '<li class="col-md-4"><a href="https://siddhi.io/en/v5.1/docs/"' +
                     'target="_blank"><i class="fw fw-carbon"></i>Siddhi Grammar</a></li>' +
                     '<li class="col-md-4"><a href="https://stackoverflow.com/questions/tagged/wso2si"' +
                     'target="_blank"><i class="fw fw-info"></i>Q&A</a></li>' +
-                    '<li class="col-md-4"><a href="https://ei.docs.wso2.com/en/7.0.0/streaming-integrator/examples/tutorials-overview"' +
+                    '<li class="col-md-4"><a href="https://ei.docs.wso2.com/en/latest/streaming-integrator/examples/tutorials-overview"' +
                     'target="_blank"><i class="fw fw-text"></i>Tutorials</a></li>' +
                     '<li class="col-md-4"><a href="https://ei.docs.wso2.com/en/latest/streaming-integrator/overview/overview/"' +
                     'target="_blank"><i class="fw fw-google-docs"></i>Documentation</a></li>' +
