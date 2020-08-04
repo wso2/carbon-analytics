@@ -47,8 +47,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                         <option disabled selected value> -- select an option -- </option>
                     </select>
                 </div>
-                <div style="padding: 0 5px;color: #373737" class="window-option-section">
-                        
+                <div style="padding: 0 5px;color: #373737; margin-top: 15px" class="window-option-section">
                 </div>
             `);
 
@@ -58,18 +57,18 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                 `);
             });
 
-
-
             container.find('#window-type').on('change', function (evt) {
                 var windowExtensionType = $(evt.currentTarget).val();
 
                 config.query.window['type'] = windowExtensionType;
                 config.query.window['parameters'] = {};
 
-                extensionData[windowExtensionType].parameters.forEach(function (paramData) {
-                    config.query.window.parameters[paramData.name] = {
-                        value: paramData.defaultValue,
-                        type: paramData.type
+                extensionData[windowExtensionType].parameters
+                    .filter(paramData => !paramData.optional)
+                    .forEach(function (paramData) {
+                        config.query.window.parameters[paramData.name] = {
+                            value: paramData.defaultValue,
+                            type: paramData.type
                     }
                 });
                 self.render();
@@ -79,8 +78,79 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                 container.find('#window-type').val(config.query.window.type)
 
                 if(Object.keys(config.query.window.parameters).length > 0) {
-                    container.find('.window-option-section').append('<h6><b>Window Options</b></h6>');
+                    container.find('.window-option-section').append(`
+                        <span><b>Window Options</b></span>
+                        ${
+                            self.__extensionData[config.query.window.type].parameters.length !== 
+                                config.query.window.parameters.length ?
+                                    `
+                                        <button style="background-color: #ee6719" 
+                                            class="btn btn-default btn-circle" id="btn-add-window-property" 
+                                            type="button" data-toggle="dropdown"
+                                        >
+                                            <i class="fw fw-add"></i>
+                                        </button>
+                                    ` : ''                                    
+                        }
+                        <div id="window-options-dropdown" class="dropdown-menu-style hidden" 
+                            aria-labelledby="">
+                        </div> 
+                    `);
                 }
+
+                self.__extensionData[config.query.window.type].parameters
+                    .filter((paramData) => Object.keys(config.query.window.parameters).indexOf(paramData.name) === -1)
+                    .forEach(paramData => {
+                        container.find('#window-options-dropdown').append(`
+                            <a title="" class="dropdown-item" href="#">
+                                <div>
+                                    <div class="option-title">${paramData.name}</div><br/>
+                                    <small style="opacity: 0.8">
+                                        ${
+                                            paramData.description.replaceAll('<', '&lt;')
+                                                .replaceAll('>', '&gt;').replaceAll('`', '')
+                                        }
+                                    </small><br/>
+                                    <small style="opacity: 0.8">
+                                        <b>Default Value</b>: ${paramData.defaultValue.replaceAll(/\`/g, '')}
+                                    </small>
+                                </div>
+                            </a>
+                        `)
+                    })
+
+                container.find('#btn-add-window-property')
+                    .on('mouseover', function (evt) {
+                        var leftOffset = evt.currentTarget.offsetLeft;
+                        var elementObj = container.find('#window-options-dropdown');
+                        elementObj.css({"left": `${leftOffset}px`})
+                        elementObj
+                            .removeClass('hidden')
+                            .on('mouseleave', function () {
+                                elementObj.addClass('hidden');
+                            });
+                    })
+                    .on('mouseleave', function () {
+                        setTimeout(function () {
+                            var elementObj = container.find('#window-options-dropdown');
+                            if (!(container.find('#window-options-dropdown:hover').length > 0)) {
+                                elementObj.addClass('hidden');
+                            }
+                        }, 300);
+                    });
+
+                container.find('#window-options-dropdown>a').on('click', function (evt) {
+                    var optionName = $(evt.currentTarget).find('.option-title').text();
+                    var selectedOption = extensionData[config.query.window.type].parameters
+                        .filter(paramData => paramData.name === optionName)[0];
+
+                    config.query.window.parameters[optionName] = {
+                        value: selectedOption.defaultValue,
+                        type: selectedOption.type
+                    };
+
+                    self.render();
+                });
 
                 Object.keys(config.query.window.parameters).forEach(function (key) {
                     paramData = extensionData[config.query.window.type]
@@ -104,9 +174,24 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'app/source-editor/compl
                             <div style="padding-top:20px; cursor: pointer">
                                 <i title="${paramData.description}" class="fw fw-info"></i>
                             </div>
+                            ${
+                                paramData.optional ?
+                                    `<div style="margin-left: 5px; padding-top:20px; cursor: pointer">
+                                        <i id="window-op-del-${paramData.name.replaceAll(/\./g, '-')}" class="fw fw-delete"></i>
+                                    </div>` : ''
+                            }
                         </div>
                     `);
                 });
+
+                container.find('.window-option-section .fw-delete')
+                    .on('click', (evt) => {
+                       let propertyName = evt.currentTarget.id
+                           .match('window-op-del-([a-zA-Z\-0-9]+)')[1].replaceAll(/-/g, '.');
+
+                       delete config.query.window.parameters[propertyName];
+                       self.render();
+                    });
 
                 container.find('.window-option-section .input-section input')
                     .on('focus', function (evt) {

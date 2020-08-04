@@ -102,18 +102,21 @@ define(['log', 'jquery', 'backbone', 'lodash', 'context_menu', 'launch_manager',
                                     status: "RUN"
                                 };
                                 commandManager.dispatch('change-app-status-single-simulation', options);
+                                return true;
                             } else {
                                 console.log("Error while parsing Errors in Siddhi app", response);
-                                alerts.error("Error while parsing Errors in Siddhi app." + response.message);                        }
-
+                                alerts.error("Error while parsing Errors in Siddhi app." + response.message);
+                                return false;
+                            }
                         },
                     );
                 } else {
                     alerts.error("Save file before running application");
+                    return false;
                 }
                 function submitToParse(data, callback, errorCallback) {
                     if (data.siddhiApp === "") {
-                        return;
+                        return false;
                     }
                     $.ajax({
                         type: "POST",

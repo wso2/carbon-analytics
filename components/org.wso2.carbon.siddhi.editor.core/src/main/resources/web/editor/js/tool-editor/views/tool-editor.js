@@ -172,8 +172,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 var etlOptions = _.cloneDeep(self.options);
                                 etlOptions.dataModel = self.JSONObject;
 
-                                var etlWizard = new ETLWizard(etlOptions);
-                                etlWizard.render();
+                                new ETLWizard(etlOptions);
                             } else if (response.status === "fail") {
                                 loadingScreen.hide();
                                 DesignViewUtils.prototype.errorAlert(response.errorMessage);
@@ -337,13 +336,12 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                 canTranslateToWizard: function(model) {
                     var config = model.siddhiAppConfig;
-                    return config.streamList.length == 2 &&
+                    return (config.streamList.length == 2 && config.tableList.length == 0 && config.sinkList.filter(s => s.type !== 'log').length == 1
+                        || config.streamList.length==1 && config.tableList.length == 1) &&
                         config.sourceList.length == 1 &&
-                        config.sinkList.filter(s => s.type !== 'log').length == 1 &&
                         config.aggregationList.length == 0 &&
                         config.functionList.length == 0 &&
                         config.partitionList.length == 0 &&
-                        config.tableList.length == 0 &&
                         config.triggerList.length == 0 &&
                         config.windowList.length == 0 &&
                         config.queryLists.JOIN.length == 0 &&
