@@ -360,7 +360,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var designContainer = this.__$parent_el_container.find(_.get(this.__options, 'design_view.container'));
             var previewContainer = this.__$parent_el_container.find(_.get(this.__options, 'preview.container'));
             var toggleControlsContainer = this.__$parent_el_container.find('.toggle-controls-container');
-            var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY)
+            var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY);
+            var wizardHeaderContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_HEADER);
 
             this.__parentWizardForm.find('.next-btn').popover('destroy');
             var wizardFooterContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_FOOTER)
@@ -446,7 +447,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 }
             }
 
-            updateButtonBar(wizardFooterContent, this.__stepIndex);
+            updateButtonBar(wizardFooterContent, this.__stepIndex, this.__substep);
+            updateHeaderTextField(wizardHeaderContent, this.__stepIndex);
 
             // handle parent container resizing
             var observer = new ResizeObserver(_.debounce((e) => {
@@ -1603,14 +1605,16 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             },
                             select: {
                                 type: "USER_DEFINED",
-                                value: Object.entries(o.query.mapping).map(v => {
+                                value: o.output.stream.attributes.map(attr => {
+
                                     return {
-                                        expression: typeof v[1] === 'string' ?
-                                        v[1]
-                                        :$('<div>'
-                                        + DataMapperUtil.generateExpressionHTML(v[1], '', null)
+                                        expression: typeof o.query.mapping[attr.name] === 'string' ?
+                                        o.query.mapping[attr.name]
+                                        : $('<div>'
+                                        + DataMapperUtil.generateExpressionHTML(
+                                            o.query.mapping[attr.name],'', null)
                                         + '</div>').text(),
-                                        as: v[0]
+                                        as: attr.name
                                     }
                                 })
                             },
@@ -1736,17 +1740,31 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             return result;
         };
 
-        var updateButtonBar = function(wizardFooterContent, stepIndex) {
+        var updateButtonBar = function(wizardFooterContent, stepIndex, substepIndex) {
             wizardFooterContent.find('.btn').show();
-            if(stepIndex === 1) {
+            if(stepIndex === 1 && substepIndex === 0) {
                 wizardFooterContent.find('.back-btn').hide();
             }
-            if (stepIndex === 6 || stepIndex === 5) {
+
+            if (stepIndex === 6) {
+                wizardFooterContent.find('.next-btn').hide();
+                wizardFooterContent.find('.save-btn').hide();
+
+            } else if (stepIndex === 5) {
                 wizardFooterContent.find('.next-btn').hide();
             } else {
                 wizardFooterContent.find('.save-btn').hide();
             }
+
         };
+
+        var updateHeaderTextField = function (wizardHeaderContent, stepIndex) {
+            if (stepIndex === 6) {
+                wizardHeaderContent.find('.etl-flow-name').attr('disabled', true);
+            } else {
+                wizardHeaderContent.find('.etl-flow-name').attr('disabled', false);
+            }
+        }
 
         return ETLWizard;
     });
