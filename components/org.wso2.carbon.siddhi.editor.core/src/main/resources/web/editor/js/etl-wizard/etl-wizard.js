@@ -176,6 +176,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         ETLWizard.prototype.constructWizardHTMLElements = function (wizardObj) {
             var self = this;
             var wizardHeaderContent = wizardObj.find(constants.CLASS_WIZARD_MODAL_HEADER);
+            var wizardFooterContent = wizardObj.find(constants.CLASS_WIZARD_MODAL_FOOTER);
             var stepIndex = self.__stepIndex;
 
             wizardHeaderContent.find('input.etl-flow-name').val(self.__propertyMap.appName);
@@ -305,6 +306,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 self.render(result);
             });
 
+            wizardFooterContent.find('.close-btn').on('click', (evt) => {
+                self.__options.application.tabController
+                    .removeTab(self.__options.application.tabController.getActiveTab());
+            });
+
             wizardHeaderContent.find('.etl-flow-name')
                 .on('keyup', _.debounce(function (evt) {
                     self.__propertyMap.appName = $(evt.currentTarget).val();
@@ -364,7 +370,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var wizardHeaderContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_HEADER);
 
             this.__parentWizardForm.find('.next-btn').popover('destroy');
-            var wizardFooterContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_FOOTER)
+            var wizardFooterContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_FOOTER);
             etlWizardContainer.append(this.__parentWizardForm);
 
             canvasContainer.addClass('hide-div');
@@ -1749,13 +1755,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             if (stepIndex === 6) {
                 wizardFooterContent.find('.next-btn').hide();
                 wizardFooterContent.find('.save-btn').hide();
-
             } else if (stepIndex === 5) {
                 wizardFooterContent.find('.next-btn').hide();
+                wizardFooterContent.find('.close-btn').hide();
             } else {
                 wizardFooterContent.find('.save-btn').hide();
+                wizardFooterContent.find('.close-btn').hide();
             }
-
         };
 
         var updateHeaderTextField = function (wizardHeaderContent, stepIndex) {
