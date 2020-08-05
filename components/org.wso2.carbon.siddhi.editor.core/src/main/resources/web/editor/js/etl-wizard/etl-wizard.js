@@ -45,16 +45,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             finalizeStep: Handlebars.compile($('#etl-wizard-finalize-template').html())
         };
 
-        var loadExtensionData = function (response, status, jqXHR) {
+        var loadExtensionData = function(response, status, jqXHR) {
             this.__expressionData = response;
         }
 
-        var handleStreamGenerationResponse = function (streamDef) {
-            if (streamDef.tableName != null) {
-                this.__propertyMap.output.stream.name = streamDef.tableName;
-            } else {
-                this.__propertyMap.output.stream.name = streamDef.name;
-            }
+        var handleStreamGenerationResponse = function(streamDef) {
+            this.__propertyMap.output.stream.name = streamDef.tableName;
             this.__propertyMap.output.stream.attributes = streamDef.attributes;
             this.render();
         };
@@ -84,14 +80,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             this.handleStreamGenerationResponse = handleStreamGenerationResponse.bind(this);
             this.generateUIDataModel = generateUIDataModel.bind(this);
             CompletionEngine.loadMetaData(this.loadExtensionData,
-                () => {
-                    console.error("Error occurred when trying to load extension data")
-                });
+                () => {console.error("Error occurred when trying to load extension data")});
 
             // Extension data loading does an async request therefore it is required to wait before proceeding with the
             // rendering
             var checkreadyToRender = function () {
-                if (self.__expressionData) {
+                if(self.__expressionData) {
                     self.__propertyMap = self.generateUIDataModel(self.__options.dataModel);
                     if (self.__propertyMap.appName.length === 0) {
                         self.__propertyMap.appName = 'UntitledETLTaskFlow';
@@ -110,11 +104,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         ETLWizard.prototype.constructor = ETLWizard;
 
         // handle schema changes
-        ETLWizard.prototype.handleSchemaChange = function (typeOfSchema, wizardObj, config) {
+        ETLWizard.prototype.handleSchemaChange = function(typeOfSchema, wizardObj, config) {
             var self = this;
             var newSchemaDef = typeOfSchema === constants.SOURCE_TYPE ?
-                self.__propertyMap.input.stream.attributes :
-                self.__propertyMap.output.stream.attributes;
+                                self.__propertyMap.input.stream.attributes:
+                                self.__propertyMap.output.stream.attributes;
 
             wizardObj.find('.next-btn').popover({
                 html: true,
@@ -134,13 +128,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 placement: 'top',
             });
 
-            if (self.__previousSchemaDef && self.__previousSchemaDef.length > 0 && !_.isEqual(self.__previousSchemaDef, newSchemaDef)) {
+            if(self.__previousSchemaDef && self.__previousSchemaDef.length > 0 && !_.isEqual(self.__previousSchemaDef, newSchemaDef)) {
 
                 wizardObj.find('.next-btn').popover('show');
                 wizardObj.find(`#${wizardObj.find('.next-btn').attr('aria-describedby')} .popover-confirm-proceed`)
                     .on('click', function (e) {
                         e.stopPropagation();
-                        if (typeOfSchema === constants.SOURCE_TYPE) {
+                        if(typeOfSchema === constants.SOURCE_TYPE) {
                             self.__propertyMap.input.mapping.attributes = {};
                             self.__propertyMap.input.mapping.samplePayload = "";
                             self.__propertyMap.query.mapping = {};
@@ -182,6 +176,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         ETLWizard.prototype.constructWizardHTMLElements = function (wizardObj) {
             var self = this;
             var wizardHeaderContent = wizardObj.find(constants.CLASS_WIZARD_MODAL_HEADER);
+            var wizardFooterContent = wizardObj.find(constants.CLASS_WIZARD_MODAL_FOOTER);
             var stepIndex = self.__stepIndex;
 
             wizardHeaderContent.find('input.etl-flow-name').val(self.__propertyMap.appName);
@@ -202,7 +197,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 }
                                 break;
                             case 1:
-                                if (etlWizardUtil.isStreamDefValid(self.__propertyMap.input.stream)) {
+                                if(etlWizardUtil.isStreamDefValid(self.__propertyMap.input.stream)) {
                                     self.handleSchemaChange(constants.SOURCE_TYPE, wizardObj, self.__propertyMap);
                                 } else {
                                     Alerts.error('Invalid source configuration please check the all the properties ' +
@@ -210,7 +205,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 }
                                 break;
                             case 2:
-                                if (etlWizardUtil.isInputMappingValid(self.__propertyMap.input)) {
+                                if(etlWizardUtil.isInputMappingValid(self.__propertyMap.input)) {
                                     self.incrementStep(wizardObj);
                                 } else {
                                     Alerts.error('Invalid source mapping configuration please check the ' +
@@ -220,7 +215,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         }
                         break;
                     case 2:
-                        if (etlWizardUtil.areInputOptionsValid(self.__propertyMap.query)) {
+                        if(etlWizardUtil.areInputOptionsValid(self.__propertyMap.query)) {
                             self.incrementStep(wizardObj);
                         } else {
                             Alerts.error('Invalid input option configuration please check the mapping configuration');
@@ -237,7 +232,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 }
                                 break;
                             case 1:
-                                if (etlWizardUtil.isStreamDefValid(self.__propertyMap.output.stream)) {
+                                if(etlWizardUtil.isStreamDefValid(self.__propertyMap.output.stream)) {
                                     self.handleSchemaChange(constants.SOURCE_TYPE, wizardObj, self.__propertyMap);
                                 } else {
                                     Alerts.error('Invalid stream definition please check the all the properties are' +
@@ -245,7 +240,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 }
                                 break;
                             case 2:
-                                if (etlWizardUtil.isOutputMappingValid(self.__propertyMap.output)) {
+                                if(etlWizardUtil.isOutputMappingValid(self.__propertyMap.output)) {
                                     self.incrementStep(wizardObj);
                                 } else {
                                     Alerts.error('Invalid sink mapping configuration please check the mapping' +
@@ -254,12 +249,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 break;
                         }
 
-                        if (self.__substep === 2 && self.__propertyMap.output.isStore) {
+                        if(self.__substep === 2 && self.__propertyMap.output.isStore) {
                             self.incrementStep(wizardObj);
                         }
                         break;
                     case 4:
-                        if (etlWizardUtil.validateGroupBy(self.__propertyMap.query.groupby)
+                        if(etlWizardUtil.validateGroupBy(self.__propertyMap.query.groupby)
                             && etlWizardUtil.validateAdvancedOutputOptions(self.__propertyMap.query.advanced)) {
                             self.incrementStep(wizardObj);
                         } else {
@@ -267,7 +262,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         }
                         break;
                     case 5:
-                        if (etlWizardUtil.validateDataMapping(self.__propertyMap)) {
+                        if(etlWizardUtil.validateDataMapping(self.__propertyMap)) {
                             self.incrementStep(wizardObj);
                         } else {
                             Alerts.error('Please perform the attribute mapping for all the output attributes');
@@ -298,7 +293,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             wizardObj.find('.save-btn').on('click', function () {
                 var dataModel = generateSourceGenDataModel(self.__propertyMap);
-                var result = self.__saved = saveSiddhiApp(dataModel);
+                var result  = self.__saved = saveSiddhiApp(dataModel);
 
                 if (result.status) {
                     self.__options.application.commandManager.dispatch("open-folder", "workspace");
@@ -309,6 +304,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 wizardObj.find(`#step-${self.__stepIndex++}`).removeClass('selected');
                 wizardObj.find(`#step-${self.__stepIndex}`).addClass('selected');
                 self.render(result);
+            });
+
+            wizardFooterContent.find('.close-btn').on('click', (evt) => {
+                self.__options.application.tabController
+                    .removeTab(self.__options.application.tabController.getActiveTab());
             });
 
             wizardHeaderContent.find('.etl-flow-name')
@@ -331,7 +331,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         ETLWizard.prototype.incrementStep = function (wizardObj) {
             var self = this;
             if (self.__stepIndex < 6) {
-                if ((self.__stepIndex === 1 || self.__stepIndex === 3) && self.__substep < 2) {
+                if ((self.__stepIndex === 1 || self.__stepIndex===3) && self.__substep < 2) {
                     self.__substep++;
                 } else {
                     wizardObj.find(`#step-${self.__stepIndex++}`).removeClass('selected');
@@ -366,10 +366,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var designContainer = this.__$parent_el_container.find(_.get(this.__options, 'design_view.container'));
             var previewContainer = this.__$parent_el_container.find(_.get(this.__options, 'preview.container'));
             var toggleControlsContainer = this.__$parent_el_container.find('.toggle-controls-container');
-            var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY)
+            var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY);
+            var wizardHeaderContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_HEADER);
 
             this.__parentWizardForm.find('.next-btn').popover('destroy');
-            var wizardFooterContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_FOOTER)
+            var wizardFooterContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_FOOTER);
             etlWizardContainer.append(this.__parentWizardForm);
 
             canvasContainer.addClass('hide-div');
@@ -381,25 +382,23 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             if (!self.__expressionData) {
                 CompletionEngine.loadMetaData(this.loadExtensionData,
-                    () => {
-                        console.error('Error occurred when trying to connect to the server')
-                    });
+                    () => {console.error('Error occurred when trying to connect to the server')});
             }
 
-            if (self.__resetSchema) {
-                if (this.__stepIndex === 1) {
+            if(self.__resetSchema) {
+                if(this.__stepIndex === 1) {
                     this.__propertyMap.input.stream.attributes = _.cloneDeep(self.__previousSchemaDef);
-                } else if (this.__stepIndex === 2) {
+                } else if(this.__stepIndex === 2) {
                     this.__propertyMap.output.stream.attributes = _.cloneDeep(self.__previousSchemaDef);
                 }
                 self.__resetSchema = false;
             }
 
-            if (!this.__previousSchemaDef && this.__stepIndex === 1) {
+            if(!this.__previousSchemaDef && this.__stepIndex === 1) {
                 this.__previousSchemaDef = _.cloneDeep(this.__propertyMap.input.stream.attributes);
             }
 
-            if (!this.__previousSchemaDef && this.__stepIndex === 2) {
+            if(!this.__previousSchemaDef && this.__stepIndex === 2) {
                 this.__previousSchemaDef = _.cloneDeep(this.__propertyMap.output.stream.attributes);
             }
 
@@ -436,36 +435,37 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     break;
             }
 
-            if (this.__stepIndex === 1 || this.__stepIndex === 3) {
+            if(this.__stepIndex === 1 || this.__stepIndex === 3) {
                 var containers = wizardBodyContent.find('.content-section');
                 for (let i = 0; i < containers.length; i++) {
-                    if (i !== this.__substep) {
+                    if(i!==this.__substep) {
                         var offsetLeft = wizardBodyContent.find('.content-section')[i].offsetLeft;
                         var offsetTop = wizardBodyContent.find('.content-section')[i].offsetTop;
                         var minWidth = $(wizardBodyContent.find('.content-section')[i]).width();
                         var minHeight = $(wizardBodyContent.find('.content-section')[i]).height();
 
                         wizardBodyContent.append(`
-                            <div style="position: absolute; top: ${offsetTop - 15}; left: ${offsetLeft - 15}; 
-                            width: ${minWidth + 30}; height: ${minHeight + 30}; background-color: rgba(0,0,0,0.5)">
+                            <div style="position: absolute; top: ${offsetTop-15}; left: ${offsetLeft-15}; 
+                            width: ${minWidth+30}; height: ${minHeight+30}; background-color: rgba(0,0,0,0.5)">
                             
                             </div>`);
                     }
                 }
             }
 
-            updateButtonBar(wizardFooterContent, this.__stepIndex);
+            updateButtonBar(wizardFooterContent, this.__stepIndex, this.__substep);
+            updateHeaderTextField(wizardHeaderContent, this.__stepIndex);
 
             // handle parent container resizing
             var observer = new ResizeObserver(_.debounce((e) => {
-                if (_.isEqual(self.__app.tabController.getActiveTab(), self.__tab)) {
+                if(_.isEqual(self.__app.tabController.getActiveTab(), self.__tab)) {
                     if (self.__parentDimension.height === 0 && self.__parentDimension.width === 0) {
                         self.__parentDimension.height = e[0].contentRect.height;
                         self.__parentDimension.width = e[0].contentRect.width
                         self.render(self.__saved);
                     }
 
-                    if (e[0].contentRect.height !== self.__parentDimension.height
+                    if(e[0].contentRect.height !== self.__parentDimension.height
                         || e[0].contentRect.width !== self.__parentDimension.width) {
                         self.__parentDimension.height = e[0].contentRect.height;
                         self.__parentDimension.width = e[0].contentRect.width
@@ -484,17 +484,17 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY);
             var extensionData = constants.SOURCE_TYPE === type ?
                 this.__expressionData.extensions.source.sources :
-                isStore ?
+                isStore?
                     this.__expressionData.extensions.store.stores
                     : this.__expressionData.extensions.sink.sinks;
             var selectedExtension = null;
 
             var logIndex = extensionData
-                .map(function (extension) {
-                    return extension.name;
-                }).indexOf('log');
+                            .map(function(extension) {
+                                return extension.name;
+                            }).indexOf('log');
 
-            if (logIndex > -1) {
+            if(logIndex > -1) {
                 extensionData.splice(logIndex, 1);
             }
 
@@ -507,8 +507,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         </small>
                     </div>
                     ${
-                type !== constants.SOURCE_TYPE ?
-                    `<div style="display: flex; padding-top:15px">
+                        type !== constants.SOURCE_TYPE ?
+                            `<div style="display: flex; padding-top:15px">
                                 <div class="extension-option" style="display: flex">
                                     <div style="">
                                         <input class="extension-type" type="radio" id="enableSink" name="extensionOption" 
@@ -522,10 +522,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                     </div>
                                 </div>
                             </div>` : ''
-            }
+                    }
                     ${
-                type !== constants.SOURCE_TYPE && !isStore ?
-                    `<div style="display: flex; padding-top:15px">
+                        type !== constants.SOURCE_TYPE && !isStore ?
+                            `<div style="display: flex; padding-top:15px">
                                 <div style="padding-top: 5px">
                                     Store mapping errors
                                 </div>
@@ -534,18 +534,18 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                         data-toggle="buttons">
                                         <label class="btn" 
                                                 style="${
-                        config.addOnError ?
-                            "background-color: rgb(91,203,92); color: white;"
-                            : "background-color: rgb(100,109,118); color: white;"}" 
+                                                    config.addOnError ?
+                                                        "background-color: rgb(91,203,92); color: white;"
+                                                        : "background-color: rgb(100,109,118); color: white;"}" 
                                          >
                                             <input type="radio" name="options" id="enable" autocomplete="off"> 
                                             <i class="fw fw-check"></i>
                                         </label>
                                         <label class="btn" 
                                                 style="${
-                        !config.addOnError ?
-                            "background-color: red; color: white;"
-                            : "background-color: rgb(100,109,118); color: white;"}" 
+                                                    !config.addOnError ?
+                                                        "background-color: red; color: white;"
+                                                        : "background-color: rgb(100,109,118); color: white;"}" 
                                         >
                                             <input type="radio" name="options" id="disable" autocomplete="off"> 
                                             <i class="fw fw-cancel"></i>
@@ -553,7 +553,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                     </div>
                                 </div>
                             </div>` : ''
-            }
+                    }
                     <div style="padding-top: 10px">
                         <div>
                             <label for="extension-type">
@@ -565,12 +565,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         </div>
 
                         ${
-                config.type.length > 0 ?
-                    `
+                            config.type.length > 0 ?
+                                `
                                     <div style="padding-top: 15px" class="extension-properties">
                                         <div>
-                                          ${type === constants.SOURCE_TYPE ? 'Source'
-                        : isStore ? 'Store' : 'Sink'} properties:
+                                          ${type === constants.SOURCE_TYPE ? 'Source' 
+                                                                            : isStore ? 'Store' : 'Sink'} properties:
                                             <button style="background-color: #ee6719" 
                                                 class="btn btn-default btn-circle" id="btn-add-transport-property" 
                                                 type="button" data-toggle="dropdown"
@@ -585,12 +585,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                         </div>
                                     </div>
                                 ` : ''
-            }
+                        }
                     </div>
                 </div>
             `);
 
-            wizardBodyContent.find('#btn-group-enable-on-error .btn').on('click', function (evt) {
+            wizardBodyContent.find('#btn-group-enable-on-error .btn').on('click', function(evt) {
                 config.addOnError = !config.addOnError;
                 self.render();
             });
@@ -602,7 +602,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             }
 
             wizardBodyContent.find('.extension-option input').on('click', evt => {
-                if (evt.currentTarget.id === 'enableStore') {
+                if(evt.currentTarget.id === 'enableStore') {
                     self.__propertyMap.output.isStore = true;
                 }
 
@@ -619,7 +619,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 self.render();
             });
 
-            extensionData.sort(function (a, b) {
+            extensionData.sort(function(a, b) {
                 return (a.name < b.name) ? -1 : ((a.name > b.name) ? 1 : 0);
             });
 
@@ -642,7 +642,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                     <div class="option-title">${param.name}</div><br/>
                                     <small style="opacity: 0.8">
                                         ${param.description.replaceAll('<', '&lt;')
-                            .replaceAll('>', '&gt;').replaceAll('`', '')}
+                                            .replaceAll('>', '&gt;').replaceAll('`', '')}
                                     </small><br/>
                                     <small style="opacity: 0.8">
                                         <b>Default Value</b>: ${param.defaultValue.replaceAll(/\`/g, '')}
@@ -677,7 +677,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 Object.keys(config.properties).forEach(function (key) {
                     var optionData = config.properties[key];
                     var name = key.replaceAll(/\./g, '-');
-                    var selectedOption = selectedExtension.parameters.find(function (element) {
+                    var selectedOption = selectedExtension.parameters.find(function(element) {
                         return element.name === key;
                     });
                     wizardBodyContent.find('.extension-properties>.options').append(`
@@ -693,15 +693,15 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             <div style="display: flex;padding-top: 20px; padding-left: 5px;" class="delete-section">
                                 <a style="margin-right: 5px; color: #333" 
                                     title="${selectedOption.description.replaceAll('<', '&lt;')
-                        .replaceAll('>', '&gt;').replaceAll('`', '')}">
+                                                .replaceAll('>', '&gt;').replaceAll('`', '')}">
                                     <i class="fw fw-info"></i>
                                 </a>
                                 ${
-                        config.type === 'rdbms' || selectedOption.optional ?
-                            `<a style="color: #333">
+                                    config.type === 'rdbms' || selectedOption.optional ?
+                                        `<a style="color: #333">
                                             <i id="extension-op-del-${name}" class="fw fw-delete"></i>
                                          </a>` : ''
-                    }
+                                }
                             </div>
                         </div>
                     `);
@@ -709,7 +709,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
                 wizardBodyContent.find('#extension-options-dropdown>a').on('click', function (evt) {
                     var optionName = $(evt.currentTarget).find('.option-title').text();
-                    var selectedOption = selectedExtension.parameters.find(function (element) {
+                    var selectedOption = selectedExtension.parameters.find(function(element) {
                         return element.name === optionName;
                     });
 
@@ -737,11 +737,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         paramData.type = param.type;
                         config.properties[param.name] = paramData;
                     });
-
-                if (config.type === 'rdbms') {
+                
+                if(config.type === 'rdbms') {
                     config.properties = {};
                 }
-
+                
                 self.render();
             });
 
@@ -789,17 +789,17 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         </small>
                     </div>
                     ${
-                self.__propertyMap.output.isStore && self.__propertyMap.output.sink.type === 'rdbms'
-                || self.__propertyMap.output.sink.type === 'file' ?
-                    `<div>
+                        self.__propertyMap.output.isStore && self.__propertyMap.output.sink.type === 'rdbms' 
+                                                        || self.__propertyMap.output.sink.type === 'file' ?
+                            `<div>
                                 <button style="background-color: #ee6719" class="btn btn-default btn-generate-stream">
                                     Generate Stream
                                 </button>
                             </div>` : ''
-            }
+                    }
                     ${
-                !(type === constants.SINK_TYPE && self.__propertyMap.output.isStore) ?
-                    `
+                        !(type === constants.SINK_TYPE && self.__propertyMap.output.isStore) ?
+                            `
                                 <div style="display: flex; padding-top:15px">
                                     <div style="padding-top: 5px">
                                         Add log sink for testing
@@ -808,18 +808,18 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                         <div id="btn-group-enable-log-sink" class="btn-group btn-group-toggle" data-toggle="buttons">
                                             <label class="btn" 
                                                     style="${
-                        config.addLog ?
-                            "background-color: rgb(91,203,92); color: white;"
-                            : "background-color: rgb(100,109,118); color: white;"}" 
+                                            config.addLog ?
+                                                "background-color: rgb(91,203,92); color: white;"
+                                                : "background-color: rgb(100,109,118); color: white;"}" 
                                              >
                                                 <input type="radio" name="options" id="enable" autocomplete="off"> 
                                                 <i class="fw fw-check"></i>
                                             </label>
                                             <label class="btn" 
                                                     style="${
-                        !config.addLog ?
-                            "background-color: red; color: white;"
-                            : "background-color: rgb(100,109,118); color: white;"}" 
+                                            !config.addLog ?
+                                                "background-color: red; color: white;"
+                                                : "background-color: rgb(100,109,118); color: white;"}" 
                                             >
                                                 <input type="radio" name="options" id="disable" autocomplete="off"> 
                                                 <i class="fw fw-cancel"></i>
@@ -827,8 +827,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                         </div>
                                     </div>
                                 </div>
-                            ` : ''
-            }
+                            `: ''
+                    }
                     <div style="padding-top: 10px">
                         <div>
                             <label for="stream-name-txt">
@@ -1014,17 +1014,17 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 config.customEnabled = false;
                 config.samplePayload = '';
 
-                if (mapper.parameters) {
+                if(mapper.parameters) {
                     mapper.parameters
-                        .filter(function (el) {
-                            return !el.optional;
-                        })
-                        .forEach(function (el) {
-                            var mapperData = {};
-                            mapperData.value = el.defaultValue;
-                            mapperData.type = el.type;
-                            config.properties[el.name] = mapperData;
-                        });
+                    .filter(function (el) {
+                        return !el.optional;
+                    })
+                    .forEach(function (el) {
+                        var mapperData = {};
+                        mapperData.value = el.defaultValue;
+                        mapperData.type = el.type;
+                        config.properties[el.name] = mapperData;
+                    });
                 }
 
                 var inputOutputMapper = new InputOutputMapper(type, mapperContainer, extensionConfig, mapper);
@@ -1041,38 +1041,38 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             }
         };
 
-        ETLWizard.prototype.renderFinalize = function (obj) {
+        ETLWizard.prototype.renderFinalize = function(obj) {
             var self = this;
             var wizardBodyContent = this.__parentWizardForm.find(constants.CLASS_WIZARD_MODAL_BODY);
             wizardBodyContent.empty();
             wizardBodyContent.html(templates.finalizeStep(obj));
 
-            wizardBodyContent.find('#btn-test').on('click', function () {
+            wizardBodyContent.find('#btn-test').on('click', function() {
                 var siddhiAppName = self.__propertyMap.appName;
                 var inputStreamName = self.__propertyMap.input.stream.name;
                 self.__app.commandManager
                     .dispatch(constants.commands.TOGGLE_EVENT_SIMULATOR, siddhiAppName, inputStreamName);
             });
 
-            wizardBodyContent.find('#btn-export-docker').on('click', function () {
+            wizardBodyContent.find('#btn-export-docker').on('click', function() {
                 var selectedFiles = [`${self.__propertyMap.appName}.siddhi`];
                 self.__app.commandManager.dispatch(constants.commands.EXPORT_FOR_DOCKER, selectedFiles);
             });
 
-            wizardBodyContent.find('#btn-export-k8s').on('click', function () {
+            wizardBodyContent.find('#btn-export-k8s').on('click', function() {
                 var selectedFiles = [`${self.__propertyMap.appName}.siddhi`];
                 self.__app.commandManager.dispatch(constants.commands.EXPORT_FOR_KUBERNETES, selectedFiles);
             });
 
-            wizardBodyContent.find('#btn-deploy').on('click', function () {
+            wizardBodyContent.find('#btn-deploy').on('click', function() {
                 var selectedFiles = [`${self.__propertyMap.appName}.siddhi`];
                 self.__app.commandManager.dispatch(constants.commands.DEPLOY_TO_SERVER, selectedFiles);
             });
         };
 
-        var generateUIDataModel = function (o) {
+        var generateUIDataModel = function(o) {
             var self = this;
-            var hasStore = o ? o.siddhiAppConfig.tableList.length > 0 : false;
+            var hasStore =  o ? o.siddhiAppConfig.tableList.length > 0 : false;
             var model = {
                 appName: '',
                 input: {
@@ -1121,12 +1121,15 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 },
                 query: {
                     window: {},
-                    filter: {},
-                    function: {},
-                    mapping: {},
+                    filter: {
+                    },
+                    function: {
+                    },
+                    mapping: {
+                    },
                     groupby: {
                         attributes: [],
-                        havingFilter: {}
+                        havingFilter : {}
                     },
                     orderby: {
                         attributes: []
@@ -1160,46 +1163,46 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
                 self.__expressionData.extensions.source.sources.forEach((s) => {
                     var parameters = {};
-                    s.parameters.forEach((p) => parameters[p.name] = {type: p.type});
-                    self.__extensionDataMap.sources[s.name] = {parameters};
+                    s.parameters.forEach((p) => parameters[p.name] = { type: p.type });
+                    self.__extensionDataMap.sources[s.name] = { parameters };
                 });
 
                 self.__expressionData.extensions.sink.sinks.forEach((s) => {
                     var parameters = {};
-                    s.parameters.forEach((p) => parameters[p.name] = {type: p.type});
-                    self.__extensionDataMap.sinks[s.name] = {parameters};
+                    s.parameters.forEach((p) => parameters[p.name] = { type: p.type });
+                    self.__extensionDataMap.sinks[s.name] = { parameters };
                 });
 
                 self.__expressionData.extensions.store.stores.forEach((s) => {
                     var parameters = {};
-                    s.parameters.forEach((p) => parameters[p.name] = {type: p.type});
-                    self.__extensionDataMap.stores[s.name] = {parameters};
+                    s.parameters.forEach((p) => parameters[p.name] = { type: p.type });
+                    self.__extensionDataMap.stores[s.name] = { parameters };
                 });
 
                 self.__expressionData.extensions.sourceMapper.sourceMaps.forEach((s) => {
                     var parameters = {};
-                    (s.parameters || []).forEach((p) => parameters[p.name] = {type: p.type});
-                    self.__extensionDataMap.sourceMappers[s.name] = {parameters};
+                    (s.parameters || []).forEach((p) => parameters[p.name] = { type: p.type });
+                    self.__extensionDataMap.sourceMappers[s.name] = { parameters };
                 });
 
                 self.__expressionData.extensions.sinkMapper.sinkMaps.forEach((s) => {
                     var parameters = {};
-                    (s.parameters || []).forEach((p) => parameters[p.name] = {type: p.type});
-                    self.__extensionDataMap.sinkMappers[s.name] = {parameters};
+                    (s.parameters || []).forEach((p) => parameters[p.name] = { type: p.type });
+                    self.__extensionDataMap.sinkMappers[s.name] = { parameters };
                 });
 
                 self.__expressionData.inBuilt.windowProcessors.forEach((w) => {
-                    self.__extensionDataMap.windowProcessors[w.name] = {parameters: w.parameters || []};
+                    self.__extensionDataMap.windowProcessors[w.name] = { parameters: w.parameters || [] };
                 });
 
                 self.__expressionData.inBuilt.streamProcessors.forEach((s) => {
-                    self.__extensionDataMap.streamProcessors[s.name] = {parameters: s.parameters || []};
+                    self.__extensionDataMap.streamProcessors[s.name] = { parameters: s.parameters || [] };
                 });
 
                 Object.entries(self.__expressionData.extensions).forEach(ext => {
                     ext[1].streamProcessors.forEach(sp => {
                         var fqn = `${sp.namespace}:${sp.name}`;
-                        self.__extensionDataMap.streamProcessors[fqn] = {parameters: sp.parameters || []};
+                        self.__extensionDataMap.streamProcessors[fqn] = { parameters: sp.parameters || [] };
                     })
                 });
             }
@@ -1261,38 +1264,38 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             model.input.source.type = m.sourceList[0].type;
             m.sourceList[0].options.forEach((option) => {
-                var {key, value} = splitKeyValueByEqual(option);
+                var { key, value } = splitKeyValueByEqual(option);
                 var type = self.__extensionDataMap.sources[m.sourceList[0].type].parameters[key].type;
-                model.input.source.properties[key] = {value, type};
+                model.input.source.properties[key] = { value, type };
             });
 
-            if (hasStore) {
+            if(hasStore) {
                 model.output.sink.type = m.tableList[0].store.type;
                 m.tableList[0].store.options.forEach((option) => {
-                    var {key, value} = splitKeyValueByEqual(option);
+                    var { key, value } = splitKeyValueByEqual(option);
                     var type = self.__extensionDataMap.stores[m.tableList[0].store.type].parameters[key].type;
-                    model.output.sink.properties[key] = {value, type};
+                    model.output.sink.properties[key] = { value, type };
                 });
             } else {
                 model.output.sink.type = m.sinkList[sinkIndex].type;
                 m.sinkList[sinkIndex].options.forEach((option) => {
-                    var {key, value} = splitKeyValueByEqual(option);
+                    var { key, value } = splitKeyValueByEqual(option);
                     var type = self.__extensionDataMap.sinks[m.sinkList[sinkIndex].type].parameters[key].type;
-                    model.output.sink.properties[key] = {value, type};
+                    model.output.sink.properties[key] = { value, type };
                 });
             }
 
             if (m.sourceList[0].map) {
                 model.input.mapping.type = m.sourceList[0].map.type;
                 m.sourceList[0].map.options.forEach((option) => {
-                    var {key, value} = splitKeyValueByEqual(option);
+                    var { key, value } = splitKeyValueByEqual(option);
                     var type = self.__extensionDataMap.sourceMappers[m.sourceList[0].map.type].parameters[key].type;
-                    model.input.mapping.properties[key] = {value, type};
+                    model.input.mapping.properties[key] = { value, type };
                 });
             }
 
             if (m.sourceList[0].map.payloadOrAttribute) {
-                switch (m.sourceList[0].map.payloadOrAttribute.annotationType) {
+                switch(m.sourceList[0].map.payloadOrAttribute.annotationType) {
                     case 'ATTRIBUTES':
                         model.input.mapping.customEnabled = true;
                         Object.entries(m.sourceList[0].map.payloadOrAttribute.value).forEach(a => {
@@ -1309,19 +1312,19 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             if (!hasStore && m.sinkList[sinkIndex].map) {
                 model.output.mapping.type = m.sinkList[sinkIndex].map.type;
                 m.sinkList[sinkIndex].map.options.forEach((option) => {
-                    var {key, value} = splitKeyValueByEqual(option);
+                    var { key, value } = splitKeyValueByEqual(option);
                     if (key.toLowerCase() === 'on.error' && value.toLowerCase() === 'store') {
                         model.output.sink.addOnError = true;
                     } else {
                         var type = self.__extensionDataMap
                             .sinkMappers[m.sinkList[sinkIndex].map.type].parameters[key].type;
-                        model.output.mapping.properties[key] = {value, type};
+                        model.output.mapping.properties[key] = { value, type };
                     }
                 });
             }
 
             if (!hasStore && m.sinkList[sinkIndex].map.payloadOrAttribute) {
-                switch (m.sinkList[sinkIndex].map.payloadOrAttribute.annotationType) {
+                switch(m.sinkList[sinkIndex].map.payloadOrAttribute.annotationType) {
                     case 'ATTRIBUTES':
                         model.output.mapping.customEnabled = true;
                         Object.entries(m.sinkList[sinkIndex].map.payloadOrAttribute.value).forEach(a => {
@@ -1336,7 +1339,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             }
 
             m.queryLists.WINDOW_FILTER_PROJECTION[0].queryInput.streamHandlerList.forEach((h) => {
-                switch (h.type) {
+                switch(h.type) {
                     case 'FILTER':
                         model.query.filter = {
                             enable: true,
@@ -1350,10 +1353,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             parameters: {}
                         };
                         for (var i = 0; i < h.value.parameters.length; i++) {
-                            var {name, type} = self.__extensionDataMap.windowProcessors[h.value.function]
+                            var { name, type } = self.__extensionDataMap.windowProcessors[h.value.function]
                                 .parameters[i];
                             var value = h.value.parameters[i];
-                            model.query.window.parameters[name] = {value, type}
+                            model.query.window.parameters[name] = { value, type }
                         }
                         break;
                     case 'FUNCTION':
@@ -1363,10 +1366,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             parameters: {}
                         };
                         for (var i = 0; i < h.value.parameters.length; i++) {
-                            var {name, type} = self.__extensionDataMap.streamProcessors[h.value.function]
+                            var { name, type } = self.__extensionDataMap.streamProcessors[h.value.function]
                                 .parameters[i];
                             var value = h.value.parameters[i];
-                            model.query.function.parameters[name] = {value, type}
+                            model.query.function.parameters[name] = { value, type }
                         }
                         break;
                 }
@@ -1403,11 +1406,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             });
 
             if (m.queryLists.WINDOW_FILTER_PROJECTION[0].offset > 0) {
-                model.query.advanced.offset = {value: m.queryLists.WINDOW_FILTER_PROJECTION[0].offset};
+                model.query.advanced.offset = { value: m.queryLists.WINDOW_FILTER_PROJECTION[0].offset };
             }
 
             if (m.queryLists.WINDOW_FILTER_PROJECTION[0].limit > 0) {
-                model.query.advanced.limit = {value: m.queryLists.WINDOW_FILTER_PROJECTION[0].limit};
+                model.query.advanced.limit = { value: m.queryLists.WINDOW_FILTER_PROJECTION[0].limit };
             }
 
             if (m.queryLists.WINDOW_FILTER_PROJECTION[0].outputRateLimit.length > 0) {
@@ -1424,7 +1427,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             return model;
         }
 
-        var splitKeyValueByEqual = function (str) {
+        var splitKeyValueByEqual = function(str) {
             var pos = str.indexOf('='),
                 trimmedValue = str.substr(pos + 1).trim();
             return {
@@ -1433,7 +1436,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             }
         }
 
-        var generateSourceGenDataModel = function (o) {
+        var generateSourceGenDataModel = function(o) {
             var config = {
                 siddhiAppName: o.appName,
                 siddhiAppDescription: o.appDescription || '',
@@ -1441,13 +1444,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 appAnnotationListObjects: [],
                 streamList: (() => {
                     let list = [];
-
+                    
                     list.push({
                         id: 'inputStream',
                         name: o.input.stream.name,
                         annotationListObjects: [],
                         attributeList: o.input.stream.attributes.map(v => {
-                            return {name: v.name, type: v.type}
+                            return { name: v.name, type: v.type }
                         }),
                         annotationList: []
                     });
@@ -1458,7 +1461,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             name: o.output.stream.name,
                             annotationListObjects: [],
                             attributeList: o.output.stream.attributes.map(v => {
-                                return {name: v.name, type: v.type}
+                                return { name: v.name, type: v.type }
                             }),
                             annotationList: []
                         });
@@ -1484,7 +1487,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         }
                     }
                 ],
-                sinkList: !o.output.isStore ? (() => {
+                sinkList:  !o.output.isStore ? (() => {
                     var list = [
                         {
                             id: 'sink',
@@ -1537,7 +1540,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             attributeList: o.output.stream.attributes,
                             store: {
                                 type: o.output.sink.type,
-                                options: (() => {
+                                options : (() => {
                                     var options = Object.entries(o.output.sink.properties).map(v => {
                                         return `${v[0]} = "${v[1].value}"`;
                                     });
@@ -1548,7 +1551,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             annotationListObjects: [],
                             id: 'outputStream',
                         }
-                    ];
+                    ];                    
                     return list;
                 })() : [],
                 windowList: [],
@@ -1582,10 +1585,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                         if (typeof o.query.filter.expression === 'string') {
                                             expression = o.query.filter.expression;
                                         } else {
-                                            expression = $('<div>' +
+                                            expression = $('<div>'+
                                                 DataMapperUtil.generateExpressionHTML(
-                                                    o.query.filter.expression, '', null)
-                                                + '</div>').text()
+                                                    o.query.filter.expression,'', null)
+                                                +'</div>').text()
                                         }
                                         list.push({
                                             type: 'FILTER',
@@ -1608,20 +1611,22 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             },
                             select: {
                                 type: "USER_DEFINED",
-                                value: Object.entries(o.query.mapping).map(v => {
+                                value: o.output.stream.attributes.map(attr => {
+
                                     return {
-                                        expression: typeof v[1] === 'string' ?
-                                            v[1]
-                                            : $('<div>'
-                                                + DataMapperUtil.generateExpressionHTML(v[1], '', null)
-                                                + '</div>').text(),
-                                        as: v[0]
+                                        expression: typeof o.query.mapping[attr.name] === 'string' ?
+                                        o.query.mapping[attr.name]
+                                        : $('<div>'
+                                        + DataMapperUtil.generateExpressionHTML(
+                                            o.query.mapping[attr.name],'', null)
+                                        + '</div>').text(),
+                                        as: attr.name
                                     }
                                 })
                             },
                             queryOutput: {
                                 type: "INSERT",
-                                output: {"eventType": "CURRENT_EVENTS"},
+                                output: { "eventType": "CURRENT_EVENTS" },
                                 target: o.output.stream.name
                             },
                             groupBy: o.query.groupby.attributes.map(v => {
@@ -1639,20 +1644,20 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 return $('<div>'
                                     + DataMapperUtil.generateExpressionHTML(
                                         o.query.groupby.havingFilter.expression, '', null)
-                                    + '</div>').text()
+                                    +'</div>').text()
                             })(),
                             outputRateLimit: (() => {
                                 if (!o.query.advanced.ratelimit.enabled) {
                                     return '';
                                 }
-                                var {value, granularity} = o.query.advanced.ratelimit,
+                                var { value, granularity } = o.query.advanced.ratelimit,
                                     eventSelection = o.query.advanced.ratelimit['event-selection'];
                                 if (o.query.advanced.ratelimit.type === 'snapshot') {
                                     return `snapshot every ${value} ${granularity}`;
                                 }
                                 return `${eventSelection} every ${value} ${granularity}`.trim();
                             })(),
-                            orderBy: (o.query.orderby || {attributes: []}).attributes.map(v => {
+                            orderBy: (o.query.orderby || { attributes: []}).attributes.map(v => {
                                 return {
                                     value: v.attribute.name,
                                     order: v.sort
@@ -1713,7 +1718,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             };
         }
 
-        var saveSiddhiApp = function (data) {
+        var saveSiddhiApp = function(data) {
             let result = {},
                 fileName = `${data.siddhiAppConfig.siddhiAppName}.siddhi`;
             $.ajax({
@@ -1741,17 +1746,31 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             return result;
         };
 
-        var updateButtonBar = function (wizardFooterContent, stepIndex) {
+        var updateButtonBar = function(wizardFooterContent, stepIndex, substepIndex) {
             wizardFooterContent.find('.btn').show();
-            if (stepIndex === 1) {
+            if(stepIndex === 1 && substepIndex === 0) {
                 wizardFooterContent.find('.back-btn').hide();
             }
-            if (stepIndex === 6 || stepIndex === 5) {
+
+            if (stepIndex === 6) {
                 wizardFooterContent.find('.next-btn').hide();
+                wizardFooterContent.find('.save-btn').hide();
+            } else if (stepIndex === 5) {
+                wizardFooterContent.find('.next-btn').hide();
+                wizardFooterContent.find('.close-btn').hide();
             } else {
                 wizardFooterContent.find('.save-btn').hide();
+                wizardFooterContent.find('.close-btn').hide();
             }
         };
+
+        var updateHeaderTextField = function (wizardHeaderContent, stepIndex) {
+            if (stepIndex === 6) {
+                wizardHeaderContent.find('.etl-flow-name').attr('disabled', true);
+            } else {
+                wizardHeaderContent.find('.etl-flow-name').attr('disabled', false);
+            }
+        }
 
         return ETLWizard;
     });
