@@ -78,8 +78,7 @@ define(['require', 'lodash', 'log', 'jquery', 'backbone', 'command', 'sample_pre
                 buttonWrap.append(createNewETLFlowButton);
                 buttonWrap.append(openButton);
 
-                $('#query-guide-link-container').append('<a href="https://siddhi.io/en/v5.1/docs/query-guide/"
-                target="_blank"><i class="fw-info"></i> Siddhi Query Guide</a>');
+                $('#query-guide-link-container').append('<a href="https://siddhi.io/en/v5.1/docs/query-guide/" target="_blank"><i class="fw-info"></i> Siddhi Query Guide</a>');
                 $('#step-2 > div.step-description-text').append('Use ${...} format to template siddhi apps');
                 $('#step-3 > div.step-description-text').append('Use ${...} format to template the configurations');
 
