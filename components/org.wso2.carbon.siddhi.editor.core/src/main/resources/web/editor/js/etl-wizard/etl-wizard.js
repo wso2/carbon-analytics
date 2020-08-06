@@ -52,10 +52,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         var handleStreamGenerationResponse = function(streamDef) {
             if (streamDef.tagName != null) {
                 this.__propertyMap.output.stream.name = streamDef.tableName;
+                this.__propertyMap.output.stream.attributes = streamDef.attributes;
             }else {
-                this.__propertyMap.output.stream.name = streamDef.name;
+                this.__propertyMap.input.stream.attributes = streamDef.attributes;
             }
-            this.__propertyMap.output.stream.attributes = streamDef.attributes;
             this.render();
         };
 
@@ -741,11 +741,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         paramData.type = param.type;
                         config.properties[param.name] = paramData;
                     });
-                
+
                 if(config.type === 'rdbms') {
                     config.properties = {};
                 }
-                
+
                 self.render();
             });
 
@@ -794,7 +794,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     </div>
                     ${
                         self.__propertyMap.output.isStore && self.__propertyMap.output.sink.type === 'rdbms' 
-                                                        || self.__propertyMap.output.sink.type === 'file' ?
+                                                        ||(self.__stepIndex === 1 && self.__propertyMap.input.source.type === 'file') ?
                             `<div>
                                 <button style="background-color: #ee6719" class="btn btn-default btn-generate-stream">
                                     Generate Stream
@@ -1448,7 +1448,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 appAnnotationListObjects: [],
                 streamList: (() => {
                     let list = [];
-                    
+
                     list.push({
                         id: 'inputStream',
                         name: o.input.stream.name,
@@ -1555,7 +1555,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             annotationListObjects: [],
                             id: 'outputStream',
                         }
-                    ];                    
+                    ];
                     return list;
                 })() : [],
                 windowList: [],
