@@ -63,7 +63,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                 return attr.name;
             });
 
-            config.output.stream.attributes
+            config.input.stream.attributes
                 .filter(function (attr) {
                     return existingGroupByAttributes.indexOf(attr.name) === -1;
                 })
@@ -103,7 +103,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                 .on('click', function (evt) {
                     var attributeName = $(evt.currentTarget).find('.option-title').html();
 
-                    var attrib = config.output.stream.attributes.find(function (attr) {
+                    var attrib = config.input.stream.attributes.find(function (attr) {
                         return attributeName === attr.name;
                     });
 
@@ -299,7 +299,7 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                                 break;
                             case 'operator':
                                 if (tempExpression.rootNode.hasRight && !tempExpression.rootNode.rightNode) {
-                                    config.output.stream.attributes
+                                    config.input.stream.attributes
                                         .filter(function (attr) {
                                             return tempExpression.rootNode
                                                 .rightTypes.indexOf(DataMapperUtil.getGenericDataType(attr.type)) > -1;
@@ -343,13 +343,13 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts', 'scopeModel', 'operatorM
                     } else {
                         var customDataTypes = []
                         if (tempExpression.returnTypes.indexOf('bool') > -1) {
-                            config.output.stream.attributes
+                            config.input.stream.attributes
                                 .forEach(function (attr) {
                                     allowedAttributes[attr.name] = attr;
                                 });
                             customDataTypes = ['text', 'number', 'bool'];
                         } else {
-                            config.output.stream.attributes
+                            config.input.stream.attributes
                                 .filter(function (attr) {
                                     return tempExpression.returnTypes.indexOf(attr.type) > -1;
                                 }).forEach(function (attr) {

@@ -50,7 +50,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         }
 
         var handleStreamGenerationResponse = function(streamDef) {
-            this.__propertyMap.output.stream.name = streamDef.tableName;
+            if (streamDef.tagName != null) {
+                this.__propertyMap.output.stream.name = streamDef.tableName;
+            }else {
+                this.__propertyMap.output.stream.name = streamDef.name;
+            }
             this.__propertyMap.output.stream.attributes = streamDef.attributes;
             this.render();
         };
