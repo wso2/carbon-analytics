@@ -54,7 +54,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 this.__propertyMap.output.stream.name = streamDef.tableName;
                 this.__propertyMap.output.stream.attributes = streamDef.attributes;
             }else {
-                this.__propertyMap.input.stream.attributes = streamDef.attributes;
+                this.__propertyMap.output.stream.attributes = streamDef.attributes;
             }
             this.render();
         };
