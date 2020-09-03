@@ -100,7 +100,7 @@ define(['require', 'jquery', 'lodash', 'log', 'dataMapperUtil', 'app/source-edit
                                 case 'bool':
                                     hasMatchingType = inputConfig.mapping.properties[key].value.length > 0
                                         && (inputConfig.mapping.properties[key].value === 'true'
-                                            || sourceConfig.properties[key].value === 'false');
+                                            || inputConfig.properties[key].value === 'false');
                                     break;
                             }
                         }
