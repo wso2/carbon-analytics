@@ -66,6 +66,7 @@ public class RePlayer {
     private static void rePlay(ErrorEntry errorEntry) throws SiddhiErrorHandlerException, InterruptedException {
         SiddhiAppRuntime siddhiAppRuntime = SiddhiErrorHandlerDataHolder.getInstance()
                 .getSiddhiAppRuntimeService().getActiveSiddhiAppRuntimes().get(errorEntry.getSiddhiAppName());
+        // TODO: 2020-09-07  check if replay for stream (in if) or table (in else)
         if (siddhiAppRuntime != null) {
             switch (errorEntry.getEventType()) {
                 case COMPLEX_EVENT:
@@ -89,6 +90,8 @@ public class RePlayer {
         }
     }
 
+    // TODO: 2020-09-07  write rePlayComplexEventChunkToTable function - params chunk, siddhiappruntime
+
     private static void rePlayComplexEvent(ErrorEntry complexEventErrorEntry, SiddhiAppRuntime siddhiAppRuntime)
             throws SiddhiErrorHandlerException, InterruptedException {
         try {
@@ -96,6 +99,7 @@ public class RePlayer {
             if (complexEvent instanceof ComplexEvent) {
                 switch (complexEventErrorEntry.getErrorOccurrence()) {
                     case STORE_ON_TABLE_ADD:
+                        // TODO: 2020-09-07 read chunk itself and send in
                         ComplexEventChunk<StreamEvent> replayAddEventChunk = new ComplexEventChunk<>();
                         replayAddEventChunk.add((StreamEvent) complexEvent);
                         ConcurrentHashMap tableMap = (ConcurrentHashMap) siddhiAppRuntime.getTables();
