@@ -29,8 +29,10 @@ import io.siddhi.core.table.Table;
 import io.siddhi.core.table.record.AbstractRecordTable;
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
 import io.siddhi.core.util.error.handler.store.ErrorStore;
+import io.siddhi.core.util.error.handler.util.ErroneousEventType;
 import io.siddhi.core.util.error.handler.util.ErrorOccurrence;
 import io.siddhi.core.util.error.handler.util.ErrorHandlerUtils;
+import io.siddhi.core.util.error.handler.util.ErrorType;
 import org.wso2.carbon.siddhi.error.handler.core.exception.SiddhiErrorHandlerException;
 import org.wso2.carbon.siddhi.error.handler.core.internal.SiddhiErrorHandlerDataHolder;
 
@@ -66,26 +68,36 @@ public class RePlayer {
     private static void rePlay(ErrorEntry errorEntry) throws SiddhiErrorHandlerException, InterruptedException {
         SiddhiAppRuntime siddhiAppRuntime = SiddhiErrorHandlerDataHolder.getInstance()
                 .getSiddhiAppRuntimeService().getActiveSiddhiAppRuntimes().get(errorEntry.getSiddhiAppName());
-        // TODO: 2020-09-07  check if replay for stream (in if) or table (in else)
-        if (siddhiAppRuntime != null) {
-            switch (errorEntry.getEventType()) {
-                case COMPLEX_EVENT:
-                    rePlayComplexEvent(errorEntry, siddhiAppRuntime);
-                    break;
-                case EVENT:
-                    rePlayEvent(errorEntry, siddhiAppRuntime);
-                    break;
-                case EVENT_ARRAY:
-                    rePlayEventArray(errorEntry, siddhiAppRuntime);
-                    break;
-                case EVENT_LIST:
-                    rePlayEventList(errorEntry, siddhiAppRuntime);
-                    break;
-                case PAYLOAD_STRING:
-                    rePlayPayloadString(errorEntry, siddhiAppRuntime);
-                    break;
-                default:
-                    // Ideally we won't reach here
+        if (errorEntry.getErrorType() == ErrorType.MAPPING || errorEntry.getErrorType() == ErrorType.TRANSPORT) {
+            if (siddhiAppRuntime != null) {
+                switch (errorEntry.getEventType()) {
+                    case COMPLEX_EVENT:
+                        rePlayComplexEvent(errorEntry, siddhiAppRuntime);
+                        break;
+                    case EVENT:
+                        rePlayEvent(errorEntry, siddhiAppRuntime);
+                        break;
+                    case EVENT_ARRAY:
+                        rePlayEventArray(errorEntry, siddhiAppRuntime);
+                        break;
+                    case EVENT_LIST:
+                        rePlayEventList(errorEntry, siddhiAppRuntime);
+                        break;
+                    case PAYLOAD_STRING:
+                        rePlayPayloadString(errorEntry, siddhiAppRuntime);
+                        break;
+                    default:
+                        // Ideally we won't reach here
+                }
+            }
+        } else {
+            if (siddhiAppRuntime != null) {
+                if (errorEntry.getEventType() == ErroneousEventType.COMPLEX_EVENT_CHUNK) {
+                    rePlayComplexEventChunk(errorEntry, siddhiAppRuntime);
+                } else {
+                    throw new SiddhiErrorHandlerException("For ErrorType STORE the ErroneousEventType should be " +
+                            "COMPLEX_EVENT_CHUNK but found " + errorEntry.getEventType().toString());
+                }
             }
         }
     }
