@@ -25,8 +25,6 @@ import io.siddhi.core.event.Event;
 import io.siddhi.core.event.stream.StreamEvent;
 import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.core.stream.input.source.Source;
-import io.siddhi.core.table.Table;
-import io.siddhi.core.table.record.AbstractRecordTable;
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
 import io.siddhi.core.util.error.handler.store.ErrorStore;
 import io.siddhi.core.util.error.handler.util.ErroneousEventType;
@@ -40,7 +38,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Contains methods to re-play collected erroneous events.
@@ -110,11 +107,10 @@ public class RePlayer {
             if (complexEventChunk instanceof ComplexEventChunk) {
                 switch (complexEventErrorEntry.getErrorOccurrence()) {
                     case STORE_ON_TABLE_ADD:
-                        ComplexEventChunk<StreamEvent> replayAddEventChunk = (ComplexEventChunk<StreamEvent>) complexEventChunk;
-                        ConcurrentHashMap tableMap = (ConcurrentHashMap) siddhiAppRuntime.getTables();
-                        AbstractRecordTable targetTable = ((AbstractRecordTable) (tableMap).get(complexEventErrorEntry
-                                .getStreamName()));
-                        targetTable.add(replayAddEventChunk);
+                        ComplexEventChunk<StreamEvent> replayAddEventChunk =
+                                (ComplexEventChunk<StreamEvent>) complexEventChunk;
+                        siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
+                                .add(replayAddEventChunk);
                         break;
                     default:
                         throw new SiddhiErrorHandlerException("Unsupported ErrorOccurenceType of " +
@@ -123,7 +119,8 @@ public class RePlayer {
                 }
             } else {
                 throw new SiddhiErrorHandlerException(
-                        "eventAsBytes present in the entry is invalid. It is expected to represent a ComplexEventChunk.");
+                        "eventAsBytes present in the entry is invalid. It is expected to represent a " +
+                                "ComplexEventChunk.");
             }
         } catch (IOException | ClassNotFoundException e) {
             throw new SiddhiErrorHandlerException("Failed to get bytes as a ComplexEventChunk object.", e);
