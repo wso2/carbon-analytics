@@ -96,43 +96,56 @@ public class RePlayer {
                     rePlayComplexEventChunk(errorEntry, siddhiAppRuntime);
                 } else {
                     throw new SiddhiErrorHandlerException("For ErrorType STORE the ErroneousEventType should be " +
-                            "COMPLEX_EVENT_CHUNK but found " + errorEntry.getEventType().toString());
+                            "COMPLEX_EVENT_CHUNK but found " + errorEntry.getEventType().toString() + " in " +
+                            errorEntry.getStreamName());
                 }
             }
         }
     }
 
-    // TODO: 2020-09-07  write rePlayComplexEventChunkToTable function - params chunk, siddhiappruntime
-
-    private static void rePlayComplexEvent(ErrorEntry complexEventErrorEntry, SiddhiAppRuntime siddhiAppRuntime)
+    private static void rePlayComplexEventChunk(ErrorEntry complexEventErrorEntry, SiddhiAppRuntime siddhiAppRuntime)
             throws SiddhiErrorHandlerException, InterruptedException {
         try {
-            Object complexEvent = ErrorHandlerUtils.getAsObject(complexEventErrorEntry.getEventAsBytes());
-            if (complexEvent instanceof ComplexEvent) {
+            Object complexEventChunk = ErrorHandlerUtils.getAsObject(complexEventErrorEntry.getEventAsBytes());
+            if (complexEventChunk instanceof ComplexEventChunk) {
                 switch (complexEventErrorEntry.getErrorOccurrence()) {
                     case STORE_ON_TABLE_ADD:
-                        // TODO: 2020-09-07 read chunk itself and send in
-                        ComplexEventChunk<StreamEvent> replayAddEventChunk = new ComplexEventChunk<>();
-                        replayAddEventChunk.add((StreamEvent) complexEvent);
+                        ComplexEventChunk<StreamEvent> replayAddEventChunk = (ComplexEventChunk<StreamEvent>) complexEventChunk;
                         ConcurrentHashMap tableMap = (ConcurrentHashMap) siddhiAppRuntime.getTables();
                         AbstractRecordTable targetTable = ((AbstractRecordTable) (tableMap).get(complexEventErrorEntry
                                 .getStreamName()));
                         targetTable.add(replayAddEventChunk);
                         break;
                     default:
-                        InputHandler inputHandler = siddhiAppRuntime.getInputHandler(complexEventErrorEntry
-                                .getStreamName());
-                        if (inputHandler != null) {
-                            ComplexEvent current = (ComplexEvent) complexEvent;
-                            while (current != null) {
-                                inputHandler.send(current.getOutputData());
-                                current = current.getNext();
-                            }
-                        } else {
-                            throw new SiddhiErrorHandlerException(String.format("Input handler was not found for " +
-                                    "stream: %s.", complexEventErrorEntry.getStreamName()));
-                        }
-                        break;
+                        throw new SiddhiErrorHandlerException("Unsupported ErrorOccurenceType of " +
+                                complexEventErrorEntry.getErrorOccurrence() + " to replay ComplexEventChunk in "
+                                + complexEventErrorEntry.getStreamName());
+                }
+            } else {
+                throw new SiddhiErrorHandlerException(
+                        "eventAsBytes present in the entry is invalid. It is expected to represent a ComplexEventChunk.");
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            throw new SiddhiErrorHandlerException("Failed to get bytes as a ComplexEventChunk object.", e);
+        }
+    }
+
+    private static void rePlayComplexEvent(ErrorEntry complexEventErrorEntry, SiddhiAppRuntime siddhiAppRuntime)
+            throws SiddhiErrorHandlerException, InterruptedException {
+        try {
+            Object complexEvent = ErrorHandlerUtils.getAsObject(complexEventErrorEntry.getEventAsBytes());
+            if (complexEvent instanceof ComplexEvent) {
+                InputHandler inputHandler = siddhiAppRuntime.getInputHandler(complexEventErrorEntry
+                        .getStreamName());
+                if (inputHandler != null) {
+                    ComplexEvent current = (ComplexEvent) complexEvent;
+                    while (current != null) {
+                        inputHandler.send(current.getOutputData());
+                        current = current.getNext();
+                    }
+                } else {
+                    throw new SiddhiErrorHandlerException(String.format("Input handler was not found for " +
+                            "stream: %s.", complexEventErrorEntry.getStreamName()));
                 }
             } else {
                 throw new SiddhiErrorHandlerException(
