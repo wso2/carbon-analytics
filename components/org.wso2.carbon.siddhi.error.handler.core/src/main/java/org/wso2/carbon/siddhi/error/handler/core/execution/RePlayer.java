@@ -27,10 +27,7 @@ import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.core.stream.input.source.Source;
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
 import io.siddhi.core.util.error.handler.store.ErrorStore;
-import io.siddhi.core.util.error.handler.util.ErroneousEventType;
-import io.siddhi.core.util.error.handler.util.ErrorOccurrence;
-import io.siddhi.core.util.error.handler.util.ErrorHandlerUtils;
-import io.siddhi.core.util.error.handler.util.ErrorType;
+import io.siddhi.core.util.error.handler.util.*;
 import org.wso2.carbon.siddhi.error.handler.core.exception.SiddhiErrorHandlerException;
 import org.wso2.carbon.siddhi.error.handler.core.internal.SiddhiErrorHandlerDataHolder;
 
@@ -89,7 +86,7 @@ public class RePlayer {
             }
         } else {
             if (siddhiAppRuntime != null) {
-                if (errorEntry.getEventType() == ErroneousEventType.COMPLEX_EVENT_CHUNK) {
+                if (errorEntry.getEventType() == ErroneousEventType.REPLAYABLE_TABLE_RECORD) {
                     rePlayComplexEventChunk(errorEntry, siddhiAppRuntime);
                 } else {
                     throw new SiddhiErrorHandlerException("For ErrorType STORE the ErroneousEventType should be " +
@@ -103,12 +100,13 @@ public class RePlayer {
     private static void rePlayComplexEventChunk(ErrorEntry complexEventErrorEntry, SiddhiAppRuntime siddhiAppRuntime)
             throws SiddhiErrorHandlerException, InterruptedException {
         try {
-            Object complexEventChunk = ErrorHandlerUtils.getAsObject(complexEventErrorEntry.getEventAsBytes());
-            if (complexEventChunk instanceof ComplexEventChunk) {
+            Object deserializedTableRecord = ErrorHandlerUtils.getAsObject(complexEventErrorEntry.getEventAsBytes());
+            if (deserializedTableRecord instanceof ReplayableTableRecord) {
+                ReplayableTableRecord replayableTableRecord = (ReplayableTableRecord) deserializedTableRecord;
                 switch (complexEventErrorEntry.getErrorOccurrence()) {
                     case STORE_ON_TABLE_ADD:
                         ComplexEventChunk<StreamEvent> replayAddEventChunk =
-                                (ComplexEventChunk<StreamEvent>) complexEventChunk;
+                                replayableTableRecord.getComplexEventChunk();
                         siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
                                 .add(replayAddEventChunk);
                         break;
@@ -120,7 +118,7 @@ public class RePlayer {
             } else {
                 throw new SiddhiErrorHandlerException(
                         "eventAsBytes present in the entry is invalid. It is expected to represent a " +
-                                "ComplexEventChunk.");
+                                ReplayableTableRecord.class);
             }
         } catch (IOException | ClassNotFoundException e) {
             throw new SiddhiErrorHandlerException("Failed to get bytes as a ComplexEventChunk object.", e);
