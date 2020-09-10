@@ -20,9 +20,7 @@ package org.wso2.carbon.siddhi.error.handler.core.execution;
 
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.event.ComplexEvent;
-import io.siddhi.core.event.ComplexEventChunk;
 import io.siddhi.core.event.Event;
-import io.siddhi.core.event.stream.StreamEvent;
 import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.core.stream.input.source.Source;
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
@@ -105,10 +103,19 @@ public class RePlayer {
                 ReplayableTableRecord replayableTableRecord = (ReplayableTableRecord) deserializedTableRecord;
                 switch (complexEventErrorEntry.getErrorOccurrence()) {
                     case STORE_ON_TABLE_ADD:
-                        ComplexEventChunk<StreamEvent> replayAddEventChunk =
-                                replayableTableRecord.getComplexEventChunk();
                         siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
-                                .add(replayAddEventChunk);
+                                .add(replayableTableRecord.getComplexEventChunk());
+                        break;
+                    case STORE_ON_TABLE_FIND:
+                        // TODO: 2020-09-10 Cannot send back a return value. We need to fingure out how to inject the
+                        //  find response into appropriate stream
+//                        siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
+//                                .find(replayableTableRecord.getComplexEventChunk());
+                        break;
+                    case STORE_ON_TABLE_DELETE:
+                        siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
+                                .delete(replayableTableRecord.getComplexEventChunk(),
+                                        replayableTableRecord.getCompiledCondition());
                         break;
                     default:
                         throw new SiddhiErrorHandlerException("Unsupported ErrorOccurenceType of " +
