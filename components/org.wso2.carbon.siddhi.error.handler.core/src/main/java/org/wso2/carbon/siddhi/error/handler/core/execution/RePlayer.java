@@ -24,6 +24,7 @@ import io.siddhi.core.event.Event;
 import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.core.stream.input.source.Source;
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
+import io.siddhi.core.util.error.handler.model.ReplayableTableRecord;
 import io.siddhi.core.util.error.handler.store.ErrorStore;
 import io.siddhi.core.util.error.handler.util.*;
 import org.wso2.carbon.siddhi.error.handler.core.exception.SiddhiErrorHandlerException;
@@ -101,6 +102,7 @@ public class RePlayer {
             Object deserializedTableRecord = ErrorHandlerUtils.getAsObject(complexEventErrorEntry.getEventAsBytes());
             if (deserializedTableRecord instanceof ReplayableTableRecord) {
                 ReplayableTableRecord replayableTableRecord = (ReplayableTableRecord) deserializedTableRecord;
+//                siddhiAppRuntime.getQueries().stream().findFirst().get().getQuery().getInputStream().
                 switch (complexEventErrorEntry.getErrorOccurrence()) {
                     case STORE_ON_TABLE_ADD:
                         siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
@@ -115,7 +117,7 @@ public class RePlayer {
                     case STORE_ON_TABLE_DELETE:
                         siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
                                 .delete(replayableTableRecord.getComplexEventChunk(),
-                                        replayableTableRecord.getCompiledCondition());
+                                        replayableTableRecord.getCompiledCondition(), null);
                         break;
                     default:
                         throw new SiddhiErrorHandlerException("Unsupported ErrorOccurenceType of " +
