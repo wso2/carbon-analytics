@@ -119,6 +119,12 @@ public class RePlayer {
                                 .delete(replayableTableRecord.getComplexEventChunk(),
                                         replayableTableRecord.getCompiledCondition(), null);
                         break;
+                    case STORE_ON_TABLE_UPDATE:
+                        siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
+                                .update(replayableTableRecord.getComplexEventChunk(),
+                                        replayableTableRecord.getCompiledCondition(),
+                                        replayableTableRecord.getCompiledUpdateSet(), null);
+                        break;
                     default:
                         throw new SiddhiErrorHandlerException("Unsupported ErrorOccurenceType of " +
                                 complexEventErrorEntry.getErrorOccurrence() + " to replay ComplexEventChunk in "
