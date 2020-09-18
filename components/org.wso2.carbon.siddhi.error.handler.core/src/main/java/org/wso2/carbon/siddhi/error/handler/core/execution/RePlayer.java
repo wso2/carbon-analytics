@@ -102,35 +102,28 @@ public class RePlayer {
             Object deserializedTableRecord = ErrorHandlerUtils.getAsObject(complexEventErrorEntry.getEventAsBytes());
             if (deserializedTableRecord instanceof ReplayableTableRecord) {
                 ReplayableTableRecord replayableTableRecord = (ReplayableTableRecord) deserializedTableRecord;
-//                siddhiAppRuntime.getQueries().stream().findFirst().get().getQuery().getInputStream().
                 switch (complexEventErrorEntry.getErrorOccurrence()) {
                     case STORE_ON_TABLE_ADD:
                         siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
                                 .add(replayableTableRecord.getComplexEventChunk());
                         break;
-                    case STORE_ON_TABLE_FIND:
-                        // TODO: 2020-09-10 Cannot send back a return value. We need to fingure out how to inject the
-                        //  find response into appropriate stream
-//                        siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
-//                                .find(replayableTableRecord.getComplexEventChunk());
-                        break;
                     case STORE_ON_TABLE_DELETE:
                         siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
                                 .delete(replayableTableRecord.getComplexEventChunk(),
-                                        replayableTableRecord.getCompiledCondition(), null);
+                                        replayableTableRecord.getCompiledCondition());
                         break;
                     case STORE_ON_TABLE_UPDATE:
                         siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
                                 .update(replayableTableRecord.getComplexEventChunk(),
                                         replayableTableRecord.getCompiledCondition(),
-                                        replayableTableRecord.getCompiledUpdateSet(), null);
+                                        replayableTableRecord.getCompiledUpdateSet());
                         break;
                     case STORE_ON_TABLE_UPDATE_OR_ADD:
                         siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
                                 .updateOrAdd(replayableTableRecord.getComplexEventChunk(),
                                         replayableTableRecord.getCompiledCondition(),
                                         replayableTableRecord.getCompiledUpdateSet(),
-                                        replayableTableRecord.getAddingStreamEventExtractor(), null);
+                                        replayableTableRecord.getAddingStreamEventExtractor());
                         break;
                     default:
                         throw new SiddhiErrorHandlerException("Unsupported ErrorOccurenceType of " +
