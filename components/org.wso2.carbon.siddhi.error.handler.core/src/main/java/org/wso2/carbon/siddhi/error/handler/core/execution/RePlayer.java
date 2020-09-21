@@ -61,42 +61,32 @@ public class RePlayer {
     private static void rePlay(ErrorEntry errorEntry) throws SiddhiErrorHandlerException, InterruptedException {
         SiddhiAppRuntime siddhiAppRuntime = SiddhiErrorHandlerDataHolder.getInstance()
                 .getSiddhiAppRuntimeService().getActiveSiddhiAppRuntimes().get(errorEntry.getSiddhiAppName());
-        if (errorEntry.getErrorType() == ErrorType.MAPPING || errorEntry.getErrorType() == ErrorType.TRANSPORT) {
-            if (siddhiAppRuntime != null) {
-                switch (errorEntry.getEventType()) {
-                    case COMPLEX_EVENT:
-                        rePlayComplexEvent(errorEntry, siddhiAppRuntime);
-                        break;
-                    case EVENT:
-                        rePlayEvent(errorEntry, siddhiAppRuntime);
-                        break;
-                    case EVENT_ARRAY:
-                        rePlayEventArray(errorEntry, siddhiAppRuntime);
-                        break;
-                    case EVENT_LIST:
-                        rePlayEventList(errorEntry, siddhiAppRuntime);
-                        break;
-                    case PAYLOAD_STRING:
-                        rePlayPayloadString(errorEntry, siddhiAppRuntime);
-                        break;
-                    default:
-                        // Ideally we won't reach here
-                }
-            }
-        } else {
-            if (siddhiAppRuntime != null) {
-                if (errorEntry.getEventType() == ErroneousEventType.REPLAYABLE_TABLE_RECORD) {
-                    rePlayComplexEventChunk(errorEntry, siddhiAppRuntime);
-                } else {
-                    throw new SiddhiErrorHandlerException("For ErrorType STORE the ErroneousEventType should be " +
-                            "COMPLEX_EVENT_CHUNK but found " + errorEntry.getEventType().toString() + " in " +
-                            errorEntry.getStreamName());
-                }
+        if (siddhiAppRuntime != null) {
+            switch (errorEntry.getEventType()) {
+                case COMPLEX_EVENT:
+                    rePlayComplexEvent(errorEntry, siddhiAppRuntime);
+                    break;
+                case EVENT:
+                    rePlayEvent(errorEntry, siddhiAppRuntime);
+                    break;
+                case EVENT_ARRAY:
+                    rePlayEventArray(errorEntry, siddhiAppRuntime);
+                    break;
+                case EVENT_LIST:
+                    rePlayEventList(errorEntry, siddhiAppRuntime);
+                    break;
+                case PAYLOAD_STRING:
+                    rePlayPayloadString(errorEntry, siddhiAppRuntime);
+                    break;
+                case REPLAYABLE_TABLE_RECORD:
+                    rePlayTableRecord(errorEntry, siddhiAppRuntime);
+                default:
+                    // Ideally we won't reach here
             }
         }
     }
 
-    private static void rePlayComplexEventChunk(ErrorEntry complexEventErrorEntry, SiddhiAppRuntime siddhiAppRuntime)
+    private static void rePlayTableRecord(ErrorEntry complexEventErrorEntry, SiddhiAppRuntime siddhiAppRuntime)
             throws SiddhiErrorHandlerException, InterruptedException {
         try {
             Object deserializedTableRecord = ErrorHandlerUtils.getAsObject(complexEventErrorEntry.getEventAsBytes());
