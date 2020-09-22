@@ -87,7 +87,7 @@ public class RePlayer {
     }
 
     private static void rePlayTableRecord(ErrorEntry complexEventErrorEntry, SiddhiAppRuntime siddhiAppRuntime)
-            throws SiddhiErrorHandlerException, InterruptedException {
+        throws SiddhiErrorHandlerException, InterruptedException {
         try {
             Object deserializedTableRecord = ErrorHandlerUtils.getAsObject(complexEventErrorEntry.getEventAsBytes());
             if (deserializedTableRecord instanceof ReplayableTableRecord) {
@@ -131,7 +131,7 @@ public class RePlayer {
     }
 
     private static void rePlayComplexEvent(ErrorEntry complexEventErrorEntry, SiddhiAppRuntime siddhiAppRuntime)
-            throws SiddhiErrorHandlerException, InterruptedException {
+        throws SiddhiErrorHandlerException, InterruptedException {
         try {
             Object complexEvent = ErrorHandlerUtils.getAsObject(complexEventErrorEntry.getEventAsBytes());
             if (complexEvent instanceof ComplexEvent) {
@@ -157,7 +157,7 @@ public class RePlayer {
     }
 
     private static void rePlayEvent(ErrorEntry eventErrorEntry, SiddhiAppRuntime siddhiAppRuntime)
-            throws SiddhiErrorHandlerException, InterruptedException {
+        throws SiddhiErrorHandlerException, InterruptedException {
         try {
             Object event = ErrorHandlerUtils.getAsObject(eventErrorEntry.getEventAsBytes());
             if (event instanceof Event) {
@@ -178,7 +178,7 @@ public class RePlayer {
     }
 
     private static void rePlayEventArray(ErrorEntry eventArrayErrorEntry, SiddhiAppRuntime siddhiAppRuntime)
-            throws SiddhiErrorHandlerException, InterruptedException {
+        throws SiddhiErrorHandlerException, InterruptedException {
         try {
             Object eventArray = ErrorHandlerUtils.getAsObject(eventArrayErrorEntry.getEventAsBytes());
             if (eventArray instanceof Event[]) {
@@ -199,7 +199,7 @@ public class RePlayer {
     }
 
     private static void rePlayEventList(ErrorEntry eventListErrorEntry, SiddhiAppRuntime siddhiAppRuntime)
-            throws SiddhiErrorHandlerException, InterruptedException {
+        throws SiddhiErrorHandlerException, InterruptedException {
         try {
             Object eventList = ErrorHandlerUtils.getAsObject(eventListErrorEntry.getEventAsBytes());
             if (eventList instanceof List) {
@@ -222,7 +222,7 @@ public class RePlayer {
     }
 
     private static void rePlayPayloadString(ErrorEntry payloadStringErrorEntry, SiddhiAppRuntime siddhiAppRuntime)
-            throws SiddhiErrorHandlerException {
+        throws SiddhiErrorHandlerException {
         try {
             Object payloadString = ErrorHandlerUtils.getAsObject(payloadStringErrorEntry.getEventAsBytes());
             if (payloadString instanceof String) {
