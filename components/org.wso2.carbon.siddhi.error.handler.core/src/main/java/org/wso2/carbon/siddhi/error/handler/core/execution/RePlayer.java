@@ -117,8 +117,8 @@ public class RePlayer {
                         break;
                     default:
                         throw new SiddhiErrorHandlerException("Unsupported ErrorOccurenceType of " +
-                                complexEventErrorEntry.getErrorOccurrence() + " to replay ComplexEventChunk in "
-                                + complexEventErrorEntry.getStreamName());
+                            complexEventErrorEntry.getErrorOccurrence() + " to replay ComplexEventChunk in "
+                            + complexEventErrorEntry.getStreamName());
                 }
             } else {
                 throw new SiddhiErrorHandlerException(
@@ -145,11 +145,11 @@ public class RePlayer {
                     }
                 } else {
                     throw new SiddhiErrorHandlerException(String.format("Input handler was not found for " +
-                            "stream: %s.", complexEventErrorEntry.getStreamName()));
+                        "stream: %s.", complexEventErrorEntry.getStreamName()));
                 }
             } else {
                 throw new SiddhiErrorHandlerException(
-                        "eventAsBytes present in the entry is invalid. It is expected to represent a ComplexEvent.");
+                    "eventAsBytes present in the entry is invalid. It is expected to represent a ComplexEvent.");
             }
         } catch (IOException | ClassNotFoundException e) {
             throw new SiddhiErrorHandlerException("Failed to get bytes as a ComplexEvent object.", e);
@@ -166,11 +166,11 @@ public class RePlayer {
                     inputHandler.send((Event) event);
                 } else {
                     throw new SiddhiErrorHandlerException(
-                            String.format("Input handler was not found for stream: %s.", eventErrorEntry.getStreamName()));
+                        String.format("Input handler was not found for stream: %s.", eventErrorEntry.getStreamName()));
                 }
             } else {
                 throw new SiddhiErrorHandlerException(
-                        "eventAsBytes present in the entry is invalid. It is expected to represent an Event.");
+                    "eventAsBytes present in the entry is invalid. It is expected to represent an Event.");
             }
         } catch (IOException | ClassNotFoundException e) {
             throw new SiddhiErrorHandlerException("Failed to get bytes as an Event object.", e);
@@ -187,11 +187,11 @@ public class RePlayer {
                     inputHandler.send((Event[]) eventArray);
                 } else {
                     throw new SiddhiErrorHandlerException(String.format("Input handler was not found for stream: %s.",
-                            eventArrayErrorEntry.getStreamName()));
+                        eventArrayErrorEntry.getStreamName()));
                 }
             } else {
                 throw new SiddhiErrorHandlerException(
-                        "eventAsBytes present in the entry is invalid. It is expected to represent an Event[].");
+                    "eventAsBytes present in the entry is invalid. It is expected to represent an Event[].");
             }
         } catch (IOException | ClassNotFoundException e) {
             throw new SiddhiErrorHandlerException("Failed to get bytes as an Event[].", e);
@@ -210,7 +210,7 @@ public class RePlayer {
                     }
                 } else {
                     throw new SiddhiErrorHandlerException(String.format("Input handler was not found for stream: %s.",
-                            eventListErrorEntry.getStreamName()));
+                        eventListErrorEntry.getStreamName()));
                 }
             } else {
                 throw new SiddhiErrorHandlerException(
@@ -229,21 +229,21 @@ public class RePlayer {
                 if (payloadStringErrorEntry.getErrorOccurrence() == ErrorOccurrence.BEFORE_SOURCE_MAPPING) {
                     // Get sources of the appropriate stream.
                     Optional<List<Source>> sourcesOfStream = siddhiAppRuntime.getSources().stream().filter(sourceList ->
-                            sourceList.stream().anyMatch(source -> Objects.equals(source.getStreamDefinition().getId(),
-                                    payloadStringErrorEntry.getStreamName()))).findFirst();
+                        sourceList.stream().anyMatch(source -> Objects.equals(source.getStreamDefinition().getId(),
+                            payloadStringErrorEntry.getStreamName()))).findFirst();
 
                     if (sourcesOfStream.isPresent() && sourcesOfStream.get().size() == 1) {
                         sourcesOfStream.get().get(0).getMapper().onEvent(payloadString, null, null);
                     } else {
                         throw new SiddhiErrorHandlerException(
-                                "Re-playing can be done only if a single source is associated with the stream.");
+                            "Re-playing can be done only if a single source is associated with the stream.");
                     }
                 } else {
                     throw new SiddhiErrorHandlerException("Unexpected error occurrence for the error.");
                 }
             } else {
                 throw new SiddhiErrorHandlerException(
-                        "eventAsBytes present in the entry is invalid. It is expected to represent a String.");
+                    "eventAsBytes present in the entry is invalid. It is expected to represent a String.");
             }
         } catch (IOException | ClassNotFoundException e) {
             throw new SiddhiErrorHandlerException("Failed to get bytes as a String.", e);
