@@ -21,7 +21,7 @@ queries:
   -
    mappings:
      IS_TABLE_EXIST: SELECT * FROM {{TABLE_NAME}} limit 1
-     CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL AUTO_INCREMENT, timestamp BIGINT, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event LONGBLOB, cause VARCHAR(255), stackTrace LONGBLOB, originalPayload LONGBLOB, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50), PRIMARY KEY (id))
+     CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL AUTO_INCREMENT, timestamp BIGINT, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event LONGBLOB, cause VARCHAR(1000), stackTrace LONGBLOB, originalPayload LONGBLOB, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50), PRIMARY KEY (id))
      INSERT: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      SELECT: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      SELECT_SINGLE: SELECT * FROM {{TABLE_NAME}} WHERE id = ?
@@ -40,7 +40,7 @@ queries:
   -
    mappings:
      IS_TABLE_EXIST: SELECT * FROM {{TABLE_NAME}} limit 1
-     CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL AUTO_INCREMENT, timestamp BIGINT, siddhiAppName VARCHAR (100), streamName VARCHAR(100), event LONGBLOB, cause VARCHAR(255), stackTrace LONGBLOB, originalPayload LONGBLOB, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50), PRIMARY KEY (id))
+     CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL AUTO_INCREMENT, timestamp BIGINT, siddhiAppName VARCHAR (100), streamName VARCHAR(100), event LONGBLOB, cause VARCHAR(1000), stackTrace LONGBLOB, originalPayload LONGBLOB, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50), PRIMARY KEY (id))
      INSERT: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      SELECT: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      SELECT_SINGLE: SELECT * FROM {{TABLE_NAME}} WHERE id = ?
@@ -59,7 +59,7 @@ queries:
   -
    mappings:
      IS_TABLE_EXIST: SELECT 1 FROM {{TABLE_NAME}} LIMIT 1
-     CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id serial primary key, timestamp bigint, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event bigint, cause VARCHAR(255), stackTrace bigint, originalPayload bigint, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50))
+     CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id serial primary key, timestamp bigint, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event bigint, cause VARCHAR(1000), stackTrace bigint, originalPayload bigint, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50))
      INSERT: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      SELECT: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      SELECT_SINGLE: SELECT * FROM {{TABLE_NAME}} WHERE id = ?
@@ -78,7 +78,7 @@ queries:
   -
    mappings:
      IS_TABLE_EXIST: SELECT TOP 1 1 FROM {{TABLE_NAME}}
-     CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL IDENTITY(1,1) PRIMARY KEY, timestamp bigint, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event VARBINARY(max), cause VARCHAR(255), stackTrace VARBINARY(max), originalPayload VARBINARY(max), errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50))
+     CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INT NOT NULL IDENTITY(1,1) PRIMARY KEY, timestamp bigint, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event VARBINARY(max), cause VARCHAR(1000), stackTrace VARBINARY(max), originalPayload VARBINARY(max), errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50))
      INSERT: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      SELECT: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      SELECT_SINGLE: SELECT * FROM {{TABLE_NAME}} WHERE id = ?
@@ -97,7 +97,7 @@ queries:
   -
    mappings:
      IS_TABLE_EXIST: SELECT 1 FROM {{TABLE_NAME}} WHERE rownum=1
-     CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id NUMBER(10) NOT NULL, timestamp LONG, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event BLOB, cause VARCHAR(255), stackTrace BLOB, originalPayload BLOB, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50)); ALTER TABLE {{TABLE_NAME}} ADD (CONSTRAINT err_store_pk PRIMARY KEY (id)); CREATE SEQUENCE err_store_seq START WITH 1;
+     CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id NUMBER(10) NOT NULL, timestamp LONG, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event BLOB, cause VARCHAR(1000), stackTrace BLOB, originalPayload BLOB, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50)); ALTER TABLE {{TABLE_NAME}} ADD (CONSTRAINT err_store_pk PRIMARY KEY (id)); CREATE SEQUENCE err_store_seq START WITH 1;
      INSERT: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      SELECT: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      SELECT_SINGLE: SELECT * FROM {{TABLE_NAME}} WHERE id = ?
@@ -116,7 +116,7 @@ queries:
   -
    mappings:
      IS_TABLE_EXIST: SELECT * FROM {{TABLE_NAME}} FETCH FIRST 1 ROWS ONLY
-     CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INTEGER GENERATED BY DEFAULT AS IDENTITY NOT NULL, timestamp BIGINT, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event BLOB(2000000000), cause VARCHAR(255), stackTrace BLOB(2000000000), originalPayload BLOB(2000000000), errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50), PRIMARY KEY (id))
+     CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id INTEGER GENERATED BY DEFAULT AS IDENTITY NOT NULL, timestamp BIGINT, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event BLOB(2000000000), cause VARCHAR(1000), stackTrace BLOB(2000000000), originalPayload BLOB(2000000000), errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50), PRIMARY KEY (id))
      INSERT: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      SELECT: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      SELECT_SINGLE: SELECT * FROM {{TABLE_NAME}} WHERE id = ?
