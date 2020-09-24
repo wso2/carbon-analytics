@@ -732,8 +732,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                 },
 
                 renderOriginalPayload: function(errorEntry) {
-                    console.log(errorEntry);
-                    console.log(errorEntry.eventType);
                     var originalPayload = $('<div></div>');
                     if (errorEntry.eventType === "REPLAYABLE_TABLE_RECORD") {
                         originalPayload.append('<div><h4>Table Record</h4></div>');
