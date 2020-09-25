@@ -353,35 +353,44 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                     var name = ''
                     var enclosedElementPath = [];
 
-                    if (config.mapping.properties['enclosing.element']
-                        && config.mapping.properties['enclosing.element'].value.startsWith('\/\/')) {
-                        enclosedElementPath = config.mapping
-                            .properties['enclosing.element'].value.substr(2).split('/');
-                    } else if (config.mapping.properties['enclosing.element']
-                        && config.mapping.properties['enclosing.element'].value.startsWith('\/')) {
-                        enclosedElementPath = config.mapping
-                            .properties['enclosing.element'].value.substr(1).split('/');
-                    } else if (config.mapping.properties['enclosing.element']) {
-                        enclosedElementPath = config.mapping
-                            .properties['enclosing.element'].value.replaceAll(/\/\//g, '\/').split('/');
-                    }
-
-                    var index = enclosedElementPath.length > 0 ? pathArray.indexOf(enclosedElementPath[0]) : -1;
-                    if (index > -1) {
-                        pathArray.splice(0, (++index));
-
-                        for (let i = 1; i < enclosedElementPath.length; i++) {
-                            pathArray = pathArray.splice(0, 1);
+                    if (config.mapping.properties['enclosing.element']) {
+                        if (config.mapping.properties['enclosing.element']
+                            && config.mapping.properties['enclosing.element'].value.startsWith('\/\/')) {
+                            enclosedElementPath = config.mapping
+                                .properties['enclosing.element'].value.substr(2).split('/');
+                        } else if (config.mapping.properties['enclosing.element']
+                            && config.mapping.properties['enclosing.element'].value.startsWith('\/')) {
+                            enclosedElementPath = config.mapping
+                                .properties['enclosing.element'].value.substr(1).split('/');
+                        } else if (config.mapping.properties['enclosing.element']) {
+                            enclosedElementPath = config.mapping
+                                .properties['enclosing.element'].value.replaceAll(/\/\//g, '\/').split('/');
                         }
-                        pathArray.splice(0, 1);
-                    }
 
-                    pathArray.forEach(function (path, i) {
-                        if (i !== 0) {
+                        var index = enclosedElementPath.length > 0 ? pathArray.indexOf(enclosedElementPath[0]) : -1;
+                        if (index > -1) {
+                            pathArray.splice(0, (++index));
+
+                            for (let i = 1; i < enclosedElementPath.length; i++) {
+                                pathArray = pathArray.splice(0, 1);
+                            }
+                            pathArray.splice(0, 1);
+                        }
+
+                        pathArray.forEach(function (path, i) {
+                            if (i !== 0) {
+                                name += '/';
+                            }
+                            name += path;
+                        });
+                    } else {
+                        pathArray.forEach(function (path, i) {
                             name += '/';
-                        }
-                        name += path;
-                    });
+                            name += path;
+                        });
+                    }
+
+
 
                     // config.mapping.attributes[hoveredEl] = { attributeName: attribName, value: name };
                     config.mapping.attributes[attribName] = name;
@@ -486,7 +495,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 } else {
                     var key = `${id}-${xmlObject.children[i].tagName}`;
                     var attrib_key = key.replaceAll(/-/g, '\/').substr(1);
-                    var attributeIndex = Object.values(config.mapping.attributes).indexOf(attrib_key);                    
+                    var attributeIndex =config.mapping.properties['enclosing.element'] ? Object.values(config.mapping.attributes).indexOf(attrib_key)
+                        : Object.values(config.mapping.attributes).map(el => el.substring(1)).indexOf(attrib_key)
                     content += `<span 
                                     id="custom-map-val-${key}" 
                                     class="custom-mapper-val ${attributeIndex > -1 ? 'ok-to-clear' : 'no-clear'}" 
@@ -522,7 +532,8 @@ define(['require', 'jquery', 'lodash', 'log', 'alerts'],
                 } else {
                     var key = `${id}-${xmlObject.children[i].tagName}`;
                     var attrib_key = key.replaceAll(/-/g, '\/').substr(1);
-                    var attributeIndex = Object.values(config.mapping.attributes).indexOf(attrib_key);                    
+                    var attributeIndex = config.mapping.properties['enclosing.element'] ? Object.values(config.mapping.attributes).indexOf(attrib_key)
+                        : Object.values(config.mapping.attributes).map(el => el.substring(1)).indexOf(attrib_key);
                     content += `${attributeIndex > -1 ? 
                         `{{${Object.keys(config.mapping.attributes)[attributeIndex]}}}` 
                         : xmlObject.children[i].textContent}`;

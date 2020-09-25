@@ -544,14 +544,14 @@ define(['require', 'log', 'lodash', 'jquery', 'appData', 'initialiseData', 'json
                             }).forEach(function (attr) {
                             supportedInputAttributes[attr.name] = attr;
                         });
-
-                        tempExp.returnTypes.forEach(function (type) {
-                            customDataTypes.push(DataMapperUtil.getGenericDataType(type));
-                            supportedFunctions = functionDataMap[type.toLowerCase()]['function'] ?
-                                _.merge({}, supportedFunctions, functionDataMap[type.toLowerCase()]['function']) :
-                                supportedFunctions;
-                        })
                     }
+
+                    tempExp.returnTypes.forEach(function (type) {
+                        customDataTypes.push(DataMapperUtil.getGenericDataType(type));
+                        supportedFunctions = functionDataMap[type.toLowerCase()]['function'] ?
+                            _.merge({}, supportedFunctions, functionDataMap[type.toLowerCase()]['function']) :
+                            supportedFunctions;
+                    })
 
                     supportedInputAttributes['$custom_val_properties'] = {
                         genericDataTypes: customDataTypes
