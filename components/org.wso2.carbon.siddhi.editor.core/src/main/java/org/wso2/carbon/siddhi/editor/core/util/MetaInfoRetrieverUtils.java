@@ -99,9 +99,7 @@ public class MetaInfoRetrieverUtils {
                     attribute.addProperty("type", findDataTypeFromString(entry.getValue().toString()));
                     attributes.add(attribute);
                 }
-
             }
-
         }
         if (!"".equals(warningMessage.toString())) {
             response.addProperty(Constants.WARNING, warningMessage.append("Hence ignoring them.").toString());

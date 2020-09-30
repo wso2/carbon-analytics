@@ -1590,7 +1590,6 @@ public class EditorMicroservice implements Microservice {
                         response = MetaInfoRetrieverUtils.createResponseForJSON(jsonArray.get(0));
                     } else {
                         response = MetaInfoRetrieverUtils.createResponseForJSON(jsonObj);
-
                     }
                 } catch (InvalidStreamAttributeException e){
                     log.error(e.getMessage());
@@ -1603,7 +1602,6 @@ public class EditorMicroservice implements Microservice {
                             .build();
                 }
                 return Response.ok().entity(response).build();
-
             } else if (type.equalsIgnoreCase(Constants.TYPE_XML)) {
                 XMLConfig xmlConfig = new Gson().fromJson(config, XMLConfig.class);
                 Map<String, String> namespaceMap = null;
