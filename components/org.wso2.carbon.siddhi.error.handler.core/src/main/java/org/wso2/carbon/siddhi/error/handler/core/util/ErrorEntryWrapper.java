@@ -19,6 +19,7 @@
 package org.wso2.carbon.siddhi.error.handler.core.util;
 
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
+import io.siddhi.core.util.error.handler.util.ErroneousEventType;
 import io.siddhi.core.util.error.handler.util.ErrorHandlerUtils;
 
 import java.io.IOException;
@@ -37,8 +38,18 @@ public class ErrorEntryWrapper {
         this.errorEntry = errorEntry;
         this.isPayloadModifiable = isPayloadModifiable;
         if (isPayloadModifiable) {
-            this.modifiablePayloadString = (String) ErrorHandlerUtils.getAsObject(errorEntry.getEventAsBytes());
+            this.modifiablePayloadString = constructModifiablePayloadString(errorEntry);
         }
+    }
+
+    private String constructModifiablePayloadString(ErrorEntry errorEntry) throws IOException, ClassNotFoundException {
+        if (errorEntry.getEventType() == ErroneousEventType.PAYLOAD_STRING) {
+            return (String) ErrorHandlerUtils.getAsObject(errorEntry.getEventAsBytes());
+        } else if (errorEntry.getEventType() == ErroneousEventType.REPLAYABLE_TABLE_RECORD) {
+            return errorEntry.getOriginalPayload();
+            // TODO: 2020-09-29 construct json
+        }
+        return null;
     }
 
     public ErrorEntry getErrorEntry() {

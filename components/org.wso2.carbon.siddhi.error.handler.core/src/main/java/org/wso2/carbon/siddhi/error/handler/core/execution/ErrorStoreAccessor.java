@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.siddhi.error.handler.core.execution;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
 import io.siddhi.core.util.error.handler.store.ErrorStore;
 import io.siddhi.core.util.error.handler.util.ErroneousEventType;
@@ -93,8 +96,7 @@ public class ErrorStoreAccessor {
             ErrorEntry errorEntry = errorStore.loadErrorEntry(id);
             if (errorEntry != null) {
                 try {
-                    return new ErrorEntryWrapper(errorEntry,
-                        errorEntry.getEventType() == ErroneousEventType.PAYLOAD_STRING);
+                    return new ErrorEntryWrapper(errorEntry, isPayloadEditable(errorEntry));
                 } catch (IOException | ClassNotFoundException e) {
                     throw new SiddhiErrorHandlerException("Failed to generate modifiable payload for error entry.", e);
                 }
@@ -103,6 +105,18 @@ public class ErrorStoreAccessor {
             }
         }
         throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
+    }
+
+    private static boolean isPayloadEditable(ErrorEntry errorEntry) {
+        if (errorEntry.getEventType() == ErroneousEventType.PAYLOAD_STRING) {
+            return true;
+        } else if(errorEntry.getEventType() == ErroneousEventType.REPLAYABLE_TABLE_RECORD) {
+            return new JsonParser().parse(errorEntry.getOriginalPayload()).getAsJsonObject().get("isEditable")
+                    .getAsString().equalsIgnoreCase("true");
+
+        }
+        return false;
+        // TODO: 2020-09-29 for ReplayableTableRecord
     }
 
     public static void purgeErrorStore(String retentionDays) throws SiddhiErrorHandlerException {

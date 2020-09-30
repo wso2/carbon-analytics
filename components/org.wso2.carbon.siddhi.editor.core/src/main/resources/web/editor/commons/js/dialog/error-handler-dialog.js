@@ -683,6 +683,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     modalBody.append(this.renderReplayButtonInDetailedErrorEntry(wrappedErrorEntry));
                     modalBody.append('<br/>');
                     if (!wrappedErrorEntry.isPayloadModifiable) {
+                        // todo
                         // Payload is not modifiable. Show the original payload, in case if the user wants to refer.
                         modalBody.append(this.renderOriginalPayload(errorEntry));
                         modalBody.append('<br/>');
@@ -713,9 +714,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     var replay = $('<div></div>');
                     var replayableWrappedErrorEntry = wrappedErrorEntry;
                     if (wrappedErrorEntry.isPayloadModifiable) {
-                        // Payload is not modifiable.
-                        replay.append('<textarea id="eventPayload" rows="4" cols="40" class="payload-content">' +
-                            wrappedErrorEntry.modifiablePayloadString + '</textarea>');
+                        // Payload is modifiable. todo
+                        replay.append(self.renderEditablePayload(wrappedErrorEntry));
                         replay.append('<br/>');
                     }
                     replay.append("<button id='replay' type='button' class='btn btn-primary'>Replay</button>");
@@ -731,6 +731,18 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     return replay;
                 },
 
+                // todo
+                renderEditablePayload: function(wrappedErrorEntry) {
+                    if (wrappedErrorEntry.errorEntry.eventType === 'PAYLOAD_STRING') {
+                        return $('<textarea id="eventPayload" rows="4" cols="40" class="payload-content">' +
+                                                             wrappedErrorEntry.modifiablePayloadString + '</textarea>');
+                    } else if (wrappedErrorEntry.errorEntry.eventType === 'REPLAYABLE_TABLE_RECORD') {
+                        // todo
+                        return $('<textarea id="eventPayload" rows="4" cols="40" class="payload-content">' +
+                        wrappedErrorEntry.modifiablePayloadString + '</textarea>');
+                    }
+                },
+
                 renderOriginalPayload: function(errorEntry) {
                     var originalPayload = $('<div></div>');
                     if (errorEntry.eventType === "REPLAYABLE_TABLE_RECORD") {
@@ -740,6 +752,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     }
                     if (errorEntry.originalPayload) {
                         originalPayload.append('<div class="payload-content">' + errorEntry.originalPayload + '</div>');
+                        // todo render as html table
                     } else {
                         originalPayload.append('<div>Original payload of the event is not available</div>');
                     }
