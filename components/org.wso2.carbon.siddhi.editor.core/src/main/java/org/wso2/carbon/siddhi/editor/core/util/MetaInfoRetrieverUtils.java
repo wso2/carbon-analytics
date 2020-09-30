@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
+import org.wso2.carbon.siddhi.editor.core.exception.InvalidStreamAttributeException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -38,6 +39,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class MetaInfoRetrieverUtils {
 
@@ -47,13 +49,19 @@ public class MetaInfoRetrieverUtils {
 
     }
 
-    public static JsonObject createResponseForCSV(String[] attributeNameArray, String[] values) {
+    public static JsonObject createResponseForCSV(String[] attributeNameArray, String[] values)
+            throws InvalidStreamAttributeException {
         JsonObject response = new JsonObject();
         com.google.gson.JsonArray attributes = new com.google.gson.JsonArray();
         int count = 0;
         for (String value : values) {
             JsonObject attribute = new JsonObject();
             if (attributeNameArray != null) {
+                if (Pattern.compile(Constants.REGEX_TO_MATCH_SPECIAL_CHARACTERS).
+                        matcher(attributeNameArray[count]).find()) {
+                    throw new InvalidStreamAttributeException("Error while populating attributes." +
+                            "Attribute contains special characters \"" + attributeNameArray[count] + "\"");
+                }
                 attribute.addProperty("name", attributeNameArray[count].
                         replaceAll("\\s", ""));
             } else {
@@ -67,7 +75,7 @@ public class MetaInfoRetrieverUtils {
         return response;
     }
 
-    public static JsonObject createResponseForJSON(Object obj) {
+    public static JsonObject createResponseForJSON(Object obj) throws InvalidStreamAttributeException {
         JsonObject response = new JsonObject();
         JsonArray attributes = new JsonArray();
         Map map = (LinkedHashMap) obj;
@@ -80,11 +88,18 @@ public class MetaInfoRetrieverUtils {
                 warningMessage.append("A complex object found for attribute key : \"" + entry.getKey() +
                         "\".");
             } else {
-                attribute.addProperty("name", ((String) entry.getKey()).
-                        replaceAll("\\s", ""));
+                if (Pattern.compile(Constants.REGEX_TO_MATCH_SPECIAL_CHARACTERS).
+                        matcher((String) entry.getKey()).find()) {
+                    throw new InvalidStreamAttributeException("Error while populating attributes." +
+                            "Attribute contains special characters \"" + entry.getKey() + "\"");
+                } else {
+                    attribute.addProperty("name", ((String) entry.getKey()).
+                            replaceAll("\\s", ""));
 
-                attribute.addProperty("type", findDataTypeFromString(entry.getValue().toString()));
-                attributes.add(attribute);
+                    attribute.addProperty("type", findDataTypeFromString(entry.getValue().toString()));
+                    attributes.add(attribute);
+                }
+
             }
 
         }

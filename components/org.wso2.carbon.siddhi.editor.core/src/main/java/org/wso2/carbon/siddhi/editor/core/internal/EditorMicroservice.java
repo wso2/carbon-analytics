@@ -46,7 +46,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.http.HttpStatus;
 import org.jaxen.JaxenException;
 import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
@@ -76,6 +75,7 @@ import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResp
 import org.wso2.carbon.siddhi.editor.core.exception.DockerGenerationException;
 import org.wso2.carbon.siddhi.editor.core.exception.ErrorHandlerServiceStubException;
 import org.wso2.carbon.siddhi.editor.core.exception.InvalidExecutionStateException;
+import org.wso2.carbon.siddhi.editor.core.exception.InvalidStreamAttributeException;
 import org.wso2.carbon.siddhi.editor.core.exception.KubernetesGenerationException;
 import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppDeployerServiceStubException;
 import org.wso2.carbon.siddhi.editor.core.exception.SiddhiStoreQueryHelperException;
@@ -1514,8 +1514,21 @@ public class EditorMicroservice implements Microservice {
                                 .type(MediaType.APPLICATION_JSON)
                                 .build();
                     }
-                    return Response.ok().entity(MetaInfoRetrieverUtils.createResponseForCSV(attributeNameList,
-                            attributeValueList)).build();
+                    JsonObject response;
+                    try {
+                        response =  MetaInfoRetrieverUtils.createResponseForCSV(attributeNameList,
+                                attributeValueList);
+                    } catch (InvalidStreamAttributeException e) {
+                        log.error(e.getMessage());
+                        errorResponse.addProperty(Constants.ERROR,
+                                e.getMessage());
+                        return Response
+                                .serverError()
+                                .entity(errorResponse)
+                                .type(MediaType.APPLICATION_JSON)
+                                .build();
+                    }
+                    return Response.ok().entity(response).build();
                 } else {
                     String message = "Error while reading the csv file, CSV file is empty ";
                     log.error(message);
@@ -1540,7 +1553,7 @@ public class EditorMicroservice implements Microservice {
                             .type(MediaType.APPLICATION_JSON)
                             .build();
                 }
-                Object jsonObj = null;
+                Object jsonObj;
                 ReadContext readContext = JsonPath.parse(fileContent.toString());
                 try {
                     jsonObj = readContext.read(jsonConfig.getEnclosingElement());
@@ -1570,12 +1583,27 @@ public class EditorMicroservice implements Microservice {
                             .type(MediaType.APPLICATION_JSON)
                             .build();
                 }
-                if (jsonObj instanceof JSONArray) {
-                    JSONArray jsonArray = (JSONArray) jsonObj;
-                    return Response.ok().entity(MetaInfoRetrieverUtils.createResponseForJSON(jsonArray.get(0))).build();
-                } else {
-                    return Response.ok().entity(MetaInfoRetrieverUtils.createResponseForJSON(jsonObj)).build();
+                JsonObject response;
+                try {
+                    if (jsonObj instanceof JSONArray) {
+                        JSONArray jsonArray = (JSONArray) jsonObj;
+                        response = MetaInfoRetrieverUtils.createResponseForJSON(jsonArray.get(0));
+                    } else {
+                        response = MetaInfoRetrieverUtils.createResponseForJSON(jsonObj);
+
+                    }
+                } catch (InvalidStreamAttributeException e){
+                    log.error(e.getMessage());
+                    errorResponse.addProperty(Constants.ERROR,
+                            e.getMessage());
+                    return Response
+                            .serverError()
+                            .entity(errorResponse)
+                            .type(MediaType.APPLICATION_JSON)
+                            .build();
                 }
+                return Response.ok().entity(response).build();
+
             } else if (type.equalsIgnoreCase(Constants.TYPE_XML)) {
                 XMLConfig xmlConfig = new Gson().fromJson(config, XMLConfig.class);
                 Map<String, String> namespaceMap = null;

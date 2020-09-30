@@ -119,6 +119,7 @@ public class Constants {
     public static final String ERROR = "error";
     public static final String WARNING = "warning";
     public static final String REGEX_TO_KEEP_QUOTES = "(?=(?:[^\"|']*(\"|')[^\"|']*(\"|'))*[^\"|']*$)";
+    public static final String REGEX_TO_MATCH_SPECIAL_CHARACTERS = "[!@#/\\\\$%^&*(),.?\":{}|<>]";
     static final Map<String, Class<?>> SUPER_CLASS_MAP;
     static final Map<String, String> PACKAGE_NAME_MAP;
 
