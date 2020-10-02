@@ -107,7 +107,7 @@ public class ErrorStoreAccessor {
         throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
     }
 
-    private static boolean isPayloadEditable(ErrorEntry errorEntry) {
+    private static boolean isPayloadEditable(ErrorEntry errorEntry) { // TODO: 2020-10-02 move to util 
         if (errorEntry.getEventType() == ErroneousEventType.PAYLOAD_STRING) {
             return true;
         } else if(errorEntry.getEventType() == ErroneousEventType.REPLAYABLE_TABLE_RECORD) {

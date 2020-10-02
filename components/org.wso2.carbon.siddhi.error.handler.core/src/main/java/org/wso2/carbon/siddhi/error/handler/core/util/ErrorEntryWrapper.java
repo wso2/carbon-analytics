@@ -47,7 +47,6 @@ public class ErrorEntryWrapper {
             return (String) ErrorHandlerUtils.getAsObject(errorEntry.getEventAsBytes());
         } else if (errorEntry.getEventType() == ErroneousEventType.REPLAYABLE_TABLE_RECORD) {
             return errorEntry.getOriginalPayload();
-            // TODO: 2020-09-29 construct json
         }
         return null;
     }

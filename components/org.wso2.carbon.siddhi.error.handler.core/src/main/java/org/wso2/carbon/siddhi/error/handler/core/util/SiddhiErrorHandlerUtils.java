@@ -43,7 +43,7 @@ public class SiddhiErrorHandlerUtils {
 
     public static List<ErrorEntry> convertToList(JsonArray errorEntryWrappersBody) throws SiddhiErrorHandlerException {
         List<ErrorEntry> errorEntries = new ArrayList<>();
-        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        Gson gson = new GsonBuilder().disableHtmlEscaping().create(); // TODO: 2020-10-02 make class level static
         Type mapType = new TypeToken<List<ErrorEntryWrapper>>() {}.getType();
         List<ErrorEntryWrapper> errorEntryWrappers = gson.fromJson(errorEntryWrappersBody, mapType);
         for (ErrorEntryWrapper errorEntryWrapper : errorEntryWrappers) {
@@ -58,7 +58,7 @@ public class SiddhiErrorHandlerUtils {
                         ReplayableTableRecord deserializedTableRecord = (ReplayableTableRecord) ErrorHandlerUtils
                                 .getAsObject(errorEntry.getEventAsBytes());
                         ComplexEventChunk eventChunk = modifyComplexEventChunk(deserializedTableRecord
-                                .getComplexEventChunk(), payloadString, gson);
+                                .getComplexEventChunk(), payloadString, gson, errorEntry);
                         deserializedTableRecord.setComplexEventChunk(eventChunk);
                         eventAsBytes = ErrorHandlerUtils.getAsBytes(deserializedTableRecord);
                     } else {
@@ -81,27 +81,31 @@ public class SiddhiErrorHandlerUtils {
     }
 
     private static ComplexEventChunk modifyComplexEventChunk(ComplexEventChunk eventChunk,
-                                                             String modifiedPayloadString, Gson gson) {
+                                                             String modifiedPayloadString, Gson gson,
+                                                             ErrorEntry errorEntry) throws SiddhiErrorHandlerException {
         JsonObject modifiedJson = new JsonParser().parse(modifiedPayloadString).getAsJsonObject();
-        JsonArray columnDataTypes = modifiedJson.get("attributeTypes").getAsJsonArray();
+        JsonArray attributes = modifiedJson.get("attributes").getAsJsonArray();
         JsonArray records = modifiedJson.get("records").getAsJsonArray();
         int numberOfRecords = records.size();
         eventChunk.reset();
         for (int i = 0; i < numberOfRecords; i++) {
             Object[] recordObjectArray = gson.fromJson(records.get(i).getAsJsonArray(), Object[].class);
-            for (int j = 0; j < columnDataTypes.size(); j++) {
-                if (columnDataTypes.get(j).getAsString().equalsIgnoreCase("STRING")) {
+            for (int j = 0; j < attributes.size(); j++) {
+                if (attributes.get(j).getAsJsonObject().get("type").getAsString().equalsIgnoreCase("STRING")) {
                     recordObjectArray[j] = String.valueOf(recordObjectArray[j]);
-                } else if(columnDataTypes.get(j).getAsString().equalsIgnoreCase("INT")) {
+                } else if(attributes.get(j).getAsJsonObject().get("type").getAsString().equalsIgnoreCase("INT")) {
                     recordObjectArray[j] = Integer.valueOf(String.valueOf(recordObjectArray[j]));
-                } else if(columnDataTypes.get(j).getAsString().equalsIgnoreCase("LONG")) {
+                } else if(attributes.get(j).getAsJsonObject().get("type").getAsString().equalsIgnoreCase("LONG")) {
                     recordObjectArray[j] = Long.valueOf(String.valueOf(recordObjectArray[j]));
-                } else if(columnDataTypes.get(j).getAsString().equalsIgnoreCase("DOUBLE")) {
+                } else if(attributes.get(j).getAsJsonObject().get("type").getAsString().equalsIgnoreCase("DOUBLE")) {
                     recordObjectArray[j] = Double.valueOf(String.valueOf(recordObjectArray[j]));
-                } else if(columnDataTypes.get(j).getAsString().equalsIgnoreCase("FLOAT")) {
+                } else if(attributes.get(j).getAsJsonObject().get("type").getAsString().equalsIgnoreCase("FLOAT")) {
                     recordObjectArray[j] = Float.valueOf(String.valueOf(recordObjectArray[j]));
-                } else if(columnDataTypes.get(j).getAsString().equalsIgnoreCase("BOOL")) {
+                } else if(attributes.get(j).getAsJsonObject().get("type").getAsString().equalsIgnoreCase("BOOL")) {
                     recordObjectArray[j] = Boolean.valueOf(String.valueOf(recordObjectArray[j]));
+                } else {
+                    throw new SiddhiErrorHandlerException(String.format(
+                            "Failed to modify original event error entry with id: %s.", errorEntry.getId()));
                 }
             }
             if (eventChunk.hasNext()) {
@@ -112,9 +116,6 @@ public class SiddhiErrorHandlerUtils {
                 }
             }
         }
-//        for (JsonElement record: modifiedJson.get("records").getAsJsonArray()) {
-//            Object[] recordObjectArray = gson.fromJson(record, Object[].class);
-//        }
         return eventChunk;
     }
 
