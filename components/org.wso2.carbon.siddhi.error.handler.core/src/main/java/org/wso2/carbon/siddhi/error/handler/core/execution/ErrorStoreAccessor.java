@@ -116,7 +116,6 @@ public class ErrorStoreAccessor {
 
         }
         return false;
-        // TODO: 2020-09-29 for ReplayableTableRecord
     }
 
     public static void purgeErrorStore(String retentionDays) throws SiddhiErrorHandlerException {

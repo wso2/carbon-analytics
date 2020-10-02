@@ -20,7 +20,9 @@ package org.wso2.carbon.siddhi.error.handler.core.util;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import io.siddhi.core.event.ComplexEvent;
 import io.siddhi.core.event.ComplexEventChunk;
+import io.siddhi.core.event.stream.StreamEvent;
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
 import io.siddhi.core.util.error.handler.model.ReplayableTableRecord;
 import io.siddhi.core.util.error.handler.util.ErroneousEventType;
@@ -48,7 +50,7 @@ public class SiddhiErrorHandlerUtils {
             if (errorEntryWrapper.isPayloadModifiable()) {
                 ErrorEntry errorEntry = errorEntryWrapper.getErrorEntry();
                 String payloadString = errorEntryWrapper.getModifiablePayloadString();
-                byte[] eventAsBytes = new byte[0];
+                byte[] eventAsBytes;
                 try {
                     if (errorEntry.getEventType() == ErroneousEventType.PAYLOAD_STRING) {
                         eventAsBytes = ErrorHandlerUtils.getAsBytes(payloadString);
@@ -56,8 +58,9 @@ public class SiddhiErrorHandlerUtils {
                         ReplayableTableRecord deserializedTableRecord = (ReplayableTableRecord) ErrorHandlerUtils
                                 .getAsObject(errorEntry.getEventAsBytes());
                         ComplexEventChunk eventChunk = modifyComplexEventChunk(deserializedTableRecord
-                                .getComplexEventChunk(), payloadString);
+                                .getComplexEventChunk(), payloadString, gson);
                         deserializedTableRecord.setComplexEventChunk(eventChunk);
+                        eventAsBytes = ErrorHandlerUtils.getAsBytes(deserializedTableRecord);
                     } else {
                         throw new SiddhiErrorHandlerException(String.format(
                                 "Unsuitable event type for error entry with id: %s.", errorEntry.getId()));
@@ -77,11 +80,41 @@ public class SiddhiErrorHandlerUtils {
         return errorEntries;
     }
 
-    private static ComplexEventChunk modifyComplexEventChunk(ComplexEventChunk eventChunk, String modifiedPayloadString) {
+    private static ComplexEventChunk modifyComplexEventChunk(ComplexEventChunk eventChunk,
+                                                             String modifiedPayloadString, Gson gson) {
         JsonObject modifiedJson = new JsonParser().parse(modifiedPayloadString).getAsJsonObject();
-        for (JsonElement record: modifiedJson.get("records").getAsJsonArray()) {
-
+        JsonArray columnDataTypes = modifiedJson.get("attributeTypes").getAsJsonArray();
+        JsonArray records = modifiedJson.get("records").getAsJsonArray();
+        int numberOfRecords = records.size();
+        eventChunk.reset();
+        for (int i = 0; i < numberOfRecords; i++) {
+            Object[] recordObjectArray = gson.fromJson(records.get(i).getAsJsonArray(), Object[].class);
+            for (int j = 0; j < columnDataTypes.size(); j++) {
+                if (columnDataTypes.get(j).getAsString().equalsIgnoreCase("STRING")) {
+                    recordObjectArray[j] = String.valueOf(recordObjectArray[j]);
+                } else if(columnDataTypes.get(j).getAsString().equalsIgnoreCase("INT")) {
+                    recordObjectArray[j] = Integer.valueOf(String.valueOf(recordObjectArray[j]));
+                } else if(columnDataTypes.get(j).getAsString().equalsIgnoreCase("LONG")) {
+                    recordObjectArray[j] = Long.valueOf(String.valueOf(recordObjectArray[j]));
+                } else if(columnDataTypes.get(j).getAsString().equalsIgnoreCase("DOUBLE")) {
+                    recordObjectArray[j] = Double.valueOf(String.valueOf(recordObjectArray[j]));
+                } else if(columnDataTypes.get(j).getAsString().equalsIgnoreCase("FLOAT")) {
+                    recordObjectArray[j] = Float.valueOf(String.valueOf(recordObjectArray[j]));
+                } else if(columnDataTypes.get(j).getAsString().equalsIgnoreCase("BOOL")) {
+                    recordObjectArray[j] = Boolean.valueOf(String.valueOf(recordObjectArray[j]));
+                }
+            }
+            if (eventChunk.hasNext()) {
+                ComplexEvent complexEvent = eventChunk.next();
+                if (complexEvent instanceof StreamEvent) {
+                    StreamEvent streamEvent = (StreamEvent) complexEvent;
+                    streamEvent.setOutputData(recordObjectArray);
+                }
+            }
         }
+//        for (JsonElement record: modifiedJson.get("records").getAsJsonArray()) {
+//            Object[] recordObjectArray = gson.fromJson(record, Object[].class);
+//        }
         return eventChunk;
     }
 
