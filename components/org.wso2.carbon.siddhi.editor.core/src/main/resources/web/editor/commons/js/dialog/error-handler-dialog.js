@@ -711,6 +711,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
 
                 renderReplayButtonInDetailedErrorEntry: function(wrappedErrorEntry) {
                     var self = this;
+                    console.log(wrappedErrorEntry);
                     var replay = $('<div></div>');
                     var replayableWrappedErrorEntry = wrappedErrorEntry;
                     if (wrappedErrorEntry.isPayloadModifiable) {
@@ -738,8 +739,26 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                                                              wrappedErrorEntry.modifiablePayloadString + '</textarea>');
                     } else if (wrappedErrorEntry.errorEntry.eventType === 'REPLAYABLE_TABLE_RECORD') {
                         // todo
-                        return $('<textarea id="eventPayload" rows="4" cols="40" class="payload-content">' +
-                        wrappedErrorEntry.modifiablePayloadString + '</textarea>');
+                        var modifiablePayloadJson = JSON.parse(wrappedErrorEntry.modifiablePayloadString);
+                        var editableTable = $('<table><thead><tr>');
+                        modifiablePayloadJson.attributes.forEach(function (attribute) {
+                            editableTable.append('<th>' + attribute.name + '(' + attribute.type + ')</th>');
+                        ;});
+                        var columnNumber = 0;
+                        editableTable.append('</tr></thead><tbody>');
+                        modifiablePayloadJson.records.forEach(function (record) {
+                            var rowNumber = 0;
+                            editableTable.append('<tr>');
+                            record.forEach(function (column) {
+                                editableTable.append('<td><input type="text" id="eventPayload:' + columnNumber + ' '
+                                + rowNumber + '" value="' + column + '"></td>');
+                                rowNumber = rowNumber + 1;
+                            });
+                            editableTable.append('</tr>');
+                            columnNumber = columnNumber + 1;
+                        ;});
+                        editableTable.append('</tbody></table>')
+                        return editableTable;
                     }
                 },
 
