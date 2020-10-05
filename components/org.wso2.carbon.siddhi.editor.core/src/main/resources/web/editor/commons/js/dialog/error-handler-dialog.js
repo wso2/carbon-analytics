@@ -723,13 +723,33 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
 
                     replay.find("#replay").click(function() {
                         if (wrappedErrorEntry.isPayloadModifiable) {
-                            replayableWrappedErrorEntry.modifiablePayloadString = replay.find("#eventPayload").val();
+                            replayableWrappedErrorEntry.modifiablePayloadString = self.constructModifiablePayloadString(replay, wrappedErrorEntry);
+                            console.log(replayableWrappedErrorEntry.modifiablePayloadString);
+//                            replayableWrappedErrorEntry.modifiablePayloadString = replay.find("#eventPayload").val();
                         }
                         self.replay([replayableWrappedErrorEntry], self.serverHost, self.serverPort,
                             self.serverUsername, self.serverPassword, true);
                         self.detailedErrorEntry.modal('hide');
                     });
                     return replay;
+                },
+
+                constructModifiablePayloadString: function(replay, wrappedErrorEntry) {
+                    if (wrappedErrorEntry.errorEntry.eventType === 'PAYLOAD_STRING') {
+                        return replay.find("#eventPayload").val();
+                    } else if (wrappedErrorEntry.errorEntry.eventType === 'REPLAYABLE_TABLE_RECORD') {
+                        var modifiablePayloadJson = JSON.parse(wrappedErrorEntry.modifiablePayloadString);
+                        var editedTableAsArray = replay.find(".eventPayloadTable");
+                        console.log(replay.find(".eventPayloadTable"));
+                        for (i = 0; i < modifiablePayloadJson.records.length; i++) {
+                            for (j = 0; j < modifiablePayloadJson.attributes.length; j++) {
+                                modifiablePayloadJson.records[i][j] = editedTableAsArray[i * modifiablePayloadJson.attributes.length + j].value;
+                            }
+                        }
+                        console.log(JSON.stringify(modifiablePayloadJson));
+                        return JSON.stringify(modifiablePayloadJson);
+                    }
+                    return null;
                 },
 
                 // todo
@@ -740,24 +760,20 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     } else if (wrappedErrorEntry.errorEntry.eventType === 'REPLAYABLE_TABLE_RECORD') {
                         // todo
                         var modifiablePayloadJson = JSON.parse(wrappedErrorEntry.modifiablePayloadString);
-                        var editableTable = $('<table><thead><tr>');
+                        var editableTable = $('<table></table>');
+                        var tableHeader = $('<tr></tr>');
                         modifiablePayloadJson.attributes.forEach(function (attribute) {
-                            editableTable.append('<th>' + attribute.name + '(' + attribute.type + ')</th>');
+                            tableHeader.append('<th>' + attribute.name + '(' + attribute.type + ')</th>');
                         ;});
-                        var columnNumber = 0;
-                        editableTable.append('</tr></thead><tbody>');
+                        editableTable.append(tableHeader);
                         modifiablePayloadJson.records.forEach(function (record) {
-                            var rowNumber = 0;
-                            editableTable.append('<tr>');
+                            var tableRow = $('<tr></tr>');
                             record.forEach(function (column) {
-                                editableTable.append('<td><input type="text" id="eventPayload:' + columnNumber + ' '
-                                + rowNumber + '" value="' + column + '"></td>');
-                                rowNumber = rowNumber + 1;
+                                tableRow.append('<td><input type="text" class="eventPayloadTable" value="' + column +
+                                '" class="configure-server-input"></td>');
                             });
-                            editableTable.append('</tr>');
-                            columnNumber = columnNumber + 1;
+                            editableTable.append(tableRow);
                         ;});
-                        editableTable.append('</tbody></table>')
                         return editableTable;
                     }
                 },
