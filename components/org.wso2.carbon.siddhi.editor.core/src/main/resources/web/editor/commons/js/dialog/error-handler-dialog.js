@@ -711,11 +711,10 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
 
                 renderReplayButtonInDetailedErrorEntry: function(wrappedErrorEntry) {
                     var self = this;
-                    console.log(wrappedErrorEntry);
                     var replay = $('<div></div>');
                     var replayableWrappedErrorEntry = wrappedErrorEntry;
                     if (wrappedErrorEntry.isPayloadModifiable) {
-                        // Payload is modifiable. todo
+                        // Payload is modifiable.
                         replay.append(self.renderEditablePayload(wrappedErrorEntry));
                         replay.append('<br/>');
                     }
@@ -723,9 +722,8 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
 
                     replay.find("#replay").click(function() {
                         if (wrappedErrorEntry.isPayloadModifiable) {
-                            replayableWrappedErrorEntry.modifiablePayloadString = self.constructModifiablePayloadString(replay, wrappedErrorEntry);
-                            console.log(replayableWrappedErrorEntry.modifiablePayloadString);
-//                            replayableWrappedErrorEntry.modifiablePayloadString = replay.find("#eventPayload").val();
+                            replayableWrappedErrorEntry.modifiablePayloadString =
+                                    self.constructModifiablePayloadString(replay, wrappedErrorEntry);
                         }
                         self.replay([replayableWrappedErrorEntry], self.serverHost, self.serverPort,
                             self.serverUsername, self.serverPassword, true);
@@ -740,25 +738,22 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     } else if (wrappedErrorEntry.errorEntry.eventType === 'REPLAYABLE_TABLE_RECORD') {
                         var modifiablePayloadJson = JSON.parse(wrappedErrorEntry.modifiablePayloadString);
                         var editedTableAsArray = replay.find(".eventPayloadTable");
-                        console.log(replay.find(".eventPayloadTable"));
                         for (i = 0; i < modifiablePayloadJson.records.length; i++) {
                             for (j = 0; j < modifiablePayloadJson.attributes.length; j++) {
-                                modifiablePayloadJson.records[i][j] = editedTableAsArray[i * modifiablePayloadJson.attributes.length + j].value;
+                                modifiablePayloadJson.records[i][j] = editedTableAsArray[i
+                                        * modifiablePayloadJson.attributes.length + j].value;
                             }
                         }
-                        console.log(JSON.stringify(modifiablePayloadJson));
                         return JSON.stringify(modifiablePayloadJson);
                     }
                     return null;
                 },
 
-                // todo
                 renderEditablePayload: function(wrappedErrorEntry) {
                     if (wrappedErrorEntry.errorEntry.eventType === 'PAYLOAD_STRING') {
                         return $('<textarea id="eventPayload" rows="4" cols="40" class="payload-content">' +
                                                              wrappedErrorEntry.modifiablePayloadString + '</textarea>');
                     } else if (wrappedErrorEntry.errorEntry.eventType === 'REPLAYABLE_TABLE_RECORD') {
-                        // todo
                         var modifiablePayloadJson = JSON.parse(wrappedErrorEntry.modifiablePayloadString);
                         var editableTable = $('<table></table>');
                         var tableHeader = $('<tr></tr>');
@@ -787,7 +782,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     }
                     if (errorEntry.originalPayload) {
                         originalPayload.append('<div class="payload-content">' + errorEntry.originalPayload + '</div>');
-                        // todo render as html table
                     } else {
                         originalPayload.append('<div>Original payload of the event is not available</div>');
                     }
