@@ -38,12 +38,13 @@ import java.util.List;
  * Contains utility methods related to Siddhi Error Handler.
  */
 public class SiddhiErrorHandlerUtils {
+    private static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+    private static JsonParser jsonParser = new JsonParser();
 
     private SiddhiErrorHandlerUtils() {}
 
     public static List<ErrorEntry> convertToList(JsonArray errorEntryWrappersBody) throws SiddhiErrorHandlerException {
         List<ErrorEntry> errorEntries = new ArrayList<>();
-        Gson gson = new GsonBuilder().disableHtmlEscaping().create(); // TODO: 2020-10-02 make class level static
         Type mapType = new TypeToken<List<ErrorEntryWrapper>>() {}.getType();
         List<ErrorEntryWrapper> errorEntryWrappers = gson.fromJson(errorEntryWrappersBody, mapType);
         for (ErrorEntryWrapper errorEntryWrapper : errorEntryWrappers) {
@@ -84,7 +85,7 @@ public class SiddhiErrorHandlerUtils {
         if (errorEntry.getEventType() == ErroneousEventType.PAYLOAD_STRING) {
             return true;
         } else if(errorEntry.getEventType() == ErroneousEventType.REPLAYABLE_TABLE_RECORD) {
-            return new JsonParser().parse(errorEntry.getOriginalPayload()).getAsJsonObject().get("isEditable")
+            return jsonParser.parse(errorEntry.getOriginalPayload()).getAsJsonObject().get("isEditable")
                     .getAsString().equalsIgnoreCase("true");
         }
         return false;
