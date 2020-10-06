@@ -758,7 +758,9 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         var editableTable = $('<table></table>');
                         var tableHeader = $('<tr></tr>');
                         modifiablePayloadJson.attributes.forEach(function (attribute) {
-                            tableHeader.append('<th>' + attribute.name + '(' + attribute.type + ')</th>');
+                            tableHeader.append('<th><span style="text-transform: capitalize; padding-left: 1em; '
+                                + 'color: white;">' + attribute.name + '</span> <span style="text-transform: lowercase;'
+                                + 'color: white;">(' + attribute.type + ')</span></th>');
                         ;});
                         editableTable.append(tableHeader);
                         modifiablePayloadJson.records.forEach(function (record) {
