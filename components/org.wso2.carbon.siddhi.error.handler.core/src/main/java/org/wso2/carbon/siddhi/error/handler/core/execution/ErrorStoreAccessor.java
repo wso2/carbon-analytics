@@ -18,12 +18,8 @@
 
 package org.wso2.carbon.siddhi.error.handler.core.execution;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
 import io.siddhi.core.util.error.handler.store.ErrorStore;
-import io.siddhi.core.util.error.handler.util.ErroneousEventType;
 import org.wso2.carbon.siddhi.error.handler.core.exception.SiddhiErrorHandlerException;
 import org.wso2.carbon.siddhi.error.handler.core.internal.SiddhiErrorHandlerDataHolder;
 import org.wso2.carbon.siddhi.error.handler.core.util.ErrorEntryWrapper;
@@ -33,6 +29,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.wso2.carbon.siddhi.error.handler.core.util.SiddhiErrorHandlerUtils.isPayloadEditable;
 
 /**
  * Communicates with the Error Store for Siddhi Error Handler functionalities.
@@ -105,17 +103,6 @@ public class ErrorStoreAccessor {
             }
         }
         throw new SiddhiErrorHandlerException(ERROR_STORE_IS_UNAVAILABLE_MESSAGE);
-    }
-
-    private static boolean isPayloadEditable(ErrorEntry errorEntry) { // TODO: 2020-10-02 move to util 
-        if (errorEntry.getEventType() == ErroneousEventType.PAYLOAD_STRING) {
-            return true;
-        } else if(errorEntry.getEventType() == ErroneousEventType.REPLAYABLE_TABLE_RECORD) {
-            return new JsonParser().parse(errorEntry.getOriginalPayload()).getAsJsonObject().get("isEditable")
-                    .getAsString().equalsIgnoreCase("true");
-
-        }
-        return false;
     }
 
     public static void purgeErrorStore(String retentionDays) throws SiddhiErrorHandlerException {

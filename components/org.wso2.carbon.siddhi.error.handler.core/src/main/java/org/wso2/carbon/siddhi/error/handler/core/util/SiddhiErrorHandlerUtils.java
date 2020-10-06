@@ -80,6 +80,16 @@ public class SiddhiErrorHandlerUtils {
         return errorEntries;
     }
 
+    public static boolean isPayloadEditable(ErrorEntry errorEntry) {
+        if (errorEntry.getEventType() == ErroneousEventType.PAYLOAD_STRING) {
+            return true;
+        } else if(errorEntry.getEventType() == ErroneousEventType.REPLAYABLE_TABLE_RECORD) {
+            return new JsonParser().parse(errorEntry.getOriginalPayload()).getAsJsonObject().get("isEditable")
+                    .getAsString().equalsIgnoreCase("true");
+        }
+        return false;
+    }
+
     private static ComplexEventChunk modifyComplexEventChunk(ComplexEventChunk eventChunk,
                                                              String modifiedPayloadString, Gson gson,
                                                              ErrorEntry errorEntry) throws SiddhiErrorHandlerException {

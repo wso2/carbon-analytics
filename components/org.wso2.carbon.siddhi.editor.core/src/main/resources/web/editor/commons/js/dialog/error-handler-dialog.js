@@ -683,7 +683,6 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     modalBody.append(this.renderReplayButtonInDetailedErrorEntry(wrappedErrorEntry));
                     modalBody.append('<br/>');
                     if (!wrappedErrorEntry.isPayloadModifiable) {
-                        // todo
                         // Payload is not modifiable. Show the original payload, in case if the user wants to refer.
                         modalBody.append(this.renderOriginalPayload(errorEntry));
                         modalBody.append('<br/>');
@@ -778,7 +777,23 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                 renderOriginalPayload: function(errorEntry) {
                     var originalPayload = $('<div></div>');
                     if (errorEntry.eventType === "REPLAYABLE_TABLE_RECORD") {
-                        originalPayload.append('<div><h4>Table Record</h4></div>');
+                        var unmodifiablePayloadJson = JSON.parse(errorEntry.originalPayload);
+                        var uneditableTable = $('<table></table>');
+                        var tableHeader = $('<tr></tr>');
+                        unmodifiablePayloadJson.attributes.forEach(function (attribute) {
+                            tableHeader.append('<th><span style="text-transform: capitalize; padding-left: 1em; '
+                                + 'color: white;">' + attribute.name + '</span> <span style="text-transform: lowercase;'
+                                + 'color: white;">(' + attribute.type + ')</span></th>');
+                        ;});
+                        uneditableTable.append(tableHeader);
+                        unmodifiablePayloadJson.records.forEach(function (record) {
+                            var tableRow = $('<tr></tr>');
+                            record.forEach(function (column) {
+                                tableRow.append('<td>' + column + '</td>');
+                            });
+                            uneditableTable.append(tableRow);
+                        ;});
+                        return uneditableTable;
                     } else {
                         originalPayload.append('<div><h4>Original Payload</h4></div>');
                     }
