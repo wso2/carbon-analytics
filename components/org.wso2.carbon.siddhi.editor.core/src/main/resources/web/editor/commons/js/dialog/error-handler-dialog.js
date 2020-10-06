@@ -736,7 +736,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         return replay.find("#eventPayload").val();
                     } else if (wrappedErrorEntry.errorEntry.eventType === 'REPLAYABLE_TABLE_RECORD') {
                         var modifiablePayloadJson = JSON.parse(wrappedErrorEntry.modifiablePayloadString);
-                        var editedTableAsArray = replay.find(".eventPayloadTable");
+                        var editedTableAsArray = replay.find(".event-payload-table-input");
                         for (i = 0; i < modifiablePayloadJson.records.length; i++) {
                             for (j = 0; j < modifiablePayloadJson.attributes.length; j++) {
                                 modifiablePayloadJson.records[i][j] = editedTableAsArray[i
@@ -757,16 +757,16 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         var editableTable = $('<table></table>');
                         var tableHeader = $('<tr></tr>');
                         modifiablePayloadJson.attributes.forEach(function (attribute) {
-                            tableHeader.append('<th><span style="text-transform: capitalize; padding-left: 1em; '
-                                + 'color: white;">' + attribute.name + '</span> <span style="text-transform: lowercase;'
-                                + 'color: white;">(' + attribute.type + ')</span></th>');
+                            tableHeader.append('<th><span class="event-payload-table-header-title">' + attribute.name
+                            + '</span> <span class="event-payload-table-header-type">(' + attribute.type
+                            + ')</span></th>');
                         ;});
                         editableTable.append(tableHeader);
                         modifiablePayloadJson.records.forEach(function (record) {
                             var tableRow = $('<tr></tr>');
                             record.forEach(function (column) {
-                                tableRow.append('<td><input type="text" class="eventPayloadTable" value="' + column +
-                                '" class="configure-server-input"></td>');
+                                tableRow.append('<td><input type="text" class="event-payload-table-input" value="' + column +
+                                '"></td>');
                             });
                             editableTable.append(tableRow);
                         ;});
@@ -781,15 +781,16 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                         var uneditableTable = $('<table></table>');
                         var tableHeader = $('<tr></tr>');
                         unmodifiablePayloadJson.attributes.forEach(function (attribute) {
-                            tableHeader.append('<th><span style="text-transform: capitalize; padding-left: 1em; '
-                                + 'color: white;">' + attribute.name + '</span> <span style="text-transform: lowercase;'
-                                + 'color: white;">(' + attribute.type + ')</span></th>');
+                            tableHeader.append('<th><span class="event-payload-table-header-title">' + attribute.name
+                                + '</span> <span class="event-payload-table-header-type">(' + attribute.type
+                                + ')</span></th>');
                         ;});
                         uneditableTable.append(tableHeader);
                         unmodifiablePayloadJson.records.forEach(function (record) {
                             var tableRow = $('<tr></tr>');
                             record.forEach(function (column) {
-                                tableRow.append('<td>' + column + '</td>');
+                                tableRow.append('<td><input type="text" class="event-payload-table-input" value="'
+                                + column + '" disabled></td>');
                             });
                             uneditableTable.append(tableRow);
                         ;});
