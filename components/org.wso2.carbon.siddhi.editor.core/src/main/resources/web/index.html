@@ -2730,9 +2730,7 @@
                                     <li><a href="#" id="transports" class="dropdown-list-element">Transports</a></li>
                                 </ul>
                             </div>
-                            <br/>
-                            <div class='config-template-container' id='config-template-container-id'
-                                 style='display: block'>
+                            <div id='config-template-container-id' style='display: block'>
                             </div>
                         </div>
                         <div id="step-4" class="export-selector">
@@ -3043,24 +3041,13 @@
         <div class="kube-config-form">
             <div class="kube-config-row">
                 <div class="kube-config-sub-row">
-                    <div class="clearfix">Deployment Mode</div>
-                    <div class="kube-input-group" id="distribution-selection">
-                        <input type="radio" name="distribution" id="non-distributed" value="non-distributed"> Non
-                        distributed deployment<br>
-                        <input type="radio" name="distribution" id="distributed-with-nats"
-                               value="distributed-with-nats"> Distributed deployment with NATS<br>
-                        <input type="radio" name="distribution" id="distributed-with-ext-nats"
-                               value="distributed-with-ext-nats"> Distributed deployment with External NATS<br>
-                    </div>
-                </div>
-                <div class="kube-config-sub-row">
                     <div class="clearfix">Persistence</div>
                     <div class="kube-input-group" id="persistent-select">
                         <select class="kube-persistence-dropdown" id="kube-persistence-dropdown-id">
-                            <option value="disable-persistence">Disable State Persistence</option>
+                            <option value="database-persistence" selected>Database Persistence</option>
                             <option value="file-system-persistence">File System Persistence</option>
-                            <option value="database-persistence">Database Persistence</option>
                             <option value="amazon-s3-persistence">Amazon S3 Persistence</option>
+                            <option value="disable-persistence">Disable State Persistence</option>
                         </select>
                     </div>
                 </div>

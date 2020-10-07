@@ -100,7 +100,8 @@ hr.export-dialog-hr {
 }
 
 .config-template-container {
-    height: 98% !important
+    margin-top: 10px;
+    height: calc(100% - 20px);
 }
 
 .kubernetes-configuration-step {
@@ -130,13 +131,14 @@ hr.export-dialog-hr {
 }
 
 .step-description {
-    padding: 5px;
+    padding: 5px 5px 0 10px;
     background-color: transparent;
 }
 
 #step-3 > div.step-description-text {
     width: 90%;
     float: left;
+    padding-top: 6px;
 }
 
 .step-description-text {
@@ -328,4 +330,10 @@ div#step-6 {
     pointer-events:none; //This makes it not clickable
     opacity:0.6;
     color: #aabcc5 !important;
+}
+
+.sw-theme-default {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
 }
