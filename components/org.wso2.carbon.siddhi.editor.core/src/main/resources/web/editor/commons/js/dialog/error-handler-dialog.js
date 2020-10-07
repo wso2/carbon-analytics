@@ -760,7 +760,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             tableHeader.append('<th><span class="event-payload-table-header-title">' + attribute.name
                             + '</span> <span class="event-payload-table-header-type">(' + attribute.type
                             + ')</span></th>');
-                        ;});
+                        });
                         editableTable.append(tableHeader);
                         modifiablePayloadJson.records.forEach(function (record) {
                             var tableRow = $('<tr></tr>');
@@ -769,7 +769,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                                 '"></td>');
                             });
                             editableTable.append(tableRow);
-                        ;});
+                        });
                         return editableTable;
                     }
                 },
@@ -784,7 +784,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                             tableHeader.append('<th><span class="event-payload-table-header-title">' + attribute.name
                                 + '</span> <span class="event-payload-table-header-type">(' + attribute.type
                                 + ')</span></th>');
-                        ;});
+                        });
                         uneditableTable.append(tableHeader);
                         unmodifiablePayloadJson.records.forEach(function (record) {
                             var tableRow = $('<tr></tr>');
@@ -793,7 +793,7 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                                 + column + '" disabled></td>');
                             });
                             uneditableTable.append(tableRow);
-                        ;});
+                        });
                         return uneditableTable;
                     } else {
                         originalPayload.append('<div><h4>Original Payload</h4></div>');
