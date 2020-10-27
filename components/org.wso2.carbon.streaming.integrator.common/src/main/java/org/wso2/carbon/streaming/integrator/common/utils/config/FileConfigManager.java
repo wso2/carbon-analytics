@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.wso2.carbon.streaming.integrator.common.utils.SPConstants.DATASOURCES_ROOT_ELEMENT;
+import static org.wso2.carbon.streaming.integrator.common.utils.SPConstants.DATASOURCE_NAMESPACE;
 import static org.wso2.carbon.streaming.integrator.common.utils.SPConstants.EXTENSIONS_NAMESPACE;
 import static org.wso2.carbon.streaming.integrator.common.utils.SPConstants.REFS_NAMESPACE;
 import static org.wso2.carbon.streaming.integrator.common.utils.SPConstants.SIDDHI_PROPERTIES_NAMESPACE;
@@ -46,17 +48,17 @@ public class FileConfigManager implements ConfigManager {
     private List<Reference> references = new ArrayList<>();
     private Map<String, String> properties = new HashMap<>();
 
+    public FileConfigManager(ConfigProvider configProvider) {
+        this.configProvider = configProvider;
+        init();
+    }
+
     private void init() {
         if (configProvider != null) {
             initializeExtensions();
             initializeReferences();
             initializeProperties();
         }
-    }
-
-    public FileConfigManager(ConfigProvider configProvider) {
-        this.configProvider = configProvider;
-        init();
     }
 
     private void initializeProperties() {
@@ -133,12 +135,29 @@ public class FileConfigManager implements ConfigManager {
 
     @Override
     public ConfigReader generateConfigReader(String namespace, String name) {
+        List datasourceConfigs;
+        Map datasourceConnectionProperties;
         for (Extension extension : this.extensions) {
             ExtensionChildConfiguration childConfiguration = extension.getExtension();
             if (childConfiguration.getNamespace().equals(namespace) &&
                     childConfiguration.getName().equals(name) &&
                     childConfiguration.getProperties() != null) {
                 return new FileConfigReader(childConfiguration.getProperties());
+            }
+        }
+        if (namespace.equalsIgnoreCase(DATASOURCES_ROOT_ELEMENT)) {
+            try {
+                datasourceConfigs = (List) ((HashMap) configProvider.getConfigurationObject(DATASOURCES_ROOT_ELEMENT))
+                        .get(DATASOURCE_NAMESPACE);
+                    for (Object datasourceConfig : datasourceConfigs) {
+                        if (((HashMap) datasourceConfig).get("name").equals(name)) {
+                            datasourceConnectionProperties = (Map) ((HashMap) ((HashMap<?, ?>) datasourceConfig).
+                                    get("definition")).get("configuration");
+                            return new FileConfigReader(datasourceConnectionProperties);
+                        }
+                    }
+            } catch (ConfigurationException e) {
+                LOGGER.error("Error occurred while reading the datasource configurations from deployment.yaml", e);
             }
         }
         if (LOGGER.isDebugEnabled()) {
@@ -185,5 +204,9 @@ public class FileConfigManager implements ConfigManager {
             LOGGER.debug("Could not find a matching configuration for property name: " + name + "");
         }
         return property;
+    }
+
+    public ConfigProvider getConfigProvider() {
+        return configProvider;
     }
 }
