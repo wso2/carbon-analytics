@@ -126,9 +126,25 @@ public class AnalyticsExecutionClient {
         stub.saveScript(scriptName, scriptContent, cron);
     }
 
+    public void pauseScripts() throws RemoteException,
+            AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+        stub.pauseAllScripts();
+    }
+
+    public void resumeScripts() throws RemoteException,
+            AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+        stub.resumeAllScripts();
+    }
+
     public AnalyticsProcessorAdminServiceStub.AnalyticsScriptDto[] getAllScripts() throws RemoteException,
             AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
         return stub.getAllScripts();
+    }
+
+    public AnalyticsProcessorAdminServiceStub.AnalyticsScheduledScriptDto[] getScheduledTaskStatuses()
+            throws RemoteException,
+            AnalyticsProcessorAdminServiceAnalyticsProcessorAdminExceptionException {
+        return stub.getScheduledTaskStatuses();
     }
 
     public AnalyticsProcessorAdminServiceStub.AnalyticsScriptDto getScriptContent(String scriptName)
