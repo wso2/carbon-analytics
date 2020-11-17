@@ -232,7 +232,6 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
                         this.activeTab.getHeader().addClass(activeTabHeaderClass);
                         this.activeTab.setActive(true);
 
-                        //this.activeTab.getHeader().tab('show');
                         /**
                          * Active tab changed event.
                          * @event TabList#active-tab-changed
@@ -270,6 +269,12 @@ define(['log', 'jquery', 'lodash', 'backbone', './tab', 'bootstrap'],
                     _.assign(tabOptions, _.get(this.options, 'tabs.tab'));
                     _.set(tabOptions, 'tabs_container',_.get(this.options, 'tabs.container'));
                     _.set(tabOptions, 'parent', this);
+                    if(opts.view === undefined && _.has(opts,'tabOptions.file')){
+                        _.set(tabOptions, 'view',opts.tabOptions.file.attributes.view);
+                    } else {
+                        _.set(tabOptions, 'view', opts.view);
+                    }
+
                     var newTab;
                     // user provided a custom tab type
                     if (_.has(opts, 'tabModel')) {

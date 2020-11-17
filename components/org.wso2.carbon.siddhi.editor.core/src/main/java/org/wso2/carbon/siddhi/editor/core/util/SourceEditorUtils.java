@@ -754,7 +754,8 @@ public class SourceEditorUtils {
             if (Constants.WINDOW_PROCESSOR.equals(processorType) ||
                     Constants.STREAM_PROCESSOR.equals(processorType) ||
                     Constants.STREAM_FUNCTION_PROCESSOR.equals(processorType) ||
-                    Constants.FUNCTION_EXECUTOR.equals(processorType)) {
+                    Constants.FUNCTION_EXECUTOR.equals(processorType) ||
+                    Constants.ATTRIBUTE_AGGREGATOR_EXECUTOR.equals(processorType)) {
                 List<AttributeMetaData> attributeMetaDataList = new ArrayList<>();
                 if (extensionAnnotation.returnAttributes().length > 0) {
                     for (ReturnAttribute additionalAttribute : extensionAnnotation.returnAttributes()) {

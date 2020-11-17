@@ -3,10 +3,10 @@
  */
 define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annotationObject', 'annotationElement',
         'designViewUtils', 'queryWindowOrFunction', 'streamHandler', 'patternOrSequenceQueryCondition', 'queryOutputInsert',
-        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'perfect_scrollbar'],
+        'queryOutputDelete', 'queryOutputUpdate', 'queryOutputUpdateOrInsertInto', 'perfect_scrollbar', 'cronstrue', 'cronGenerator'],
     function (require, _, AppData, log, Constants, Handlebars, AnnotationObject, AnnotationElement, DesignViewUtils,
               QueryWindowOrFunction, StreamHandler, PatternOrSequenceQueryCondition, QueryOutputInsert, QueryOutputDelete,
-              QueryOutputUpdate, QueryOutputUpdateOrInsertInto, PerfectScrollbar) {
+              QueryOutputUpdate, QueryOutputUpdateOrInsertInto, PerfectScrollbar, Cronstrue, CronGenerator) {
 
         /**
          * @class FormUtils Contains utility methods for forms
@@ -20,6 +20,10 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             this.jsPlumbInstance = jsPlumbInstance;
         };
 
+        var constants = {
+            FILE: 'file',
+            CRON_EXPRESSION: ' cron.expression '
+        };
         /**
          * @function check whether given name to the definition element is used(This will only consider definitions
          * which creates internal streams in Siddhi for each of them. Function definitions are not considered.)
@@ -483,6 +487,17 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 customizedOptions: customizedOptions
             });
             $('#' + id + '-options-div').html(optionsTemplate);
+            if(id === Constants.SOURCE){
+                var optionParent = $('#source-options-div .option');
+                if($('#define-source #source-type').val() === constants.FILE){
+                    for(var i=0;i<optionsArray.length;i++){
+                        if(optionParent[i].innerText === constants.CRON_EXPRESSION){
+                            new CronGenerator().init(optionParent[i]);
+                            break;
+                        }
+                    }
+                }
+            }
             self.changeCustomizedOptDiv(id);
             self.updatePerfectScroller();
         };
@@ -2473,8 +2488,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                 if (predefinedFunction.name.toLowerCase() === savedType) {
                     if (predefinedFunction.parameterOverloads) {
                         var nameWithUniqueOverload = predefinedFunction.name + "(";
+                        var overload;
                         for (var i = 0; i < predefinedFunction.parameterOverloads.length; i++) {
-                            var overload = predefinedFunction.parameterOverloads[i];
+                            overload = predefinedFunction.parameterOverloads[i];
                             var lengthOfSavedParameters = savedParameters.length;
                             var noOfOverloadParameters = overload.length;
                             for (var k = 0; k < overload.length; k++) {
@@ -2492,7 +2508,7 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
                                 nameWithUniqueOverload += overload;
                             }
                         }
-                        nameWithUniqueOverload += ")";
+                        nameWithUniqueOverload += overload + ")";
                         functionName = nameWithUniqueOverload;
                     } else {
                         var nameWithAllParameters = predefinedFunction.name + "(";
@@ -4125,9 +4141,9 @@ define(['require', 'lodash', 'appData', 'log', 'constants', 'handlebar', 'annota
             $('#' + id + '-options-div').on('change', '.option-checkbox', function () {
                 var optionParent = $(this).parents(".option");
                 if ($(this).is(':checked')) {
-                    optionParent.find(".option-value").show();
+                    optionParent.find(".option-content").show();
                 } else {
-                    optionParent.find(".option-value").hide();
+                    optionParent.find(".option-content").hide();
                     optionParent.find(".option-value").removeClass("required-input-field");
                     optionParent.find(".error-message").text("");
                 }

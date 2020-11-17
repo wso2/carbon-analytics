@@ -60,6 +60,12 @@
     width: 100%;
 }
 
+.etl-wizard-view-enabled {
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+
 .hide-div {
     display: none;
 }

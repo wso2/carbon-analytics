@@ -28,6 +28,7 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             self.sendLabel = "Send";
             var consoleListManager = self.app.outputController;
             self.console = consoleListManager.getGlobalConsole();
+            self.defaults = config.defaults;
 
             // add methods to validate int/long and double/float
             $.validator.addMethod("validateIntOrLong", function (value, element) {
@@ -52,95 +53,13 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
             });
 
             // When siddhi app name selected changes refresh the form
-            self.$singleEventConfigTabContent.on('change', 'select[name="single-event-siddhi-app-name"]', function () {
-                var $element = $(this);
-                var $form = $element.closest('form[data-form-type="single"]');
-                var uuid = $form.data('uuid');
-                var siddhiAppName = $element.val();
-                var $siddhiAppMode = $form.find('div[data-name="siddhi-app-name-mode"]');
-                var $streamNameSelect = $form.find('select[name="stream-name"]');
-                var $timestamp = $form.find('input[name="sim-timestamp"]');
-                var $attributes = $form.find('div[data-name="attributes"]');
-                var $send = $form.find('button[type="submit"][name="send"]');
-                var $singleEventForm = $element.closest(".single-event-form");
-                var $nitificationBox = $singleEventForm.find(".alert");
-
-                $streamNameSelect.empty();
-                $timestamp.val('');
-
-                // update the siddhi app status
-                Simulator.retrieveSiddhiAppNames(
-                    function (data) {
-                        self.createSiddhiAppMap(data);
-                        $siddhiAppMode.html(self.SiddhiAppStatus + self.siddhiAppDetailsMap[siddhiAppName]);
-                        self.removeSingleEventAttributeRules(uuid);
-                        $attributes.empty();
-                        if (self.siddhiAppDetailsMap[siddhiAppName] === self.FAULTY) {
-                            $streamNameSelect.prop('disabled', true);
-                            $timestamp.prop('disabled', true);
-                            $send.prop('disabled', true);
-                            $nitificationBox.removeClass("hidden");
-                            $nitificationBox.addClass("alert-danger");
-                            $nitificationBox.removeClass("alert-warning");
-                            $nitificationBox.removeClass("alert-success");
-                        } else {
-                            $streamNameSelect.prop('disabled', false);
-                            $timestamp.prop('disabled', false);
-                            $send.prop('disabled', false);
-                            Simulator.retrieveStreamNames(
-                                siddhiAppName,
-                                function (data) {
-                                    self.refreshStreamList($streamNameSelect, data);
-                                    var firstOptionVal = $streamNameSelect.children().first().val();
-                                    $streamNameSelect.val(firstOptionVal).change();
-                                },
-                                function (data) {
-                                    log.info(data);
-                                });
-                            $nitificationBox.removeClass("hidden");
-                            var $sendButton = $singleEventForm.find('button[name="send"]');
-                            if (self.siddhiAppDetailsMap[siddhiAppName] === self.STOP) {
-                                $nitificationBox.removeClass("alert-success");
-                                $nitificationBox.removeClass("alert-danger");
-                                $nitificationBox.addClass("alert-warning");
-                                $sendButton.text(self.startAndSendLabel);
-                            } else {
-                                $nitificationBox.addClass("alert-success");
-                                $nitificationBox.removeClass("alert-warning");
-                                $nitificationBox.removeClass("alert-danger");
-                                $sendButton.text("Send");
-                            }
-                        }
-                    },
-                    function (data) {
-                        var message = {
-                            "type" : "ERROR",
-                            "message": data
-                        };
-                        self.console.println(message);
-                    }
-                );
+            self.$singleEventConfigTabContent.on('change', 'select[name="single-event-siddhi-app-name"]', function() {
+                self.onSiddhiAppSelected($(this));
             });
 
             // refresh attributes list when a stream is selected
             self.$singleEventConfigTabContent.on('change', 'select[name="stream-name"]', function () {
-                var $form = $(this).closest('form[data-form-type="single"]');
-                var uuid = $form.data('uuid');
-                self.removeSingleEventAttributeRules(uuid);
-                Simulator.retrieveStreamAttributes(
-                    $form
-                        .find('select[name="single-event-siddhi-app-name"]')
-                        .val(),
-                    $form
-                        .find('select[name="stream-name"]')
-                        .val(),
-                    function (data) {
-                        self.refreshAttributesList(uuid, data);
-                        self.addRulesForAttributes(uuid);
-                    },
-                    function (data) {
-                        log.info(data);
-                    });
+                self.onStreamSelected($(this));
             });
 
             // remove a single event config tab and make the tab before it active
@@ -243,6 +162,113 @@ define(['jquery', 'log', './constants', './simulator-rest-client', 'lodash', './
                 }
             });
         };
+
+        self.updateSelected = function(siddhiAppName, streamName) {
+            var siddhiAppList = self.$singleEventConfigTabContent.find('select[name="single-event-siddhi-app-name"]'),
+            streamList = self.$singleEventConfigTabContent.find('select#stream-name');
+
+            siddhiAppList.find('option').removeAttr('selected');
+            siddhiAppList.find(`option[value=${siddhiAppName}]`).attr('selected', true);
+
+            self.onSiddhiAppSelected(siddhiAppList, function() {
+                streamList.find('option').removeAttr('selected');
+                streamList.find(`option[value=${streamName}]`).attr('selected', true);
+
+                self.onStreamSelected(streamList);
+            });
+        };
+
+        self.onSiddhiAppSelected = function ($element, onStreamsLoaded) {
+            $element = $element || $(this);
+            var $form = $element.closest('form[data-form-type="single"]');
+            var uuid = $form.data('uuid');
+            var siddhiAppName = $element.val();
+            var $siddhiAppMode = $form.find('div[data-name="siddhi-app-name-mode"]');
+            var $streamNameSelect = $form.find('select[name="stream-name"]');
+            var $timestamp = $form.find('input[name="sim-timestamp"]');
+            var $attributes = $form.find('div[data-name="attributes"]');
+            var $send = $form.find('button[type="submit"][name="send"]');
+            var $singleEventForm = $element.closest(".single-event-form");
+            var $nitificationBox = $singleEventForm.find(".alert");
+
+            $streamNameSelect.empty();
+            $timestamp.val('');
+
+            // update the siddhi app status
+            Simulator.retrieveSiddhiAppNames(
+                function (data) {
+                    self.createSiddhiAppMap(data);
+                    $siddhiAppMode.html(self.SiddhiAppStatus + self.siddhiAppDetailsMap[siddhiAppName]);
+                    self.removeSingleEventAttributeRules(uuid);
+                    $attributes.empty();
+                    if (self.siddhiAppDetailsMap[siddhiAppName] === self.FAULTY) {
+                        $streamNameSelect.prop('disabled', true);
+                        $timestamp.prop('disabled', true);
+                        $send.prop('disabled', true);
+                        $nitificationBox.removeClass("hidden");
+                        $nitificationBox.addClass("alert-danger");
+                        $nitificationBox.removeClass("alert-warning");
+                        $nitificationBox.removeClass("alert-success");
+                    } else {
+                        $streamNameSelect.prop('disabled', false);
+                        $timestamp.prop('disabled', false);
+                        $send.prop('disabled', false);
+                        Simulator.retrieveStreamNames(
+                            siddhiAppName,
+                            function (data) {
+                                self.refreshStreamList($streamNameSelect, data);
+                                var firstOptionVal = $streamNameSelect.children().first().val();
+                                $streamNameSelect.val(firstOptionVal).change();
+                                onStreamsLoaded && onStreamsLoaded();
+                            },
+                            function (data) {
+                                log.info(data);
+                            });
+                        $nitificationBox.removeClass("hidden");
+                        var $sendButton = $singleEventForm.find('button[name="send"]');
+                        if (self.siddhiAppDetailsMap[siddhiAppName] === self.STOP) {
+                            $nitificationBox.removeClass("alert-success");
+                            $nitificationBox.removeClass("alert-danger");
+                            $nitificationBox.addClass("alert-warning");
+                            $sendButton.text(self.startAndSendLabel);
+                        } else {
+                            $nitificationBox.addClass("alert-success");
+                            $nitificationBox.removeClass("alert-warning");
+                            $nitificationBox.removeClass("alert-danger");
+                            $sendButton.text("Send");
+                        }
+                    }
+                },
+                function (data) {
+                    var message = {
+                        "type" : "ERROR",
+                        "message": data
+                    };
+                    self.console.println(message);
+                }
+            );
+        };
+
+        self.onStreamSelected = function (element) {
+            // var $form = $(this).closest('form[data-form-type="single"]');
+            var $form = element.closest('form[data-form-type="single"]');
+            var uuid = $form.data('uuid');
+            self.removeSingleEventAttributeRules(uuid);
+            Simulator.retrieveStreamAttributes(
+                $form
+                    .find('select[name="single-event-siddhi-app-name"]')
+                    .val(),
+                $form
+                    .find('select[name="stream-name"]')
+                    .val(),
+                function (data) {
+                    self.refreshAttributesList(uuid, data);
+                    self.addRulesForAttributes(uuid);
+                },
+                function (data) {
+                    log.info(data);
+                });
+        }
 
 // add a datetimepicker to an element
         var myControl = {

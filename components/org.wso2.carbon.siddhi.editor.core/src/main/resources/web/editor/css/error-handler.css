@@ -1,0 +1,102 @@
+/*
+~   Copyright 2020, WSO2 Inc. (http://www.wso2.com)
+~
+~   Licensed under the Apache License, Version 2.0 (the "License");
+~   you may not use this file except in compliance with the License.
+~   You may obtain a copy of the License at
+~
+~        http://www.apache.org/licenses/LICENSE-2.0
+~
+~   Unless required by applicable law or agreed to in writing, software
+~   distributed under the License is distributed on an "AS IS" BASIS,
+~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~   See the License for the specific language governing permissions and
+~   limitations under the License.
+*/
+
+.error-handler-dialog-form-block {
+    padding: 20px 20px 20px 20px;
+    width: 90.15%;
+    background-color: #2C2C2C;
+    margin-left: 30px;
+    margin-bottom: 20px;
+}
+
+.server-properties-clearfix {
+    display: block;
+    content: "";
+    clear: both;
+}
+
+.server-property {
+    float: left;
+    display: inline-block;
+    margin-right: 35px;
+}
+
+.configure-server-input {
+    width: 120px;
+    background-color: #222222;
+    border-style: none;
+    height: 35px;
+    padding-left: 10px;
+    color: #fff;
+}
+
+.error-entry-container {
+    background-color: #373737;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.error-label {
+    color: #03a9f4;
+    background-color: #2C2C2C;
+    padding: 5px;
+    margin: 0;
+    font-weight: bold;
+}
+
+.event-payload-table-input {
+    width: 120px;
+    background-color: #383838;
+    border-style: none;
+    height: 35px;
+    padding-left: 10px;
+    color: #fff;
+}
+
+.event-payload-table-header-title {
+    text-transform: capitalize;
+    padding-left: 1em;
+    color: white;
+}
+
+.event-payload-table-header-type {
+    text-transform: lowercase;
+    color: white;
+}
+
+.error-cause {
+    color: #f47b20;
+}
+
+h5.description {
+    color: #c8c7c7;
+}
+
+.payload-content {
+    color: #FFF;
+    background: #131313;
+    overflow: auto;
+    padding: 10px;
+    font-family: "Lucida Console", Monaco, monospace;
+}
+
+.stack-trace-content {
+    padding: 10px;
+    overflow-y: auto;
+    background: #131313;
+    color: #f44336;
+    font-family: "Lucida Console", Monaco, monospace;
+}

@@ -1,0 +1,210 @@
+/*
+~   Copyright 2020, WSO2 Inc. (http://www.wso2.com)
+~
+~   Licensed under the Apache License, Version 2.0 (the "License");
+~   you may not use this file except in compliance with the License.
+~   You may obtain a copy of the License at
+~
+~        http://www.apache.org/licenses/LICENSE-2.0
+~
+~   Unless required by applicable law or agreed to in writing, software
+~   distributed under the License is distributed on an "AS IS" BASIS,
+~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~   See the License for the specific language governing permissions and
+~   limitations under the License.
+*/
+
+.paginationjs {
+  line-height: 1.6;
+  font-size: 14px;
+  box-sizing: initial;
+}
+
+.paginationjs:after {
+  display: table;
+  content: " ";
+  clear: both;
+}
+
+.paginationjs .paginationjs-pages {
+  float: left;
+}
+
+.paginationjs .paginationjs-pages ul {
+  float: left;
+  margin: 0;
+  padding: 0;
+}
+
+.paginationjs .paginationjs-pages li {
+  float: left;
+  list-style: none;
+}
+
+.paginationjs .paginationjs-pages li > a {
+  min-width: 30px;
+  height: 28px;
+  line-height: 28px;
+  display: block;
+  font-size: 14px;
+  text-decoration: none;
+  text-align: center;
+}
+
+.paginationjs .paginationjs-pages li > a:hover {
+  background: #373737;
+}
+
+.paginationjs .paginationjs-pages li.active > a {
+  background: #f47b20;
+  color: #fff;
+}
+
+.paginationjs .paginationjs-pages li.disabled > a {
+  opacity: .3;
+}
+
+.paginationjs .paginationjs-pages li.disabled > a:hover {
+  background: none;
+}
+
+.paginationjs .paginationjs-go-input {
+  float: left;
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+.paginationjs .paginationjs-go-input > input[type="text"] {
+  width: 30px;
+  height: 28px;
+  background: #222222;
+  color: #fff;
+  padding: 0;
+  font-size: 14px;
+  text-align: center;
+  vertical-align: baseline;
+  outline: none;
+  box-shadow: none;
+  box-sizing: initial;
+}
+
+.paginationjs .paginationjs-go-button {
+  float: left;
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+.paginationjs .paginationjs-go-button > input[type="button"] {
+  min-width: 40px;
+  height: 30px;
+  line-height: 28px;
+  background: #2c2c2c;
+  color: #fff;
+  text-align: center;
+  padding: 0 8px;
+  font-size: 14px;
+  vertical-align: baseline;
+  outline: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.paginationjs .paginationjs-go-button > input[type="button"]:hover {
+  background-color: #f47b20;
+}
+
+.paginationjs .paginationjs-nav {
+  float: left;
+  height: 30px;
+  line-height: 30px;
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+.paginationjs.paginationjs-small {
+  font-size: 12px;
+}
+
+.paginationjs.paginationjs-small .paginationjs-pages li > a {
+  min-width: 26px;
+  height: 24px;
+  line-height: 24px;
+  font-size: 12px;
+}
+
+.paginationjs.paginationjs-small .paginationjs-pages li.active > a {
+  height: 26px;
+  line-height: 26px;
+}
+
+.paginationjs.paginationjs-small .paginationjs-go-input {
+  font-size: 12px;
+}
+
+.paginationjs.paginationjs-small .paginationjs-go-input > input[type="text"] {
+  width: 26px;
+  height: 24px;
+  font-size: 12px;
+}
+
+.paginationjs.paginationjs-small .paginationjs-go-button {
+  font-size: 12px;
+}
+
+.paginationjs.paginationjs-small .paginationjs-go-button > input[type="button"] {
+  min-width: 30px;
+  height: 26px;
+  line-height: 24px;
+  padding: 0 6px;
+  font-size: 12px;
+}
+
+.paginationjs.paginationjs-small .paginationjs-nav {
+  height: 26px;
+  line-height: 26px;
+  font-size: 12px;
+}
+
+.paginationjs.paginationjs-big {
+  font-size: 16px;
+}
+
+.paginationjs.paginationjs-big .paginationjs-pages li > a {
+  min-width: 36px;
+  height: 34px;
+  line-height: 34px;
+  font-size: 16px;
+}
+
+.paginationjs.paginationjs-big .paginationjs-pages li.active > a {
+  height: 36px;
+  line-height: 36px;
+}
+
+.paginationjs.paginationjs-big .paginationjs-go-input {
+  font-size: 16px;
+}
+
+.paginationjs.paginationjs-big .paginationjs-go-input > input[type="text"] {
+  width: 36px;
+  height: 34px;
+  font-size: 16px;
+}
+
+.paginationjs.paginationjs-big .paginationjs-go-button {
+  font-size: 16px;
+}
+
+.paginationjs.paginationjs-big .paginationjs-go-button > input[type="button"] {
+  min-width: 50px;
+  height: 36px;
+  line-height: 34px;
+  padding: 0 12px;
+  font-size: 16px;
+}
+
+.paginationjs.paginationjs-big .paginationjs-nav {
+  height: 36px;
+  line-height: 36px;
+  font-size: 16px;
+}

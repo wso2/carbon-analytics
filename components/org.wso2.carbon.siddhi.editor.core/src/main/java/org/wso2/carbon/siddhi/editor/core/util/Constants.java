@@ -57,6 +57,8 @@ public class Constants {
     public static final String TYPE_JSON = "json";
     public static final String TYPE_TEXT = "text";
     public static final String TYPE_CSV = "csv";
+    public static final String TYPE_NUMBER = "number";
+    public static final String TYPE_DECIMAL = "decimal";
     public static final String SAMPLE_EVENTS_PARENT_TAG = "events";
     public static final String SAMPLE_EVENT_PARENT_TAG = "event";
     public static final String ATTR_TYPE_FLOAT = "float";
@@ -65,6 +67,7 @@ public class Constants {
     public static final String ATTR_TYPE_LONG = "long";
     public static final String ATTR_TYPE_STRING = "string";
     public static final String ATTR_TYPE_BOOL = "bool";
+    public static final String ATTR_TYPE_OBJECT = "object";
     public static final String EVENT_ATTRIBUTE_VALUE_SEPARATOR = ":";
     public static final String FAULT_STREAM_PREFIX = "!";
     public static final String EXPORT_PROPERTIES_NAMESPACE = "exportConfigs";
@@ -90,6 +93,8 @@ public class Constants {
     public static final String TRUE = "true";
     public static final String FALSE = "false";
     public static final String COLUMN_NAME = "COLUMN_NAME";
+    public static final String DECIMAL_DIGITS = "DECIMAL_DIGITS";
+    public static final String COLUMN_SIZE = "COLUMN_SIZE";
     public static final String TYPE_NAME = "TYPE_NAME";
     public static final String DATASOURCE_NAME = "dataSourceName";
     public static final String ATTRIBUTES = "attributes";
@@ -98,6 +103,7 @@ public class Constants {
     public static final String DATA_TYPE = "type";
     public static final String TABLE_NAME = "tableName";
     static final String FUNCTION_EXECUTOR = "FunctionExecutor";
+    static final String ATTRIBUTE_AGGREGATOR_EXECUTOR = "AttributeAggregatorExecutor";
     static final String ATTRIBUTE_AGGREGATOR = "AttributeAggregatorExecutor";
     static final String INCREMENTAL_AGGREGATOR = "IncrementalAggregator";
     static final String WINDOW_PROCESSOR = "WindowProcessor";
@@ -112,7 +118,8 @@ public class Constants {
     public static final String OPERATOR_PREREQ_YAML_NAME = "k8-prerequisites.yaml";
     public static final String ERROR = "error";
     public static final String WARNING = "warning";
-    public static final String REGEX_TO_KEEP_QUOTES = "(?=(?:[^(\"|')]*(\"|')[^(\"|')]*(\"|'))*[^(\"|')]*$)";
+    public static final String REGEX_TO_KEEP_QUOTES = "(?=(?:[^\"|']*(\"|')[^\"|']*(\"|'))*[^\"|']*$)";
+    public static final String REGEX_TO_MATCH_SPECIAL_CHARACTERS = "[!@#/\\\\$%^&*(),.?\":{}|<>]";
     static final Map<String, Class<?>> SUPER_CLASS_MAP;
     static final Map<String, String> PACKAGE_NAME_MAP;
 

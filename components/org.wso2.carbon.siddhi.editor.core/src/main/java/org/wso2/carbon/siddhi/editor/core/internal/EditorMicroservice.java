@@ -73,7 +73,9 @@ import org.wso2.carbon.siddhi.editor.core.commons.response.MetaDataResponse;
 import org.wso2.carbon.siddhi.editor.core.commons.response.Status;
 import org.wso2.carbon.siddhi.editor.core.commons.response.ValidationSuccessResponse;
 import org.wso2.carbon.siddhi.editor.core.exception.DockerGenerationException;
+import org.wso2.carbon.siddhi.editor.core.exception.ErrorHandlerServiceStubException;
 import org.wso2.carbon.siddhi.editor.core.exception.InvalidExecutionStateException;
+import org.wso2.carbon.siddhi.editor.core.exception.InvalidStreamAttributeException;
 import org.wso2.carbon.siddhi.editor.core.exception.KubernetesGenerationException;
 import org.wso2.carbon.siddhi.editor.core.exception.SiddhiAppDeployerServiceStubException;
 import org.wso2.carbon.siddhi.editor.core.exception.SiddhiStoreQueryHelperException;
@@ -97,6 +99,7 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.deserializers.Deserial
 import org.wso2.carbon.siddhi.editor.core.util.designview.designgenerator.DesignGenerator;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerationException;
 import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.DesignGenerationException;
+import org.wso2.carbon.siddhi.editor.core.util.errorhandler.ErrorHandlerApiHelper;
 import org.wso2.carbon.siddhi.editor.core.util.metainforetriever.beans.CSVConfig;
 import org.wso2.carbon.siddhi.editor.core.util.metainforetriever.beans.JSONConfig;
 import org.wso2.carbon.siddhi.editor.core.util.metainforetriever.beans.XMLConfig;
@@ -144,6 +147,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -1170,6 +1174,62 @@ public class EditorMicroservice implements Microservice {
     }
 
     @POST
+    @Path("/etl-wizard/save")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response saveSiddhiApp(
+            @FormDataParam("configName") String configName,
+            @FormDataParam("config") String encodedEventFlowJson,
+            @FormDataParam("overwrite") boolean overwrite) {
+        String fileName = new String(Base64.getDecoder().decode(configName), Charset.defaultCharset());
+        java.nio.file.Path filePath = Paths.get(Constants.RUNTIME_PATH, Constants.DIRECTORY_DEPLOYMENT,
+                Constants.DIRECTORY_WORKSPACE, fileName).toAbsolutePath();
+
+        try {
+            if (!overwrite) {
+                // Check if the file already exist. If so return 409 CONFLICT
+                if (workspace.exists(filePath).get("exists").getAsBoolean()) {
+                    return Response.status(Response.Status.CONFLICT).build();
+                }
+            }
+
+            // Get the app source from the encodedEventFlowJson.
+            String eventFlowJson = new String(Base64.getDecoder().decode(encodedEventFlowJson), StandardCharsets.UTF_8);
+            Gson gson = DeserializersRegisterer.getGsonBuilder().disableHtmlEscaping().create();
+            EventFlow eventFlow = gson.fromJson(eventFlowJson, EventFlow.class);
+            String siddhiAppCode = new CodeGenerator().generateSiddhiAppCode(eventFlow);
+
+            // Save the Siddhi app in the file system
+            Files.write(filePath, siddhiAppCode.getBytes(Charset.defaultCharset()));
+
+            // Deploy Siddhi app
+            WorkspaceDeployer.deployConfigFile(fileName, siddhiAppCode);
+
+            JsonObject responseEntity = new JsonObject();
+            responseEntity.addProperty(STATUS, SUCCESS);
+            responseEntity.addProperty("path", filePath.toString());
+
+            // Return status
+            return Response.ok().entity(responseEntity).type(MediaType.APPLICATION_JSON).build();
+        } catch (CodeGenerationException e) {
+            log.error("Unable to generate code view.", e);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .build();
+        } catch (IOException e) {
+            log.error(String.format("Error occurred when trying to read/write the %s app.", fileName), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .build();
+        } catch (Exception e) {
+            log.error(String.format("Error occurred while saving the %s app.", fileName), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .build();
+        }
+    }
+
+    @POST
     @Path("/tooltips")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
@@ -1454,8 +1514,21 @@ public class EditorMicroservice implements Microservice {
                                 .type(MediaType.APPLICATION_JSON)
                                 .build();
                     }
-                    return Response.ok().entity(MetaInfoRetrieverUtils.createResponseForCSV(attributeNameList,
-                            attributeValueList)).build();
+                    JsonObject response;
+                    try {
+                        response =  MetaInfoRetrieverUtils.createResponseForCSV(attributeNameList,
+                                attributeValueList);
+                    } catch (InvalidStreamAttributeException e) {
+                        log.error(e.getMessage());
+                        errorResponse.addProperty(Constants.ERROR,
+                                e.getMessage());
+                        return Response
+                                .serverError()
+                                .entity(errorResponse)
+                                .type(MediaType.APPLICATION_JSON)
+                                .build();
+                    }
+                    return Response.ok().entity(response).build();
                 } else {
                     String message = "Error while reading the csv file, CSV file is empty ";
                     log.error(message);
@@ -1480,7 +1553,7 @@ public class EditorMicroservice implements Microservice {
                             .type(MediaType.APPLICATION_JSON)
                             .build();
                 }
-                Object jsonObj = null;
+                Object jsonObj;
                 ReadContext readContext = JsonPath.parse(fileContent.toString());
                 try {
                     jsonObj = readContext.read(jsonConfig.getEnclosingElement());
@@ -1510,12 +1583,25 @@ public class EditorMicroservice implements Microservice {
                             .type(MediaType.APPLICATION_JSON)
                             .build();
                 }
-                if (jsonObj instanceof JSONArray) {
-                    JSONArray jsonArray = (JSONArray) jsonObj;
-                    return Response.ok().entity(MetaInfoRetrieverUtils.createResponseForJSON(jsonArray.get(0))).build();
-                } else {
-                    return Response.ok().entity(MetaInfoRetrieverUtils.createResponseForJSON(jsonObj)).build();
+                JsonObject response;
+                try {
+                    if (jsonObj instanceof JSONArray) {
+                        JSONArray jsonArray = (JSONArray) jsonObj;
+                        response = MetaInfoRetrieverUtils.createResponseForJSON(jsonArray.get(0));
+                    } else {
+                        response = MetaInfoRetrieverUtils.createResponseForJSON(jsonObj);
+                    }
+                } catch (InvalidStreamAttributeException e){
+                    log.error(e.getMessage());
+                    errorResponse.addProperty(Constants.ERROR,
+                            e.getMessage());
+                    return Response
+                            .serverError()
+                            .entity(errorResponse)
+                            .type(MediaType.APPLICATION_JSON)
+                            .build();
                 }
+                return Response.ok().entity(response).build();
             } else if (type.equalsIgnoreCase(Constants.TYPE_XML)) {
                 XMLConfig xmlConfig = new Gson().fromJson(config, XMLConfig.class);
                 Map<String, String> namespaceMap = null;
@@ -1808,7 +1894,21 @@ public class EditorMicroservice implements Microservice {
                 while (rsColumns.next()) {
                     JsonObject object = new JsonObject();
                     object.addProperty(Constants.NAME, rsColumns.getString(Constants.COLUMN_NAME));
-                    object.addProperty(Constants.DATA_TYPE, rsColumns.getString(Constants.TYPE_NAME));
+                    if (rsColumns.getString(Constants.TYPE_NAME).equalsIgnoreCase(Constants.TYPE_NUMBER) ||
+                            rsColumns.getString(Constants.TYPE_NAME).equalsIgnoreCase(Constants.TYPE_DECIMAL)) {
+                        if (rsColumns.getInt(Constants.DECIMAL_DIGITS) > 0) {
+                            object.addProperty(Constants.DATA_TYPE, Constants.ATTR_TYPE_DOUBLE);
+                        } else if (rsColumns.getInt(Constants.COLUMN_SIZE) > 10) {
+                            object.addProperty(Constants.DATA_TYPE, Constants.ATTR_TYPE_LONG);
+                        } else if (rsColumns.getInt(Constants.COLUMN_SIZE) == 1) {
+                            object.addProperty(Constants.DATA_TYPE, Constants.ATTR_TYPE_BOOL);
+                        } else {
+                            object.addProperty(Constants.DATA_TYPE, Constants.ATTR_TYPE_INTEGER);
+                        }
+                    } else {
+                        object.addProperty(Constants.DATA_TYPE, MetaInfoRetrieverUtils.
+                                getSiddhiDataType(rsColumns.getString(Constants.TYPE_NAME)));
+                    }
                     tableNamesArray.add(object);
                 }
                 jsonResponse.add(Constants.ATTRIBUTES, tableNamesArray);
@@ -1828,6 +1928,177 @@ public class EditorMicroservice implements Microservice {
         } else {
             return response;
         }
+    }
+
+    @GET
+    @Path("/error-handler/server/siddhi-apps")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSiddhiAppList(@HeaderParam("serverHost") String host, @HeaderParam("serverPort") String port,
+                                     @HeaderParam("username") String username,
+                                     @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        try {
+            return Response.ok()
+                    .entity(errorHandlerApiHelper.getSiddhiAppList(hostAndPort, username, password)).build();
+        } catch (ErrorHandlerServiceStubException e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/error-handler/error-entries/count")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTotalErrorEntriesCount(@HeaderParam("serverHost") String host,
+                                              @HeaderParam("serverPort") String port,
+                                              @HeaderParam("username") String username,
+                                              @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        try {
+            return Response.ok()
+                    .entity(errorHandlerApiHelper.getTotalErrorEntriesCount(hostAndPort, username, password)).build();
+        } catch (ErrorHandlerServiceStubException e) {
+            return Response.serverError().entity(e).build();
+        }
+    }
+
+    @GET
+    @Path("/error-handler/error-entries/count")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getErrorEntriesCount(@QueryParam("siddhiApp") String siddhiAppName,
+                                         @HeaderParam("serverHost") String host, @HeaderParam("serverPort") String port,
+                                         @HeaderParam("username") String username,
+                                         @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        try {
+            return Response.ok().entity(
+                    errorHandlerApiHelper.getErrorEntriesCount(siddhiAppName, hostAndPort, username, password)).build();
+        } catch (ErrorHandlerServiceStubException e) {
+            return Response.serverError().entity(e).build();
+        }
+    }
+
+    @GET
+    @Path("/error-handler/error-entries")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMinimalErrorEntries(@QueryParam("siddhiApp") String siddhiAppName,
+                                           @QueryParam("limit") String limit, @QueryParam("offset") String offset,
+                                           @HeaderParam("serverHost") String host,
+                                           @HeaderParam("serverPort") String port,
+                                           @HeaderParam("username") String username,
+                                           @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        try {
+            JsonArray jsonArray = errorHandlerApiHelper.getMinimalErrorEntries(siddhiAppName, limit, offset,
+                    hostAndPort, username, password);
+            return Response.ok().entity(jsonArray).build();
+        } catch (ErrorHandlerServiceStubException e) {
+            return Response.serverError().entity(e).build();
+        }
+    }
+
+    @GET
+    @Path("/error-handler/error-entries/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDescriptiveErrorEntry(@PathParam("id") String id, @HeaderParam("serverHost") String host,
+                                             @HeaderParam("serverPort") String port,
+                                             @HeaderParam("username") String username,
+                                             @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        try {
+            JsonObject jsonObject = errorHandlerApiHelper.getDescriptiveErrorEntry(id, hostAndPort, username, password);
+            return Response.ok().entity(jsonObject).build();
+        } catch (ErrorHandlerServiceStubException e) {
+            return Response.serverError().entity(e).build();
+        }
+    }
+
+    @POST
+    @Path("/error-handler")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response replayErrorEntry(JsonArray payload, @HeaderParam("serverHost") String host,
+                                     @HeaderParam("serverPort") String port, @HeaderParam("username") String username,
+                                     @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        try {
+            boolean isSuccess = errorHandlerApiHelper.replay(payload, hostAndPort, username, password);
+            if (isSuccess) {
+                return Response.ok().entity(new Gson().toJson("{}")).build();
+            }
+            return Response.serverError().entity("There were failures during the replay.").build();
+        } catch (ErrorHandlerServiceStubException e) {
+            return Response.serverError().entity(e).build();
+        }
+    }
+
+    @DELETE
+    @Path("/error-handler/error-entries/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response discardErrorEntry(@PathParam("id") String id, @HeaderParam("serverHost") String host,
+                                      @HeaderParam("serverPort") String port, @HeaderParam("username") String username,
+                                      @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        try {
+            boolean isSuccess = errorHandlerApiHelper.discardErrorEntry(id, hostAndPort, username, password);
+            if (isSuccess) {
+                return Response.ok().entity(new Gson().toJson("{}")).build();
+            }
+            return Response.serverError().entity(String.format("Failed to discard error entry: %s.", id)).build();
+        } catch (ErrorHandlerServiceStubException e) {
+            return Response.serverError().entity(e).build();
+        }
+    }
+
+    @DELETE
+    @Path("/error-handler/error-entries")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response discardErrorEntries(@QueryParam("siddhiApp") String siddhiAppName,
+                                        @QueryParam("retentionDays") String retentionDays,
+                                        @HeaderParam("serverHost") String host, @HeaderParam("serverPort") String port,
+                                        @HeaderParam("username") String username,
+                                        @HeaderParam("password") String password) {
+        ErrorHandlerApiHelper errorHandlerApiHelper = new ErrorHandlerApiHelper();
+        String hostAndPort = host + ":" + port;
+        if (siddhiAppName != null && retentionDays == null) {
+            try {
+                boolean isSuccess =
+                        errorHandlerApiHelper.discardErrorEntries(siddhiAppName, hostAndPort, username, password);
+                if (isSuccess) {
+                    return Response.ok().entity(new Gson().toJson("{}")).build();
+                }
+                return Response.serverError().entity(
+                        String.format("Failed to discard error entries for Siddhi app: %s.", siddhiAppName)).build();
+            } catch (ErrorHandlerServiceStubException e) {
+                return Response.serverError().entity(e).build();
+            }
+        } else if (retentionDays != null && siddhiAppName == null) {
+            try {
+                boolean isSuccess =
+                        errorHandlerApiHelper.doPurge(Integer.parseInt(retentionDays), hostAndPort, username, password);
+                if (isSuccess) {
+                    return Response.ok().entity(new Gson().toJson("{}")).build();
+                }
+                return Response.serverError().entity("Failed to purge the error store.").build();
+            } catch (ErrorHandlerServiceStubException e) {
+                return Response.serverError().entity(e).build();
+            }
+        }
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("Exactly one of the following query parameters is required: 'siddhiApp', 'retentionDays'.").build();
     }
 
     /**

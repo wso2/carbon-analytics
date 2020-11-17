@@ -171,6 +171,7 @@ public class DBErrorStore extends ErrorStore {
             stmt.setLong(1, timestamp);
             stmt.setString(2,siddhiAppName);
             stmt.setString(3,streamName);
+            cause = (cause.length() > 1000) ? cause.substring(0,997) + "..." : cause ;
             stmt.setString(5,cause);
             stmt.setString(8,errorOccurrence);
             stmt.setString(9,eventType);

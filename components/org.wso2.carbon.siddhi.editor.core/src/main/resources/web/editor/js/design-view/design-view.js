@@ -197,7 +197,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
                 $.ajax({
                     type: "POST",
                     url: self.codeToDesignURL,
-                    data: window.btoa(code),
+                    data: btoa(unescape(encodeURIComponent(code))),
                     async: false,
                     success: function (response) {
                         result = {status: "success", responseString: self.options.application.utils.

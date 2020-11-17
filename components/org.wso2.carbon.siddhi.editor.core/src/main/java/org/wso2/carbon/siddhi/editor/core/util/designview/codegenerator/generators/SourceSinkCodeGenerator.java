@@ -77,7 +77,7 @@ public class SourceSinkCodeGenerator {
 
         sourceSinkStringBuilder.append(SiddhiCodeBuilderConstants.CLOSE_BRACKET);
 
-        return sourceSinkStringBuilder.toString();
+        return sourceSinkStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE).toString();
     }
 
     /**
@@ -93,6 +93,7 @@ public class SourceSinkCodeGenerator {
 
         StringBuilder mapperStringBuilder = new StringBuilder();
         mapperStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE)
+                .append("\t")
                 .append(SiddhiCodeBuilderConstants.MAP_ANNOTATION)
                 .append(mapper.getType())
                 .append(SiddhiCodeBuilderConstants.SINGLE_QUOTE);
@@ -106,10 +107,16 @@ public class SourceSinkCodeGenerator {
             mapperStringBuilder.append(SiddhiCodeBuilderConstants.COMMA);
             if (mapper.getPayloadOrAttribute().getAnnotationType()
                     .equalsIgnoreCase(CodeGeneratorConstants.ATTRIBUTE)) {
-                mapperStringBuilder.append(SiddhiCodeBuilderConstants.ATTRIBUTES_ANNOTATION);
+                mapperStringBuilder
+                        .append(SiddhiCodeBuilderConstants.NEW_LINE)
+                        .append(SiddhiCodeBuilderConstants.INDENT+SiddhiCodeBuilderConstants.INDENT)
+                        .append(SiddhiCodeBuilderConstants.ATTRIBUTES_ANNOTATION);
             } else if (mapper.getPayloadOrAttribute().getAnnotationType()
                     .equalsIgnoreCase(CodeGeneratorConstants.PAYLOAD)) {
-                mapperStringBuilder.append(SiddhiCodeBuilderConstants.PAYLOAD_ANNOTATION);
+                mapperStringBuilder
+                        .append(SiddhiCodeBuilderConstants.NEW_LINE)
+                        .append(SiddhiCodeBuilderConstants.INDENT+SiddhiCodeBuilderConstants.INDENT)
+                        .append(SiddhiCodeBuilderConstants.PAYLOAD_ANNOTATION);
             }
             mapperStringBuilder.append(generateMapperPayloadOrAttribute(mapper.getPayloadOrAttribute()))
                     .append(SiddhiCodeBuilderConstants.CLOSE_BRACKET);

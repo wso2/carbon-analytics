@@ -1,0 +1,448 @@
+.etl-task-wizard-container {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+}
+
+.etl-task-wizard-container .popover {
+    width: fit-content;
+}
+
+.etl-task-wizard-container .etl-task-wizard-canvas .btn-select-all {
+    cursor: pointer;
+    background-color: #f47b20;
+    color: #fefefe;
+    text-align: center;
+    padding: 6px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    font-size: 1rem;
+    width: 60px;
+    height: 25px;
+    font-weight: 400;
+}
+
+.etl-task-wizard-container .etl-task-wizard-canvas {
+    position: relative;
+    height: 100%;
+    /* background-color: rgb(24, 26, 27); */
+}
+
+.etl-task-wizard-container .popup-backdrop {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    background: rgba(12, 12, 12, 0.5);
+    z-index: 1;
+}
+
+/* Data mapper related styles */
+.listContainer {
+    position: absolute;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.listContainer .heading {
+    padding: 10px;
+    font-family: inherit;
+    font-size: 16px;
+    text-align: center;
+    background: lightgray;
+    color: #333;
+}
+
+.listContainer.inputs .heading {
+    font-weight: 600;
+}
+
+.listContainer.outputs .heading {
+    font-weight: 700;
+    display: flex;
+}
+
+.listContainer.inputs {
+    top: 15px;
+    left: 15px;
+    width: 20%;
+}
+
+.listContainer.outputs {
+    top: 15px;
+    right: 15px;
+    max-height: 96%;
+    width: 40%;
+}
+
+.listContainer .attributeList li .attribute {
+    border-bottom: 1px solid rgba(102, 102, 102, 0.2);
+    padding-left: 5px;
+    opacity: 0.8;
+    font-weight: 600;
+}
+
+.listContainer.outputs .attributeList li .attribute {
+    padding-top: 5px;
+    font-size: 1.8rem;
+    opacity: 1;
+    /* color: #d6d3cd; */
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    height: 50px;
+}
+
+.listContainer.outputs .attributeList li .attribute .clear-icon {
+    width: 10%;
+    text-align: center;
+    padding-top: 15px;
+    /* color: #d6d3cd; */
+    display: none;
+}
+
+.listContainer.outputs .attributeList li .attribute:hover .clear-icon {
+    display: block;
+}
+
+.listContainer.inputs .attributeList li .attribute {
+    font-size: 1.8rem;
+    padding: 10px;
+    display: flex;
+}
+
+.listContainer.inputs .attributeList li .attribute .attrib-type {
+    font-size: 1.6rem;
+    font-family: monospace;
+    font-weight: 300;
+    padding-left: 5px;
+}
+
+.listContainer.outputs .attributeList li .attribute .attrib-type {
+    font-size: 1.6rem;
+    font-family: monospace;
+    font-weight: 300;
+    padding-left: 5px;
+}
+
+.listContainer.outputs .attributeList li .attribute .mapped-expression {
+    font-size: 13px;
+    /*position: absolute;*/
+    /*right: 0;*/
+    /*padding-right: 5px*/
+}
+
+.float {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    bottom: 20px;
+    /*right:40px;*/
+    font-size: 24px;
+    background-color: #0C9;
+    color: #FFF;
+    border-radius: 40px;
+    text-align: center;
+    box-shadow: 2px 2px 3px #999;
+}
+
+.my-float {
+    margin-top: 22px;
+}
+
+/* Direct Mapping Dialog */
+.etl-task-wizard-container .popup-backdrop .mapping-generation-dialog {
+    background: rgb(169, 169, 169);
+    height: fit-content;
+    width: 70%;
+    margin-left: 15%;
+    position: absolute;
+    box-shadow: 3px 3px #2c2c2c59;
+    max-width: 900px;
+    padding: 15px;
+}
+
+.mapping-generation-dialog {
+    color: white;
+}
+
+.mapping-generation-dialog .dialog-heading {
+    height: 50px;
+    font-size: 19px;
+    color: rgb(71, 71, 71);
+}
+
+.mapping-generation-dialog .dialog-body .expression-container {
+    padding-bottom: 2%;
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression {
+    text-align: center;
+    font-size: 1.8rem;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    background-color: rgb(185, 185, 185);;
+    /*border-bottom: 1px solid #555;*/
+    color: rgb(91, 91, 91);
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression.target {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-size: 2.0rem;
+    background-color: rgb(201, 201, 201);
+    border-left: 3px solid #ee6719;
+    box-shadow: 0 2px #77777761;
+    color: rgb(41, 41, 41);
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression.target .exp-content {
+    width: 95%;
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression.target .exp-content span:hover {
+    color: #ee6719;
+    cursor: pointer;
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression.target .exp-content span.add-param {
+    color: #ffa500;
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression.target .exp-content span.add-param:hover {
+    color: #ee6719;
+    cursor: pointer;
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression.target .exp-content span i {
+    display: inline-block;
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression span.selected {
+    color: #ee6719;
+}
+
+.mapping-generation-dialog .dialog-body .expression-container .expression.target .expression-merge {
+    margin-top: 1%;
+    width: 5%;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .node-category {
+    text-align: center;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .node-container {
+    width: 20%;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .node-container ul {
+    border-top: 1px rgba(0, 0, 0, 0.2) solid;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .node-container ul li a div.selected {
+    background-color: #d3d3d3;
+    border-bottom: 1px #d3d3d33b solid;
+    color: #ee6719;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .node-container ul li a div {
+    border-bottom: 1px rgba(0, 0, 0, 0.2) solid;
+    font-weight: 400;
+    color: rgb(71, 71, 71);
+    text-align: left;
+    padding: 15px;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container {
+    width: 80%;
+    right: 0;
+    color: #333;
+    background-color: #c5c5c5;
+    padding: 5px;
+    min-height: 250px
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .attrib-selector-containers {
+    padding-top: 5px;
+    max-height: 250px;
+    overflow: auto;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .attrib-selector-containers .attribute {
+    border-bottom: 1px solid #b7b6b6;
+    padding: 5px 10px;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .attrib-selector-containers .attribute .description {
+    font-size: 1rem;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .select-function-format-container {
+    font-size: 1rem;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .select-function-format-container ul li a {
+    color: #333
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .select-function-format-container .function-syntax {
+    padding-left: 3px;
+    padding-right: 3px;
+    border-bottom: 1px solid #b7b6b6;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .select-function-format-container .syntax-expression {
+    font-size: 1.5rem;
+}
+
+.mapping-generation-dialog .dialog-body .generation-content .att-fun-op-container .select-function-format-container .function-syntax .description {
+    font-size: 1rem;
+}
+
+.mapping-generation-dialog .btn-tray {
+    padding-top: 15px;
+}
+
+.mapping-generation-dialog .btn-tray .btn-default {
+    background: #232323;
+    margin-right: 15px;
+}
+
+
+/* ETL Wizard flow container styles */
+#ETLWizardForm {
+    background: #222;
+    height: 100%;
+}
+
+#ETLWizardForm .wizard-form-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+}
+
+.wizard-form-content .header-content {
+    color: white;
+    height: fit-content;
+}
+
+.wizard-form-content .header-content h4 {
+    font-weight: 600;
+}
+
+.wizard-form-content .header-content .header-steps {
+    display: flex;
+    background-color: #2a2a2a
+}
+
+.wizard-form-content .header-content .header-steps .step-item {
+    width: 30%;
+    opacity: 0.6;
+    border-top: 2px solid #fff;
+    padding: 5px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.wizard-form-content .header-content .header-steps .step-item.selected {
+    color: #ee6719;
+    border-top: 2px solid #ee6719;
+    width: 100%;
+    opacity: 1;
+    background-color: #3a3a3a;
+}
+
+.wizard-form-content .body-content {
+    height: 100%;
+    background-color: #c5c5c5;
+    display: flex;
+}
+
+.wizard-form-content .body-content .content-section {
+    width: 100%;
+    margin: 15px;
+}
+
+.wizard-form-content .footer-content {
+    height: 50px;
+}
+
+.visible {
+    visibility: visible;
+}
+
+.not-visible {
+    visibility: hidden;
+}
+
+.dropdown-menu-style {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background-color: #3a3a3a;
+    max-height: 50%;
+    overflow-y: auto;
+    max-width: 400px;
+    z-index: 1;
+}
+
+.dropdown-menu-style .dropdown-item {
+    padding: 15px;
+    color: white;
+    border-bottom: 1px solid #4a4a4a;
+}
+
+.dropdown-menu-style .dropdown-item:hover {
+    background-color: #4a4a4a;
+}
+
+.etl-flow-name {
+    border: 1px solid #fff0;
+    background: transparent;
+    border-radius: 5px;
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.etl-flow-name:hover {
+    border: 1px solid #fff8;
+}
+
+.custom-mapper-val {
+    color: #ee6719;
+    cursor: pointer;
+    padding: 0 5px;
+}
+
+.expression-section .expression {
+    padding: 15px 0;
+    text-align: center;
+    background: #b3b3b3;
+}
+
+.expression-section .focus {
+    background: lightgray;
+    font-size: 1.8rem;
+    border-left: 1px solid orangered;
+}
+
+.operand-category-select .focus {
+    background: #eee;
+}
+
+.expression.focus .expression-content span:hover {
+    color: #ee6719;
+    cursor: pointer;
+}
+
+.expression .expression-content span.selected {
+    color: #ee6719;
+}
+
+.grey-on-hover:hover {
+    background: rgba(0, 0, 0, 0.1);
+}

@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
+import org.wso2.carbon.siddhi.editor.core.exception.InvalidStreamAttributeException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -38,6 +39,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class MetaInfoRetrieverUtils {
 
@@ -47,46 +49,57 @@ public class MetaInfoRetrieverUtils {
 
     }
 
-    public static JsonObject createResponseForCSV(String[] attributeNameArray, String[] values) {
+    public static JsonObject createResponseForCSV(String[] attributeNameArray, String[] values)
+            throws InvalidStreamAttributeException {
         JsonObject response = new JsonObject();
         com.google.gson.JsonArray attributes = new com.google.gson.JsonArray();
         int count = 0;
         for (String value : values) {
             JsonObject attribute = new JsonObject();
             if (attributeNameArray != null) {
+                if (Pattern.compile(Constants.REGEX_TO_MATCH_SPECIAL_CHARACTERS).
+                        matcher(attributeNameArray[count]).find()) {
+                    throw new InvalidStreamAttributeException("Error while populating attributes." +
+                            "Attribute contains special characters \"" + attributeNameArray[count] + "\"");
+                }
                 attribute.addProperty("name", attributeNameArray[count].
-                        replaceAll("\\s",""));
+                        replaceAll("\\s", ""));
             } else {
                 attribute.addProperty("name", "attr" + (count + 1));
             }
             attribute.addProperty("type", findDataTypeFromString(value));
             attributes.add(attribute);
-            count ++;
+            count++;
         }
         response.addProperty("attributes", attributes.toString());
         return response;
     }
 
-    public static JsonObject createResponseForJSON(Object obj) {
+    public static JsonObject createResponseForJSON(Object obj) throws InvalidStreamAttributeException {
         JsonObject response = new JsonObject();
         JsonArray attributes = new JsonArray();
         Map map = (LinkedHashMap) obj;
         StringBuilder warningMessage = new StringBuilder("");
         Iterator it = map.entrySet().iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             JsonObject attribute = new JsonObject();
             Map.Entry entry = (Map.Entry) it.next();
             if (entry.getValue() instanceof JSONArray || entry.getValue() instanceof LinkedHashMap) {
                 warningMessage.append("A complex object found for attribute key : \"" + entry.getKey() +
                         "\".");
             } else {
-                attribute.addProperty("name", ((String) entry.getKey()).
-                        replaceAll("\\s",""));
+                if (Pattern.compile(Constants.REGEX_TO_MATCH_SPECIAL_CHARACTERS).
+                        matcher((String) entry.getKey()).find()) {
+                    throw new InvalidStreamAttributeException("Error while populating attributes." +
+                            "Attribute contains special characters \"" + entry.getKey() + "\"");
+                } else {
+                    attribute.addProperty("name", ((String) entry.getKey()).
+                            replaceAll("\\s", ""));
 
-                attribute.addProperty("type", findDataTypeFromString(entry.getValue().toString()));
-                attributes.add(attribute);
+                    attribute.addProperty("type", findDataTypeFromString(entry.getValue().toString()));
+                    attributes.add(attribute);
+                }
             }
-
         }
         if (!"".equals(warningMessage.toString())) {
             response.addProperty(Constants.WARNING, warningMessage.append("Hence ignoring them.").toString());
@@ -218,4 +231,32 @@ public class MetaInfoRetrieverUtils {
         return new String[]{dataSource.getJdbcUrl(), dataSource.getUsername(), dataSource.getPassword()};
     }
 
+    public static String getSiddhiDataType(String databaseDataType) {
+        switch (databaseDataType) {
+            case "TINYINT":
+            case "NUMBER":
+            case "BIT":
+            case "BOOLEAN":
+            case "SMALLINT":
+                return Constants.ATTR_TYPE_BOOL;
+            case "BLOB":
+            case "VARBINARY":
+            case "BYTEA":
+                return Constants.ATTR_TYPE_OBJECT;
+            case "INTEGER":
+            case "INT":
+                return Constants.ATTR_TYPE_INTEGER;
+            case "FLOAT":
+            case "REAL":
+                return Constants.ATTR_TYPE_FLOAT;
+            case "BIGINT":
+            case "LONG":
+                return Constants.ATTR_TYPE_LONG;
+            case "DOUBLE":
+            case "DOUBLE PRECISION":
+                return Constants.ATTR_TYPE_DOUBLE;
+            default:
+                return Constants.ATTR_TYPE_STRING;
+        }
+    }
 }
