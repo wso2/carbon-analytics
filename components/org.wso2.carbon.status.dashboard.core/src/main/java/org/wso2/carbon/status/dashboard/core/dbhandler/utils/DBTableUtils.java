@@ -188,7 +188,7 @@ public class DBTableUtils {
         attributeSelection.put(METRICS_TABLE_METRIC_COUNTER, "AGG_TIMESTAMP,COUNT");
         attributeSelection.put(METRICS_TABLE_METRIC_GAUGE, "AGG_TIMESTAMP,VALUE");
         attributeSelection.put(METRICS_TABLE_METRIC_HISTOGRAM, "AGG_TIMESTAMP,MEAN,MAX,MIN,STDDEV,P75,P95,P99,P999");
-        attributeSelection.put(METRICS_TABLE_METRIC_METER, "AGG_TIMESTAMP,M1_RATE,MEAN_RATE,M5_RATE,M15_RATE");
+        attributeSelection.put(METRICS_TABLE_METRIC_METER, "AGG_TIMESTAMP,MEAN_RATE,M1_RATE,M5_RATE,M15_RATE");
         attributeSelection.put(METRICS_TABLE_METRIC_TIMER, "AGG_TIMESTAMP,MEAN,MAX,MIN,STDDEV,P75,P95,P99,P999,MEAN_RATE," +
                 "M1_RATE,M5_RATE,M15_RATE");
         return attributeSelection;
