@@ -300,4 +300,8 @@ public class StreamProcessorService {
     public Map<String, SiddhiAppData> getSiddhiAppMap() {
         return siddhiAppMap;
     }
+
+    public boolean isActiveNode() {
+        return StreamProcessorDataHolder.getHAManager().isActiveNode();
+    }
 }

@@ -354,4 +354,18 @@ public class SiddhiAppsApi implements Microservice {
             throws NotFoundException {
         return delegate.siddhiAppsStatsEnable(statsEnable.getEnabledSiddhiStatLevel(), request);
     }
+
+    @GET
+    @Path("/ha/is-active-node")
+    @Produces({"text/plain"})
+    @io.swagger.annotations.ApiOperation(value = "Returns the active-passive status of the stream processor.",
+            notes = "Returns the HA status.", response = void.class,
+            tags = {"HA Status",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "OK.", response = void.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = void.class)})
+    public Response isActive(@Context Request request) throws NotFoundException {
+        return delegate.isActive(request);
+    }
 }

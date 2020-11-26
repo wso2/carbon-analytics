@@ -67,4 +67,6 @@ public abstract class SiddhiAppsApiService {
     public abstract Response siddhiAppExistsGet(String siddhiApp, Request request) throws NotFoundException;
 
     public abstract Response siddhiAppsCountGet(Request request) throws NotFoundException;
+
+    public abstract Response isActive(Request request) throws NotFoundException;
 }
