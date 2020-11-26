@@ -666,6 +666,49 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
                 this._errorHandlerDialog.show();
             };
 
+            // this.initAsyncAPIDefinitionGenerator = function initAsyncAPIDefinitionGenerator() {
+            //     console.log("initAsyncAPIDefinitionGenerator()");
+            //     if (_.isNil(this._AsyncAPIDefinitionGeneratorDialog)) {
+            //         this._AsyncAPIDefinitionGeneratorDialog = new Dialogs.AsyncAPIDefinitionGeneratorDialog(app);
+            //     }
+            //     // var asyncLauncher = app.tabController.getActiveTab().getSiddhiFileEditor().getAsyncLauncher();
+            //     // launcher.runApplication(self);
+            //     this._AsyncAPIDefinitionGeneratorDialog.render();
+            //     this._AsyncAPIDefinitionGeneratorDialog.show();
+            // };
+            //
+            // this.getSourcesAndSinks = function getSourcesAndSinks (options) {
+            //     console.log("getSourcesAndSinks()");
+            //     var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getAsyncLauncher();
+            //     launcher.getSinkAndSources(self);
+            // };
+            //
+            // this.handleAsyncAPISourceSinkSelector = function handleAsyncAPISourceSinkSelector (data) {
+            //     console.log("handleAsyncAPISourceSinkSelector()");
+            //     console.log(data);
+            //     if (_.isNil(this.AsyncAPISourceSinkSelectorDialog)) {
+            //         this.AsyncAPISourceSinkSelectorDialog = new Dialogs.AsyncAPISourceSinkSelectorDialog(app);
+            //     }
+            //     this.AsyncAPISourceSinkSelectorDialog.render(data, app.commandManager);
+            //     this.AsyncAPISourceSinkSelectorDialog.show();
+            // };
+
+            // this.getSourcesAndSinks = function getSourcesAndSinks (options) {
+            //     console.log("getSourcesAndSinks()");
+            //     var launcher = app.tabController.getActiveTab().getSiddhiFileEditor().getAsyncLauncher();
+            //     launcher.getSinkAndSources(self);
+            // };
+
+            this.handleAsyncAPIDefGenerator = function handleAsyncAPIDefGenerator() {
+                if (!_.isNil(this._handleAsyncAPIDefGenerator)) {
+                    this._handleAsyncAPIDefGenerator.clear();
+                }
+                let opts = _.cloneDeep(app);
+                this._handleAsyncAPIDefGenerator = new Dialogs.AsyncAPIGeneratorDialog(opts);
+                this._handleAsyncAPIDefGenerator.render();
+                this._handleAsyncAPIDefGenerator.show();
+            };
+
             this.openQueryStore = function openQueryStore(options) {
                 if (_.isNil(this._queryStoreApi)) {
                     var opts = _.cloneDeep(_.get(app.config, 'query_store_api'));
@@ -835,6 +878,9 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
             //Export Menu
             app.commandManager.registerHandler('export-for-docker', this.handleExportForDocker, this);
             app.commandManager.registerHandler('export-for-kubernetes', this.handleExportForKubernetes, this);
+
+            //Open Extension install dialog
+            app.commandManager.registerHandler('async-api-def-generator', this.handleAsyncAPIDefGenerator , this);
         }
     });
 

@@ -3,7 +3,7 @@
  */
 define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin **/ 'js_tree'], function ($, Backbone, _, log) {
 
-    var FileBrowser = Backbone.View.extend({
+    var ElementBrowser = Backbone.View.extend({
 
         initialize: function (config) {
             var errMsg;
@@ -36,7 +36,7 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
             this._showSamples = _.get(config, 'showSamples');
             this._showBundles = _.get(config, 'showBundles');
             this._multiSelect = _.get(config, 'multiSelect', false);
-            this._deleteIcon = _.get(config, 'deleteIcon', false);
+            // this._deleteIcon = _.get(config, 'deleteIcon', false);
             var self = this;
 
             /**
@@ -114,9 +114,9 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
                 this._plugins.push('checkbox');
             }
 
-            if (this._deleteIcon) {
-                this._plugins.push('deletebtn');
-            }
+            // if (this._deleteIcon) {
+            //     this._plugins.push('deletebtn');
+            // }
 
             this._contextMenuProvider = _.get(config, 'contextMenuProvider');
             if(!_.isNil(this._contextMenuProvider)){
@@ -130,7 +130,6 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
         getURLProvider: function(){
             var self = this;
             return function (node) {
-                console.log("getURLProvider() node.id: " + node.id);
                 if (self._showBundles) {
                     if (node.id === '#') {
                         return self._serviceURL + "/listDirectoriesInPath" +
@@ -209,7 +208,6 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
 
             files.forEach(function(file) {
                 var nodeId = `wso2/server/deployment/workspace/${file}`;
-                console.log(nodeId);
                 self._$parent_el.jstree(true).select_node(nodeId);
             });
         },
@@ -259,6 +257,6 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
         }
     });
 
-    return FileBrowser;
+    return ElementBrowser;
 
 });

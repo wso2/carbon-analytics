@@ -34,6 +34,8 @@ import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.debugger.SiddhiDebugger;
 import io.siddhi.core.exception.SiddhiAppCreationException;
+import io.siddhi.core.stream.input.source.Source;
+import io.siddhi.core.stream.output.sink.Sink;
 import io.siddhi.core.util.SiddhiComponentActivator;
 import io.siddhi.query.api.definition.StreamDefinition;
 import io.siddhi.query.api.exception.SiddhiAppContextException;
@@ -132,6 +134,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -2099,6 +2102,43 @@ public class EditorMicroservice implements Microservice {
         }
         return Response.status(Response.Status.BAD_REQUEST)
                 .entity("Exactly one of the following query parameters is required: 'siddhiApp', 'retentionDays'.").build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{siddhiAppName}/sources-sinks")
+    public Response sourcesSinks(@PathParam("siddhiAppName") String siddhiAppName) {
+//        List<Source> sources = new ArrayList<>();
+//        List<Sink> sinks = new ArrayList<>();
+        SiddhiAppRuntime siddhiAppRuntime = EditorDataHolder
+                .getDebugProcessorService()
+                .getSiddhiAppRuntimeHolder(siddhiAppName)
+                .getSiddhiAppRuntime();
+        JSONObject sourceSinks = new JSONObject();
+        org.json.JSONArray sourcesArray = new org.json.JSONArray();
+        org.json.JSONArray sinksArray = new org.json.JSONArray();
+        try {
+            for (List<Source> sources : siddhiAppRuntime.getSources()) {
+                for (Source source : sources) {
+                    JSONObject sourceObject = new JSONObject();
+                    sourceObject.put("type", source.getType());
+                    sourceObject.put("streamDefinition", source.getStreamDefinition().getId());
+                    sourcesArray.put(sourceObject);
+                }
+            }
+            for (List<Sink> sinks : siddhiAppRuntime.getSinks()) {
+                for (Sink sink : sinks) {
+                    JSONObject sinkObject = new JSONObject();
+                    sinkObject.put("type", sink.getType());
+                    sinkObject.put("streamDefinition", sink.getStreamDefinition().getId());
+                    sinksArray.put(sinkObject);
+                }
+            }
+            sourceSinks.put("sources", sourcesArray);
+            sourceSinks.put("sinks", sinksArray);
+        } catch (InvalidExecutionStateException ignored) {
+        }
+        return Response.ok().entity(sourceSinks.toString()).build();
     }
 
     /**

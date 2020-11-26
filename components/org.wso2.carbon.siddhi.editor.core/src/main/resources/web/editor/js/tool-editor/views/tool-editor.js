@@ -2,10 +2,10 @@
  * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
 define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./source", '../constants',
-        'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils', 'etlWizard'],
+        'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils', 'etlWizard', 'asyncAPI'],
 
     function (require, $, Backbone, _, log, DesignView, SourceView, constants, UndoManager, Launcher,
-              DebugManager, DesignViewUtils, ETLWizard) {
+              DebugManager, DesignViewUtils, ETLWizard, AsyncAPI) {
 
         const ENTER_KEY = 13;
 
@@ -32,7 +32,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     // init undo manager
                     this._undoManager = new UndoManager();
                     this._launcher = new Launcher(options);
-
                 },
 
                 render: function () {
@@ -42,6 +41,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var loadingScreen = this._$parent_el.find(_.get(this.options, 'loading_screen.container'));
                     var sourceContainer = this._$parent_el.find(_.get(this.options, 'source.container'));
                     var etlWizardContainer = this._$parent_el.find(_.get(this.options, 'etl_wizard.container'));
+                    var asyncAPIViewContainer = this._$parent_el.find(_.get(this.options, 'async_api_view.container'));
                     var designContainer = this._$parent_el.find(_.get(this.options, 'design_view.container'));
                     var debugContainer = this._$parent_el.find(_.get(this.options, 'debug.container'));
                     var tabContentContainer = $(_.get(this.options, 'tabs_container'));
@@ -61,6 +61,9 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                     var designViewDynamicId = "design-container-" + this._$parent_el.attr('id');
                     designContainer.attr('id', designViewDynamicId);
+
+                    var asyncAPIViewDynamicId = "async-api-container-" + this._$parent_el.attr('id');
+                    asyncAPIViewContainer.attr('id', asyncAPIViewDynamicId);
 
                     /*
                     * Use the below line to assign dynamic id for design grid container and pass the id to initialize
@@ -106,6 +109,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     canvasContainer.removeClass('show-div').addClass('hide-div');
                     previewContainer.removeClass('show-div').addClass('hide-div');
                     designContainer.removeClass('show-div').addClass('hide-div');
+                    asyncAPIViewContainer.removeClass('show-div').addClass('hide-div');
                     sourceContainer.removeClass('source-view-disabled').addClass('source-view-enabled');
                     tabContentContainer.removeClass('tab-content-default');
 
@@ -173,6 +177,44 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 etlOptions.dataModel = self.JSONObject;
 
                                 new ETLWizard(etlOptions);
+                            } else if (response.status === "fail") {
+                                loadingScreen.hide();
+                                DesignViewUtils.prototype.errorAlert(response.errorMessage);
+                            }
+                        }, 100);
+
+                    });
+
+                    $('.toggle-controls-container #btn-async-api-view').on('click', function(e) {
+                        //todo this gets called by the #of siddhi apps
+                        e.preventDefault();
+                        // e.stopPropagation();
+                        // assume this is from the source view
+                        if (application.tabController.getActiveTab().getFile().isDirty()) {
+                            DesignViewUtils.prototype.warnAlert("Please save the file before switching to the Async API View");
+                            return;
+                        }
+                        setTimeout(function(){
+                            var response = self._designView.getDesign(self.getContent());
+                            if (response.status === "success") {
+                                self.JSONObject = JSON.parse(response.responseString);
+                                if (application.tabController.getActiveTab().getFile().getName().replace(".siddhi", "").localeCompare(self.JSONObject.siddhiAppConfig.siddhiAppName) === 0) {
+                                    console.log(application.tabController.getActiveTab().getFile().getName());
+                                    console.log(self.JSONObject);
+                                    // self.options.container = self._$parent_el;
+                                    var asyncAPIYaml = self.canTranslateToAsyncAPI(self.JSONObject, asyncAPIViewContainer, sourceContainer, _.cloneDeep(self.options));
+                                    if (asyncAPIYaml == null) {
+                                        DesignViewUtils.prototype.errorAlert('This Siddhi app cannot be opened as Async API view');
+                                        return;
+                                    } else {
+                                        // sourceContainer.hide();
+                                        // asyncAPIViewContainer.show();
+                                        // var asyncAPIViewOptions = _.cloneDeep(self.options);
+                                        // asyncAPIViewOptions.container = asyncAPIViewContainer;
+                                        // asyncAPIViewOptions.asyncAPIDefYaml = asyncAPIYaml;
+                                        // new ETLWizard(etlOptions);
+                                    }
+                                }
                             } else if (response.status === "fail") {
                                 loadingScreen.hide();
                                 DesignViewUtils.prototype.errorAlert(response.errorMessage);
@@ -347,6 +389,32 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         config.queryLists.JOIN.length == 0 &&
                         config.queryLists.PATTERN.length == 0 &&
                         config.queryLists.SEQUENCE.length == 0;
+                },
+
+                canTranslateToAsyncAPI: function(model, asyncAPIViewContainer, sourceContainer, options) {
+                    var annotations = model.siddhiAppConfig.appAnnotationList;
+                    var foundAsyncAnnotation = -1;
+                    var siddhiAsyncAnnotation = "@App:AyncAPI";
+                    for (var i=0; i<annotations.length; i++) {
+                        if (annotations[i].toLowerCase().startsWith(siddhiAsyncAnnotation.toLowerCase())) {
+                            foundAsyncAnnotation = i;
+                        }
+                    }
+                    if (foundAsyncAnnotation !== -1) {
+                        var ayncAPIContent = annotations[foundAsyncAnnotation].replace(siddhiAsyncAnnotation + "(\"", "").replace(new RegExp('"\\)$'), "");
+                        console.log("found ayncAPIContent: ");
+                        console.log(ayncAPIContent);
+                        //todo Error Handling part
+                        window.getAsyncAPIParserDoc(ayncAPIContent).then(asyncAPIDoc => {
+                            console.log(asyncAPIDoc);
+                            sourceContainer.hide();
+                            asyncAPIViewContainer.show();
+                            options.asyncAPIDefYaml = ayncAPIContent;
+                            new AsyncAPI(options);
+                        })
+                    } else {
+                        return null;
+                    }
                 },
 
                 getContent: function () {

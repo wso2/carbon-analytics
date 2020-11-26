@@ -41,6 +41,14 @@ define([], function () {
                     }
                 },
                 disabled: false
+            },
+            {
+                id: "export-async-api",
+                label: "Async API",
+                command: {
+                    id: "export-async-api",
+                },
+                disabled: false
             }
         ]
     };

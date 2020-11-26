@@ -1,0 +1,49 @@
+.async-api-modal-body {
+    width: 100%;
+    height: 200px;
+    border: 1px solid black;
+}
+
+.async-api-view-yaml-container {
+    width: calc(50% - 2px);
+    float: left;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.async-api-view-spec-container {
+    width: calc(50% - 2px);
+    float: right;
+    /*border: 1px solid red;*/
+    height: 100%;
+}
+
+.clear-fix {
+    clear: both;
+}
+
+.asyncAPi {
+    right: 650px;
+}
+
+.async-api-source-sink-list {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.toggle-view-button:hover, .async-api-view-button:hover {
+    color: #fff;
+    transition: 0.15s;
+}
+
+.toggle-view-button, .async-api-view-button {
+    transition: 0.15s;
+    font-weight: bold;
+    color: #333;
+    width: 100%;
+    background-color: #6aa53f;
+    margin-bottom: 10px;
+}

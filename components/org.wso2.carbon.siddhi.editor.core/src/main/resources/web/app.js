@@ -13,6 +13,8 @@ requirejs.config({
         remarkable:"commons/lib/remarkable/remarkable.min",
         handlebar: "commons/lib/handlebar/handlebars-v4.0.11.min",
         jquery: "commons/lib/jquery_v1.9.1/jquery-1.9.1.min",
+        react: "commons/lib/react/react.development",
+        react_dom: "commons/lib/react/react-dom.development",
         jquery_ui: "commons/lib/jquery-ui_v1.12.1/jquery-ui.min",
         bootstrap: "commons/lib/theme-wso2-2.0.0/js/bootstrap.min",
         dagre: "commons/lib/dagre-0.7.4/dagre.min",
@@ -183,7 +185,11 @@ requirejs.config({
         orderByConfigurator:"js/etl-wizard/output-option-configurator/components/order-by-component",
         advancedOutputConfiguration:"js/etl-wizard/output-option-configurator/components/advanced-output-options-component",
         // ETL Wizard Components  <-- end
-        cronGenerator: "js/design-view/cron-generator/cron-generator"
+        cronGenerator: "js/design-view/cron-generator/cron-generator",
+        asyncAPI: "js/async-api/async-api",
+        asyncApiDefinition: "js/async-api/artifacts/async-api-definition-dialog",
+        asyncApiSourceSinkSelect: "js/async-api/artifacts/async-api-source-sink-select-dialog",
+        siddhiElementBrowser: "js/async-api/siddhi-element-browser",
     },
     map: {
         "*": {
