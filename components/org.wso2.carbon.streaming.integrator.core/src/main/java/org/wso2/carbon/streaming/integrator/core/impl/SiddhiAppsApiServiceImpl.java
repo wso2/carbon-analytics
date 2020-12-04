@@ -1077,4 +1077,17 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     private PermissionProvider getPermissionProvider() {
         return StreamProcessorDataHolder.getPermissionProvider();
     }
+
+    @Override
+    public Response isActive(Request request) throws NotFoundException {
+
+        if (getUserName(request) != null && !(getPermissionProvider().hasPermission(getUserName(request), new
+                Permission(PERMISSION_APP_NAME, VIEW_SIDDHI_APP_PERMISSION_STRING)) || getPermissionProvider()
+                .hasPermission(getUserName(request), new Permission(PERMISSION_APP_NAME,
+                        MANAGE_SIDDHI_APP_PERMISSION_STRING)))) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to list Siddhi Apps")
+                    .build();
+        }
+        return Response.ok().entity(StreamProcessorDataHolder.getStreamProcessorService().isActiveNode()).build();
+    }
 }

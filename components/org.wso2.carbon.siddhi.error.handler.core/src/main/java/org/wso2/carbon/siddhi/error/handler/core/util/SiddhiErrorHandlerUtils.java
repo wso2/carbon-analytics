@@ -21,8 +21,15 @@ package org.wso2.carbon.siddhi.error.handler.core.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import io.siddhi.core.event.ComplexEvent;
+import io.siddhi.core.event.ComplexEventChunk;
+import io.siddhi.core.event.stream.StreamEvent;
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
+import io.siddhi.core.util.error.handler.model.ReplayableTableRecord;
+import io.siddhi.core.util.error.handler.util.ErroneousEventType;
 import io.siddhi.core.util.error.handler.util.ErrorHandlerUtils;
 import org.wso2.carbon.siddhi.error.handler.core.exception.SiddhiErrorHandlerException;
 
@@ -35,33 +42,96 @@ import java.util.List;
  * Contains utility methods related to Siddhi Error Handler.
  */
 public class SiddhiErrorHandlerUtils {
+    private static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+    private static JsonParser jsonParser = new JsonParser();
 
     private SiddhiErrorHandlerUtils() {}
 
     public static List<ErrorEntry> convertToList(JsonArray errorEntryWrappersBody) throws SiddhiErrorHandlerException {
         List<ErrorEntry> errorEntries = new ArrayList<>();
-        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
         Type mapType = new TypeToken<List<ErrorEntryWrapper>>() {}.getType();
         List<ErrorEntryWrapper> errorEntryWrappers = gson.fromJson(errorEntryWrappersBody, mapType);
         for (ErrorEntryWrapper errorEntryWrapper : errorEntryWrappers) {
             if (errorEntryWrapper.isPayloadModifiable()) {
                 ErrorEntry errorEntry = errorEntryWrapper.getErrorEntry();
                 String payloadString = errorEntryWrapper.getModifiablePayloadString();
+                byte[] eventAsBytes;
                 try {
+                    if (errorEntry.getEventType() == ErroneousEventType.PAYLOAD_STRING) {
+                        eventAsBytes = ErrorHandlerUtils.getAsBytes(payloadString);
+                    } else if (errorEntry.getEventType() == ErroneousEventType.REPLAYABLE_TABLE_RECORD) {
+                        ReplayableTableRecord deserializedTableRecord = (ReplayableTableRecord) ErrorHandlerUtils
+                                .getAsObject(errorEntry.getEventAsBytes());
+                        ComplexEventChunk eventChunk = modifyComplexEventChunk(deserializedTableRecord
+                                .getComplexEventChunk(), payloadString, gson, errorEntry);
+                        deserializedTableRecord.setComplexEventChunk(eventChunk);
+                        eventAsBytes = ErrorHandlerUtils.getAsBytes(deserializedTableRecord);
+                    } else {
+                        throw new SiddhiErrorHandlerException(String.format(
+                                "Unsuitable event type for error entry with id: %s.", errorEntry.getId()));
+                    }
                     errorEntries.add(new ErrorEntry(errorEntry.getId(), errorEntry.getTimestamp(),
-                        errorEntry.getSiddhiAppName(), errorEntry.getStreamName(),
-                        ErrorHandlerUtils.getAsBytes(payloadString),
-                        errorEntry.getCause(), errorEntry.getStackTrace(), errorEntry.getOriginalPayload(),
-                        errorEntry.getErrorOccurrence(), errorEntry.getEventType(), errorEntry.getErrorType()));
-                } catch (IOException e) {
+                            errorEntry.getSiddhiAppName(), errorEntry.getStreamName(), eventAsBytes,
+                            errorEntry.getCause(), errorEntry.getStackTrace(), errorEntry.getOriginalPayload(),
+                            errorEntry.getErrorOccurrence(), errorEntry.getEventType(), errorEntry.getErrorType()));
+                } catch (IOException | ClassNotFoundException e) {
                     throw new SiddhiErrorHandlerException(String.format(
-                        "Failed to get modifiable payload as bytes for error entry with id: %s.", errorEntry.getId()));
+                            "Failed to get modifiable payload as bytes for error entry with id: %s.", errorEntry.getId()));
                 }
             } else {
                 errorEntries.add(errorEntryWrapper.getErrorEntry());
             }
         }
         return errorEntries;
+    }
+
+    public static boolean isPayloadEditable(ErrorEntry errorEntry) {
+        if (errorEntry.getEventType() == ErroneousEventType.PAYLOAD_STRING) {
+            return true;
+        } else if(errorEntry.getEventType() == ErroneousEventType.REPLAYABLE_TABLE_RECORD) {
+            return jsonParser.parse(errorEntry.getOriginalPayload()).getAsJsonObject().get("isEditable")
+                    .getAsString().equalsIgnoreCase("true");
+        }
+        return false;
+    }
+
+    private static ComplexEventChunk modifyComplexEventChunk(ComplexEventChunk eventChunk,
+                                                             String modifiedPayloadString, Gson gson,
+                                                             ErrorEntry errorEntry) throws SiddhiErrorHandlerException {
+        JsonObject modifiedJson = new JsonParser().parse(modifiedPayloadString).getAsJsonObject();
+        JsonArray attributes = modifiedJson.get("attributes").getAsJsonArray();
+        JsonArray records = modifiedJson.get("records").getAsJsonArray();
+        int numberOfRecords = records.size();
+        eventChunk.reset();
+        for (int i = 0; i < numberOfRecords; i++) {
+            Object[] recordObjectArray = gson.fromJson(records.get(i).getAsJsonArray(), Object[].class);
+            for (int j = 0; j < attributes.size(); j++) {
+                if (attributes.get(j).getAsJsonObject().get("type").getAsString().equalsIgnoreCase("STRING")) {
+                    recordObjectArray[j] = String.valueOf(recordObjectArray[j]);
+                } else if(attributes.get(j).getAsJsonObject().get("type").getAsString().equalsIgnoreCase("INT")) {
+                    recordObjectArray[j] = Integer.valueOf(String.valueOf(recordObjectArray[j]));
+                } else if(attributes.get(j).getAsJsonObject().get("type").getAsString().equalsIgnoreCase("LONG")) {
+                    recordObjectArray[j] = Long.valueOf(String.valueOf(recordObjectArray[j]));
+                } else if(attributes.get(j).getAsJsonObject().get("type").getAsString().equalsIgnoreCase("DOUBLE")) {
+                    recordObjectArray[j] = Double.valueOf(String.valueOf(recordObjectArray[j]));
+                } else if(attributes.get(j).getAsJsonObject().get("type").getAsString().equalsIgnoreCase("FLOAT")) {
+                    recordObjectArray[j] = Float.valueOf(String.valueOf(recordObjectArray[j]));
+                } else if(attributes.get(j).getAsJsonObject().get("type").getAsString().equalsIgnoreCase("BOOL")) {
+                    recordObjectArray[j] = Boolean.valueOf(String.valueOf(recordObjectArray[j]));
+                } else {
+                    throw new SiddhiErrorHandlerException(String.format(
+                            "Failed to modify original event error entry with id: %s.", errorEntry.getId()));
+                }
+            }
+            if (eventChunk.hasNext()) {
+                ComplexEvent complexEvent = eventChunk.next();
+                if (complexEvent instanceof StreamEvent) {
+                    StreamEvent streamEvent = (StreamEvent) complexEvent;
+                    streamEvent.setOutputData(recordObjectArray);
+                }
+            }
+        }
+        return eventChunk;
     }
 
     public static long getRetentionStartTimestamp(long currentTimestamp, int retentionDays) {

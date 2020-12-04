@@ -713,16 +713,16 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     var replay = $('<div></div>');
                     var replayableWrappedErrorEntry = wrappedErrorEntry;
                     if (wrappedErrorEntry.isPayloadModifiable) {
-                        // Payload is not modifiable.
-                        replay.append('<textarea id="eventPayload" rows="4" cols="40" class="payload-content">' +
-                            wrappedErrorEntry.modifiablePayloadString + '</textarea>');
+                        // Payload is modifiable.
+                        replay.append(self.renderEditablePayload(wrappedErrorEntry));
                         replay.append('<br/>');
                     }
                     replay.append("<button id='replay' type='button' class='btn btn-primary'>Replay</button>");
 
                     replay.find("#replay").click(function() {
                         if (wrappedErrorEntry.isPayloadModifiable) {
-                            replayableWrappedErrorEntry.modifiablePayloadString = replay.find("#eventPayload").val();
+                            replayableWrappedErrorEntry.modifiablePayloadString =
+                                    self.constructModifiablePayloadString(replay, wrappedErrorEntry);
                         }
                         self.replay([replayableWrappedErrorEntry], self.serverHost, self.serverPort,
                             self.serverUsername, self.serverPassword, true);
@@ -731,8 +731,73 @@ define(['require', 'lodash', 'jquery', 'constants', 'backbone', 'alerts', 'pagin
                     return replay;
                 },
 
+                constructModifiablePayloadString: function(replay, wrappedErrorEntry) {
+                    if (wrappedErrorEntry.errorEntry.eventType === 'PAYLOAD_STRING') {
+                        return replay.find("#eventPayload").val();
+                    } else if (wrappedErrorEntry.errorEntry.eventType === 'REPLAYABLE_TABLE_RECORD') {
+                        var modifiablePayloadJson = JSON.parse(wrappedErrorEntry.modifiablePayloadString);
+                        var editedTableAsArray = replay.find(".event-payload-table-input");
+                        for (i = 0; i < modifiablePayloadJson.records.length; i++) {
+                            for (j = 0; j < modifiablePayloadJson.attributes.length; j++) {
+                                modifiablePayloadJson.records[i][j] = editedTableAsArray[i
+                                        * modifiablePayloadJson.attributes.length + j].value;
+                            }
+                        }
+                        return JSON.stringify(modifiablePayloadJson);
+                    }
+                    return null;
+                },
+
+                renderEditablePayload: function(wrappedErrorEntry) {
+                    if (wrappedErrorEntry.errorEntry.eventType === 'PAYLOAD_STRING') {
+                        return $('<textarea id="eventPayload" rows="4" cols="40" class="payload-content">' +
+                                                             wrappedErrorEntry.modifiablePayloadString + '</textarea>');
+                    } else if (wrappedErrorEntry.errorEntry.eventType === 'REPLAYABLE_TABLE_RECORD') {
+                        var modifiablePayloadJson = JSON.parse(wrappedErrorEntry.modifiablePayloadString);
+                        var editableTable = $('<table></table>');
+                        var tableHeader = $('<tr></tr>');
+                        modifiablePayloadJson.attributes.forEach(function (attribute) {
+                            tableHeader.append('<th><span class="event-payload-table-header-title">' + attribute.name
+                            + '</span> <span class="event-payload-table-header-type">(' + attribute.type
+                            + ')</span></th>');
+                        });
+                        editableTable.append(tableHeader);
+                        modifiablePayloadJson.records.forEach(function (record) {
+                            var tableRow = $('<tr></tr>');
+                            record.forEach(function (column) {
+                                tableRow.append('<td><input type="text" class="event-payload-table-input" value="' + column +
+                                '"></td>');
+                            });
+                            editableTable.append(tableRow);
+                        });
+                        return editableTable;
+                    }
+                },
+
                 renderOriginalPayload: function(errorEntry) {
-                    var originalPayload = $('<div><h4>Original Payload</h4></div>');
+                    var originalPayload = $('<div></div>');
+                    if (errorEntry.eventType === "REPLAYABLE_TABLE_RECORD") {
+                        var unmodifiablePayloadJson = JSON.parse(errorEntry.originalPayload);
+                        var uneditableTable = $('<table></table>');
+                        var tableHeader = $('<tr></tr>');
+                        unmodifiablePayloadJson.attributes.forEach(function (attribute) {
+                            tableHeader.append('<th><span class="event-payload-table-header-title">' + attribute.name
+                                + '</span> <span class="event-payload-table-header-type">(' + attribute.type
+                                + ')</span></th>');
+                        });
+                        uneditableTable.append(tableHeader);
+                        unmodifiablePayloadJson.records.forEach(function (record) {
+                            var tableRow = $('<tr></tr>');
+                            record.forEach(function (column) {
+                                tableRow.append('<td><input type="text" class="event-payload-table-input" value="'
+                                + column + '" disabled></td>');
+                            });
+                            uneditableTable.append(tableRow);
+                        });
+                        return uneditableTable;
+                    } else {
+                        originalPayload.append('<div><h4>Original Payload</h4></div>');
+                    }
                     if (errorEntry.originalPayload) {
                         originalPayload.append('<div class="payload-content">' + errorEntry.originalPayload + '</div>');
                     } else {

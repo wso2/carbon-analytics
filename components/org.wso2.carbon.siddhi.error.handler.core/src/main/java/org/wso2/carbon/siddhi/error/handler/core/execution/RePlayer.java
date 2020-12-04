@@ -24,9 +24,10 @@ import io.siddhi.core.event.Event;
 import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.core.stream.input.source.Source;
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
+import io.siddhi.core.util.error.handler.model.ReplayableTableRecord;
 import io.siddhi.core.util.error.handler.store.ErrorStore;
-import io.siddhi.core.util.error.handler.util.ErrorOccurrence;
 import io.siddhi.core.util.error.handler.util.ErrorHandlerUtils;
+import io.siddhi.core.util.error.handler.util.ErrorOccurrence;
 import org.wso2.carbon.siddhi.error.handler.core.exception.SiddhiErrorHandlerException;
 import org.wso2.carbon.siddhi.error.handler.core.internal.SiddhiErrorHandlerDataHolder;
 
@@ -78,9 +79,55 @@ public class RePlayer {
                 case PAYLOAD_STRING:
                     rePlayPayloadString(errorEntry, siddhiAppRuntime);
                     break;
+                case REPLAYABLE_TABLE_RECORD:
+                    rePlayTableRecord(errorEntry, siddhiAppRuntime);
                 default:
                     // Ideally we won't reach here
             }
+        }
+    }
+
+    private static void rePlayTableRecord(ErrorEntry complexEventErrorEntry, SiddhiAppRuntime siddhiAppRuntime)
+        throws SiddhiErrorHandlerException, InterruptedException {
+        try {
+            Object deserializedTableRecord = ErrorHandlerUtils.getAsObject(complexEventErrorEntry.getEventAsBytes());
+            if (deserializedTableRecord instanceof ReplayableTableRecord) {
+                ReplayableTableRecord replayableTableRecord = (ReplayableTableRecord) deserializedTableRecord;
+                switch (complexEventErrorEntry.getErrorOccurrence()) {
+                    case STORE_ON_TABLE_ADD:
+                        siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
+                                .add(replayableTableRecord.getComplexEventChunk());
+                        break;
+                    case STORE_ON_TABLE_DELETE:
+                        siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
+                                .delete(replayableTableRecord.getComplexEventChunk(),
+                                        replayableTableRecord.getCompiledCondition());
+                        break;
+                    case STORE_ON_TABLE_UPDATE:
+                        siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
+                                .update(replayableTableRecord.getComplexEventChunk(),
+                                        replayableTableRecord.getCompiledCondition(),
+                                        replayableTableRecord.getCompiledUpdateSet());
+                        break;
+                    case STORE_ON_TABLE_UPDATE_OR_ADD:
+                        siddhiAppRuntime.getTableInputHandler(complexEventErrorEntry.getStreamName())
+                                .updateOrAdd(replayableTableRecord.getComplexEventChunk(),
+                                        replayableTableRecord.getCompiledCondition(),
+                                        replayableTableRecord.getCompiledUpdateSet(),
+                                        replayableTableRecord.getAddingStreamEventExtractor());
+                        break;
+                    default:
+                        throw new SiddhiErrorHandlerException("Unsupported ErrorOccurenceType of " +
+                            complexEventErrorEntry.getErrorOccurrence() + " to replay ComplexEventChunk in "
+                            + complexEventErrorEntry.getStreamName());
+                }
+            } else {
+                throw new SiddhiErrorHandlerException(
+                        "eventAsBytes present in the entry is invalid. It is expected to represent a " +
+                                ReplayableTableRecord.class);
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            throw new SiddhiErrorHandlerException("Failed to get bytes as a ComplexEventChunk object.", e);
         }
     }
 
