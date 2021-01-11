@@ -57,7 +57,14 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
              * Folding is located at ace-editor/mode/folding/siddhi.js
              * Snippets are located at ace-editor/snippets/siddhi.js
              */
-            aceEditor.session.setMode(constants.ace.SIDDHI_MODE);
+            self.mode = config.mode;
+            if(config.mode !== undefined && config.mode === "ASYNC_API_MODE") {
+                aceEditor.session.setMode(constants.ace.ASYNC_API_MODE);
+            } else {
+                aceEditor.session.setMode(constants.ace.SIDDHI_MODE);
+                // Attaching editor's onChange event handler
+                aceEditor.getSession().on('change', editorChangeHandler);
+            }
 
             // Setting the editor options
             aceEditor.setReadOnly(config.readOnly);
@@ -87,9 +94,6 @@ define(["ace/ace", "jquery", "./constants", "./utils", "./completion-engine", ".
 
             self.completionEngine = new CompletionEngine();
             self.rawExtensions = CompletionEngine.rawExtensions;
-
-            // Attaching editor's onChange event handler
-            aceEditor.getSession().on('change', editorChangeHandler);
 
             // For adjusting the completer list as required
             adjustAutoCompletionHandlers();

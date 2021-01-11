@@ -2,8 +2,8 @@
  * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-define(['require', 'lodash', 'jquery', 'constants', 'react', 'react_dom'],
-    function (require, _, $, Constants, React, ReactDOM) {
+define(['require', 'lodash', 'jquery', 'constants'],
+    function (require, _, $, Constants) {
         return function (app) {
             /**
              * initialize function for ExtensionInstallDialog.

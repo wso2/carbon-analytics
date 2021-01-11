@@ -49,8 +49,7 @@
     <script src="editor/commons/lib/json-editor_v0.7.28/jsoneditor.min.js"></script>
     <!-- loading jsPlumb script-->
     <script src="editor/commons/lib/jsplumb_v2.6.9/jsplumb.min.js"></script>
-    <script src="editor/commons/lib/react/react-dom.development.js"></script>
-    <script src="editor/commons/lib/react/react.development.js"></script>
+    <script src="editor/commons/lib/js-yaml/js-yaml.js"></script>
     <script src="editor/js/async-api/react-component/dist/bundle.js"></script>
 
     <link rel="stylesheet" type="text/css" href="editor/css/styles.css"/>
@@ -59,6 +58,7 @@
     <link rel="stylesheet" type="text/css" href="editor/css/error-handler.css"/>
     <link rel="stylesheet" type="text/css" href="editor/commons/css/welcome-screen.css"/>
     <link rel="stylesheet" type="text/css" href="editor/css/async-api-def.css"/>
+    <link rel="stylesheet" type="text/css" href="editor/css/async-api-font.css"/>
 
     <link rel="stylesheet" type="text/css" href="editor/css/design-view.css"/>
     <link rel="stylesheet" type="text/css" href="editor/css/etl-task-view.css"/>
@@ -323,11 +323,11 @@
         </div>
 
         <div class="async-api-view-container" id="async-api-view-container" style="display: none">
-            <div class="async-api-view-yaml-container">
-                <p></p>
+            <div class="async-api-view-yaml-container" id="async-api-view-yaml-container-id">
             </div>
             <div class="async-api-view-spec-container"></div>
             <div class='clear-fix'></div>
+            <div class="async-api-generator-container"></div>
         </div>
         <!-- End: design view container -->
 
@@ -424,7 +424,9 @@
                 <span class="toggle-button-text" id="design_view_btn">Design View</span>
             </div>
             <button class="btn wizard-view-button" id="btn-wizard-view">Wizard View</button>
-            <button class="btn async-api-view-button" id="btn-async-api-view">Async API View</button>
+            <button class="btn async-api-add-update-button" id="btn-add-update-async-btn">Add API</button>
+            <button class="btn async-api-view-button" id="asyncbtn-asyncapi-view">Async API View</button>
+            <button class="btn asyncbtn-to-code-view" id="asyncbtn-to-code-view">Code View</button>
         </div>
         <!-- End: Toggle Controls Container  -->
     </div>
@@ -2759,51 +2761,8 @@
     </div>
 </div>
 
-!-- Export Dialog -->
-<div class='modal fade' id='openAsyncAPIGenerateModal' tabindex='-1' role='dialog'>
-    <div class='modal-dialog' role='document'>
-        <iframe name="export-download" style="display: none;"></iframe>
-        <div class='modal-content export-dialog'>
-            <div class='modal-header'>
-                <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
-                    <i class='fw fw-cancel about-dialog-close'></i>
-                </button>
-                <h4 class='modal-title export-dialog-title' id='initialAsyncApiDefHeading'>Generating Async API for Sinks and Sources</h4>
-                <hr class='export-dialog-hr'>
-            </div>
-            <div class='modal-body'>
-                <div id='async-api-form' class="clearfix">
-                    <div id="async-api-step-1" class="export-selector">
-                        <div class='async-api-source-sink-list' id='async-api-source-sink-list' style='display: block'>
+!-- Async API Dialog -->
 
-                            <div class="form-group">
-                                <label>
-                                    Select Source or Sink type to Generate Async API
-                                </label>
-                                <select name="siddhi-sink-source-type" id="siddhi-sink-source-type" class="form-control">
-                                </select>
-                            </div>
-                            <div class='form-group'>
-                                <label>
-                                    Sources
-                                </label>
-                                <div id='source-list' class="col-xs-12" style="margin:10px 0px;">
-                                </div>
-                            </div>
-                            <div class='form-group'>
-                                <label>
-                                    Sinks
-                                </label>
-                                <div id='sink-list' class="col-xs-12" style="margin:10px 0px;">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!--Cron Generator Dialog-->
 <div class='modal fade' id='cronGenerator' tabindex='-1' role='dialog'>

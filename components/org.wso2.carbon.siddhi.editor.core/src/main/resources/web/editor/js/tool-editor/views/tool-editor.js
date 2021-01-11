@@ -2,10 +2,11 @@
  * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
 define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./source", '../constants',
-        'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils', 'etlWizard', 'asyncAPI'],
+        'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils', 'etlWizard', 'asyncAPI',
+        'asyncAPIGenerator', "js/async-api/constants"],
 
     function (require, $, Backbone, _, log, DesignView, SourceView, constants, UndoManager, Launcher,
-              DebugManager, DesignViewUtils, ETLWizard, AsyncAPI) {
+              DebugManager, DesignViewUtils, ETLWizard, AsyncAPI, AsyncAPIGenerator, AsyncAPIConstants) {
 
         const ENTER_KEY = 13;
 
@@ -64,6 +65,12 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                     var asyncAPIViewDynamicId = "async-api-container-" + this._$parent_el.attr('id');
                     asyncAPIViewContainer.attr('id', asyncAPIViewDynamicId);
+
+                    var toggleControlsContainer = self._$parent_el.find('.toggle-controls-container');
+                    var asyncAPIAddUpdateButton = $(toggleControlsContainer[0]).find('.async-api-add-update-button');
+                    asyncAPIAddUpdateButton.addClass('hide-div');
+                    var codeViewButton = self._$parent_el.find('.asyncbtn-to-code-view');
+                    codeViewButton.addClass('hide-div');
 
                     /*
                     * Use the below line to assign dynamic id for design grid container and pass the id to initialize
@@ -185,11 +192,8 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                     });
 
-                    $('.toggle-controls-container #btn-async-api-view').on('click', function(e) {
-                        //todo this gets called by the #of siddhi apps
+                    $('.toggle-controls-container #asyncbtn-asyncapi-view').on('click', function(e) {
                         e.preventDefault();
-                        // e.stopPropagation();
-                        // assume this is from the source view
                         if (application.tabController.getActiveTab().getFile().isDirty()) {
                             DesignViewUtils.prototype.warnAlert("Please save the file before switching to the Async API View");
                             return;
@@ -200,27 +204,13 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 self.JSONObject = JSON.parse(response.responseString);
                                 if (application.tabController.getActiveTab().getFile().getName().replace(".siddhi", "").localeCompare(self.JSONObject.siddhiAppConfig.siddhiAppName) === 0) {
                                     console.log(application.tabController.getActiveTab().getFile().getName());
-                                    console.log(self.JSONObject);
-                                    // self.options.container = self._$parent_el;
-                                    var asyncAPIYaml = self.canTranslateToAsyncAPI(self.JSONObject, asyncAPIViewContainer, sourceContainer, _.cloneDeep(self.options));
-                                    if (asyncAPIYaml == null) {
-                                        DesignViewUtils.prototype.errorAlert('This Siddhi app cannot be opened as Async API view');
-                                        return;
-                                    } else {
-                                        // sourceContainer.hide();
-                                        // asyncAPIViewContainer.show();
-                                        // var asyncAPIViewOptions = _.cloneDeep(self.options);
-                                        // asyncAPIViewOptions.container = asyncAPIViewContainer;
-                                        // asyncAPIViewOptions.asyncAPIDefYaml = asyncAPIYaml;
-                                        // new ETLWizard(etlOptions);
-                                    }
+                                    self.viewOrGenerateAsyncAPI(self.JSONObject, asyncAPIViewContainer, sourceContainer, _.cloneDeep(self.options), self._sourceView.getEditor());
                                 }
                             } else if (response.status === "fail") {
                                 loadingScreen.hide();
                                 DesignViewUtils.prototype.errorAlert(response.errorMessage);
                             }
                         }, 100);
-
                     });
 
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
@@ -373,6 +363,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         sourceContainer.hide();
                         designContainer.hide();
                         toggleViewButton.hide();
+                        asyncAPIViewContainer.hide();
                     }
                 },
 
@@ -391,30 +382,47 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         config.queryLists.SEQUENCE.length == 0;
                 },
 
-                canTranslateToAsyncAPI: function(model, asyncAPIViewContainer, sourceContainer, options) {
+                viewOrGenerateAsyncAPI: function(model, asyncAPIViewContainer, sourceContainer, options, editorInstance) {
                     var annotations = model.siddhiAppConfig.appAnnotationList;
-                    var foundAsyncAnnotation = -1;
-                    var siddhiAsyncAnnotation = "@App:AyncAPI";
-                    for (var i=0; i<annotations.length; i++) {
-                        if (annotations[i].toLowerCase().startsWith(siddhiAsyncAnnotation.toLowerCase())) {
-                            foundAsyncAnnotation = i;
+                    console.log("viewOrGenerateAsyncAPI() ???");
+                    if (annotations.length > 0) {
+                        for (var i=0; i<annotations.length; i++) {
+                            console.log(annotations[i].toLowerCase());
+                            var asyncAPIAnnotationRegex = new RegExp(AsyncAPIConstants.ASYNC_API_ANNOTATION_REGEX);
+                            var asyncAPIAnnotation = annotations[i].match(asyncAPIAnnotationRegex);
+                            if (asyncAPIAnnotation.length > 0) {
+                                var ayncAPIContent = annotations[i].replace(asyncAPIAnnotation[0], "").replace(new RegExp('"\\)$'), "");
+                                console.log("found ayncAPIContent: ");
+                                console.log(ayncAPIContent);
+                                //todo Error Handling part
+                                window.getAsyncAPIParserDoc(ayncAPIContent).then(asyncAPIDoc => {
+                                    console.log(asyncAPIDoc);
+                                    sourceContainer.hide();
+                                    asyncAPIViewContainer.show();
+                                    options.asyncAPIDefYaml = ayncAPIContent;
+                                    options.asyncAPIViewContainer = asyncAPIViewContainer;
+                                    options.fromGenerator = false;
+                                    options.editorInstance = editorInstance;
+                                    this.asyncAPI = new AsyncAPI(options);
+                                })
+                            } else {
+                                console.log("NOT found ayncAPIContent: ");
+                                sourceContainer.hide();
+                                asyncAPIViewContainer.show();
+                                options.asyncAPIViewContainer = asyncAPIViewContainer;
+                                options.editorInstance = editorInstance;
+                                this.asyncAPIGenerator = new AsyncAPIGenerator(options);
+                            }
                         }
-                    }
-                    if (foundAsyncAnnotation !== -1) {
-                        var ayncAPIContent = annotations[foundAsyncAnnotation].replace(siddhiAsyncAnnotation + "(\"", "").replace(new RegExp('"\\)$'), "");
-                        console.log("found ayncAPIContent: ");
-                        console.log(ayncAPIContent);
-                        //todo Error Handling part
-                        window.getAsyncAPIParserDoc(ayncAPIContent).then(asyncAPIDoc => {
-                            console.log(asyncAPIDoc);
-                            sourceContainer.hide();
-                            asyncAPIViewContainer.show();
-                            options.asyncAPIDefYaml = ayncAPIContent;
-                            new AsyncAPI(options);
-                        })
                     } else {
-                        return null;
+                        console.log("NOT found ayncAPIContent: ");
+                        sourceContainer.hide();
+                        asyncAPIViewContainer.show();
+                        options.asyncAPIViewContainer = asyncAPIViewContainer;
+                        options.editorInstance = editorInstance;
+                        this.asyncAPIGenerator = new AsyncAPIGenerator(options);
                     }
+
                 },
 
                 getContent: function () {

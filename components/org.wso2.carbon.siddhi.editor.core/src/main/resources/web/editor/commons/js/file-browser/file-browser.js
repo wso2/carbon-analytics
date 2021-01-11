@@ -130,7 +130,6 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
         getURLProvider: function(){
             var self = this;
             return function (node) {
-                console.log("getURLProvider() node.id: " + node.id);
                 if (self._showBundles) {
                     if (node.id === '#') {
                         return self._serviceURL + "/listDirectoriesInPath" +

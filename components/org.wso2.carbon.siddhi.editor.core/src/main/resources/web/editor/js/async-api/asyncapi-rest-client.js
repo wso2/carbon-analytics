@@ -33,18 +33,28 @@ define(["jquery", "utils"], function (jQuery, Utils) {
         });
     };
 
-    self.submitToParse = function (data, callback, errorCallback) {
+    self.submitToParse = function (data) {
         if (data.siddhiApp === "") {
             return false;
         }
+        var result = {};
         $.ajax({
             async: false,
             type: "POST",
             url: self.editorUrl + "/validator",
             data: JSON.stringify(data),
-            success: callback,
-            error: errorCallback
+            success: function (response) {
+                result = {status: "success", response: response};
+            },
+            error: function (error) {
+                if (error.responseText) {
+                    result = {status: "fail", errorMessage: error.responseText};
+                } else {
+                    result = {status: "fail", errorMessage: "Error Occurred while processing your request"};
+                }
+            }
         });
+        return result;
     }
 
     self.getSourcesAndSinks = function (siddhiAppName, callback, errorCallback) {
@@ -55,6 +65,93 @@ define(["jquery", "utils"], function (jQuery, Utils) {
             success: callback,
             error: errorCallback
         });
+    }
+
+    self.getCodeView = function (designViewJSON) {
+        var self = this;
+        var result = {};
+        self.designToCodeURL = window.location.protocol + "//" + window.location.host + "/editor/code-view";
+        $.ajax({
+            type: "POST",
+            url: self.designToCodeURL,
+            data: window.btoa(designViewJSON),
+            async: false,
+            success: function (response) {
+                result = {status: "success", responseString: response};
+            },
+            error: function (error) {
+                if (error.responseText) {
+                    result = {status: "fail", errorMessage: error.responseText};
+                } else {
+                    result = {status: "fail", errorMessage: "Error Occurred while processing your request"};
+                }
+            }
+        });
+        return result;
+    }
+
+    self.getSiddhiElements = function (code) {
+        var self = this;
+        var result = {};
+        // Remove Single Line Comments
+        var regexStr = code.replace(/--.*/g, '');
+        // Remove Multi-line Comments
+        regexStr = regexStr.replace(/\/\*(.|\s)*?\*\//g, '');
+        var regex = /^\s*@\s*app\s*:\s*name\s*\(\s*["|'](.*)["|']\s*\)\s*@\s*app\s*:\s*description\s*\(\s*["|'](.*)["|']\s*\)\s*$/gi;
+        var match = regex.exec(regexStr);
+
+        // check whether Siddhi app is in initial mode(initial Siddhi app template) and if yes then go to the
+        // design view with the no content
+        if (match !== null) {
+            var defaultResponse = {
+                "siddhiAppConfig": {
+                    "siddhiAppName": match[1],
+                    "siddhiAppDescription": match[2],
+                    "appAnnotationList": [],
+                    "streamList": [],
+                    "tableList": [],
+                    "windowList": [],
+                    "triggerList": [],
+                    "aggregationList": [],
+                    "functionList": [],
+                    "partitionList": [],
+                    "sourceList": [],
+                    "sinkList": [],
+                    "queryLists": {
+                        "WINDOW_FILTER_PROJECTION": [],
+                        "PATTERN": [],
+                        "SEQUENCE": [],
+                        "JOIN": []
+                    },
+                    "finalElementCount": 0
+                },
+                "edgeList": []
+            };
+            var defaultString = JSON.stringify(defaultResponse);
+            result = {
+                status: "success",
+                responseString: defaultString
+            };
+        } else {
+            self.codeToDesignURL = window.location.protocol + "//" + window.location.host + "/editor/design-view";
+            $.ajax({
+                type: "POST",
+                url: self.codeToDesignURL,
+                data: btoa(unescape(encodeURIComponent(code))),
+                async: false,
+                success: function (response) {
+                    result = {status: "success", response: response};
+                },
+                error: function (error) {
+                    if (error.responseText) {
+                        result = {status: "fail", errorMessage: error.responseText};
+                    } else {
+                        result = {status: "fail", errorMessage: "Error Occurred while processing your request"};
+                    }
+                }
+            });
+        }
+        return result;
     }
 
     return self;

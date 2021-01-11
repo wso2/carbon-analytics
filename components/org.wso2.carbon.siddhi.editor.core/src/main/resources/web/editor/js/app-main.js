@@ -686,7 +686,8 @@ define(['app/main', 'jquery'],
                             // relative selector within container for a tab
                             container: '.async-api-view-container',
                             yamlContainer: '.async-api-view-yaml-container',
-                            specContainer: '.async-api-view-spec-container'
+                            specContainer: '.async-api-view-spec-container',
+                            generatorContainer: '.async-api-generator-container'
                         },
                         debug: {
                             // relative selector within container for a tab
