@@ -394,12 +394,6 @@ metricsLabelMapping:
     labels:
       app: "${0}"
 
-  siddhi.io.kafka.source.read.count:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Source.Total.Reads"
-    name: "siddhi.kafka.source.read.count"
-    labels:
-      app: "${0}"
-
   siddhi.io.kafka.source.current.offset:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Source.Current.Offset.*.partition.*.groupId.*.stream_id.*"
     name: "siddhi.kafka.source.current.offset"
@@ -409,21 +403,6 @@ metricsLabelMapping:
       partition: "${2}"
       group_id: "${3}"
       stream_id: "${4}"
-
-  siddhi.io.kafka.source.read.count.per.topic:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Source.Reads.Per.Topic.*"
-    name: "siddhi.kafka.source.read.count.per.topic"
-    labels:
-      app: "${0}"
-      topic: "${1}"
-
-  siddhi.io.kafka.source.read.count.per.group:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Source.Reads.Per.Group.*.groupId.*"
-    name: "siddhi.kafka.source.read.count.per.group"
-    labels:
-      app: "${0}"
-      topic: "${1}"
-      group_id: "${2}"
 
   siddhi.io.kafka.source.read.count.per.stream:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Source.Reads.Per.Stream.*.stream_id.*.partition.*.groupId.*"
@@ -435,14 +414,6 @@ metricsLabelMapping:
       partition: "${3}"
       group_id: "${4}"
 
-  siddhi.io.kafka.source.error.count.per.topic:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Source.Errors.Per.Topic.*.errorString.(.*)"
-    name: "siddhi.kafka.source.error.count"
-    labels:
-      app: "${0}"
-      topic: "${1}"
-      error_string: "${2}"
-
   siddhi.io.kafka.source.error.count.per.stream:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Source.Errors.Per.Stream.*.stream_id.*.groupId.*.errorString.(.*)"
     name: "siddhi.kafka.source.error.count.per.stream"
@@ -452,30 +423,6 @@ metricsLabelMapping:
       stream_id: "${2}"
       group_id: "${3}"
       error_string: "${4}"
-
-  siddhi.io.kafka.source.error.count.per.group:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Source.Errors.Per.Group.*.groupId.*.errorString.(.*)"
-    name: "siddhi.kafka.source.error.count.per.group"
-    labels:
-      app: "${0}"
-      topic: "${1}"
-      group_id: "${2}"
-      error_string: "${3}"
-
-  siddhi.io.kafka.source.per.topic.misc:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Source.*.*"
-    name: "siddhi.kafka.source.per.topic.${2}"
-    labels:
-      app: "${0}"
-      topic: "${1}"
-
-  siddhi.io.kafka.source.per.group.misc:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Source.Per.Group.*.groupId.*.*"
-    name: "siddhi.kafka.source.per.group.${3}"
-    labels:
-      app: "${0}"
-      topic: "${1}"
-      group_id: "${2}"
 
   siddhi.io.kafka.source.per.stream.misc:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Source.Per.Stream.*.groupId.*.streamId.*.*"
@@ -498,27 +445,6 @@ metricsLabelMapping:
 
 ## Kafka Sink Metrics
 
-  siddhi.io.kafka.sink.write.count:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Sink.Total.Writes"
-    name: "siddhi.kafka.sink.write.count"
-    labels:
-      app: "${0}"
-
-  siddhi.io.kafka.sink.write.count.per.topic:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Sink.Writes.Per.Topic.*"
-    name: "siddhi.kafka.sink.write.count.per.topic"
-    labels:
-      app: "${0}"
-      topic: "${1}"
-
-  siddhi.io.kafka.sink.write.count.per.partition:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Sink.Writes.Per.Partition.*.partition.*"
-    name: "siddhi.kafka.sink.write.count.per.partition"
-    labels:
-      app: "${0}"
-      topic: "${1}"
-      partition: "${2}"
-
   siddhi.io.kafka.sink.write.count.per.stream:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Sink.Writes.Per.Stream.*.stream_id.*.partition.*"
     name: "siddhi.kafka.sink.write.count.per.stream"
@@ -527,14 +453,6 @@ metricsLabelMapping:
       topic: "${1}"
       stream_id: "${2}"
       partition: "${3}"
-
-  siddhi.io.kafka.sink.error.count.per.topic:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Sink.Errors.Per.Topic.*.errorString.(.*)"
-    name: "siddhi.kafka.sink.error.count"
-    labels:
-      app: "${0}"
-      topic: "${1}"
-      error_string: "${2}"
 
   siddhi.io.kafka.sink.error.count.per.stream:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Sink.Errors.Per.Stream.*.stream_id.*.partition.*.errorString.(.*)"
@@ -546,29 +464,14 @@ metricsLabelMapping:
       partition: "${3}"
       error_string: "${4}"
 
-  siddhi.io.kafka.sink.error.count.per.partition:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Sink.Errors.Per.Partition.*.partition.*.errorString.(.*)"
-    name: "siddhi.kafka.sink.error.count.per.partition"
+  siddhi.io.kafka.sink.error.count.without.partition:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Sink.Errors.Without.Partition.*.stream_id.*.errorString.(.*)"
+    name: "siddhi.kafka.sink.error.count.without.partition"
     labels:
       app: "${0}"
       topic: "${1}"
-      partition: "${2}"
+      stream_id: "${2}"
       error_string: "${3}"
-
-  siddhi.io.kafka.sink.per.topic.misc:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Sink.*.*"
-    name: "siddhi.kafka.sink.per.topic.${2}"
-    labels:
-      app: "${0}"
-      topic: "${1}"
-
-  siddhi.io.kafka.sink.per.partition.misc:
-    match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Sink.Per.Partition.*.partition.*.*"
-    name: "siddhi.kafka.sink.per.partition.${3}"
-    labels:
-      app: "${0}"
-      topic: "${1}"
-      partition: "${2}"
 
   siddhi.io.kafka.sink.per.stream.misc:
     match: "io.siddhi.SiddhiApps.*.Siddhi.Kafka.Sink.Per.Stream.*.partition.*.streamId.*.*"

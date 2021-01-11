@@ -19,12 +19,14 @@ package org.wso2.carbon.streaming.integrator.core.ha.tcp;
 
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.streaming.integrator.core.ha.util.HAConstants;
 import org.wso2.carbon.streaming.integrator.core.util.BinaryMessageConverterUtil;
 import io.siddhi.core.event.Event;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -80,7 +82,8 @@ public class SiddhiEventConverter {//todo
                         if (stringSize == 0) {
                             objects[i] = null;
                         } else {
-                            objects[i] = BinaryMessageConverterUtil.getString(byteBuffer, stringSize);
+                            objects[i] = URLDecoder.decode(BinaryMessageConverterUtil.getString(byteBuffer, stringSize),
+                                    HAConstants.DEFAULT_CHARSET);
                         }
                         break;
                     case "DOUBLE":

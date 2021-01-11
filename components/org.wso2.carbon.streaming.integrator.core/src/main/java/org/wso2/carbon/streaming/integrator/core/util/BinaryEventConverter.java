@@ -18,13 +18,17 @@
 
 package org.wso2.carbon.streaming.integrator.core.util;
 
+import org.apache.log4j.Logger;
 import org.wso2.carbon.streaming.integrator.core.event.queue.EventDataMetaInfo;
 import org.wso2.carbon.streaming.integrator.core.event.queue.EventMetaInfo;
 import org.wso2.carbon.streaming.integrator.core.event.queue.QueuedEvent;
 import io.siddhi.core.event.Event;
 import io.siddhi.query.api.definition.Attribute;
+import org.wso2.carbon.streaming.integrator.core.ha.util.HAConstants;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -33,6 +37,7 @@ import java.util.Arrays;
  * This is a Util class help to convert from Siddhi event to Binary message.
  */
 public class BinaryEventConverter {
+    private static final Logger log = Logger.getLogger(BinaryEventConverter.class);
 
     public static ByteBuffer convertToBinaryMessage(QueuedEvent[] queuedEvents)
             throws IOException {
@@ -51,7 +56,7 @@ public class BinaryEventConverter {
 
             String[] trpSyncProperties = queuedEvent.getTransportSyncProperties();
             if (trpSyncProperties != null) {
-                for(String property : trpSyncProperties){
+                for (String property : trpSyncProperties) {
                     allTrpSyncPropertiesByteLength += property.length();
                     messageSize += 4;
                 }
@@ -71,7 +76,7 @@ public class BinaryEventConverter {
             if (trpSyncProperties != null) {
                 messageBuffer.putInt(trpSyncProperties.length);
                 if (trpSyncProperties.length != 0) {
-                    for(String property : trpSyncProperties){
+                    for (String property : trpSyncProperties) {
                         messageBuffer.putInt(property.length());
                         messageBuffer.put((property.getBytes(Charset.defaultCharset())));
                     }
@@ -84,7 +89,16 @@ public class BinaryEventConverter {
             if (event.getData() != null && event.getData().length != 0) {
                 Object[] data = event.getData();
                 for (int i = 0; i < data.length; i++) {
-                    Object aData = data[i];
+                    Object aData = new Object();
+                    if (data[i] instanceof String) {
+                        try {
+                            aData = URLEncoder.encode(data[i].toString(), HAConstants.DEFAULT_CHARSET);
+                        } catch (UnsupportedEncodingException e) {
+                            log.error("Error occurred while encoding the data using UTF-8 ", e);
+                        }
+                    } else {
+                        aData = data[i];
+                    }
                     BinaryMessageConverterUtil.assignData(aData, messageBuffer);
                 }
             }
@@ -97,7 +111,16 @@ public class BinaryEventConverter {
         Object[] data = event.getData();
         if (data != null) {
             for (int i = 0; i < data.length; i++) {
-                Object aData = data[i];
+                Object aData = new Object();
+                if (data[i] instanceof String) {
+                    try {
+                        aData = URLEncoder.encode(data[i].toString(), HAConstants.DEFAULT_CHARSET);
+                    } catch (UnsupportedEncodingException e) {
+                        log.error("Error occurred  while encoding the data using UTF-8 ", e);
+                    }
+                } else {
+                    aData = data[i];
+                }
                 eventSize += BinaryMessageConverterUtil.getSize(aData);
             }
         }
