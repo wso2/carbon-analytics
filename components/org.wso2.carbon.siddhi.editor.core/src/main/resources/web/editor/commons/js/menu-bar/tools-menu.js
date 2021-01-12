@@ -149,24 +149,6 @@ define([],function (){
                     }
                 },
                 disabled: false
-            },
-            {
-                id: "asyncAPIDefinition",
-                label: "Generate Async API Def",
-                command: {
-                    id: "async-api-def-generator"
-                    // shortcuts: {
-                    //     mac: {
-                    //         key: "command+alt+i",
-                    //         label: "\u2318\u2325I"
-                    //     },
-                    //     other: {
-                    //         key: "ctrl+alt+i",
-                    //         label: "Ctrl+Alt+I"
-                    //     }
-                    // }
-                },
-                disabled: false
             }
         ]
 

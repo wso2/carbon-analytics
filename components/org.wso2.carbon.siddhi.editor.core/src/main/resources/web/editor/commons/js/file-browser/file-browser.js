@@ -208,7 +208,6 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
 
             files.forEach(function(file) {
                 var nodeId = `wso2/server/deployment/workspace/${file}`;
-                console.log(nodeId);
                 self._$parent_el.jstree(true).select_node(nodeId);
             });
         },
@@ -250,7 +249,6 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
                 var path = node.id;
                 var fileName = _.last(path.split(self.application.getPathSeperator()));
                 node.id = "workspace" + self.application.getPathSeperator() + fileName;
-                console.log("################################" + node.id);
                 self.trigger("double-click-node", node);
             });
 

@@ -44,126 +44,12 @@ define("ace/mode/asyncapi_highlight_rules", ["require", "exports", "module", "ac
                     regex: "(@\\s*[Aa][Pp][Pp]\\s*)(:)(\\s*[a-zA-Z_][a-zA-Z_0-9]*\\s*)(\\(\\s*)",
                     next: "annotation"
                 }
-                // {
-                //     token: ["annotation.common.start", "keyword.other"],
-                //     regex: "(@\\s*[a-zA-Z_][a-zA-Z_0-9]*\\s*)(\\(\\s*)",
-                //     next: "annotation"
-                // },
-                // {
-                //     token: "comment.line",
-                //     regex: "--.*$"
-                // },
-                // {
-                //     token: "comment.block",
-                //     start: "/\\*",
-                //     end: "\\*/"
-                // },
-                // {
-                //     token: "string.quoted.double.thrice",
-                //     start: '"""',
-                //     end: '"""'
-                // },
-                // {
-                //     token: "string.quoted.double",
-                //     regex: '".*?"'
-                // },
-                // {
-                //     token: "string.quoted.single",
-                //     regex: "'.*?'"
-                // },
-                // {
-                //     token: "constant.numeric",
-                //     regex: "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
-                // },
-                // {
-                //     token: keywordMapper,
-                //     regex: "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
-                // },
-                // {
-                //     token: "keyword.operator",
-                //     regex: "\\+|\\-|\\/|\\/\\/|%|<@>|@>|<@|&|\\^|~|<|>|<=|=>|==|!=|<>|=|->"
-                // },
-                // {
-                //     token: "keyword.other",
-                //     regex: "\\?|:|;|,|\\.|#|@|\\[|\\]"
-                // },
-                // {
-                //     token: "keyword.other.lparen",
-                //     regex: "\\("
-                // },
-                // {
-                //     token: "keyword.other.rparen",
-                //     regex: "\\)"
-                // },
-                // {
-                //     token: "paren.lparen",
-                //     regex: "{"
-                // },
-                // {
-                //     token: "paren.rparen",
-                //     regex: "}"
-                // },
-                // {
-                //     token: "whitespace",
-                //     regex: "\\s+"
-                // }
             ],
             "annotation": [
                 {
                     token: ["annotation.common.start", "keyword.other"],
                     regex: "(@\\s*[a-zA-Z_][a-zA-Z_0-9]*\\s*)(\\(\\s*)"
                 }
-                // {
-                //     token: "identifier",
-                //     regex: "([a-zA-Z_][a-zA-Z_0-9]*\\s*)"
-                // },
-                // {
-                //     token: "comment.line",
-                //     regex: "--.*$"
-                // },
-                // {
-                //     token: "comment.block",
-                //     start: "/\\*",
-                //     end: "\\*/"
-                // },
-                // {
-                //     token: "string.quoted.double.thrice",
-                //     start: '"""',
-                //     end: '"""'
-                // },
-                // {
-                //     token: "string.quoted.double",
-                //     regex: '".*?"'
-                // },
-                // {
-                //     token: "string.quoted.single",
-                //     regex: "'.*?'"
-                // },
-                // {
-                //     token: "constant.numeric",
-                //     regex: "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
-                // },
-                // {
-                //     token: "keyword.other.annotation.mid.end",
-                //     regex: "\\)+\\s+,"
-                // },
-                // {
-                //     token: "keyword.other.annotation.full.end",
-                //     regex: "(\\)+\\s*)+",
-                //     next: "start"
-                // },
-                // {
-                //     token: "keyword.operator",
-                //     regex: "="
-                // },
-                // {
-                //     token: "keyword.other",
-                //     regex: "-|:|,|\\."
-                // },
-                // {
-                //     token: "whitespace",
-                //     regex: "\\s+"
-                // }
             ]
         };
 

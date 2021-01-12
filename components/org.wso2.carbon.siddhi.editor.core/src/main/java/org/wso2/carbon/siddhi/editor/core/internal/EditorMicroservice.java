@@ -2108,8 +2108,6 @@ public class EditorMicroservice implements Microservice {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{siddhiAppName}/sources-sinks")
     public Response sourcesSinks(@PathParam("siddhiAppName") String siddhiAppName) {
-//        List<Source> sources = new ArrayList<>();
-//        List<Sink> sinks = new ArrayList<>();
         SiddhiAppRuntime siddhiAppRuntime = EditorDataHolder
                 .getDebugProcessorService()
                 .getSiddhiAppRuntimeHolder(siddhiAppName)

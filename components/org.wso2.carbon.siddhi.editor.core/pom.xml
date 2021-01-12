@@ -356,37 +356,6 @@
                 </plugins>
             </build>
         </profile>
-<!--        <profile>-->
-<!--            <id>platform-windows</id>-->
-<!--            <activation>-->
-<!--                <os>-->
-<!--                    <family>windows</family>-->
-<!--                </os>-->
-<!--            </activation>-->
-<!--            <properties>-->
-<!--                <npm.executable>npm.cmd</npm.executable>-->
-<!--            </properties>-->
-<!--        </profile>-->
-<!--        <profile>-->
-<!--            <id>platform-unix</id>-->
-<!--            <activation>-->
-<!--                <os>-->
-<!--                    <family>unix</family>-->
-<!--                </os>-->
-<!--            </activation>-->
-<!--            <properties>-->
-<!--                <npm.executable>npm</npm.executable>-->
-<!--            </properties>-->
-<!--        </profile>-->
-<!--        <profile>-->
-<!--            <id>platform-default</id>-->
-<!--            <activation>-->
-<!--                <activeByDefault>true</activeByDefault>-->
-<!--            </activation>-->
-<!--            <properties>-->
-<!--                <npm.executable>npm</npm.executable>-->
-<!--            </properties>-->
-<!--        </profile>-->
     </profiles>
 
     <build>
@@ -399,12 +368,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-<!--        <resources>-->
-<!--            <resource>-->
-<!--                <directory>${basedir}/src/main/resources/web/editor/js/async-api/react-component/dist</directory>-->
-<!--                <targetPath>js</targetPath>-->
-<!--            </resource>-->
-<!--        </resources>-->
     </build>
 
     <repositories>
