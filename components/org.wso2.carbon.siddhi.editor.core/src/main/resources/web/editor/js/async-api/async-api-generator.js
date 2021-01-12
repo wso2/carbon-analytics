@@ -47,8 +47,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             self.__editorInstance = initOpts.editorInstance;
             self.__tab = initOpts.application.tabController.getActiveTab();
             self.asyncAPIDefYaml = initOpts.asyncAPIDefYaml;
-            console.log("Async-API-Generator");
-
             self.openAsyncAPIGenerateModal = $(
                 "<div>" +
                 "    <h4 class='modal-title file-dialog-title' id='initialAsyncApiDefHeading'>Generating Async API for Sinks and Sources</h4>" +
@@ -376,7 +374,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             }
             console.log(asyncAPIJSON.toString());
             yaml.safeLoad(JSON.stringify(asyncAPIJSON));
-            console.log(yaml.safeDump(yaml.safeLoad(JSON.stringify(asyncAPIJSON))));
             var options = _.cloneDeep(self.__options)
             options.asyncAPIDefYaml = yaml.safeDump(yaml.safeLoad(JSON.stringify(asyncAPIJSON)));
             options.asyncAPIViewContainer = self.asyncAPIViewContainer;
@@ -446,7 +443,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 } else {
                     alerts.error("Error while parsing Errors in Siddhi app. " +
                         "Please fix Siddhi app before generating AsyncAPI. " + response.message);
-                    console.log("Error while parsing Errors in Siddhi app", response.message);
                 }
             } else {
                 alerts.error("Save file before running application");

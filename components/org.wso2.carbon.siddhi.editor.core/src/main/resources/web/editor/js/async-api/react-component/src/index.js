@@ -4,7 +4,6 @@ import React from 'react';
 import App from './App'
 
 const getAsyncAPIUI = (element, asyncYaml) => {
-    console.log("Hanei happoi");
     ReactDOM.render(<App asyncYaml={asyncYaml}/>, element);
 };
 

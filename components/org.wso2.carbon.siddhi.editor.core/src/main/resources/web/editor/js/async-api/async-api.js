@@ -48,8 +48,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             self.__app = initOpts.application;
             self.__tab = initOpts.application.tabController.getActiveTab();
             self.asyncAPIDefYaml = initOpts.asyncAPIDefYaml;
-            console.log("Async-API");
-            console.log(self.asyncAPIDefYaml);
             this.divId = $(this.asyncAPIYamlContainer[0]).attr('id');
             this._mainEditor = new AsyncAPIEditor({
                 divID: this.divId,
@@ -78,10 +76,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             $('.toggle-controls-container #asyncbtn-to-code-view').on('click', function(e) {
                 e.preventDefault();
                 if (self._contentChanged) {
-                    // self.__tab.getFile().setContent(self._changedEditorText);
                     self.__editorInstance.getSession().setValue(self._changedEditorText);
-                    console.log("_____________________ contentChanged __________________________");
-                    console.log(self._changedEditorText)
                 }
                 self.sourceContainer.show();
                 self.asyncAPIViewContainer.hide();
@@ -97,8 +92,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             $('.toggle-controls-container #btn-add-update-async-btn').on('click', function(e) {
                 e.preventDefault();
-                console.log("btn-add-update-async-btn NEW CLICKED");
-                console.log(self.__tab.getFile().getContent());
                 var response = AsyncAPIRESTClient.getSiddhiElements(self.__tab.getFile().getContent());
                 if (response.status === "success") {
                     self.JSONObject = JSON.parse(self.__app.utils.b64DecodeUnicode(response.response));
@@ -161,7 +154,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var self = this;
             self.editor.getSession().setValue(self.asyncAPIDefYaml);
             self.editor.resize(true);
-            console.log(self.asyncAPISpecContainer.length);
             window.getAsyncAPIUI(self.asyncAPISpecContainerDom, self.asyncAPIDefYaml);
         };
 

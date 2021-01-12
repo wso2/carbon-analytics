@@ -249,7 +249,6 @@ define(['jquery', 'backbone', 'lodash', 'log', /** void module - jquery plugin *
                 var path = node.id;
                 var fileName = _.last(path.split(self.application.getPathSeperator()));
                 node.id = "workspace" + self.application.getPathSeperator() + fileName;
-                console.log("################################" + node.id);
                 self.trigger("double-click-node", node);
             });
 

@@ -203,7 +203,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             if (response.status === "success") {
                                 self.JSONObject = JSON.parse(response.responseString);
                                 if (application.tabController.getActiveTab().getFile().getName().replace(".siddhi", "").localeCompare(self.JSONObject.siddhiAppConfig.siddhiAppName) === 0) {
-                                    console.log(application.tabController.getActiveTab().getFile().getName());
                                     self.viewOrGenerateAsyncAPI(self.JSONObject, asyncAPIViewContainer, sourceContainer, _.cloneDeep(self.options), self._sourceView.getEditor());
                                 }
                             } else if (response.status === "fail") {
@@ -384,19 +383,14 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                 viewOrGenerateAsyncAPI: function(model, asyncAPIViewContainer, sourceContainer, options, editorInstance) {
                     var annotations = model.siddhiAppConfig.appAnnotationList;
-                    console.log("viewOrGenerateAsyncAPI() ???");
                     if (annotations.length > 0) {
                         for (var i=0; i<annotations.length; i++) {
-                            console.log(annotations[i].toLowerCase());
                             var asyncAPIAnnotationRegex = new RegExp(AsyncAPIConstants.ASYNC_API_ANNOTATION_REGEX);
                             var asyncAPIAnnotation = annotations[i].match(asyncAPIAnnotationRegex);
                             if (asyncAPIAnnotation.length > 0) {
                                 var ayncAPIContent = annotations[i].replace(asyncAPIAnnotation[0], "").replace(new RegExp('"\\)$'), "");
-                                console.log("found ayncAPIContent: ");
-                                console.log(ayncAPIContent);
                                 //todo Error Handling part
                                 window.getAsyncAPIParserDoc(ayncAPIContent).then(asyncAPIDoc => {
-                                    console.log(asyncAPIDoc);
                                     sourceContainer.hide();
                                     asyncAPIViewContainer.show();
                                     options.asyncAPIDefYaml = ayncAPIContent;
@@ -406,7 +400,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                     this.asyncAPI = new AsyncAPI(options);
                                 })
                             } else {
-                                console.log("NOT found ayncAPIContent: ");
                                 sourceContainer.hide();
                                 asyncAPIViewContainer.show();
                                 options.asyncAPIViewContainer = asyncAPIViewContainer;
@@ -415,7 +408,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             }
                         }
                     } else {
-                        console.log("NOT found ayncAPIContent: ");
                         sourceContainer.hide();
                         asyncAPIViewContainer.show();
                         options.asyncAPIViewContainer = asyncAPIViewContainer;
