@@ -35,13 +35,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             this.designContainer = this.__$parent_el_container.find(_.get(initOpts, 'design_view.container'));
             this.previewContainer = this.__$parent_el_container.find(_.get(initOpts, 'preview.container'));
             this.toggleControlsContainer = this.__$parent_el_container.find('.toggle-controls-container');
-
             this.asyncAPIViewContainer = initOpts.asyncAPIViewContainer;
             this.asyncAPIViewContainer.removeClass("hide-div");
             this.asyncAPISpecContainer = this.asyncAPIViewContainer.find(_.get(initOpts, 'async_api_view.specContainer'));
             this.asyncAPIGenContainer = this.asyncAPIViewContainer.find(_.get(initOpts, 'async_api_view.generatorContainer'));
             this.asyncAPIYamlContainer = this.asyncAPIViewContainer.find(_.get(initOpts, 'async_api_view.yamlContainer'));
-
             this.renderCallback = this.renderCallback.bind(this);
             self.__options = initOpts;
             self.__editorInstance = initOpts.editorInstance;
@@ -65,14 +63,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             } else {
                 $(self.toggleControlsContainer[0]).find('.async-api-add-update-button').html('Update Async API');
             }
-
             self.hideOthers();
             self.hideInternalViews();
             self.renderAsyncAPIView();
-
             $(self.toggleControlsContainer[0]).find('#asyncbtn-to-code-view').removeClass('hide-div');
             $(self.toggleControlsContainer[0]).find('#asyncbtn-asyncapi-view').addClass('hide-div');
-
             $('.toggle-controls-container #asyncbtn-to-code-view').on('click', function(e) {
                 e.preventDefault();
                 if (self._contentChanged) {
@@ -89,7 +84,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 var asyncAPIViewButton = $(self.toggleControlsContainer[0]).find('#asyncbtn-asyncapi-view');
                 asyncAPIViewButton.removeClass('hide-div');
             });
-
             $('.toggle-controls-container #btn-add-update-async-btn').on('click', function(e) {
                 e.preventDefault();
                 var response = AsyncAPIRESTClient.getSiddhiElements(self.__tab.getFile().getContent());
@@ -122,8 +116,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 } else if (response.status === "fail") {
                     alerts.error(response.errorMessage);
                 }
-
-
             });
         };
         //Constructor for the AsyncAPIView
@@ -159,8 +151,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
         AsyncAPIView.prototype.renderCallback = function () {
             var self = this;
-            self.checkVar = "dsfsdf";
-            console.log(self.checkVar);
             if (self.editor.getSession().getValue() !== "" && self.asyncAPIDefYaml !== self.editor.getSession().getValue()) {
                 self._contentChanged = true;
                 window.getAsyncAPIUI(self.asyncAPISpecContainerDom, self.editor.getSession().getValue());

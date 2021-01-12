@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,22 @@
  * limitations under the License.
  */
 
-define("ace/mode/asyncapi_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function (require, exports, module) {
-
+define("ace/mode/asyncapi_highlight_rules", ["require", "exports", "module", "ace/lib/oop",
+    "ace/mode/text_highlight_rules"], function (require, exports, module) {
     "use strict";   // JS strict mode
-
     var oop = require("../lib/oop");
     var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
-
     var AsyncAPIHighlightRules = function () {
         var keywords = "WEBSOCKET|SSE|WEBHOOK";
-
         var builtInConstants = "TRUE|FALSE|NULL";
-
         var builtInBooleanConstants = "TRUE|FALSE";
-
         var builtInTypes = "STRING|INT|LONG|FLOAT|DOUBLE|BOOL|OBJECT";
-
         var keywordMapper = this.createKeywordMapper({
             "keyword": keywords,
             "constant.language": builtInConstants,
             "constant.language.boolean": builtInBooleanConstants,
             "support.type": builtInTypes
         }, "identifier", true);
-
         this.$rules = {
             "start": [
                 {
@@ -52,10 +45,8 @@ define("ace/mode/asyncapi_highlight_rules", ["require", "exports", "module", "ac
                 }
             ]
         };
-
         this.normalizeRules();
     };
-
     oop.inherits(AsyncAPIHighlightRules, TextHighlightRules);
     exports.AsyncAPIHighlightRules = AsyncAPIHighlightRules;
 });

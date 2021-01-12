@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define("ace/mode/asyncapi", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text", "ace/mode/asyncapi_highlight_rules", "ace/range", "ace/mode/folding/asyncapi"],
+define("ace/mode/asyncapi", ["require", "exports", "module"],
     function (require, exports, module) {
 
         "use strict";   // JS strict mode
