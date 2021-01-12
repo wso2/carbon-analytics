@@ -114,21 +114,21 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         }
                     }
                 },
-                "SSE": {
-                    "source": {
-                        "security": {
-                            "basic.auth.enabled": {"http-basic": {"type": "http", "scheme": "basic"}},
-                        }
-                    }
-                },
-                "WebSubPublisher": {
-                    "sink": {
-                        "security": {
-                            "basic.auth.username": {"http-basic": {"type": "http", "scheme": "basic"}},
-                            "https.truststore.file": {"type": "X509"}
-                        }
-                    }
-                },
+                // "SSE": {
+                //     "source": {
+                //         "security": {
+                //             "basic.auth.enabled": {"http-basic": {"type": "http", "scheme": "basic"}},
+                //         }
+                //     }
+                // },
+                // "WebSubPublisher": {
+                //     "sink": {
+                //         "security": {
+                //             "basic.auth.username": {"http-basic": {"type": "http", "scheme": "basic"}},
+                //             "https.truststore.file": {"type": "X509"}
+                //         }
+                //     }
+                // },
                 "WebSocket-Server": {
                     "sink": {
                         "security": {
