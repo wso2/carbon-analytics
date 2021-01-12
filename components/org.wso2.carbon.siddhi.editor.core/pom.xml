@@ -163,6 +163,8 @@
         <carbon.component>
             osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
         </carbon.component>
+        <npm.executable>npm</npm.executable>
+        <npm.build.command>build</npm.build.command>
     </properties>
 
     <profiles>
@@ -179,6 +181,47 @@
                     </resource>
                 </resources>
                 <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>0.0.29</version>
+                        <configuration>
+                            <nodeVersion>v10.16.2</nodeVersion>
+                            <npmVersion>6.9.0</npmVersion>
+                            <workingDirectory>${basedir}/src/main/resources/web/editor/js/async-api/react-component</workingDirectory>
+                        </configuration>
+                        <executions>
+                            <!-- install node & npm -->
+                            <execution>
+                                <id>install node and npm</id>
+                                <goals>
+                                    <goal>install-node-and-npm</goal>
+                                </goals>
+                            </execution>
+
+                            <!--npm install -->
+                            <execution>
+                                <id>npm install</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                </configuration>
+                            </execution>
+
+                            <!-- npm run build -->
+                            <execution>
+                                <id>npm run build</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run build</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-resources-plugin</artifactId>

@@ -2,10 +2,11 @@
  * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org)  Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
  */
 define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./source", '../constants',
-        'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils', 'etlWizard'],
+        'undo_manager', 'launcher', 'app/debugger/debugger', 'designViewUtils', 'etlWizard', 'asyncAPI',
+        'asyncAPIGenerator', "js/async-api/constants"],
 
     function (require, $, Backbone, _, log, DesignView, SourceView, constants, UndoManager, Launcher,
-              DebugManager, DesignViewUtils, ETLWizard) {
+              DebugManager, DesignViewUtils, ETLWizard, AsyncAPI, AsyncAPIGenerator, AsyncAPIConstants) {
 
         const ENTER_KEY = 13;
 
@@ -32,7 +33,6 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     // init undo manager
                     this._undoManager = new UndoManager();
                     this._launcher = new Launcher(options);
-
                 },
 
                 render: function () {
@@ -42,6 +42,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     var loadingScreen = this._$parent_el.find(_.get(this.options, 'loading_screen.container'));
                     var sourceContainer = this._$parent_el.find(_.get(this.options, 'source.container'));
                     var etlWizardContainer = this._$parent_el.find(_.get(this.options, 'etl_wizard.container'));
+                    var asyncAPIViewContainer = this._$parent_el.find(_.get(this.options, 'async_api_view.container'));
                     var designContainer = this._$parent_el.find(_.get(this.options, 'design_view.container'));
                     var debugContainer = this._$parent_el.find(_.get(this.options, 'debug.container'));
                     var tabContentContainer = $(_.get(this.options, 'tabs_container'));
@@ -61,6 +62,15 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
 
                     var designViewDynamicId = "design-container-" + this._$parent_el.attr('id');
                     designContainer.attr('id', designViewDynamicId);
+
+                    var asyncAPIViewDynamicId = "async-api-container-" + this._$parent_el.attr('id');
+                    asyncAPIViewContainer.attr('id', asyncAPIViewDynamicId);
+
+                    var toggleControlsContainer = self._$parent_el.find('.toggle-controls-container');
+                    var asyncAPIAddUpdateButton = $(toggleControlsContainer[0]).find('.async-api-add-update-button');
+                    asyncAPIAddUpdateButton.addClass('hide-div');
+                    var codeViewButton = self._$parent_el.find('.asyncbtn-to-code-view');
+                    codeViewButton.addClass('hide-div');
 
                     /*
                     * Use the below line to assign dynamic id for design grid container and pass the id to initialize
@@ -106,6 +116,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     canvasContainer.removeClass('show-div').addClass('hide-div');
                     previewContainer.removeClass('show-div').addClass('hide-div');
                     designContainer.removeClass('show-div').addClass('hide-div');
+                    asyncAPIViewContainer.removeClass('show-div').addClass('hide-div');
                     sourceContainer.removeClass('source-view-disabled').addClass('source-view-enabled');
                     tabContentContainer.removeClass('tab-content-default');
 
@@ -179,6 +190,26 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             }
                         }, 100);
 
+                    });
+
+                    $('.toggle-controls-container #asyncbtn-asyncapi-view').on('click', function(e) {
+                        e.preventDefault();
+                        if (application.tabController.getActiveTab().getFile().isDirty()) {
+                            DesignViewUtils.prototype.warnAlert("Please save the file before switching to the Async API View");
+                            return;
+                        }
+                        setTimeout(function(){
+                            var response = self._designView.getDesign(self.getContent());
+                            if (response.status === "success") {
+                                self.JSONObject = JSON.parse(response.responseString);
+                                if (application.tabController.getActiveTab().getFile().getName().replace(".siddhi", "").localeCompare(self.JSONObject.siddhiAppConfig.siddhiAppName) === 0) {
+                                    self.viewOrGenerateAsyncAPI(self.JSONObject, asyncAPIViewContainer, sourceContainer, _.cloneDeep(self.options), self._sourceView.getEditor());
+                                }
+                            } else if (response.status === "fail") {
+                                loadingScreen.hide();
+                                DesignViewUtils.prototype.errorAlert(response.errorMessage);
+                            }
+                        }, 100);
                     });
 
                     var toggleViewButton = this._$parent_el.find(_.get(this.options, 'toggle_controls.toggle_view'));
@@ -331,6 +362,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         sourceContainer.hide();
                         designContainer.hide();
                         toggleViewButton.hide();
+                        asyncAPIViewContainer.hide();
                     }
                 },
 
@@ -347,6 +379,42 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         config.queryLists.JOIN.length == 0 &&
                         config.queryLists.PATTERN.length == 0 &&
                         config.queryLists.SEQUENCE.length == 0;
+                },
+
+                viewOrGenerateAsyncAPI: function(model, asyncAPIViewContainer, sourceContainer, options, editorInstance) {
+                    var annotations = model.siddhiAppConfig.appAnnotationList;
+                    if (annotations.length > 0) {
+                        for (var i=0; i<annotations.length; i++) {
+                            var asyncAPIAnnotationRegex = new RegExp(AsyncAPIConstants.ASYNC_API_ANNOTATION_REGEX);
+                            var asyncAPIAnnotation = annotations[i].match(asyncAPIAnnotationRegex);
+                            if (asyncAPIAnnotation.length > 0) {
+                                var ayncAPIContent = annotations[i].replace(asyncAPIAnnotation[0], "").replace(new RegExp('"\\)$'), "");
+                                //todo Error Handling part
+                                window.getAsyncAPIParserDoc(ayncAPIContent).then(asyncAPIDoc => {
+                                    sourceContainer.hide();
+                                    asyncAPIViewContainer.show();
+                                    options.asyncAPIDefYaml = ayncAPIContent;
+                                    options.asyncAPIViewContainer = asyncAPIViewContainer;
+                                    options.fromGenerator = false;
+                                    options.editorInstance = editorInstance;
+                                    this.asyncAPI = new AsyncAPI(options);
+                                })
+                            } else {
+                                sourceContainer.hide();
+                                asyncAPIViewContainer.show();
+                                options.asyncAPIViewContainer = asyncAPIViewContainer;
+                                options.editorInstance = editorInstance;
+                                this.asyncAPIGenerator = new AsyncAPIGenerator(options);
+                            }
+                        }
+                    } else {
+                        sourceContainer.hide();
+                        asyncAPIViewContainer.show();
+                        options.asyncAPIViewContainer = asyncAPIViewContainer;
+                        options.editorInstance = editorInstance;
+                        this.asyncAPIGenerator = new AsyncAPIGenerator(options);
+                    }
+
                 },
 
                 getContent: function () {

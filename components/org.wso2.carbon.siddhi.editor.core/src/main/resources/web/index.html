@@ -49,12 +49,16 @@
     <script src="editor/commons/lib/json-editor_v0.7.28/jsoneditor.min.js"></script>
     <!-- loading jsPlumb script-->
     <script src="editor/commons/lib/jsplumb_v2.6.9/jsplumb.min.js"></script>
+    <script src="editor/commons/lib/js-yaml/js-yaml.js"></script>
+    <script src="editor/js/async-api/react-component/dist/bundle.js"></script>
 
     <link rel="stylesheet" type="text/css" href="editor/css/styles.css"/>
     <link rel="stylesheet" type="text/css" href="editor/css/debugger.css"/>
     <link rel="stylesheet" type="text/css" href="editor/css/console.css"/>
     <link rel="stylesheet" type="text/css" href="editor/css/error-handler.css"/>
     <link rel="stylesheet" type="text/css" href="editor/commons/css/welcome-screen.css"/>
+    <link rel="stylesheet" type="text/css" href="editor/css/async-api-def.css"/>
+    <link rel="stylesheet" type="text/css" href="editor/css/async-api-font.css"/>
 
     <link rel="stylesheet" type="text/css" href="editor/css/design-view.css"/>
     <link rel="stylesheet" type="text/css" href="editor/css/etl-task-view.css"/>
@@ -317,6 +321,14 @@
             <div class="overlayed-container"></div>
             <!-- End: design-view-grid-container -->
         </div>
+
+        <div class="async-api-view-container" id="async-api-view-container" style="display: none">
+            <div class="async-api-view-yaml-container" id="async-api-view-yaml-container-id">
+            </div>
+            <div class="async-api-view-spec-container"></div>
+            <div class='clear-fix'></div>
+            <div class="async-api-generator-container"></div>
+        </div>
         <!-- End: design view container -->
 
         <!--    Start:  ETL Task View Container    -->
@@ -412,6 +424,9 @@
                 <span class="toggle-button-text" id="design_view_btn">Design View</span>
             </div>
             <button class="btn wizard-view-button" id="btn-wizard-view">Wizard View</button>
+            <button class="btn async-api-add-update-button" id="btn-add-update-async-btn">Add API</button>
+            <button class="btn async-api-view-button" id="asyncbtn-asyncapi-view">Async API View</button>
+            <button class="btn asyncbtn-to-code-view" id="asyncbtn-to-code-view">Code View</button>
         </div>
         <!-- End: Toggle Controls Container  -->
     </div>

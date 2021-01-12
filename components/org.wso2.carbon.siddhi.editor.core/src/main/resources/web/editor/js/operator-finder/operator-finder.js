@@ -126,6 +126,7 @@ define(['jquery', 'lodash', 'log', 'remarkable', 'handlebar', 'designViewUtils',
             if (operator.description) {
                 operator.extensionDescription = markDownConvertor.render(operator.description);
             }
+
             if (operator.examples) {
                 operator.combinedExamples = "";
                 operator.examples.forEach(function (e, i) {

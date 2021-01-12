@@ -73,6 +73,7 @@ define(function () {
         SNIPPET_MANAGER: "ace/snippets",
         LANG_TOOLS: "ace/ext/language_tools",
         SIDDHI_MODE: "ace/mode/siddhi",
+        ASYNC_API_MODE: "ace/mode/asyncapi",
         DEFAULT_THEME: "ace/theme/twilight",
         ACE_RANGE: "ace/range",
         LANG_LIB: "ace/lib/lang",
@@ -103,6 +104,10 @@ define(function () {
         PARSE_TREE_GENERATION_COMPLETION: "PARSE_TREE_GENERATION_COMPLETION",
         DATA_POPULATION_COMPLETION: "DATA_POPULATION_COMPLETION",
         TOKEN_TOOLTIP_POINT_RECOGNITION_COMPLETION: "TOKEN_TOOLTIP_POINT_RECOGNITION_COMPLETION"
+    };
+
+    constants.asyncAPI = {
+        UNDEFINED_DATA_TYPE: "#"
     };
 
     return constants;

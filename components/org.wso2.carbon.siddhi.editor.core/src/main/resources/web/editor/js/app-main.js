@@ -682,6 +682,13 @@ define(['app/main', 'jquery'],
                             // relative selector within container for a tab
                             container: '.etl-wizard-container'
                         },
+                        async_api_view: {
+                            // relative selector within container for a tab
+                            container: '.async-api-view-container',
+                            yamlContainer: '.async-api-view-yaml-container',
+                            specContainer: '.async-api-view-spec-container',
+                            generatorContainer: '.async-api-generator-container'
+                        },
                         debug: {
                             // relative selector within container for a tab
                             container: '.debug-container'
@@ -764,6 +771,9 @@ define(['app/main', 'jquery'],
         },
         export_dialog: {
             selector: "#openExportModal"
+        },
+        generate_async_api: {
+            selector: "#openAsyncAPIGenerateModal"
         },
         export_k8s_path_step_5: {
             selector: "#k8s-path-step-5"
