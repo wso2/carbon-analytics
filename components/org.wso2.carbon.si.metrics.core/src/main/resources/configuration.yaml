@@ -490,3 +490,100 @@ metricsLabelMapping:
       topic: "${1}"
       partition: "${2}"
       stream_id: "${3}"
+
+  # Siddhi-io-http Metrics
+  siddhi.io.http.apps:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Http"
+    name: "siddhi.http.apps"
+    labels:
+      app: "${0}"
+
+  # Http Source
+  siddhi.io.http.source.event.count:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Http.Source.Total.Reads.*.(.*)"
+    name: "siddhi.http.source.event.count"
+    labels:
+      app: "${0}"
+      stream_name: "${1}"
+      url: "${2}"
+
+  siddhi.io.http.source.error.count:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Http.Source.Total.Errors.*.(.*)"
+    name: "siddhi.http.source.error.count"
+    labels:
+      app: "${0}"
+      stream_name: "${1}"
+      url: "${2}"
+
+  siddhi.io.http.source.status:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Http.Source.Endpoint.Status.*.(.*)"
+    name: "siddhi.http.source.status"
+    labels:
+      app: "${0}"
+      stream_name: "${1}"
+      url: "${2}"
+
+  siddhi.io.http.source.request.size:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Http.Source.Total.Request.Size.*.(.*)"
+    name: "siddhi.http.source.request.size"
+    labels:
+      app: "${0}"
+      stream_name: "${1}"
+      url: "${2}"
+
+  siddhi.io.http.source.last.event.time:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Http.Source.Last.Event.Time.*.(.*)"
+    name: "siddhi.http.source.last.event.time"
+    labels:
+      app: "${0}"
+      stream_name: "${1}"
+      url: "${2}"
+
+  # Http Sink
+  siddhi.io.http.sink.event.count:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Http.Sink.Total.Writes.*.(.*)"
+    name: "siddhi.http.sink.event.count"
+    labels:
+      app: "${0}"
+      stream_name: "${1}"
+      url: "${2}"
+
+  siddhi.io.http.sink.error.count:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Http.Sink.Total.Errors.*.(.*)"
+    name: "siddhi.http.sink.error.count"
+    labels:
+      app: "${0}"
+      stream_name: "${1}"
+      url: "${2}"
+
+  siddhi.io.http.sink.status:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Http.Sink.Endpoint.Status.*.(.*)"
+    name: "siddhi.http.sink.status"
+    labels:
+      app: "${0}"
+      stream_name: "${1}"
+      url: "${2}"
+
+  siddhi.io.http.sink.request.size:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Http.Sink.Total.Request.Size.*.(.*)"
+    name: "siddhi.http.sink.request.size"
+    labels:
+      app: "${0}"
+      stream_name: "${1}"
+      url: "${2}"
+
+  siddhi.io.http.sink.average.latency:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Http.Sink.Average.Latency.*.(.*)"
+    name: "siddhi.http.sink.average.latency"
+    labels:
+      app: "${0}"
+      stream_name: "${1}"
+      url: "${2}"
+
+  siddhi.io.http.sink.last.event.time:
+    match: "io.siddhi.SiddhiApps.*.Siddhi.Http.Sink.Last.Event.Time.*.(.*)"
+    name: "siddhi.http.sink.last.event.time"
+    labels:
+      app: "${0}"
+      stream_name: "${1}"
+      url: "${2}"
