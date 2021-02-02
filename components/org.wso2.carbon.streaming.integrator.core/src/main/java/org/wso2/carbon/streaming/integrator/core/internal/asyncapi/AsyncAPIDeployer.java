@@ -92,7 +92,8 @@ public class AsyncAPIDeployer implements Runnable {
                     log.info("Async API: " + asyncAPiKeyVersion + " uploaded to the service catalogue");
                 }
             } catch (ServiceCatalogueAPIServiceStubException e) {
-                e.printStackTrace();
+                log.error("Exception occurred when deploying Async API: " + asyncAPiKeyVersion +
+                        " to the service catalogue");
             }
         }
     }
