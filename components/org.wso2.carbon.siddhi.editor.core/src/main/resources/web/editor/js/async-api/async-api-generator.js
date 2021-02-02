@@ -212,26 +212,39 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             self.asyncAPIViewContainer.addClass('etl-wizard-view-enabled');
         }
 
-        AsyncAPIView.prototype.renderSinksSources = function () {
+        AsyncAPIView.prototype.renderSinksSources = function (type) {
             var self = this;
             var sinks = self.siddhiAppConfig.siddhiAppConfig.sinkList;
             var sources = self.siddhiAppConfig.siddhiAppConfig.sourceList;
+            var sinksAvailable = false;
+            for (var i = 0; i < sinks.length; i++) {
+                if (sinks[i].type === type) {
+                    sinksAvailable = true;
+                    break;
+                }
+            }
+            var sourcesAvailable = false;
+            for (var i = 0; i < sources.length; i++) {
+                if (sources[i].type === type) {
+                    sourcesAvailable = true;
+                    break;
+                }
+            }
 
-            if (sinks.length > 0) {
+            if (sinks.length > 0 && sinksAvailable) {
                 self.sinkListDivSelector.removeClass('hide-div');
-                self.sinkListSelector.html(generateCheckboxListOptions(sinks));
+                self.sinkListSelector.html(generateCheckboxListOptions(sinks, type));
                 self.sinkListSelector.find('.asyncapitooltip').popover({
                     container: 'body',
                     trigger: 'hover'
                 })
-
             } else {
                 self.sinkListDivSelector.addClass('hide-div');
             }
 
-            if (sources.length > 0) {
+            if (sources.length > 0 && sourcesAvailable) {
                 self.sourceListDivSelector.removeClass('hide-div');
-                self.sourceListSelector.html(generateCheckboxListOptions(sources));
+                self.sourceListSelector.html(generateCheckboxListOptions(sources, type));
                 self.sourceListSelector.find('.asyncapitooltip').popover({
                     container: 'body',
                     trigger: 'hover'
@@ -296,7 +309,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         serverDetails = getServerHostPort(sourceList[j].options, sourceList[j].type.toLowerCase(), self.sinkSorceTypes, "source");
                         serverDetails.channelType = "publish";
                         serverDetails.stream = sourceList[j].connectedElementName;
-                        serverDetails.payloadProperties = getPayloadSpec(sourceList[j].connectedElementName, streamList, sinkList[j].type.toLowerCase());
+                        serverDetails.payloadProperties = getPayloadSpec(sourceList[j].connectedElementName, streamList, sourceList[j].type.toLowerCase());
                         serverDetails.payloadSchemaProperties = getPayloadSchemas(sourceList[j].connectedElementName, streamList)
                         serversDetails.push(serverDetails);
                         if (initialPort === -1) {
@@ -579,7 +592,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 //todo: check how to get channel information from each IO type
                 //adding channel information retrived by the url
                 serverDetails.url = serverDetails.protocol + serverDetails.hostname + ":" + serverDetails.port;
-                serverDetails.channel.push(serverKeyValue[1].replaceAll("ws://", '').replaceAll("wss://", '').replace(serverDetails[0] + ":" + serverDetails[1]));
+                serverDetails.channel.push(serverKeyValue[1].replaceAll(serverDetails.url, "").replaceAll('\"','').trim());
             } else if (type === "sse") { //todo need to change when SSE is developed currently assumed it as http sink
                 for (i = 0; i < options.length; i++) {
                     if (options[i].startsWith("publisher.url")) {
@@ -638,7 +651,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             return serverDetails;
         };
 
-        var generateCheckboxListOptions = function (dataArray, initialOptionValue, componentName, type) {
+        var generateCheckboxListOptions = function (dataArray, type) {
             var dataOption =
                 '<label for="{{dataName}}"  class="asyncapitooltip" data-toggle="popover" data-content="{{options}}">' +
                 // '<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here\'s some amazing content. It\'s very engaging. Right?">Click to toggle popover</button>\n' +
@@ -651,13 +664,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 '</label>';
 
             var result = '';
-            if (initialOptionValue !== undefined) {
-                result += initialOptionValue;
-            }
             if (dataArray) {
                 dataArray.sort();
                 for (var i = 0; i < dataArray.length; i++) {
-                    result += dataOption.replaceAll('{{dataName}}', dataArray[i].connectedElementName).replaceAll('{{options}}', dataArray[i].options.toString().replaceAll('"',"'"));
+                    if (dataArray[i].type === type) {
+                        result += dataOption.replaceAll('{{dataName}}', dataArray[i].connectedElementName).replaceAll('{{options}}', dataArray[i].options.toString().replaceAll('"',"'"));
+                    }
                 }
             }
             return result;
