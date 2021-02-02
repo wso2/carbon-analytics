@@ -25,6 +25,7 @@ import io.siddhi.core.stream.output.sink.SinkHandlerManager;
 import io.siddhi.core.table.record.RecordTableHandlerManager;
 import io.siddhi.core.util.statistics.StatisticsManager;
 import org.osgi.framework.BundleContext;
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.analytics.permissions.PermissionProvider;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.provider.ConfigProvider;
@@ -65,6 +66,7 @@ public class StreamProcessorDataHolder {
     private static StatisticsConfiguration statisticsConfiguration;
     private static StatisticsManager statisticsManager;
     private static boolean isStatisticsEnabled;
+    private AnalyticsHttpClientBuilderService clientBuilderService;
 
     /**
      * List used to hold all the registered hs state change listeners.
@@ -296,5 +298,23 @@ public class StreamProcessorDataHolder {
 
     public static void setIsStatisticsEnabled(boolean isStatisticsEnabled) {
         StreamProcessorDataHolder.isStatisticsEnabled = isStatisticsEnabled;
+    }
+
+    /**
+     * Get an instance of Analytics HTTP client builder service.
+     *
+     * @return An instance of AnalyticsHttpClientBuilderService
+     */
+    public AnalyticsHttpClientBuilderService getClientBuilderService() {
+        return clientBuilderService;
+    }
+
+    /**
+     * Set an instance of Analytics HTTP client builder service.
+     *
+     * @param clientBuilderService An object of AnalyticsHttpClientBuilderService
+     */
+    public void setClientBuilderService(AnalyticsHttpClientBuilderService clientBuilderService) {
+        this.clientBuilderService = clientBuilderService;
     }
 }

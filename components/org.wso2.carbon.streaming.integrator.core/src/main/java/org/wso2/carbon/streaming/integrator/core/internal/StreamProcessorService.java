@@ -34,22 +34,27 @@ import io.siddhi.query.api.util.AnnotationHelper;
 import io.siddhi.query.compiler.SiddhiCompiler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.config.ConfigurationException;
+import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationRecordTableHandler;
 import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSinkHandler;
 import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSourceHandler;
 import org.wso2.carbon.streaming.integrator.core.ha.HAManager;
 import org.wso2.carbon.streaming.integrator.core.ha.RetryRecordTableConnection;
+import org.wso2.carbon.streaming.integrator.core.internal.asyncapi.AsyncAPIUndeployer;
 import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppAlreadyExistException;
 import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppConfigurationException;
 import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppFilesystemInvoker;
 import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppProcessorConstants;
+import org.wso2.carbon.streaming.integrator.core.persistence.beans.AsyncAPIServiceCatalogueConfigs;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -63,6 +68,7 @@ public class StreamProcessorService {
     private static final Logger log = LoggerFactory.getLogger(StreamProcessorService.class);
     private Map<String, SiddhiAppData> siddhiAppMap = new ConcurrentHashMap<>();
     private BackoffRetryCounter backoffRetryCounter = new BackoffRetryCounter();
+    private static final ExecutorService asyncAPIUndeployExecutorService = Executors.newFixedThreadPool(10);
 
     public void deploySiddhiApp(String siddhiAppContent, String siddhiAppName) throws SiddhiAppConfigurationException,
             SiddhiAppAlreadyExistException, ConnectionUnavailableException {
@@ -231,6 +237,24 @@ public class StreamProcessorService {
                     siddhiAppData.getSiddhiAppRuntime().shutdown();
                 }
             }
+            try {
+                ConfigProvider configProvider = StreamProcessorDataHolder.getInstance().getConfigProvider();
+                AsyncAPIServiceCatalogueConfigs asyncAPIServiceCatalogueConfigs =
+                        configProvider.getConfigurationObject(AsyncAPIServiceCatalogueConfigs.class);
+                if (asyncAPIServiceCatalogueConfigs != null && asyncAPIServiceCatalogueConfigs.isEnabled()) {
+                    String asyncAPIValue = StreamProcessorDataHolder.getStreamProcessorService().
+                            getSiddhiAnnotationValue(StreamProcessorDataHolder.getStreamProcessorService().getSiddhiAppMap().get(siddhiAppName).getSiddhiApp(),
+                                    SiddhiAppProcessorConstants.ANNOTATION_ASYNC_API_NAME, siddhiAppName);
+                    AsyncAPIUndeployer asyncAPIUndeployer = new AsyncAPIUndeployer(asyncAPIServiceCatalogueConfigs, asyncAPIValue);
+                    asyncAPIUndeployExecutorService.execute(asyncAPIUndeployer);
+                }
+            } catch (SiddhiAppConfigurationException e){
+                if (log.isDebugEnabled()) {
+                    log.debug("AsyncAPI annotation not found in Siddhi app: " + siddhiAppName);
+                }
+            } catch (ConfigurationException e) {
+                log.error("Configuration exception occurred when deleting Async API definition.", e);
+            }
             siddhiAppMap.remove(siddhiAppName);
             log.info("Siddhi App File " + siddhiAppName + " undeployed successfully.");
         }
@@ -238,7 +262,6 @@ public class StreamProcessorService {
 
     public boolean delete(String siddhiAppName) throws SiddhiAppConfigurationException,
             SiddhiAppDeploymentException {
-
         if (siddhiAppMap.containsKey(siddhiAppName)) {
             SiddhiAppFilesystemInvoker.delete(siddhiAppName);
             return true;
@@ -284,6 +307,21 @@ public class StreamProcessorService {
 
             return nameAnnotation.getValue();
 
+        } catch (Throwable e) {
+            throw new SiddhiAppConfigurationException("Exception occurred when retrieving Siddhi App Name ", e);
+        }
+    }
+
+    public String getSiddhiAnnotationValue(String siddhiApp, String annotationNameName, String appFileName) throws SiddhiAppConfigurationException {
+        try {
+            SiddhiApp parsedSiddhiApp = SiddhiCompiler.parse(siddhiApp);
+            Element annotation = AnnotationHelper.
+                    getAnnotationElement(annotationNameName, null, parsedSiddhiApp.getAnnotations());
+            if (annotation == null || annotation.getValue().isEmpty()) {
+                throw new SiddhiAppConfigurationException
+                        ("Siddhi App annotation: " + annotationNameName + " doesnt exist in file: " + appFileName);
+            }
+            return annotation.getValue();
         } catch (Throwable e) {
             throw new SiddhiAppConfigurationException("Exception occurred when retrieving Siddhi App Name ", e);
         }

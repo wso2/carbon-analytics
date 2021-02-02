@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.analytics.permissions.PermissionManager;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.config.ConfigurationException;
@@ -52,6 +53,8 @@ import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import org.wso2.carbon.streaming.integrator.common.utils.config.FileConfigManager;
 import org.wso2.carbon.streaming.integrator.core.DeploymentMode;
 import org.wso2.carbon.streaming.integrator.core.NodeInfo;
+import org.wso2.carbon.streaming.integrator.core.internal.asyncapi.AsyncAPIDeployer;
+import org.wso2.carbon.streaming.integrator.core.persistence.beans.AsyncAPIServiceCatalogueConfigs;
 import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.beans.ErrorStoreConfigurations;
 import org.wso2.carbon.streaming.integrator.core.ha.HAManager;
 import org.wso2.carbon.streaming.integrator.core.ha.exception.HAModeException;
@@ -489,4 +492,17 @@ public class ServiceComponent {
         }
     }
 
+    @Reference(
+            name = "carbon.anaytics.common.clientservice",
+            service = AnalyticsHttpClientBuilderService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterAnalyticsHttpClient"
+    )
+    protected void registerAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+        StreamProcessorDataHolder.getInstance().setClientBuilderService(service);
+    }
+    protected void unregisterAnalyticsHttpClient(AnalyticsHttpClientBuilderService service) {
+        StreamProcessorDataHolder.getInstance().setClientBuilderService(null);
+    }
 }

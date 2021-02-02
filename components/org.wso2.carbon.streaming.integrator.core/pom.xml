@@ -179,6 +179,14 @@
             <artifactId>org.wso2.carbon.databridge.commons</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.wso2.org.apache.commons</groupId>
+            <artifactId>commons-vfs2</artifactId>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.github.openfeign.form</groupId>-->
+<!--            <artifactId>feign-form</artifactId>-->
+<!--        </dependency>-->
+        <dependency>
             <groupId>findbugs</groupId>
             <artifactId>findbugs</artifactId>
         </dependency>
@@ -243,7 +251,9 @@
             org.wso2.carbon.streaming.integrator.core.internal,
             org.wso2.carbon.streaming.integrator.core.internal.*,
             org.apache.http.*,
+            org.apache.commons.vfs2.*,
             org.apache.commons.codec.*,
+<!--            feign.form.*,-->
         </private.package>
         <export.package>
             <!--!org.wso2.carbon.streaming.integrator.core.internal,-->
