@@ -31,7 +31,7 @@ public class SiddhiAppProcessorConstants {
     public static final String SIDDHI_APP_STATUS_INACTIVE = "inactive";
     public static final String WSO2_ARTIFACT_DEPLOYMENT_NS = "wso2.artifact.deployment";
     public static final String WSO2_ARTIFACT_DEPLOYMENT_REPOSITORY_LOCATION = "repositoryLocation";
-
+    public static final String ANNOTATION_ASYNC_API_NAME = "AsyncAPI";
 
     public static final String ANALYTICS_SOLUTIONS = "analytics.solutions";
 

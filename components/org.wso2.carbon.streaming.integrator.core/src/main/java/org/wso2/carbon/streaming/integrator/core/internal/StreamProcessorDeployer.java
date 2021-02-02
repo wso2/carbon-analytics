@@ -35,9 +35,13 @@ import org.wso2.carbon.deployment.engine.exception.CarbonDeploymentException;
 import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppDeploymentListener;
 import org.wso2.carbon.streaming.integrator.common.SimulationDependencyListener;
+import org.wso2.carbon.streaming.integrator.core.internal.asyncapi.AsyncAPIDeployer;
+import org.wso2.carbon.streaming.integrator.core.internal.asyncapi.AsyncAPIUndeployer;
 import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppAlreadyExistException;
+import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppConfigurationException;
 import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppProcessorConstants;
+import org.wso2.carbon.streaming.integrator.core.persistence.beans.AsyncAPIServiceCatalogueConfigs;
 import org.wso2.msf4j.MicroservicesServer;
 
 import java.io.BufferedReader;
@@ -49,8 +53,11 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * {@code StreamProcessorDeployer} is responsible for all Siddhi Appp file deployment tasks
@@ -73,6 +80,8 @@ public class StreamProcessorDeployer implements Deployer {
     private static boolean isAnalyticsEnabledOnSP = false;
     private static boolean apimAnalyticsEnabledOnSP = false;
     private static boolean eiAnalyticsEnabledOnSP = false;
+    private static final ExecutorService asyncAPIDeployExecutorService = Executors.newFixedThreadPool(10);
+
 
     public static void deploySiddhiQLFile(File file) throws Exception {
         InputStream inputStream = null;
@@ -96,6 +105,23 @@ public class StreamProcessorDeployer implements Deployer {
                             broadcastBeforeSiddhiAppDeployment(siddhiAppName, siddhiApp);
                             StreamProcessorDataHolder.getStreamProcessorService().deploySiddhiApp(siddhiApp,
                                     siddhiAppName);
+                            try {
+                                ConfigProvider configProvider = StreamProcessorDataHolder.getInstance().getConfigProvider();
+                                AsyncAPIServiceCatalogueConfigs asyncAPIServiceCatalogueConfigs =
+                                        configProvider.getConfigurationObject(AsyncAPIServiceCatalogueConfigs.class);
+                                if (asyncAPIServiceCatalogueConfigs != null && asyncAPIServiceCatalogueConfigs.isEnabled()) {
+                                    String asyncAPIValue = StreamProcessorDataHolder.getStreamProcessorService().
+                                            getSiddhiAnnotationValue(siddhiApp,
+                                                    SiddhiAppProcessorConstants.ANNOTATION_ASYNC_API_NAME, file.getName());
+                                    AsyncAPIDeployer asyncAPIDeployer =
+                                            new AsyncAPIDeployer(asyncAPIServiceCatalogueConfigs, asyncAPIValue);
+                                    asyncAPIDeployExecutorService.execute(asyncAPIDeployer);
+                                }
+                            } catch (SiddhiAppConfigurationException e){
+                                if (log.isDebugEnabled()) {
+                                    log.debug("AsyncAPI annotation not found in file: " + file.getName());
+                                }
+                            }
                             broadcastSiddhiAppDeployment(siddhiAppName, siddhiApp);
                         } else {
                             throw new SiddhiAppDeploymentException("Siddhi App file name needs be identical with the " +

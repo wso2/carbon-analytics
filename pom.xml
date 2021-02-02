@@ -1421,11 +1421,6 @@
                 <version>${openfeign.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.netflix.feign</groupId>
-                <artifactId>feign-core</artifactId>
-                <version>8.18.0</version>
-            </dependency>
-            <dependency>
                 <groupId>io.github.openfeign</groupId>
                 <artifactId>feign-okhttp</artifactId>
                 <version>${openfeign.version}</version>
@@ -1623,16 +1618,20 @@
                 <artifactId>simpleclient_httpserver</artifactId>
                 <version>${prometheus.simpleclient.httpserver.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.wso2.org.apache.commons</groupId>
+                <artifactId>commons-vfs2</artifactId>
+                <version>${commons-vfs2.wso2.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
         <carbon.analytics.version>3.0.50-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>5.1.16</siddhi.version>
-        <siddhi.bundle.version>5.1.16</siddhi.bundle.version>
+        <siddhi.version>5.1.17</siddhi.version>
+        <siddhi.bundle.version>5.1.17</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.1.46</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.1.47</carbon.analytics-common.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[3.0.0, 4.0.0)</carbon.analytics.version.range>
         <com.spotify.docker.client.version>8.16.0</com.spotify.docker.client.version>
@@ -1724,6 +1723,7 @@
 
         <netty.version>4.1.34.Final</netty.version>
         <org.wso2.transport.http.netty.version>6.1.9</org.wso2.transport.http.netty.version>
+        <commons-vfs2.wso2.version>2.2-wso2v1</commons-vfs2.wso2.version>
         <carbon.transport.package.import.version.range>[6.0.0, 7.0.0)</carbon.transport.package.import.version.range>
 
         <carbon.messaging.version>3.0.3</carbon.messaging.version>

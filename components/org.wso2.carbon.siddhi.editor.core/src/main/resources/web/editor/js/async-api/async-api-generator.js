@@ -39,9 +39,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             this.asyncAPIViewContainer = initOpts.asyncAPIViewContainer;
             this.asyncAPIViewContainer.removeClass("hide-div");
-            this.asyncAPISpecContainer = this.asyncAPIViewContainer.find(_.get(initOpts, 'async_api_view.specContainer'));
-            this.asyncAPIGenContainer = this.asyncAPIViewContainer.find(_.get(initOpts, 'async_api_view.generatorContainer'));
-            this.asyncAPIYamlContainer = this.asyncAPIViewContainer.find(_.get(initOpts, 'async_api_view.yamlContainer'));
+            this.asyncAPISpecContainer = this.asyncAPIViewContainer
+                .find(_.get(initOpts, 'async_api_view.specContainer'));
+            this.asyncAPIGenContainer = this.asyncAPIViewContainer
+                .find(_.get(initOpts, 'async_api_view.generatorContainer'));
+            this.asyncAPIYamlContainer = this.asyncAPIViewContainer
+                .find(_.get(initOpts, 'async_api_view.yamlContainer'));
             self.__options = initOpts;
             self.__app = initOpts.application;
             self.__editorInstance = initOpts.editorInstance;
@@ -49,16 +52,19 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             self.asyncAPIDefYaml = initOpts.asyncAPIDefYaml;
             self.openAsyncAPIGenerateModal = $(
                 "<div>" +
-                "    <h4 class='modal-title file-dialog-title' id='initialAsyncApiDefHeading'>Generating Async API for Sinks and Sources</h4>" +
+                "    <h4 class='modal-title file-dialog-title' " +
+                "           id='initialAsyncApiDefHeading'>Generating Async API for Sinks and Sources</h4>" +
                 "    <hr class='style1'>" +
                 "</div>" +
                 "<div>" +
                 "    <div id='async-api-form'>" +
                 "        <div>" +
-                "            <div class='async-api-source-sink-list' id='async-api-source-sink-list' style='display: block'>" +
+                "            <div class='async-api-source-sink-list' id='async-api-source-sink-list' " +
+                "               style='display: block'>" +
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'> Title </label> " +
-                "                    <input class='add-new-server-input' id='asyncAPITitle' placeholder='Sweet Production Application'> " +
+                "                    <input class='add-new-server-input' id='asyncAPITitle' " +
+                "                       placeholder='Sweet Production Application'> " +
                 "                </div>" +
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'> Version </label> " +
@@ -67,14 +73,16 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'>Description</label>" +
                 "                    <div class='col-sm-12'>" +
-                "                         <textarea id='asyncAPIDescription' class='curl-editor form-control'></textarea>" +
+                "                         <textarea id='asyncAPIDescription' class='curl-editor form-control'>" +
+                "                         </textarea>" +
                 "                    </div>" +
                 "                </div>" +
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'>" +
                 "                        Select Source or Sink type to Generate Async API" +
                 "                    </label>" +
-                "                    <select name='siddhi-sink-source-type' id='siddhi-sink-source-type' class='form-control'>" +
+                "                    <select name='siddhi-sink-source-type' id='siddhi-sink-source-type' " +
+                "                       class='form-control'>" +
                 "                    </select>" +
                 "                </div>" +
                 "                <div class='form-group' id='source-list-div'>" +
@@ -96,7 +104,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 "    </div>" +
                 "    <div class='button-container' id='async-button-container'>" +
                 "        <div class='async-dialog-form-btn'>" +
-                "            <button id='deployButton' type='button' class='btn btn-primary'>Generate Async API</button>" +
+                "            <button id='deployButton' type='button' class='btn btn-primary'>" +
+                "               Generate Async API</button>" +
                 "            <div class='divider'/>" +
                 "            <button type='button' class='btn btn-default' data-dismiss='modal'>Cancel</button>" +
                 "        </div>" +
@@ -179,7 +188,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     self.asyncAPIViewContainer.hide();
                     $(self.toggleControlsContainer[0]).find('.toggle-view-button').removeClass('hide-div');
                     $(self.toggleControlsContainer[0]).find('.wizard-view-button').removeClass('hide-div');
-                    var asyncAPIAddUpdateButton = $(self.toggleControlsContainer[0]).find('.async-api-add-update-button');
+                    var asyncAPIAddUpdateButton = $(self.toggleControlsContainer[0])
+                        .find('.async-api-add-update-button');
                     asyncAPIAddUpdateButton.addClass('hide-div');
                     var codeViewButton = $(self.toggleControlsContainer[0]).find('#asyncbtn-to-code-view');
                     codeViewButton.addClass('hide-div');
@@ -212,26 +222,39 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             self.asyncAPIViewContainer.addClass('etl-wizard-view-enabled');
         }
 
-        AsyncAPIView.prototype.renderSinksSources = function () {
+        AsyncAPIView.prototype.renderSinksSources = function (type) {
             var self = this;
             var sinks = self.siddhiAppConfig.siddhiAppConfig.sinkList;
             var sources = self.siddhiAppConfig.siddhiAppConfig.sourceList;
+            var sinksAvailable = false;
+            for (var i = 0; i < sinks.length; i++) {
+                if (sinks[i].type === type) {
+                    sinksAvailable = true;
+                    break;
+                }
+            }
+            var sourcesAvailable = false;
+            for (var i = 0; i < sources.length; i++) {
+                if (sources[i].type === type) {
+                    sourcesAvailable = true;
+                    break;
+                }
+            }
 
-            if (sinks.length > 0) {
+            if (sinks.length > 0 && sinksAvailable) {
                 self.sinkListDivSelector.removeClass('hide-div');
-                self.sinkListSelector.html(generateCheckboxListOptions(sinks));
+                self.sinkListSelector.html(generateCheckboxListOptions(sinks, type));
                 self.sinkListSelector.find('.asyncapitooltip').popover({
                     container: 'body',
                     trigger: 'hover'
                 })
-
             } else {
                 self.sinkListDivSelector.addClass('hide-div');
             }
 
-            if (sources.length > 0) {
+            if (sources.length > 0 && sourcesAvailable) {
                 self.sourceListDivSelector.removeClass('hide-div');
-                self.sourceListSelector.html(generateCheckboxListOptions(sources));
+                self.sourceListSelector.html(generateCheckboxListOptions(sources, type));
                 self.sourceListSelector.find('.asyncapitooltip').popover({
                     container: 'body',
                     trigger: 'hover'
@@ -272,18 +295,22 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             for (i = 0; i < checkedSinkList.length; i++) {
                 for (j = 0; j < sinkList.length; j++) {
-                    if (selectedIOType.toLowerCase() === sinkList[j].type.toLowerCase() && sinkList[j].connectedElementName === checkedSinkList[i].value) {
-                        serverDetails = getServerHostPort(sinkList[j].options, sinkList[j].type.toLowerCase(), self.sinkSorceTypes, "sink");
+                    if (selectedIOType.toLowerCase() === sinkList[j].type.toLowerCase() &&
+                        sinkList[j].connectedElementName === checkedSinkList[i].value) {
+                        serverDetails = getServerHostPort(sinkList[j].options, sinkList[j].type.toLowerCase(),
+                            self.sinkSorceTypes, "sink");
                         serverDetails.channelType = "subscribe";
                         serverDetails.stream = sinkList[j].connectedElementName;
-                        serverDetails.payloadProperties = getPayloadSpec(sinkList[j].connectedElementName, streamList, sinkList[j].type.toLowerCase())
+                        serverDetails.payloadProperties = getPayloadSpec(sinkList[j].connectedElementName,
+                            streamList, sinkList[j].type.toLowerCase())
                         serversDetails.push(serverDetails);
                         if (initialPort === -1) {
                             initialServer = serverDetails.host;
                             initialPort = serverDetails.port;
                         } else {
                             if (initialServer !== serverDetails.host || initialPort !== serverDetails.port) {
-                                alerts.error("The selected sink " + sinkList[j].connectedElementName + " of " + sinkList[j].type + " has different server values (host:port)");
+                                alerts.error("The selected sink " + sinkList[j].connectedElementName + " of " +
+                                    sinkList[j].type + " has different server values (host:port)");
                             }
                         }
                     }
@@ -292,19 +319,24 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             for (i = 0; i < checkedSourceList.length; i++) {
                 for (j = 0; j < sourceList.length; j++) {
-                    if (selectedIOType.toLowerCase() === sourceList[j].type.toLowerCase() && sourceList[j].connectedElementName === checkedSourceList[i].value) {
-                        serverDetails = getServerHostPort(sourceList[j].options, sourceList[j].type.toLowerCase(), self.sinkSorceTypes, "source");
+                    if (selectedIOType.toLowerCase() === sourceList[j].type.toLowerCase() &&
+                        sourceList[j].connectedElementName === checkedSourceList[i].value) {
+                        serverDetails = getServerHostPort(
+                            sourceList[j].options, sourceList[j].type.toLowerCase(), self.sinkSorceTypes, "source");
                         serverDetails.channelType = "publish";
                         serverDetails.stream = sourceList[j].connectedElementName;
-                        serverDetails.payloadProperties = getPayloadSpec(sourceList[j].connectedElementName, streamList, sinkList[j].type.toLowerCase());
-                        serverDetails.payloadSchemaProperties = getPayloadSchemas(sourceList[j].connectedElementName, streamList)
+                        serverDetails.payloadProperties = getPayloadSpec(
+                            sourceList[j].connectedElementName, streamList, sourceList[j].type.toLowerCase());
+                        serverDetails.payloadSchemaProperties =
+                            getPayloadSchemas(sourceList[j].connectedElementName, streamList)
                         serversDetails.push(serverDetails);
                         if (initialPort === -1) {
                             initialServer = serverDetails.host;
                             initialPort = serverDetails.port;
                         } else {
                             if (initialServer !== serverDetails.host || initialPort !== serverDetails.port) {
-                                alerts.error("The selected source " + sourceList[j].connectedElementName + " of " + sourceList[j].type + " has different server values (host:port)");
+                                alerts.error("The selected source " + sourceList[j].connectedElementName +
+                                    " of " + sourceList[j].type + " has different server values (host:port)");
                             }
                         }
                     }
@@ -329,11 +361,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             for (i = 0; i < serversDetails.length; i++) {
                 var channelRef;
                 if (serversDetails[i].channelType === "publish") {
-                    channelRef = {"publish": {"message": {"$ref": "#/components/messages/" + serversDetails[i].stream + "Payload"}}};
-                    // asyncAPIJSON.channels[serversDetails[i].channel] = {"publish": {"message": {"$ref": "#/components/messages/" + serversDetails[i].stream + "Payload"}}}
+                    channelRef = {"publish": {"message": {"$ref": "#/components/messages/" +
+                                    serversDetails[i].stream + "Payload"}}};
                 } else {
-                    channelRef = {"subscribe": {"message": {"$ref": "#/components/messages/" + serversDetails[i].stream + "Payload"}}};
-                    // asyncAPIJSON.channels[serversDetails[i].channel] = {"subscribe": {"message": {"$ref": "#/components/messages/" + serversDetails[i].stream + "Payload"}}}
+                    channelRef = {"subscribe": {"message": {"$ref": "#/components/messages/" +
+                                    serversDetails[i].stream + "Payload"}}};
                 }
                 var serverDetailChannels = serversDetails[i].channel;
                 if (serverDetailChannels !== undefined && serverDetailChannels !== null) {
@@ -359,7 +391,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 "securitySchemes": {}
             };
             for (i = 0; i < serversDetails.length; i++) {
-                asyncAPIJSON.components.messages[serversDetails[i].stream + "Payload"] = {"payload": serversDetails[i].payloadProperties};
+                asyncAPIJSON.components.messages[serversDetails[i].stream + "Payload"] =
+                    {"payload": serversDetails[i].payloadProperties};
                 Object.keys(serversDetails[i].payloadSchemaProperties).forEach(function (key) {
                     asyncAPIJSON.components.schemas[key] = serversDetails[i].payloadSchemaProperties[key];
                 })
@@ -407,7 +440,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         response = AsyncAPIRESTClient.getSiddhiElements(editorText);
                         if (response.status === "success") {
                             self.JSONObject = JSON.parse(self.__app.utils.b64DecodeUnicode(response.response));
-                            if (self.__app.tabController.getActiveTab().getFile().getName().replace(".siddhi", "").localeCompare(self.JSONObject.siddhiAppConfig.siddhiAppName) === 0) {
+                            if (self.__app.tabController.getActiveTab().getFile().getName().replace(".siddhi", "")
+                                .localeCompare(self.JSONObject.siddhiAppConfig.siddhiAppName) === 0) {
                                 console.log(self.JSONObject);
                                 var sinks = self.JSONObject.siddhiAppConfig.sinkList;
                                 var sources = self.JSONObject.siddhiAppConfig.sourceList;
@@ -431,7 +465,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                     }
                                 }
                                 if (!foundCompatibleType) {
-                                    alerts.error("No compatible sink or source types found in the siddhi app to generate Async API");
+                                    alerts.error("No compatible sink or source types found in the siddhi app to " +
+                                        "generate Async API");
                                 } else {
                                     return self.JSONObject;
                                 }
@@ -560,7 +595,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 for (i = 0; i < options.length; i++) {
                     if (options[i].startsWith("url")) {
                         serverKeyValue = options[i].split("=");
-                        urlElements = serverKeyValue[1].trim().replaceAll('"', '').replaceAll("ws://", '').replaceAll("wss://", '').split("/");
+                        urlElements = serverKeyValue[1].trim().replaceAll('"', '')
+                            .replaceAll("ws://", '').replaceAll("wss://", '').split("/");
                         var temp = urlElements[0].split(":");
                         serverDetails.hostname = temp[0];
                         serverDetails.port = temp[1];
@@ -579,12 +615,15 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 //todo: check how to get channel information from each IO type
                 //adding channel information retrived by the url
                 serverDetails.url = serverDetails.protocol + serverDetails.hostname + ":" + serverDetails.port;
-                serverDetails.channel.push(serverKeyValue[1].replaceAll("ws://", '').replaceAll("wss://", '').replace(serverDetails[0] + ":" + serverDetails[1]));
+                serverDetails.channel.push(serverKeyValue[1]
+                    .replaceAll(serverDetails.url, "").replaceAll('\"','').trim());
             } else if (type === "sse") { //todo need to change when SSE is developed currently assumed it as http sink
                 for (i = 0; i < options.length; i++) {
                     if (options[i].startsWith("publisher.url")) {
                         serverKeyValue = options[i].split("=");
-                        urlElements = serverKeyValue[1].trim().replaceAll('"', '').replaceAll("http://", '').replaceAll("https://", '').split("/");
+                        urlElements = serverKeyValue[1].trim()
+                            .replaceAll('"', '').replaceAll("http://", '')
+                            .replaceAll("https://", '').split("/");
                         var temp = urlElements[0].split(":");
                         serverDetails.hostname = temp[0];
                         serverDetails.port = temp[1];
@@ -594,7 +633,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             serverDetails.protocol = "http://";
                         }
                         serverDetails.url = serverDetails.protocol + serverDetails.hostname + ":" + serverDetails.port;
-                        serverDetails.channel.push(serverKeyValue[1].replaceAll("http://", '').replaceAll("https://", '').replace(serverDetails[0] + ":" + serverDetails[1]));
+                        serverDetails.channel.push(serverKeyValue[1].replaceAll("http://", '')
+                            .replaceAll("https://", '').replace(serverDetails[0] + ":" + serverDetails[1]));
 
                     }
                     Object.keys(securityOptions).forEach(function (key) {
@@ -603,11 +643,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         }
                     })
                 }
-            } else if (type === "websubpublisher") { //todo need to change when WebHook is developed currently assumed it as http sink
+            } else if (type === "websubpublisher") {
+                //todo need to change when WebHook is developed currently assumed it as http sink
                 for (i = 0; i < options.length; i++) {
                     if (options[i].startsWith("hub.url")) {
                         serverKeyValue = options[i].split("=");
-                        urlElements = serverKeyValue[1].trim().replaceAll('"', '').replaceAll("http://", '').replaceAll("https://", '').split("/");
+                        urlElements = serverKeyValue[1].trim().replaceAll('"', '')
+                            .replaceAll("http://", '').replaceAll("https://", '').split("/");
                         var temp = urlElements[0].split(":");
                         serverDetails.hostname = temp[0];
                         serverDetails.port = temp[1];
@@ -638,26 +680,21 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             return serverDetails;
         };
 
-        var generateCheckboxListOptions = function (dataArray, initialOptionValue, componentName, type) {
+        var generateCheckboxListOptions = function (dataArray, type) {
             var dataOption =
                 '<label for="{{dataName}}"  class="asyncapitooltip" data-toggle="popover" data-content="{{options}}">' +
-                // '<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here\'s some amazing content. It\'s very engaging. Right?">Click to toggle popover</button>\n' +
                 '<input id="{{dataName}}" name="stream-name"  type="radio" value="{{dataName}}" ' +
-                    // 'data-toggle="popover" data-trigger="focus"' +
-                    // 'data-content="And here\'s some amazing content. It\'s very engaging. Right?" ' +
-                    // 'class="asyncapitooltiptext"' +
                 '/>{{dataName}}' +
-                // '<span class="asyncapitooltiptext">{{options}}</span>' +
                 '</label>';
 
             var result = '';
-            if (initialOptionValue !== undefined) {
-                result += initialOptionValue;
-            }
             if (dataArray) {
                 dataArray.sort();
                 for (var i = 0; i < dataArray.length; i++) {
-                    result += dataOption.replaceAll('{{dataName}}', dataArray[i].connectedElementName).replaceAll('{{options}}', dataArray[i].options.toString().replaceAll('"',"'"));
+                    if (dataArray[i].type === type) {
+                        result += dataOption.replaceAll('{{dataName}}', dataArray[i].connectedElementName)
+                            .replaceAll('{{options}}', dataArray[i].options.toString().replaceAll('"',"'"));
+                    }
                 }
             }
             return result;
