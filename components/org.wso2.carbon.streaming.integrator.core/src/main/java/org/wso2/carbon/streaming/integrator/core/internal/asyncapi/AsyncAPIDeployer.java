@@ -32,10 +32,13 @@ import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppDep
 import org.wso2.carbon.streaming.integrator.core.persistence.beans.AsyncAPIServiceCatalogueConfigs;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import sun.nio.cs.UTF_32;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -123,14 +126,14 @@ public class AsyncAPIDeployer implements Runnable {
                 metadataYamlFile.createFile();
                 metadataYamlFile.refresh();
                 OutputStream outputStream = metadataYamlFile.getContent().getOutputStream();
-                outputStream.write(metadataContent.getBytes());
+                outputStream.write(metadataContent.getBytes(StandardCharsets.UTF_8));
                 outputStream.flush();
             }
             if (!asyncAPIYamlFile.exists()) {
                 asyncAPIYamlFile.createFile();
                 asyncAPIYamlFile.refresh();
                 OutputStream outputStream = asyncAPIYamlFile.getContent().getOutputStream();
-                outputStream.write(asyncAPIContent.getBytes());
+                outputStream.write(asyncAPIContent.getBytes(StandardCharsets.UTF_8));
                 outputStream.flush();
             }
         } catch (IOException e) {
@@ -144,7 +147,7 @@ public class AsyncAPIDeployer implements Runnable {
         try {
             JSONObject apiMd5s = serviceCatalogueApiHelper.getKeyMd5s(hostAndPort, username, password, asyncAPiKeyVersion);
             if (log.isDebugEnabled() && apiMd5s != null) {
-                log.info(" Retrieved Async API definition md5s: " + apiMd5s.toString());
+                log.debug(" Retrieved Async API definition md5s: " + apiMd5s.toString());
             }
             if (apiMd5s != null && apiMd5s.getInt("count") > 0) {
                 JSONArray md5List = apiMd5s.getJSONArray("list");
@@ -159,7 +162,8 @@ public class AsyncAPIDeployer implements Runnable {
                             if (log.isDebugEnabled()) {
                                 log.debug("MD5 of " + asyncAPiKeyVersion + " is equal, hence not deployong Async API");
                             }
-                            log.info("MD5 of " + asyncAPiKeyVersion + " is equal, hence not deploying Async API");
+                            log.info("MD5 of " + asyncAPiKeyVersion +
+                                    " is equal, hence not deploying Async API to service catalogue");
                             return true;
                         }
                     }
@@ -179,7 +183,7 @@ public class AsyncAPIDeployer implements Runnable {
         MessageDigest md5Digest;
         try {
             md5Digest = MessageDigest.getInstance("MD5");
-            md5Digest.update(stringValue.getBytes());
+            md5Digest.update(stringValue.getBytes(StandardCharsets.UTF_8));
             byte[] bytes = md5Digest.digest();
             StringBuilder sb = new StringBuilder();
             for (byte aByte : bytes) {

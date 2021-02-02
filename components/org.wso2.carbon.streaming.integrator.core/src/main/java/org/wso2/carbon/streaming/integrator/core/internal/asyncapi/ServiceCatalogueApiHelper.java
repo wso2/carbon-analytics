@@ -65,12 +65,11 @@ public class ServiceCatalogueApiHelper implements ServiceCatalogueApiHelperServi
     public boolean uploadAsyncAPIDef(File file, String hostAndPort, String username, String password)
         throws ServiceCatalogueAPIServiceStubException {
         try (Response response = HTTPSClientUtil.uploadZip(file, hostAndPort, username, password)) {
-            log.info(" --- uploadZip --- " + response.status() + " : " + getAsString(response.body().asInputStream()));
             if (response.status() == 200) {
                 return true;
             }
             throw new ServiceCatalogueAPIServiceStubException("There were failures during the replay." + response.reason());
-        } catch (RetryableException | IOException e) {
+        } catch (RetryableException e) {
             throw new ServiceCatalogueAPIServiceStubException(
                 String.format(CANNOT_CONNECT_TO_SERVER_ERROR_FORMAT, hostAndPort), e);
         }

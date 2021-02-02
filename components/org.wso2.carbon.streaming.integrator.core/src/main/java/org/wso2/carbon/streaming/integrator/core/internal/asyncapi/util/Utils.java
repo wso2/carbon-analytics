@@ -63,7 +63,7 @@ public class Utils {
                         log.debug("File Adding : " + file + " to " + zipFile + ".");
                     }
                     if (file.indexOf(File.separator) == 0) {
-                        file = file.replaceFirst(File.separator, "");
+                        file = file.substring(1);
                     }
                     ZipEntry ze = new ZipEntry(file);
                     zos.putNextEntry(ze);
