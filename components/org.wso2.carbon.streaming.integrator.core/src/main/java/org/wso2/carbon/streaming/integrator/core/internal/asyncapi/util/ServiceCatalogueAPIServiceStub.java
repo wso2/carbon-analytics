@@ -31,15 +31,15 @@ import java.io.File;
  */
 public interface ServiceCatalogueAPIServiceStub {
 
-    @RequestLine("GET /api/am/service-catalog/service-entries?key={key}&shrink=true")
+    @RequestLine("GET /api/am/service-catalog/v0/services?key={key}&shrink=true")
     @Headers("Content-Type: application/json; charset=utf-8")
     Response doGetKeyMd5s(@Param("key") String key) throws ServiceCatalogueAPIServiceStubException;
 
-    @RequestLine("POST /api/am/service-catalog/service-entries/import?overwrite=true")
+    @RequestLine("POST api/am/service-catalog/v0/services/import?overwrite=true")
     @Headers("Content-Type: multipart/form-data; charset=utf-8")
     Response uploadZip(@Param("file") File file) throws ServiceCatalogueAPIServiceStubException;
 
-    @RequestLine("DELETE /api/am/service-catalog/service-entries/{serviceKey}")
+    @RequestLine("DELETE /api/am/service-catalog/v0/services/{serviceUUID}")
     @Headers("Content-Type: text/plain; charset=utf-8")
-    Response deleteAsyncAPI(@Param("serviceKey") String serviceKey) throws ServiceCatalogueAPIServiceStubException;
+    Response deleteAsyncAPI(@Param("serviceUUID") String serviceUUID) throws ServiceCatalogueAPIServiceStubException;
 }

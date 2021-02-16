@@ -26,20 +26,17 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.streaming.integrator.core.internal.asyncapi.util.Constants;
+import org.wso2.carbon.streaming.integrator.core.internal.asyncapi.util.Md5HashGenerator;
 import org.wso2.carbon.streaming.integrator.core.internal.asyncapi.util.Utils;
 import org.wso2.carbon.streaming.integrator.core.internal.exception.ServiceCatalogueAPIServiceStubException;
-import org.wso2.carbon.streaming.integrator.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.streaming.integrator.core.persistence.beans.AsyncAPIServiceCatalogueConfigs;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import sun.nio.cs.UTF_32;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,15 +72,16 @@ public class AsyncAPIDeployer implements Runnable {
         String serviceKey = asyncAPIJson.getJSONObject(Constants.ASYNC_API_INFO).
                 getString(Constants.ASYNC_API_TITLE).replaceAll(" ", "");
         String version = asyncAPIJson.getJSONObject(Constants.ASYNC_API_INFO).getString(Constants.ASYNC_API_VERSION);
-        asyncAPiKeyVersion = serviceKey + "-" + version;
+        asyncAPiKeyVersion = serviceKey + Constants.KEY_SEPARATOR + version;
         zipDirectoryURI = Constants.SERVICE_DEF_DIRECTORY + asyncAPiKeyVersion;
         directoryURI = zipDirectoryURI + File.separator + asyncAPiKeyVersion;
     }
 
     @Override
     public void run() {
+        metadataContent = createAndGetMetadataContent(asyncAPIJson);
+        createFiles();
         if (!isMD5Equal()) {
-            createFiles();
             zipFiles();
             try {
                 boolean isUploaded = serviceCatalogueApiHelper.uploadAsyncAPIDef(new File(zipDirectoryURI +
@@ -116,7 +114,7 @@ public class AsyncAPIDeployer implements Runnable {
                 fileObject.createFolder();
             }
             FileObject metadataYamlFile = Utils.getFileObject(directoryURI + File.separator + "metadata.yaml");
-            FileObject asyncAPIYamlFile = Utils.getFileObject(directoryURI + File.separator + "asyncAPI.yaml");
+            FileObject asyncAPIYamlFile = Utils.getFileObject(directoryURI + File.separator + "definition.yaml");
             if (metadataYamlFile.exists()) {
                 metadataYamlFile.delete(Selectors.SELECT_ALL);
             }
@@ -143,28 +141,24 @@ public class AsyncAPIDeployer implements Runnable {
     }
 
 
-
     public boolean isMD5Equal() {
         try {
+            // TODO: 2/16/21 Handle pagination
             JSONObject apiMd5s = serviceCatalogueApiHelper.getKeyMd5s(hostAndPort, username, password, asyncAPiKeyVersion);
-            if (log.isDebugEnabled() && apiMd5s != null) {
-                log.debug(" Retrieved Async API definition md5s: " + apiMd5s.toString());
-            }
-            if (apiMd5s != null && apiMd5s.getInt("count") > 0) {
+            if (apiMd5s != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug(" Retrieved Async API definition md5s: " + apiMd5s.toString());
+                }
                 JSONArray md5List = apiMd5s.getJSONArray("list");
                 for (int i = 0; i < md5List.length(); i++) {
                     JSONObject apiKeyObject = md5List.getJSONObject(i);
-                    if (apiKeyObject.getString("key").compareTo(asyncAPiKeyVersion) == 0) {
+                    if (apiKeyObject.getString("serviceKey").compareTo(asyncAPiKeyVersion) == 0) {
                         String md5 = apiKeyObject.getString("md5");
-                        metadataContent = createAndGetMetadataContent(asyncAPIJson);
-                        String md5Calculated =
-                                getMD5(asyncAPIContent, asyncAPiKeyVersion) + getMD5(metadataContent, asyncAPiKeyVersion);
-                        if (md5.compareTo(md5Calculated) == 0) {
+                        String md5Calculated = Md5HashGenerator.generateHash(directoryURI);
+                        if (md5Calculated != null && md5.compareTo(md5Calculated) == 0) {
                             if (log.isDebugEnabled()) {
-                                log.debug("MD5 of " + asyncAPiKeyVersion + " is equal, hence not deployong Async API");
+                                log.debug("MD5 of " + asyncAPiKeyVersion + " is equal, hence not deploying Async API");
                             }
-                            log.info("MD5 of " + asyncAPiKeyVersion +
-                                    " is equal, hence not deploying Async API to service catalogue");
                             return true;
                         }
                     }
@@ -172,28 +166,15 @@ public class AsyncAPIDeployer implements Runnable {
             }
             metadataContent = createAndGetMetadataContent(asyncAPIJson);
             return false;
-        } catch (ServiceCatalogueAPIServiceStubException | SiddhiAppDeploymentException e) {
+        } catch (ServiceCatalogueAPIServiceStubException e) {
             log.error("Exception occurred when getting md5 for async api: " +
                     asyncAPiKeyVersion + " when deploying Siddhi app", e);
             metadataContent = createAndGetMetadataContent(asyncAPIJson);
             return false;
-        }
-    }
-
-    public String getMD5(String stringValue, String asyncAPiKeyVersion) throws SiddhiAppDeploymentException {
-        MessageDigest md5Digest;
-        try {
-            md5Digest = MessageDigest.getInstance("MD5");
-            md5Digest.update(stringValue.getBytes(StandardCharsets.UTF_8));
-            byte[] bytes = md5Digest.digest();
-            StringBuilder sb = new StringBuilder();
-            for (byte aByte : bytes) {
-                sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new SiddhiAppDeploymentException("Exception occurred when getting md5 for async api: " +
-                    asyncAPiKeyVersion + " when deploying Siddhi app");
+        } catch (NoSuchAlgorithmException | IOException e) {
+            log.error("Exception occurred when generating md5 for async api: " +
+                    asyncAPiKeyVersion, e);
+            return false;
         }
     }
 

@@ -76,14 +76,14 @@ public class ServiceCatalogueApiHelper implements ServiceCatalogueApiHelperServi
     }
 
     @Override
-    public boolean deleteAsyncAPIDef(String serviceKey, String hostAndPort, String username, String password)
+    public boolean deleteAsyncAPIDef(String serviceUUID, String hostAndPort, String username, String password)
         throws ServiceCatalogueAPIServiceStubException {
-        try (Response response = HTTPSClientUtil.deleteAsyncAPI(serviceKey, hostAndPort, username, password)) {
-            if (response.status() == 200) {
+        try (Response response = HTTPSClientUtil.deleteAsyncAPI(serviceUUID, hostAndPort, username, password)) {
+            if (response.status() == 204) {
                 return true;
             }
             throw new ServiceCatalogueAPIServiceStubException(
-                String.format("Failed to delete the error entry with id: %s. %s", serviceKey, response.reason()));
+                String.format("Failed to delete the error entry with id: %s. %s", serviceUUID, response.reason()));
         } catch (RetryableException e) {
             throw new ServiceCatalogueAPIServiceStubException(
                 String.format(CANNOT_CONNECT_TO_SERVER_ERROR_FORMAT, hostAndPort), e);
