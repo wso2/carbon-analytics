@@ -1589,10 +1589,15 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                         if (typeof o.query.filter.expression === 'string') {
                                             expression = o.query.filter.expression;
                                         } else {
-                                            expression = $('<div>'+
+                                            $('<div>'+
                                                 DataMapperUtil.generateExpressionHTML(
                                                     o.query.filter.expression,'', null)
+                                                        .replaceAll('&nbsp;', '')
                                                 +'</div>').text()
+                                                            .split('\n').forEach(text => {
+                                                                expression += text.trim();
+                                                            });
+
                                         }
                                         list.push({
                                             type: 'FILTER',
