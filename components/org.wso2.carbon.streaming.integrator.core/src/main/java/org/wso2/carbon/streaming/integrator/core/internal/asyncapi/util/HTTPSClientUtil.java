@@ -60,9 +60,9 @@ public class HTTPSClientUtil {
             .uploadZip(file);
     }
 
-    public static Response deleteAsyncAPI(String serviceKey, String hostAndPort, String username, String password)
+    public static Response deleteAsyncAPI(String serviceUUID, String hostAndPort, String username, String password)
         throws ServiceCatalogueAPIServiceStubException {
         return ServiceCatalogueHandlerFactory.getServiceCatalogueHandlerHttpsClient(generateURL(hostAndPort), username, password)
-            .deleteAsyncAPI(serviceKey);
+            .deleteAsyncAPI(serviceUUID);
     }
 }

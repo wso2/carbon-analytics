@@ -26,4 +26,5 @@ public class Constants {
     public static final String ASYNC_API_INFO = "info";
     public static final String ASYNC_API_TITLE = "title";
     public static final String ASYNC_API_VERSION = "version";
+    public static final String KEY_SEPARATOR = "-";
 }

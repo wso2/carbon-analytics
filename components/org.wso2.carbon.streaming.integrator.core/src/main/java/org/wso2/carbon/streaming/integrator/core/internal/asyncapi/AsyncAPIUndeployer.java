@@ -21,6 +21,7 @@ package org.wso2.carbon.streaming.integrator.core.internal.asyncapi;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.Selectors;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,9 +61,10 @@ public class AsyncAPIUndeployer implements Runnable {
 
     @Override
     public void run() {
-        if (isAsyncAPIDeployedInServiceCatalogue()) {
+        String serviceUUID = getAsyncAPIUUIDinServiceCatalogue();
+        if (serviceUUID != null) {
             try {
-                serviceCatalogueApiHelper.deleteAsyncAPIDef(asyncAPiKeyVersion, hostAndPort, username, password);
+                serviceCatalogueApiHelper.deleteAsyncAPIDef(serviceUUID, hostAndPort, username, password);
                 FileObject fileObject = Utils.getFileObject(zipDirectoryURI);
                 fileObject.delete(Selectors.SELECT_ALL);
                 log.error("Async api: " + asyncAPiKeyVersion +
@@ -77,17 +79,26 @@ public class AsyncAPIUndeployer implements Runnable {
         }
     }
 
-    public boolean isAsyncAPIDeployedInServiceCatalogue() {
+    public String getAsyncAPIUUIDinServiceCatalogue() {
         try {
             JSONObject apiMd5s = serviceCatalogueApiHelper.getKeyMd5s(hostAndPort, username, password, asyncAPiKeyVersion);
             if (log.isDebugEnabled() && apiMd5s != null) {
                 log.info(" Retrieved Async API definition md5s: " + apiMd5s.toString());
             }
-            return apiMd5s != null && apiMd5s.getInt("count") > 0;
+            if (apiMd5s != null) {
+                JSONArray md5List = apiMd5s.getJSONArray("list");
+                for (int i = 0; i < md5List.length(); i++) {
+                    JSONObject apiKeyObject = md5List.getJSONObject(i);
+                    if (apiKeyObject.getString("serviceKey").compareTo(asyncAPiKeyVersion) == 0) {
+                        return apiKeyObject.getString("id");
+                    }
+                }
+            }
+            return null;
         } catch (ServiceCatalogueAPIServiceStubException e) {
             log.error("Exception occurred when getting checking for async api: " +
                     asyncAPiKeyVersion + " when undeploying Siddhi app", e);
-            return false;
+            return null;
         }
     }
 }
