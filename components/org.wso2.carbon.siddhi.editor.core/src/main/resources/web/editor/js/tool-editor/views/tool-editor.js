@@ -394,9 +394,14 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                     sourceContainer.hide();
                                     asyncAPIViewContainer.show();
                                     options.asyncAPIDefYaml = ayncAPIContent;
+                                    this.asyncAPIYamlContainer = asyncAPIViewContainer
+                                        .find(_.get(this.options, 'async_api_view.yamlContainer'));
+                                    var asyncAPIYAMLViewDynamicId = "async-api-view-yaml-container-id-" + $(this._$parent_el).attr('id');
+                                    $(this.asyncAPIYamlContainer[0]).attr('id', asyncAPIYAMLViewDynamicId);
                                     options.asyncAPIViewContainer = asyncAPIViewContainer;
                                     options.fromGenerator = false;
                                     options.editorInstance = editorInstance;
+                                    options.parentEl =  this._$parent_el;
                                     this.asyncAPI = new AsyncAPI(options);
                                 })
                             } else {
@@ -404,6 +409,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 asyncAPIViewContainer.show();
                                 options.asyncAPIViewContainer = asyncAPIViewContainer;
                                 options.editorInstance = editorInstance;
+                                options.parentEl =  this._$parent_el;
                                 this.asyncAPIGenerator = new AsyncAPIGenerator(options);
                             }
                         }
@@ -412,6 +418,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                         asyncAPIViewContainer.show();
                         options.asyncAPIViewContainer = asyncAPIViewContainer;
                         options.editorInstance = editorInstance;
+                        options.parentEl =  this._$parent_el;
                         this.asyncAPIGenerator = new AsyncAPIGenerator(options);
                     }
 
