@@ -19,9 +19,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
 
         KubernetesConfigDialog.prototype.render = function () {
             var self = this;
-            var distributionSelectionInput = self.templateContainer.find("#distribution-selection");
             var persistenceSelectionInput = self.templateContainer.find("#persistent-select");
-            distributionSelectionInput.find("#non-distributed").prop('checked', true);
             persistenceSelectionInput.find("#stateless").prop('checked', true);
 
             var messagingEdtdivId = "kubernetes-messaging-editor-id";
@@ -47,24 +45,6 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
                 content: this._editor1
             };
             self.editorObjectArrayList.push(obj1);
-
-            self.templateContainer.find('#distributed-with-ext-nats').change(function(){
-                self.natsConfigsGiven = true;
-                self.needDefaultNats = false;
-                self.templateContainer.find('#kubernetes-messaging-editor-id').show();
-            });
-
-            self.templateContainer.find('#non-distributed').change(function(){
-                self.natsConfigsGiven = false;
-                self.needDefaultNats = false;
-                self.templateContainer.find('#kubernetes-messaging-editor-id').hide();
-            });
-
-            self.templateContainer.find('#distributed-with-nats').change(function(){
-                self.natsConfigsGiven = false;
-                self.needDefaultNats = true;
-                self.templateContainer.find('#kubernetes-messaging-editor-id').hide();
-            });
 
             this.divId = "kubernetes-pv-editor-id";
             this.divParentId = "kubernetes-pv-editor-parent-id";
@@ -186,20 +166,11 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
 
         KubernetesConfigDialog.prototype.getConfigs = function () {
             var self = this;
-            var messagingConfig ='';
             var pvConfig = '';
             var statePersistenceConfig = '';
             var siddhiProcessName = self.siddhiProcessName || 'sample-siddhi-process';
             var siddhiProcessNameConfig = "siddhiProcessName: ".concat(siddhiProcessName.toString());
-            var messagingDefaultConfig = 'messagingSystem:\n' +
-                            '  type: nats\n';
             self.editorObjectArrayList.forEach(function(editorObj) {
-                if (self.natsConfigsGiven && !self.needDefaultNats && editorObj.name == 'messaging') {
-                    messagingConfig = "\n" + editorObj.content.session.getValue().toString();
-                }
-                if (self.needDefaultNats && !self.natsConfigsGiven && editorObj.name == 'messaging') {
-                    messagingConfig = "\n" + messagingDefaultConfig;
-                }
                 if(self.pvConfigsGiven && editorObj.name == 'persistence') {
                     pvConfig = "\n" + editorObj.content.session.getValue().toString().trim();
                 }
@@ -209,7 +180,7 @@ define(['require', 'lodash', 'jquery', 'log', 'ace/ace', 'app/source-editor/edit
             });
 
             return {
-                        "kubernetesConfig": siddhiProcessNameConfig + messagingConfig + pvConfig,
+                        "kubernetesConfig": siddhiProcessNameConfig + pvConfig,
                         "statePersistenceConfig": statePersistenceConfig
             };
         };

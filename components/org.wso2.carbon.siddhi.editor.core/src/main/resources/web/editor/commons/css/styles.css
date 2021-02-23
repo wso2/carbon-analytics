@@ -1609,7 +1609,8 @@ textarea.form-control.curl-editor {
 
 .table {
     background: #242424;
-    color: #b7b7b7
+    color: #b7b7b7;
+    font-size: 1.4rem;
 }
 
 .table-striped > tbody > tr:nth-of-type(2n+1) {
@@ -1860,4 +1861,18 @@ div.consoleIcon {
 }
 .checkPanel{
     padding-left: 10px;
+}
+
+
+/* Extension installer related styles */
+.extension-installer-form-scrollable-block {
+    overflow-y: auto;
+    height: 50%;
+    width: 90%;
+    background-color: #2C2C2C;
+    margin-left: 30px;
+}
+
+.extension-installer-form-scrollable-block .table > tbody > tr > td {
+    vertical-align: initial;
 }

@@ -403,7 +403,7 @@ define(['require', 'lodash', 'jquery', 'constants'],
                         " id='extensionSearchId' autofocus>" +
                         "</div>" +
                         "<div class='form-group'>" +
-                        "<div class='file-dialog-form-scrollable-block' style='padding:10px4px; margin-left:35px;'>" +
+                        "<div class='extension-installer-form-scrollable-block' style='padding:10px4px; margin-left:35px;'>" +
                         "<div id='noResults' style='display:none;'>No extensions found.</div>" +
                         "<div id='extensionTableId' class='samples-pane'>" +
                         "</div>" +
