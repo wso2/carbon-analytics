@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-define("ace/mode/asyncapi", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text",
-        "ace/mode/asyncapi_highlight_rules", "ace/range", "ace/mode/folding/asyncapi"],
+define("ace/mode/asyncapi", ["require", "exports", "module"],
     function (require, exports, module) {
 
         "use strict";   // JS strict mode
