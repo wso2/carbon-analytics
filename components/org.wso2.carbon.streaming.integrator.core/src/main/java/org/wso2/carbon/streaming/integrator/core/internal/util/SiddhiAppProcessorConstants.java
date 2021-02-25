@@ -58,6 +58,8 @@ public class SiddhiAppProcessorConstants {
     public static final String HA_METRICS_PREFIX = "org.wso2.ha";
     public static final String HA_METRICS_SENDING_THROUGHPUT = "sending.throughput";
     public static final String HA_METRICS_RECEIVING_THROUGHPUT = "receiving.throughput";
+    public static final int SIDDHI_APP_REDEPLOY_RETRY_COUNT = 5;
+    public static final long SIDDHI_APP_REDEPLOY_SLEEP_TIMEOUT = 3000;
 
     private SiddhiAppProcessorConstants() {
         // Prevents instantiation.
