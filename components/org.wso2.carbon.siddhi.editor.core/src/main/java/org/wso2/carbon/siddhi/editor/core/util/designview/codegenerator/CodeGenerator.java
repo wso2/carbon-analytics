@@ -65,9 +65,7 @@ public class CodeGenerator {
      * @throws CodeGenerationException Error while generating the code
      */
     public String generateSiddhiAppCode(EventFlow eventFlow) throws CodeGenerationException {
-
         SiddhiAppConfig siddhiApp = eventFlow.getSiddhiAppConfig();
-
         List<QueryConfig> queries = new ArrayList<>();
         for (List<QueryConfig> queryList : siddhiApp.getQueryLists().values()) {
             queries.addAll(queryList);
@@ -85,7 +83,6 @@ public class CodeGenerator {
         List<String> allDefinitions = CodeGeneratorUtils.getDefinitionNames(siddhiApp.getStreamList(),
                 siddhiApp.getTableList(), siddhiApp.getWindowList(),
                 siddhiApp.getTriggerList(), siddhiApp.getAggregationList(), siddhiApp.getPartitionList());
-
         return generateAppName(siddhiApp.getSiddhiAppName()) +
                 generateAppDescription(siddhiApp.getSiddhiAppDescription()) +
                 SubElementCodeGenerator.generateAnnotations(siddhiApp.getAppAnnotationList()) +
@@ -104,12 +101,10 @@ public class CodeGenerator {
      *
      * @param siddhiAppConfig Siddhi app configuration
      * @return tool tip which generated based on Siddhi App configuration
-     * @throws CodeGenerationException  Error when loading code view
+     * @throws CodeGenerationException Error when loading code view
      */
     public List<ToolTip> generateSiddhiAppToolTips(SiddhiAppConfig siddhiAppConfig) throws CodeGenerationException {
-
         SiddhiAppConfig siddhiApp = siddhiAppConfig;
-
         List<ToolTip> toolTipList = new ArrayList<>();
         toolTipList.addAll(generateStreamSinkSourceToolTips(siddhiApp.getStreamList(), siddhiApp.getSourceList(),
                 siddhiApp.getSinkList()));
@@ -119,7 +114,6 @@ public class CodeGenerator {
         toolTipList.addAll(generateAggregationToolTips(siddhiApp.getAggregationList()));
         toolTipList.addAll(generateFunctionToolTips(siddhiApp.getFunctionList()));
         toolTipList.addAll(generateExcecutionElementToolTips(siddhiApp.getQueryLists(), siddhiApp.getPartitionList()));
-
         return toolTipList;
     }
 
@@ -130,9 +124,7 @@ public class CodeGenerator {
      * @return The Siddhi code representation of a Siddhi app name annotation
      */
     private String generateAppName(String appName) {
-
         StringBuilder appNameStringBuilder = new StringBuilder();
-
         if (appName != null && !appName.isEmpty()) {
             appNameStringBuilder.append(SiddhiCodeBuilderConstants.APP_NAME_ANNOTATION)
                     .append(appName)
@@ -141,8 +133,12 @@ public class CodeGenerator {
         } else {
             appNameStringBuilder.append(SiddhiCodeBuilderConstants.DEFAULT_APP_NAME_ANNOTATION);
         }
-
-        return appNameStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE).toString();
+        if (appNameStringBuilder.length() != 0 &&
+                appNameStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                        appNameStringBuilder.length() - 1) {
+            appNameStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        }
+        return appNameStringBuilder.toString();
     }
 
     /**
@@ -152,9 +148,7 @@ public class CodeGenerator {
      * @return The Siddhi code representation of a Siddhi app description annotation
      */
     private String generateAppDescription(String appDescription) {
-
         StringBuilder appDescriptionStringBuilder = new StringBuilder();
-
         if (appDescription != null && !appDescription.isEmpty()) {
             appDescriptionStringBuilder.append(SiddhiCodeBuilderConstants.APP_DESCRIPTION_ANNOTATION)
                     .append(appDescription)
@@ -163,11 +157,23 @@ public class CodeGenerator {
         } else {
             appDescriptionStringBuilder.append(SiddhiCodeBuilderConstants.DEFAULT_APP_DESCRIPTION_ANNOTATION);
         }
-
-        return appDescriptionStringBuilder
-                .append(SiddhiCodeBuilderConstants.NEW_LINE)
-                .append(SiddhiCodeBuilderConstants.NEW_LINE)
-                .toString();
+        if (appDescriptionStringBuilder.length() != 0 &&
+                appDescriptionStringBuilder.charAt(appDescriptionStringBuilder.length() - 1) !=
+                        SiddhiCodeBuilderConstants.NEW_LINE &&
+                appDescriptionStringBuilder.charAt(appDescriptionStringBuilder.length() - 2) !=
+                        SiddhiCodeBuilderConstants.NEW_LINE) {
+            appDescriptionStringBuilder
+                    .append(SiddhiCodeBuilderConstants.NEW_LINE)
+                    .append(SiddhiCodeBuilderConstants.NEW_LINE);
+        } else if (appDescriptionStringBuilder.length() != 0 &&
+                appDescriptionStringBuilder.charAt(appDescriptionStringBuilder.length() - 1) ==
+                        SiddhiCodeBuilderConstants.NEW_LINE &&
+                appDescriptionStringBuilder.charAt(appDescriptionStringBuilder.length() - 2) !=
+                        SiddhiCodeBuilderConstants.NEW_LINE) {
+            appDescriptionStringBuilder
+                    .append(SiddhiCodeBuilderConstants.NEW_LINE);
+        }
+        return appDescriptionStringBuilder.toString();
     }
 
     /**
@@ -181,17 +187,13 @@ public class CodeGenerator {
      */
     private String generateStreams(List<StreamConfig> streamList, List<SourceSinkConfig> sourceList,
                                    List<SourceSinkConfig> sinkList) throws CodeGenerationException {
-
         if (streamList == null || streamList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
-
         List<SourceSinkConfig> sourcesAndSinks = new LinkedList<>();
         sourcesAndSinks.addAll(sourceList);
         sourcesAndSinks.addAll(sinkList);
-
         StringBuilder streamListStringBuilder = new StringBuilder();
-
         SourceSinkCodeGenerator sourceSinkCodeGenerator = new SourceSinkCodeGenerator();
         StreamCodeGenerator streamCodeGenerator = new StreamCodeGenerator();
         for (StreamConfig stream : streamList) {
@@ -203,18 +205,23 @@ public class CodeGenerator {
             if (stream.getPartitionId() != null && !stream.getPartitionId().isEmpty()) {
                 continue;
             }
-
-            streamListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+            if (streamListStringBuilder.length() != 0 && streamListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE))
+                    == streamListStringBuilder.length() - 1) {
+                streamListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+            }
             for (SourceSinkConfig sourceSink : sourcesAndSinks) {
                 if (stream.getName().equals(sourceSink.getConnectedElementName())) {
                     streamListStringBuilder.append(sourceSinkCodeGenerator.generateSourceSink(sourceSink,
                             false));
                 }
             }
-
             streamListStringBuilder
-                    .append(streamCodeGenerator.generateStream(stream, false))
-                    .append(SiddhiCodeBuilderConstants.NEW_LINE);
+                    .append(streamCodeGenerator.generateStream(stream, false));
+            if (streamListStringBuilder.length() != 0 &&
+                    streamListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                            streamListStringBuilder.length() - 1) {
+                streamListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+            }
         }
 
         return streamListStringBuilder.toString();
@@ -233,26 +240,21 @@ public class CodeGenerator {
                                                            List<SourceSinkConfig> sourceList,
                                                            List<SourceSinkConfig> sinkList)
             throws CodeGenerationException {
-
         List<ToolTip> streamSourceSinkToolTipList = new ArrayList<>();
         List<SourceSinkConfig> sourcesAndSinks = new ArrayList<>();
         sourcesAndSinks.addAll(sourceList);
         sourcesAndSinks.addAll(sinkList);
-
         StreamCodeGenerator streamCodeGenerator = new StreamCodeGenerator();
         SourceSinkCodeGenerator sourceSinkCodeGenerator = new SourceSinkCodeGenerator();
-
         for (StreamConfig stream : streamList) {
             CodeGeneratorUtils.NullValidator.validateConfigObject(stream);
             streamSourceSinkToolTipList.add(new ToolTip(stream.getId(),
                     streamCodeGenerator.generateStream(stream, true)));
         }
-
         for (SourceSinkConfig sourceSink : sourcesAndSinks) {
             streamSourceSinkToolTipList.add(new ToolTip(sourceSink.getId(),
                     sourceSinkCodeGenerator.generateSourceSink(sourceSink, true)));
         }
-
         return streamSourceSinkToolTipList;
     }
 
@@ -264,20 +266,26 @@ public class CodeGenerator {
      * @throws CodeGenerationException Error while generating the code
      */
     private String generateTables(List<TableConfig> tableList) throws CodeGenerationException {
-
         if (tableList == null || tableList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
-
         StringBuilder tableListStringBuilder = new StringBuilder();
-        tableListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        if (tableListStringBuilder.length() !=0 &&
+                tableListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                        tableListStringBuilder.length() - 1) {
+            tableListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        }
 
         TableCodeGenerator tableCodeGenerator = new TableCodeGenerator();
         for (TableConfig table : tableList) {
             tableListStringBuilder.append(tableCodeGenerator.generateTable(table, false));
         }
 
-        tableListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        if (tableListStringBuilder.length() !=0 &&
+                tableListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                        tableListStringBuilder.length() - 1) {
+            tableListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        }
 
         return tableListStringBuilder.toString();
     }
@@ -290,7 +298,6 @@ public class CodeGenerator {
      * @throws CodeGenerationException Error while generating the code
      */
     private List<ToolTip> generateTableToolTips(List<TableConfig> tableList) throws CodeGenerationException {
-
         List<ToolTip> tableTooltipList = new ArrayList<>();
         if (tableList == null || tableList.isEmpty()) {
             return tableTooltipList;
@@ -300,7 +307,6 @@ public class CodeGenerator {
             tableTooltipList.add(new ToolTip(table.getId(), tableCodeGenerator.generateTable(table,
                     true)));
         }
-
         return tableTooltipList;
     }
 
@@ -312,21 +318,23 @@ public class CodeGenerator {
      * @throws CodeGenerationException Error while generating the code
      */
     private String generateWindows(List<WindowConfig> windowList) throws CodeGenerationException {
-
         if (windowList == null || windowList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
-
         StringBuilder windowListStringBuilder = new StringBuilder();
-        windowListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
-
+        if (windowListStringBuilder.length() !=0 && windowListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE))
+                == windowListStringBuilder.length() - 1) {
+            windowListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        }
         WindowCodeGenerator windowCodeGenerator = new WindowCodeGenerator();
         for (WindowConfig window : windowList) {
             windowListStringBuilder.append(windowCodeGenerator.generateWindow(window, false));
         }
-
-        windowListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
-
+        if (windowListStringBuilder.length() !=0 &&
+                windowListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                        windowListStringBuilder.length() - 1) {
+            windowListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        }
         return windowListStringBuilder.toString();
     }
 
@@ -338,18 +346,15 @@ public class CodeGenerator {
      * @throws CodeGenerationException Error while generating the code
      */
     private List<ToolTip> generateWindowToolTips(List<WindowConfig> windowList) throws CodeGenerationException {
-
         List<ToolTip> windowToolTipList = new ArrayList<>();
         if (windowList == null || windowList.isEmpty()) {
             return windowToolTipList;
         }
-
         WindowCodeGenerator windowCodeGenerator = new WindowCodeGenerator();
         for (WindowConfig window : windowList) {
             windowToolTipList.add(new ToolTip(window.getId(),
                     windowCodeGenerator.generateWindow(window, true)));
         }
-
         return windowToolTipList;
     }
 
@@ -361,21 +366,24 @@ public class CodeGenerator {
      * @throws CodeGenerationException Error while generating the code
      */
     private String generateTriggers(List<TriggerConfig> triggerList) throws CodeGenerationException {
-
         if (triggerList == null || triggerList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
-
         StringBuilder triggerListStringBuilder = new StringBuilder();
-        triggerListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
-
+        if (triggerListStringBuilder.length() !=0 &&
+                triggerListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                        triggerListStringBuilder.length() - 1) {
+            triggerListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        }
         TriggerCodeGenerator triggerCodeGenerator = new TriggerCodeGenerator();
         for (TriggerConfig trigger : triggerList) {
             triggerListStringBuilder.append(triggerCodeGenerator.generateTrigger(trigger, false));
         }
-
-        triggerListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
-
+        if (triggerListStringBuilder.length() !=0 &&
+                triggerListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                        triggerListStringBuilder.length() - 1) {
+            triggerListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        }
         return triggerListStringBuilder.toString();
     }
 
@@ -387,18 +395,15 @@ public class CodeGenerator {
      * @throws CodeGenerationException Error while generating the code
      */
     private List<ToolTip> generateTriggerToolTips(List<TriggerConfig> triggerList) throws CodeGenerationException {
-
         List<ToolTip> triggerToolTipList = new ArrayList<>();
         if (triggerList == null || triggerList.isEmpty()) {
             return triggerToolTipList;
         }
-
         TriggerCodeGenerator triggerToolTipGenerator = new TriggerCodeGenerator();
         for (TriggerConfig trigger : triggerList) {
             triggerToolTipList.add(new ToolTip(trigger.getId(),
                     triggerToolTipGenerator.generateTrigger(trigger, true)));
         }
-
         return triggerToolTipList;
     }
 
@@ -410,21 +415,24 @@ public class CodeGenerator {
      * @throws CodeGenerationException Error while generating the code
      */
     private String generateAggregations(List<AggregationConfig> aggregationList) throws CodeGenerationException {
-
         if (aggregationList == null || aggregationList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
-
         StringBuilder aggregationListStringBuilder = new StringBuilder();
-        aggregationListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
-
+        if (aggregationListStringBuilder.length() !=0 &&
+                aggregationListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                        aggregationListStringBuilder.length() - 1) {
+            aggregationListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        }
         AggregationCodeGenerator aggregationCodeGenerator = new AggregationCodeGenerator();
         for (AggregationConfig aggregation : aggregationList) {
             aggregationListStringBuilder.append(aggregationCodeGenerator.generateAggregation(aggregation, false));
         }
-
-        aggregationListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
-
+        if (aggregationListStringBuilder.length() !=0 &&
+                aggregationListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                        aggregationListStringBuilder.length() - 1) {
+            aggregationListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        }
         return aggregationListStringBuilder.toString();
     }
 
@@ -437,18 +445,15 @@ public class CodeGenerator {
      */
     private List<ToolTip> generateAggregationToolTips(List<AggregationConfig> aggregationList)
             throws CodeGenerationException {
-
         List<ToolTip> aggregationToolTipList = new ArrayList<>();
         if (aggregationList == null || aggregationList.isEmpty()) {
             return aggregationToolTipList;
         }
-
         AggregationCodeGenerator aggregationCodeGenerator = new AggregationCodeGenerator();
         for (AggregationConfig aggregation : aggregationList) {
             aggregationToolTipList.add(new ToolTip(aggregation.getId(),
                     aggregationCodeGenerator.generateAggregation(aggregation, true)));
         }
-
         return aggregationToolTipList;
     }
 
@@ -460,21 +465,24 @@ public class CodeGenerator {
      * @throws CodeGenerationException Error while generating the code
      */
     private String generateFunctions(List<FunctionConfig> functionList) throws CodeGenerationException {
-
         if (functionList == null || functionList.isEmpty()) {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
-
         StringBuilder functionListStringBuilder = new StringBuilder();
-        functionListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
-
+        if (functionListStringBuilder.length() != 0 &&
+                functionListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                        functionListStringBuilder.length() - 1) {
+            functionListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        }
         FunctionCodeGenerator functionCodeGenerator = new FunctionCodeGenerator();
         for (FunctionConfig function : functionList) {
             functionListStringBuilder.append(functionCodeGenerator.generateFunction(function, false));
         }
-
-        functionListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
-
+        if (functionListStringBuilder.length() != 0 &&
+                functionListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                        functionListStringBuilder.length() - 1) {
+            functionListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        }
         return functionListStringBuilder.toString();
     }
 
@@ -487,18 +495,15 @@ public class CodeGenerator {
      */
     private List<ToolTip> generateFunctionToolTips(List<FunctionConfig> functionList) throws
             CodeGenerationException {
-
         List<ToolTip> functionTooltipList = new ArrayList<>();
         if (functionList == null || functionList.isEmpty()) {
             return functionTooltipList;
         }
-
         FunctionCodeGenerator functionCodeGenerator = new FunctionCodeGenerator();
         for (FunctionConfig function : functionList) {
             functionTooltipList.add(new ToolTip(function.getId(),
                     functionCodeGenerator.generateFunction(function, true)));
         }
-
         return functionTooltipList;
     }
 
@@ -518,12 +523,15 @@ public class CodeGenerator {
             throws CodeGenerationException {
 
         StringBuilder executionElementStringBuilder = new StringBuilder();
-        executionElementStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        if (executionElementStringBuilder.length() != 0 &&
+                executionElementStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                        executionElementStringBuilder.length() - 1) {
+            executionElementStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+        }
         List<QueryConfig> queries = new LinkedList<>();
         for (List<QueryConfig> queryList : queryLists.values()) {
             queries.addAll(queryList);
         }
-
         List<ExecutionElementConfig> executionElements =
                 CodeGeneratorUtils.convertToExecutionElements(queries, partitions);
         QueryCodeGenerator queryCodeGenerator = new QueryCodeGenerator();
@@ -540,9 +548,12 @@ public class CodeGenerator {
             } else {
                 throw new CodeGenerationException("Unidentified ExecutionElement type: " + executionElement.getType());
             }
-            executionElementStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+            if (executionElementStringBuilder.length() != 0 &&
+                    executionElementStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                            executionElementStringBuilder.length() - 1) {
+                executionElementStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
+            }
         }
-
         return executionElementStringBuilder.toString();
     }
 
@@ -557,19 +568,15 @@ public class CodeGenerator {
     private List<ToolTip> generateExcecutionElementToolTips(Map<QueryListType, List<QueryConfig>> queryLists,
                                                             List<PartitionConfig> partitions)
             throws CodeGenerationException {
-
         List<ToolTip> excecutionElementTooltipList = new ArrayList<>();
-
         List<QueryConfig> queries = new LinkedList<>();
         for (List<QueryConfig> queryList : queryLists.values()) {
             queries.addAll(queryList);
         }
-
         List<ExecutionElementConfig> executionElements =
                 CodeGeneratorUtils.convertToExecutionElements(queries, partitions);
         QueryCodeGenerator queryCodeGenerator = new QueryCodeGenerator();
         PartitionCodeGenerator partitionCodeGenerator = new PartitionCodeGenerator();
-
         for (ExecutionElementConfig executionElement : executionElements) {
             if (executionElement.getType().equalsIgnoreCase(CodeGeneratorConstants.QUERY)) {
                 QueryConfig query = (QueryConfig) executionElement.getValue();
@@ -590,7 +597,6 @@ public class CodeGenerator {
                 throw new CodeGenerationException("Unidentified ExecutionElement type: " + executionElement.getType());
             }
         }
-
         return excecutionElementTooltipList;
     }
 

@@ -27,7 +27,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
               ace, AsyncAPIEditor, AsyncAPIRESTClient, alerts, AsyncAPIConstants) {
     
         var AsyncAPIView = function (initOpts) {
-            this.__$parent_el_container = $(initOpts.container);
+            this.__$parent_el_container = $(initOpts.parentEl);
             var self = this;
             this.etlWizardContainer = this.__$parent_el_container.find(_.get(initOpts, 'etl_wizard.container'));
             this.canvasContainer = this.__$parent_el_container.find(_.get(initOpts, 'canvas.container'));
@@ -99,10 +99,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             }
                         }
                         self.JSONObject.siddhiAppConfig.appAnnotationList.push(asyncApiDef);
+                        console.log("self.JSONObject ->>>");
                         console.log(self.JSONObject);
                         var editorTextResponse = AsyncAPIRESTClient.getCodeView(JSON.stringify(self.JSONObject));
                         if (editorTextResponse.status === "success") {
                             self._changedEditorText = self.__app.utils.b64DecodeUnicode(editorTextResponse.responseString);
+                            alerts.info("self._changedEditorText ->>>");
+                            console.log(self._changedEditorText)
                             if (self._fromGenerator && !self._contentChanged) {
                                 alerts.info("Async API Added.");
                                 self._contentChanged = true;

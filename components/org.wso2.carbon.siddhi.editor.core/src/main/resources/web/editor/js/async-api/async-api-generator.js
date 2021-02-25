@@ -27,9 +27,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
               ace, AsyncAPIEditor, alerts, AsyncAPIRESTClient, yaml, Utils, AsyncAPI) {
 
         var AsyncAPIView = function (initOpts) {
-            this.__$parent_el_container = $(initOpts.container);
+            this.__$parent_el_container = $(initOpts.parentEl);
             var self = this;
-
             this.etlWizardContainer = this.__$parent_el_container.find(_.get(initOpts, 'etl_wizard.container'));
             this.canvasContainer = this.__$parent_el_container.find(_.get(initOpts, 'canvas.container'));
             this.sourceContainer = this.__$parent_el_container.find(_.get(initOpts, 'source.container'));
@@ -45,6 +44,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 .find(_.get(initOpts, 'async_api_view.generatorContainer'));
             this.asyncAPIYamlContainer = this.asyncAPIViewContainer
                 .find(_.get(initOpts, 'async_api_view.yamlContainer'));
+
+            var asyncAPIYAMLViewDynamicId = "async-api-view-yaml-container-id-" + $(this.__$parent_el_container).attr('id');
+            $(this.asyncAPIYamlContainer[0]).attr('id', asyncAPIYAMLViewDynamicId);
+
             self.__options = initOpts;
             self.__app = initOpts.application;
             self.__editorInstance = initOpts.editorInstance;
@@ -216,8 +219,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             self.sourceContainer.addClass('hide-div');
             $(self.toggleControlsContainer[0]).find('.toggle-view-button').addClass('hide-div');
             $(self.toggleControlsContainer[0]).find('.wizard-view-button').addClass('hide-div');
-            $(self.toggleControlsContainer[0]).find('#asyncbtn-to-code-view').removeClass('hide-div');
-            $(self.toggleControlsContainer[0]).find('#asyncbtn-asyncapi-view').addClass('hide-div');
+            $(self.toggleControlsContainer[0]).find('.asyncbtn-to-code-view').removeClass('hide-div');
+            $(self.toggleControlsContainer[0]).find('.async-api-view-button').addClass('hide-div');
             self.etlWizardContainer.addClass('hide');
             self.asyncAPIViewContainer.addClass('etl-wizard-view-enabled');
         }
@@ -412,6 +415,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             options.asyncAPIViewContainer = self.asyncAPIViewContainer;
             options.fromGenerator = true;
             options.editorInstance = self.__editorInstance;
+            options.parentEl =  this.__$parent_el_container;
             this.asyncAPI = new AsyncAPI(options);
         }
 
@@ -467,6 +471,17 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 if (!foundCompatibleType) {
                                     alerts.error("No compatible sink or source types found in the siddhi app to " +
                                         "generate Async API");
+                                    self.sourceContainer.show();
+                                    self.asyncAPIViewContainer.hide();
+                                    $(self.toggleControlsContainer[0]).find('.toggle-view-button').removeClass('hide-div');
+                                    $(self.toggleControlsContainer[0]).find('.wizard-view-button').removeClass('hide-div');
+                                    var asyncAPIAddUpdateButton = $(self.toggleControlsContainer[0])
+                                        .find('.async-api-add-update-button');
+                                    asyncAPIAddUpdateButton.addClass('hide-div');
+                                    var codeViewButton = $(self.toggleControlsContainer[0]).find('.asyncbtn-to-code-view');
+                                    codeViewButton.addClass('hide-div');
+                                    var AsyncAPIViewButton = $(self.toggleControlsContainer[0]).find('.async-api-view-button');
+                                    AsyncAPIViewButton.removeClass('hide-div');
                                 } else {
                                     return self.JSONObject;
                                 }
