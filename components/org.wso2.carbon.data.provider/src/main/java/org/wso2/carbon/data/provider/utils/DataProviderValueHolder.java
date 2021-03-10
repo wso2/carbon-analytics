@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.data.provider.utils;
 
+import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.data.provider.DataProvider;
 import org.wso2.carbon.data.provider.DataProviderAuthorizer;
@@ -37,6 +38,7 @@ public class DataProviderValueHolder {
     private Map<String, Map<String, DataProvider>> sessionDataProviderMap = new ConcurrentHashMap<>();
     private Map<String, Class> dataProviderClassMap = new ConcurrentHashMap<>();
     private Map<String, DataProviderAuthorizer> dataProviderAuthorizerClassMap = new ConcurrentHashMap<>();
+    private IdPClient idpClient = null;
 
     public static DataProviderValueHolder getDataProviderHelper() {
         return dataProviderHelper;
@@ -115,5 +117,13 @@ public class DataProviderValueHolder {
             this.sessionDataProviderMap.put(sessionId, new ConcurrentHashMap<>());
             this.sessionDataProviderMap.get(sessionId).put(topic, dataProvider);
         }
+    }
+
+    public IdPClient getIdpClient() {
+        return idpClient;
+    }
+
+    public void setIdpClient(IdPClient idpClient) {
+        this.idpClient = idpClient;
     }
 }

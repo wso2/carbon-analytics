@@ -333,6 +333,9 @@ public class LoginApiServiceImpl extends LoginApiService {
                     NewCookie accessTokenhttpOnlyCookie = AuthUtil
                             .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, accessTokenSecondHalf, appContext, true, true,
                                     -1);
+                    NewCookie accessTokenhttpOnlyCookieForDP = AuthUtil
+                            .cookieBuilder("DID", accessTokenSecondHalf, "/data-provider", true, true,
+                                    -1);
                     NewCookie logoutContextAccessToken = AuthUtil
                             .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, accessTokenSecondHalf,
                                     AuthRESTAPIConstants.LOGOUT_CONTEXT + AuthRESTAPIConstants.LOGOUT_SSO_CONTEXT +
@@ -351,7 +354,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                         return Response.status(Response.Status.FOUND)
                                 .header(HttpHeaders.LOCATION, targetURIForRedirection)
                                 .entity(userDTO)
-                                .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
+                                .cookie(accessTokenhttpOnlyCookie, accessTokenhttpOnlyCookieForDP, logoutContextAccessToken,
                                         loginContextRefreshTokenCookie, userAuthenticate,
                                         logoutContextIdToken)
                                 .build();
@@ -359,7 +362,7 @@ public class LoginApiServiceImpl extends LoginApiService {
                     return Response.status(Response.Status.FOUND)
                             .header(HttpHeaders.LOCATION, targetURIForRedirection)
                             .entity(userDTO)
-                            .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken, logoutContextIdToken)
+                            .cookie(accessTokenhttpOnlyCookie, accessTokenhttpOnlyCookieForDP, logoutContextAccessToken, logoutContextIdToken)
                             .build();
                 } else {
                     if (LOG.isDebugEnabled()) {
