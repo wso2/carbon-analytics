@@ -164,10 +164,6 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
         DataProviderConfigRoot dataProviderConfigRoot = new Gson().fromJson(message, DataProviderConfigRoot.class);
         String authoringClassName;
 
-        // TODO:
-        System.out.println(">>>>>>>>>> onMessage() - Filter query based on the username: "
-                + usernameMap.get(webSocketConnection.getChannelId()));
-
         try {
             Map webSocketConfiguration = null;
             if (!(getDataProviderHelper().getConfigProvider().getConfigurationObject(WEB_SOCKET_CONFIG_HEADER)
@@ -191,7 +187,8 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
             }
             DataProviderAuthorizer dataProviderAuthorizer
                     = getDataProviderHelper().getDataProviderAuthorizer(authoringClassName);
-            boolean authorizerResult = dataProviderAuthorizer.authorize(dataProviderConfigRoot);
+            boolean authorizerResult = dataProviderAuthorizer
+                    .authorize(dataProviderConfigRoot, usernameMap.get(webSocketConnection.getChannelId()));
             if (!authorizerResult) {
                 throw new Exception("Access denied to data provider.");
             }
