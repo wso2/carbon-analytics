@@ -140,8 +140,8 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
         String[] cookies = request.getHeader("Cookie").split(";");
         String accessTokenPart1 = "";
         String accessTokenPart2 = "";
-        for (int i = 0; i < cookies.length; i++) {
-            String[] cookieParts = cookies[i].trim().split("=");
+        for (String cookie : cookies) {
+            String[] cookieParts = cookie.trim().split("=");
             if ("DID".equals(cookieParts[0])) {
                 accessTokenPart2 = cookieParts[1];
             } else if ("DATA_PROVIDER_USER".equals(cookieParts[0])) {
