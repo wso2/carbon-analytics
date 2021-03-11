@@ -290,6 +290,7 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
             }
         }
         getDataProviderHelper().removeSessionData(webSocketConnection.getChannelId());
+        usernameMap.remove(webSocketConnection.getChannelId());
     }
 
     /**
