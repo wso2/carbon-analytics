@@ -205,7 +205,8 @@ public class CodeGenerator {
             if (stream.getPartitionId() != null && !stream.getPartitionId().isEmpty()) {
                 continue;
             }
-            if (streamListStringBuilder.length() != 0 && streamListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE))
+            if (streamListStringBuilder.length() != 0 &&
+                    streamListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE))
                     != streamListStringBuilder.length() - 1) {
                 streamListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
             }
@@ -322,7 +323,8 @@ public class CodeGenerator {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
         StringBuilder windowListStringBuilder = new StringBuilder();
-        if (windowListStringBuilder.length() !=0 && windowListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE))
+        if (windowListStringBuilder.length() !=0 &&
+                windowListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE))
                 != windowListStringBuilder.length() - 1) {
             windowListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
