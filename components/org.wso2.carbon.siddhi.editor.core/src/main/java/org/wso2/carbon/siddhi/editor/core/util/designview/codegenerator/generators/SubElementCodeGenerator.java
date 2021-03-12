@@ -30,6 +30,8 @@ import org.wso2.carbon.siddhi.editor.core.util.designview.exceptions.CodeGenerat
 import org.wso2.carbon.siddhi.editor.core.util.designview.utilities.CodeGeneratorUtils;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Generates the code for a sub-element of a Siddhi element.
@@ -54,7 +56,13 @@ public class SubElementCodeGenerator {
         } else if (comment.getContent() == null || comment.getContent().isEmpty()) {
             throw new CodeGenerationException("The content of a given comment object is empty");
         }
-        return comment.getContent();
+        String content = comment.getContent();
+        Pattern p = Pattern.compile("\n\n(\n*).*");//. represents single character
+        Matcher m = p.matcher(content);
+        if (m.find()) {
+            content = content.replaceFirst(m.group(1), "");
+        }
+        return content;
     }
 
     /**

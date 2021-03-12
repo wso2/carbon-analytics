@@ -37,7 +37,7 @@ public interface ServiceCatalogueAPIServiceStub {
 
     @RequestLine("POST api/am/service-catalog/v0/services/import?overwrite=true")
     @Headers("Content-Type: multipart/form-data; charset=utf-8")
-    Response uploadZip(@Param("file") File file) throws ServiceCatalogueAPIServiceStubException;
+    Response uploadZip(@Param("file") File file, @Param("verifier") String verifier) throws ServiceCatalogueAPIServiceStubException;
 
     @RequestLine("DELETE /api/am/service-catalog/v0/services/{serviceUUID}")
     @Headers("Content-Type: text/plain; charset=utf-8")
