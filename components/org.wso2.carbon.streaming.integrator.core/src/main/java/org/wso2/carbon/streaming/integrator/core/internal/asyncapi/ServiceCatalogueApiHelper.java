@@ -62,9 +62,9 @@ public class ServiceCatalogueApiHelper implements ServiceCatalogueApiHelperServi
     }
 
     @Override
-    public boolean uploadAsyncAPIDef(File file, String hostAndPort, String username, String password)
+    public boolean uploadAsyncAPIDef(File file, String verifier, String hostAndPort, String username, String password)
         throws ServiceCatalogueAPIServiceStubException {
-        try (Response response = HTTPSClientUtil.uploadZip(file, hostAndPort, username, password)) {
+        try (Response response = HTTPSClientUtil.uploadZip(file, verifier, hostAndPort, username, password)) {
             if (response.status() == 200) {
                 return true;
             }

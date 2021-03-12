@@ -54,10 +54,10 @@ public class HTTPSClientUtil {
             .doGetKeyMd5s(key);
     }
 
-    public static Response uploadZip(File file, String hostAndPort, String username, String password)
+    public static Response uploadZip(File file, String verifier, String hostAndPort, String username, String password)
         throws ServiceCatalogueAPIServiceStubException {
         return ServiceCatalogueHandlerFactory.getServiceCatalogueHandlerHttpsClient2(generateURL(hostAndPort), username, password)
-            .uploadZip(file);
+            .uploadZip(file, verifier);
     }
 
     public static Response deleteAsyncAPI(String serviceUUID, String hostAndPort, String username, String password)

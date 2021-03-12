@@ -56,6 +56,7 @@ public class AsyncAPIDeployer implements Runnable {
     private final JSONObject asyncAPIJson;
     private final String directoryURI;
     private final String zipDirectoryURI;
+    private String md5Calculated;
 
     private static final Logger log = LoggerFactory.getLogger(AsyncAPIDeployer.class);
 
@@ -84,8 +85,14 @@ public class AsyncAPIDeployer implements Runnable {
         if (!isMD5Equal()) {
             zipFiles();
             try {
+                JSONArray verifiers = new JSONArray();
+                JSONObject verifier = new JSONObject();
+                verifier.put("key", asyncAPiKeyVersion);
+                verifier.put("md5", md5Calculated);
+                verifiers.put(verifier);
                 boolean isUploaded = serviceCatalogueApiHelper.uploadAsyncAPIDef(new File(zipDirectoryURI +
-                        File.separator + asyncAPiKeyVersion + ".zip"), hostAndPort, username, password);
+                        File.separator + asyncAPiKeyVersion + ".zip"), verifiers.toString(), hostAndPort,
+                        username, password);
                 if (isUploaded) {
                     log.info("Async API: " + asyncAPiKeyVersion + " uploaded to the service catalogue");
                 }
@@ -154,7 +161,7 @@ public class AsyncAPIDeployer implements Runnable {
                     JSONObject apiKeyObject = md5List.getJSONObject(i);
                     if (apiKeyObject.getString("serviceKey").compareTo(asyncAPiKeyVersion) == 0) {
                         String md5 = apiKeyObject.getString("md5");
-                        String md5Calculated = Md5HashGenerator.generateHash(directoryURI);
+                        md5Calculated = Md5HashGenerator.generateHash(directoryURI);
                         if (md5Calculated != null && md5.compareTo(md5Calculated) == 0) {
                             if (log.isDebugEnabled()) {
                                 log.debug("MD5 of " + asyncAPiKeyVersion + " is equal, hence not deploying Async API");
@@ -201,7 +208,11 @@ public class AsyncAPIDeployer implements Runnable {
             }
         }
         map.put("mutualSSLEnabled", false);
-        map.put("securityType", strBuilder.toString());
+        if (strBuilder.toString().isEmpty()) {
+            map.put("securityType", "NONE");
+        } else {
+            map.put("securityType", strBuilder.toString());
+        }
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setPrettyFlow(true);
