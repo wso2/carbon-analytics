@@ -1563,6 +1563,9 @@ public class AnalyticsDataIndexer {
             String values = obj.toString();
             String[] facetArray = new String[]{};
             try {
+                if (values.isEmpty()) {
+                    values = analyticsFacetConfig.getFacetDefaultValue(tableName, field);
+                }
                 facetArray = values.split(analyticsFacetConfig.getFacetSplitter(tableName, field));
                 doc.add(new FacetField(field, facetArray));
             } catch (IllegalArgumentException e) {
