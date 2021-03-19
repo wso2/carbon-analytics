@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.streaming.integrator.core.internal;
 
+import io.siddhi.core.exception.ExtensionNotFoundException;
+import io.siddhi.core.exception.SiddhiAppCreationException;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -355,11 +357,40 @@ public class StreamProcessorDeployer implements Deployer {
     @Override
     public Object deploy(Artifact artifact) throws CarbonDeploymentException {
 
-        try {
-            deploySiddhiQLFile(artifact.getFile());
-        } catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            //throw new CarbonDeploymentException(e.getMessage(), e);
+        int retryCount = 0;
+        boolean extensionUnavailabilityErrorRecieved = false;
+        while (retryCount != SiddhiAppProcessorConstants.SIDDHI_APP_REDEPLOY_RETRY_COUNT) {
+            try {
+                deploySiddhiQLFile(artifact.getFile());
+                extensionUnavailabilityErrorRecieved = false;
+                break;
+            } catch (Throwable e) {
+                if (e instanceof SiddhiAppDeploymentException && e.getCause() instanceof
+                        ExtensionNotFoundException) {
+                        extensionUnavailabilityErrorRecieved = true;
+                        try {
+                            log.warn("Dependencies are not satisfied to deploy siddhi file " +
+                                    artifact.getFile().getName() + " due to " + e.getCause().getMessage() +
+                                    ".Please check the required dependencies exist.Redeploy will retry in " +
+                                    SiddhiAppProcessorConstants.SIDDHI_APP_REDEPLOY_SLEEP_TIMEOUT +
+                                    " milliseconds.");
+                            StreamProcessorDataHolder.getStreamProcessorService().
+                                    undeploySiddhiApp(getFileNameWithoutExtenson(artifact.getName()));
+                            Thread.sleep(SiddhiAppProcessorConstants.SIDDHI_APP_REDEPLOY_SLEEP_TIMEOUT);
+                        } catch (InterruptedException e1) {
+                            log.error("Error while waiting for dependencies to be statisfied " + e1.getMessage());
+                        }
+                } else {
+                    extensionUnavailabilityErrorRecieved = false;
+                    log.error(e.getMessage(), e);
+                    break;
+                }
+            }
+            retryCount ++;
+        }
+        if (extensionUnavailabilityErrorRecieved) {
+            log.error("Could not deploy siddhi file " + artifact.getFile().getName() + " after retrying for " +
+                    SiddhiAppProcessorConstants.SIDDHI_APP_REDEPLOY_RETRY_COUNT + " times.");
         }
         broadcastDeploy();
         return artifact.getFile().getName();
