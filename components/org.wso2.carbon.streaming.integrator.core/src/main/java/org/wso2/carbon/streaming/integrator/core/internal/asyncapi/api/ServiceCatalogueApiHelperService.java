@@ -31,7 +31,7 @@ public interface ServiceCatalogueApiHelperService {
     JSONObject getKeyMd5s(String hostAndPort, String username, String password, String key)
         throws ServiceCatalogueAPIServiceStubException;
 
-    boolean uploadAsyncAPIDef(File file, String hostAndPort, String username, String password)
+    boolean uploadAsyncAPIDef(File file, String verifier, String hostAndPort, String username, String password)
         throws ServiceCatalogueAPIServiceStubException;
 
     boolean deleteAsyncAPIDef(String serviceKey, String hostAndPort, String username, String password)

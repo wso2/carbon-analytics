@@ -77,8 +77,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 "                    <label class='clearfix'>Description</label>" +
                 "                    <div class='col-sm-12'>" +
                 "                         <textarea id='asyncAPIDescription' class='curl-editor form-control'>" +
-                "                         </textarea>" +
+                "</textarea>" +
                 "                    </div>" +
+                "                </div>" +
+                "                <div class='form-group'>" +
+                "                    <label class='clearfix'>Enter server name</label> " +
+                "                    <input class='add-new-server-input' id='serverName' placeholder='production'> " +
                 "                </div>" +
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'>" +
@@ -119,21 +123,28 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             $(this.asyncAPIGenContainer[0]).html(self.openAsyncAPIGenerateModal);
 
             self.sinkSorceTypes = {
-                "WebSocket": {
+                "websocket": {
                     "source": {
                         "security": {
                             "truststore.path": {"truststore.file": {"type": "X509"}}
                         }
                     }
                 },
-                // "SSE": {
-                //     "source": {
-                //         "security": {
-                //             "basic.auth.enabled": {"http-basic": {"type": "http", "scheme": "basic"}},
-                //         }
-                //     }
-                // },
-                // "WebSubPublisher": {
+                "sse": {
+                    "source": {
+                        "security": {
+                            "basic.auth.enabled": {"http-basic": {"type": "http", "scheme": "basic"}}
+                        }
+                    },
+                    "sink": {
+                        "security": {
+                            "basic.auth.username": {"http-basic": {"type": "http", "scheme": "basic"}},
+                            "https.truststore.file": {"truststore.file": {"type": "X509"}},
+                            "oauth.username": {"oauth": {"type": "oauth2"}},
+                        }
+                    }
+                },
+                // "websubpublisher": {
                 //     "sink": {
                 //         "security": {
                 //             "basic.auth.username": {"http-basic": {"type": "http", "scheme": "basic"}},
@@ -141,7 +152,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 //         }
                 //     }
                 // },
-                "WebSocket-Server": {
+                "websocket-server": {
                     "sink": {
                         "security": {
                             "keystore.path": {"keystore.file": {"type": "X509"}}
@@ -178,6 +189,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 this.sourceListDivSelector = this.openAsyncAPIGenerateModal.find("#source-list-div");
                 this.sinkListDivSelector = this.openAsyncAPIGenerateModal.find("#sink-list-div");
                 this.asyncAPITitleSelector = this.openAsyncAPIGenerateModal.find("#asyncAPITitle");
+                this.asyncAPIServerName = this.openAsyncAPIGenerateModal.find("#serverName");
                 this.asyncAPIVersionSelector = this.openAsyncAPIGenerateModal.find("#asyncAPIVersion");
                 this.asyncAPIDescriptionSelector = this.openAsyncAPIGenerateModal.find("#asyncAPIDescription");
                 this.sourceListDivSelector.addClass('hide-div');
@@ -345,19 +357,21 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     }
                 }
             }
-
+            var title = (self.asyncAPITitleSelector.val().trim() !== "" ? self.asyncAPITitleSelector.val().trim() : 'TestApp');
+            var version = (self.asyncAPIVersionSelector.val().trim() !== "" ? self.asyncAPIVersionSelector.val().trim() : '1.0.0');
+            var description = (self.asyncAPIDescriptionSelector.val().trim() !== "" ? self.asyncAPIDescriptionSelector.val().trim() : 'This exposes an API from WSO2 SI');
             var asyncAPIJSON = {"asyncapi": "2.0.0"};
             asyncAPIJSON.info = {
-                "title": self.asyncAPITitleSelector.val(),
-                "version": self.asyncAPIVersionSelector.val(),
-                "description": self.asyncAPIDescriptionSelector.val()
+                "title": title,
+                "version": version,
+                "description": description
             };
-            asyncAPIJSON.servers = {
-                "production": {
-                    "url": serverDetails.url,
-                    "protocol": serverDetails.protocol,
-                    "security": [] //serverDetails.security
-                }
+            asyncAPIJSON.servers = {};
+            var serverName = (self.asyncAPIServerName.val().trim() !== "" ? self.asyncAPIServerName.val().trim() : 'production');
+            asyncAPIJSON.servers[serverName] = {
+                "url": serverDetails.url,
+                "protocol": serverDetails.protocol,
+                "security": [] //serverDetails.security
             };
 
             asyncAPIJSON.channels = {};
@@ -383,7 +397,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         Object.keys(securityOptions[i]).forEach(function (key) {
                             var secutiryObject = {}
                             secutiryObject[key] = [];
-                            asyncAPIJSON.servers.production.security.push(secutiryObject);
+                            asyncAPIJSON.servers[serverName].security.push(secutiryObject);
                         });
                     }
                 }
@@ -584,7 +598,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var serverDetails = {};
             serverDetails.security = [];
             serverDetails.channel = [];
-            var securityOptions = sinkSorceTypes["WebSocket-Server"][ioType].security;
+            var securityOptions = sinkSorceTypes[type][ioType].security;
             if (type === "websocket-server") {
                 for (i = 0; i < options.length; i++) {
                     if (options[i].startsWith("host")) {
@@ -595,15 +609,17 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         portKeyValue = options[i].split("=");
                         serverDetails.port = portKeyValue[1].trim().replaceAll('"', '');
                     }
-
                     Object.keys(securityOptions).forEach(function (key) {
                         if (options[i].startsWith(key)) {
                             serverDetails.security.push(securityOptions[key]);
                         }
                     })
-
                 }
-                serverDetails.protocol = "ws";
+                if (serverKeyValue[1].trim().includes("wss")) {
+                    serverDetails.protocol = "wss";
+                } else {
+                    serverDetails.protocol = "ws";
+                }
                 serverDetails.url = serverDetails.hostname + ":" + serverDetails.port;
                 serverDetails.channel.push("/");
             } else if (type === "websocket") {
@@ -616,9 +632,9 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         serverDetails.hostname = temp[0];
                         serverDetails.port = temp[1];
                         if (serverKeyValue[1].trim().includes("wss")) {
-                            serverDetails.protocol = "wss://";
+                            serverDetails.protocol = "wss";
                         } else {
-                            serverDetails.protocol = "ws://";
+                            serverDetails.protocol = "ws";
                         }
                     }
                     Object.keys(securityOptions).forEach(function (key) {
@@ -630,11 +646,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 //todo: check how to get channel information from each IO type
                 //adding channel information retrived by the url
                 serverDetails.url = serverDetails.protocol + serverDetails.hostname + ":" + serverDetails.port;
-                serverDetails.channel.push(serverKeyValue[1]
-                    .replaceAll(serverDetails.url, "").replaceAll('\"','').trim());
+                serverDetails.channel.push(new URL(serverKeyValue[1].trim().replaceAll('"', '')).pathname);
             } else if (type === "sse") { //todo need to change when SSE is developed currently assumed it as http sink
                 for (i = 0; i < options.length; i++) {
-                    if (options[i].startsWith("publisher.url")) {
+                    if (options[i].startsWith("event.source.url")) {
                         serverKeyValue = options[i].split("=");
                         urlElements = serverKeyValue[1].trim()
                             .replaceAll('"', '').replaceAll("http://", '')
@@ -643,14 +658,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         serverDetails.hostname = temp[0];
                         serverDetails.port = temp[1];
                         if (serverKeyValue[1].trim().includes("https")) {
-                            serverDetails.protocol = "https://";
+                            serverDetails.protocol = "https";
                         } else {
-                            serverDetails.protocol = "http://";
+                            serverDetails.protocol = "http";
                         }
-                        serverDetails.url = serverDetails.protocol + serverDetails.hostname + ":" + serverDetails.port;
-                        serverDetails.channel.push(serverKeyValue[1].replaceAll("http://", '')
-                            .replaceAll("https://", '').replace(serverDetails[0] + ":" + serverDetails[1]));
-
+                        serverDetails.url = serverDetails.hostname + ":" + serverDetails.port;
+                        serverDetails.channel.push(new URL(serverKeyValue[1].trim().replaceAll('"', '')).pathname);
                     }
                     Object.keys(securityOptions).forEach(function (key) {
                         if (options[i].startsWith(key)) {

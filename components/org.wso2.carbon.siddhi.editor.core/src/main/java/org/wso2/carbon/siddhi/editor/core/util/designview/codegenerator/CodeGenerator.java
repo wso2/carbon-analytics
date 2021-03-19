@@ -134,7 +134,7 @@ public class CodeGenerator {
             appNameStringBuilder.append(SiddhiCodeBuilderConstants.DEFAULT_APP_NAME_ANNOTATION);
         }
         if (appNameStringBuilder.length() != 0 &&
-                appNameStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                appNameStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) !=
                         appNameStringBuilder.length() - 1) {
             appNameStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
@@ -205,8 +205,9 @@ public class CodeGenerator {
             if (stream.getPartitionId() != null && !stream.getPartitionId().isEmpty()) {
                 continue;
             }
-            if (streamListStringBuilder.length() != 0 && streamListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE))
-                    == streamListStringBuilder.length() - 1) {
+            if (streamListStringBuilder.length() != 0 &&
+                    streamListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE))
+                    != streamListStringBuilder.length() - 1) {
                 streamListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
             }
             for (SourceSinkConfig sourceSink : sourcesAndSinks) {
@@ -218,7 +219,7 @@ public class CodeGenerator {
             streamListStringBuilder
                     .append(streamCodeGenerator.generateStream(stream, false));
             if (streamListStringBuilder.length() != 0 &&
-                    streamListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                    streamListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) !=
                             streamListStringBuilder.length() - 1) {
                 streamListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
             }
@@ -271,7 +272,7 @@ public class CodeGenerator {
         }
         StringBuilder tableListStringBuilder = new StringBuilder();
         if (tableListStringBuilder.length() !=0 &&
-                tableListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                tableListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) !=
                         tableListStringBuilder.length() - 1) {
             tableListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
@@ -282,7 +283,7 @@ public class CodeGenerator {
         }
 
         if (tableListStringBuilder.length() !=0 &&
-                tableListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                tableListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) !=
                         tableListStringBuilder.length() - 1) {
             tableListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
@@ -322,8 +323,9 @@ public class CodeGenerator {
             return SiddhiCodeBuilderConstants.EMPTY_STRING;
         }
         StringBuilder windowListStringBuilder = new StringBuilder();
-        if (windowListStringBuilder.length() !=0 && windowListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE))
-                == windowListStringBuilder.length() - 1) {
+        if (windowListStringBuilder.length() !=0 &&
+                windowListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE))
+                != windowListStringBuilder.length() - 1) {
             windowListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
         WindowCodeGenerator windowCodeGenerator = new WindowCodeGenerator();
@@ -331,7 +333,7 @@ public class CodeGenerator {
             windowListStringBuilder.append(windowCodeGenerator.generateWindow(window, false));
         }
         if (windowListStringBuilder.length() !=0 &&
-                windowListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                windowListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) !=
                         windowListStringBuilder.length() - 1) {
             windowListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
@@ -371,7 +373,7 @@ public class CodeGenerator {
         }
         StringBuilder triggerListStringBuilder = new StringBuilder();
         if (triggerListStringBuilder.length() !=0 &&
-                triggerListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                triggerListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) !=
                         triggerListStringBuilder.length() - 1) {
             triggerListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
@@ -380,7 +382,7 @@ public class CodeGenerator {
             triggerListStringBuilder.append(triggerCodeGenerator.generateTrigger(trigger, false));
         }
         if (triggerListStringBuilder.length() !=0 &&
-                triggerListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                triggerListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) !=
                         triggerListStringBuilder.length() - 1) {
             triggerListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
@@ -420,7 +422,7 @@ public class CodeGenerator {
         }
         StringBuilder aggregationListStringBuilder = new StringBuilder();
         if (aggregationListStringBuilder.length() !=0 &&
-                aggregationListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                aggregationListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) !=
                         aggregationListStringBuilder.length() - 1) {
             aggregationListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
@@ -429,7 +431,7 @@ public class CodeGenerator {
             aggregationListStringBuilder.append(aggregationCodeGenerator.generateAggregation(aggregation, false));
         }
         if (aggregationListStringBuilder.length() !=0 &&
-                aggregationListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                aggregationListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) !=
                         aggregationListStringBuilder.length() - 1) {
             aggregationListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
@@ -470,7 +472,7 @@ public class CodeGenerator {
         }
         StringBuilder functionListStringBuilder = new StringBuilder();
         if (functionListStringBuilder.length() != 0 &&
-                functionListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                functionListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) !=
                         functionListStringBuilder.length() - 1) {
             functionListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
@@ -479,7 +481,7 @@ public class CodeGenerator {
             functionListStringBuilder.append(functionCodeGenerator.generateFunction(function, false));
         }
         if (functionListStringBuilder.length() != 0 &&
-                functionListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                functionListStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) !=
                         functionListStringBuilder.length() - 1) {
             functionListStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
@@ -524,7 +526,7 @@ public class CodeGenerator {
 
         StringBuilder executionElementStringBuilder = new StringBuilder();
         if (executionElementStringBuilder.length() != 0 &&
-                executionElementStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                executionElementStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) !=
                         executionElementStringBuilder.length() - 1) {
             executionElementStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
         }
@@ -549,7 +551,7 @@ public class CodeGenerator {
                 throw new CodeGenerationException("Unidentified ExecutionElement type: " + executionElement.getType());
             }
             if (executionElementStringBuilder.length() != 0 &&
-                    executionElementStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) ==
+                    executionElementStringBuilder.lastIndexOf(String.valueOf(SiddhiCodeBuilderConstants.NEW_LINE)) !=
                             executionElementStringBuilder.length() - 1) {
                 executionElementStringBuilder.append(SiddhiCodeBuilderConstants.NEW_LINE);
             }
