@@ -21,6 +21,8 @@ package org.wso2.carbon.data.provider.siddhi;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.siddhi.query.api.execution.query.StoreQuery;
+import io.siddhi.query.compiler.SiddhiCompiler;
 import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.data.provider.AbstractDataProvider;
 import org.wso2.carbon.data.provider.DataProvider;
@@ -58,9 +60,9 @@ public class SiddhiProvider extends AbstractDataProvider {
     private static final String QUERY = "query";
     private static final Pattern LIMIT_FILTER_REGEX = Pattern.compile("(?<=limit )([0-9]*)");
     private static final Pattern OFFSET_AND_VALUE_REGEX = Pattern.compile("(offset )(?<=offset )([0-9]*)");
+    private static SiddhiManager siddhiManager = null;
     private SiddhiDataProviderConfig siddhiDataProviderConfig;
     private DataSetMetadata metadata;
-    private static SiddhiManager siddhiManager = null;
     private SiddhiAppRuntime siddhiAppRuntime;
     private String[] linearTypes = new String[]{"INT", "LONG", "FLOAT", "DOUBLE"};
     private String[] ordinalTypes = new String[]{"STRING", "BOOL"};
@@ -74,11 +76,11 @@ public class SiddhiProvider extends AbstractDataProvider {
         this.timeColumns = Arrays.asList(this.siddhiDataProviderConfig.getTimeColumns().toUpperCase(Locale.ENGLISH)
                 .split(","));
         super.init(topic, sessionId, siddhiDataProviderConfig);
-        SiddhiAppRuntime siddhiAppRuntime = getSiddhiAppRuntime();
-        siddhiAppRuntime.setPurgingEnabled(false);
-        siddhiAppRuntime.start();
-        String onDemandQuery = siddhiDataProviderConfig.getQueryData().getAsJsonObject().get(QUERY).getAsString();
-        Attribute[] outputAttributeList = siddhiAppRuntime.getOnDemandQueryOutputAttributes(onDemandQuery);
+        this.siddhiAppRuntime = SiddhiAppRuntimeHolder.
+                getSiddhiAppRuntime(siddhiDataProviderConfig.getSiddhiAppContext());
+        StoreQuery storeQuery = SiddhiCompiler.parseStoreQuery(siddhiDataProviderConfig.getQueryData()
+                .getAsJsonObject().get(QUERY).getAsString());
+        Attribute[] outputAttributeList = siddhiAppRuntime.getStoreQueryOutputAttributes(storeQuery);
         metadata = new DataSetMetadata(outputAttributeList.length);
         Attribute outputAttribute;
         for (int i = 0; i < outputAttributeList.length; i++) {
@@ -209,26 +211,7 @@ public class SiddhiProvider extends AbstractDataProvider {
 
     @Override
     public void stop() {
-        siddhiAppRuntime.shutdown();
         super.stop();
-    }
-
-    private static SiddhiManager getSiddhiManager() {
-        if (siddhiManager == null) {
-            siddhiManager = new SiddhiManager();
-        }
-        return siddhiManager;
-    }
-
-    private SiddhiAppRuntime getSiddhiAppRuntime() throws DataProviderException {
-        if (this.siddhiAppRuntime == null) {
-            try {
-                this.siddhiAppRuntime = getSiddhiManager().createSiddhiAppRuntime(siddhiDataProviderConfig.getSiddhiAppContext());
-            } catch (SiddhiParserException e) {
-                throw new DataProviderException("Invalid Siddhi App Context", e);
-            }
-        }
-        return this.siddhiAppRuntime;
     }
 
     /**
