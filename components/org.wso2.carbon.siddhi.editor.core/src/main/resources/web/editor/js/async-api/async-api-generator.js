@@ -275,7 +275,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     trigger: 'hover'
                 })
             } else {
-                self.sinkListDivSelector.addClass('hide-div');
+                self.sourceListSelector.addClass('hide-div');
             }
         }
 
@@ -318,6 +318,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         serverDetails.stream = sinkList[j].connectedElementName;
                         serverDetails.payloadProperties = getPayloadSpec(sinkList[j].connectedElementName,
                             streamList, sinkList[j].type.toLowerCase())
+                        serverDetails.payloadSchemaProperties =
+                            getPayloadSchemas(sinkList[j].connectedElementName, streamList)
                         serversDetails.push(serverDetails);
                         if (initialPort === -1) {
                             initialServer = serverDetails.host;
