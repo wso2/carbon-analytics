@@ -99,13 +99,9 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                             }
                         }
                         self.JSONObject.siddhiAppConfig.appAnnotationList.push(asyncApiDef);
-                        console.log("self.JSONObject ->>>");
-                        console.log(self.JSONObject);
                         var editorTextResponse = AsyncAPIRESTClient.getCodeView(JSON.stringify(self.JSONObject));
                         if (editorTextResponse.status === "success") {
                             self._changedEditorText = self.__app.utils.b64DecodeUnicode(editorTextResponse.responseString);
-                            alerts.info("self._changedEditorText ->>>");
-                            console.log(self._changedEditorText)
                             if (self._fromGenerator && !self._contentChanged) {
                                 alerts.info("Async API Added.");
                                 self._contentChanged = true;
@@ -155,7 +151,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         AsyncAPIView.prototype.renderCallback = function () {
             var self = this;
             if (self.editor.getSession().getValue() !== "" && self.asyncAPIDefYaml !== self.editor.getSession().getValue()) {
-                self._contentChanged = true;
                 window.getAsyncAPIUI(self.asyncAPISpecContainerDom, self.editor.getSession().getValue());
             }
         };

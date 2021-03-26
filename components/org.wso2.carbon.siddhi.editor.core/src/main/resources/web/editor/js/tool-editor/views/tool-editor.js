@@ -172,12 +172,10 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                             var response = self._designView.getDesign(self.getContent());
                             if (response.status === "success") {
                                 self.JSONObject = JSON.parse(response.responseString);
-
                                 if (!self.canTranslateToWizard(self.JSONObject)) {
                                     DesignViewUtils.prototype.errorAlert('This Siddhi app cannot be opened in ETL Wizard mode');
                                     return;
                                 }
-
                                 sourceContainer.hide();
                                 etlWizardContainer.show();
                                 var etlOptions = _.cloneDeep(self.options);
@@ -233,6 +231,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                     setTimeout(function () {
                                         var fileHashCode = application.tabController.getActiveTab().getFile().attributes.hashCode;
                                         var renderedAppContentHashCode = designView.getHashCode();
+                                        $(toggleControlsContainer[0]).find('#asyncbtn-asyncapi-view').addClass('hide-div');
                                         if (fileHashCode != renderedAppContentHashCode || fileHashCode == undefined &&
                                             renderedAppContentHashCode == undefined) {
                                             designView.setHashCode(fileHashCode);
@@ -298,7 +297,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                     }
                                 });
                             }
-
+                            $(toggleControlsContainer[0]).find('#asyncbtn-asyncapi-view').removeClass('hide-div');
                             var isDesignViewContentChanged
                                 = designView.getConfigurationData().getIsDesignViewContentChanged();
 

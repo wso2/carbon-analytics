@@ -275,7 +275,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     trigger: 'hover'
                 })
             } else {
-                self.sinkListDivSelector.addClass('hide-div');
+                self.sourceListSelector.addClass('hide-div');
             }
         }
 
@@ -318,6 +318,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         serverDetails.stream = sinkList[j].connectedElementName;
                         serverDetails.payloadProperties = getPayloadSpec(sinkList[j].connectedElementName,
                             streamList, sinkList[j].type.toLowerCase())
+                        serverDetails.payloadSchemaProperties =
+                            getPayloadSchemas(sinkList[j].connectedElementName, streamList)
                         serversDetails.push(serverDetails);
                         if (initialPort === -1) {
                             initialServer = serverDetails.host;
@@ -645,7 +647,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 }
                 //todo: check how to get channel information from each IO type
                 //adding channel information retrived by the url
-                serverDetails.url = serverDetails.protocol + serverDetails.hostname + ":" + serverDetails.port;
+                serverDetails.url = serverDetails.hostname + ":" + serverDetails.port;
                 serverDetails.channel.push(new URL(serverKeyValue[1].trim().replaceAll('"', '')).pathname);
             } else if (type === "sse") { //todo need to change when SSE is developed currently assumed it as http sink
                 for (i = 0; i < options.length; i++) {
