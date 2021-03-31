@@ -30,7 +30,7 @@ import javax.ws.rs.core.MediaType;
  */
 public interface SiddhiStoreQueryServiceStub {
 
-    @RequestLine("POST /query")
+    @RequestLine("POST /stores/query")
     @Headers("Content-Type: " + MediaType.APPLICATION_JSON)
     Response executeStoreQuery(String payload);
 }

@@ -26,6 +26,7 @@ import org.wso2.transport.http.netty.contract.config.ListenerConfiguration;
 import org.wso2.transport.http.netty.contract.config.TransportsConfiguration;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utility class to access the Siddhi Store API.
@@ -57,15 +58,15 @@ public class StoreQueryAPIHelper {
 
         // TODO: 9/23/19 Temporary fix till  https://github.com/siddhi-io/distribution/issues/426 is solved
         try {
-            HashMap<String, String> storeAPIConfig = (HashMap<String, String>)
+            Map<String, String> storeAPIConfig = (HashMap<String, String>)
                                                             configProvider.getConfigurationObject(STORE_API_CONFIG);
             String url;
             if (storeAPIConfig != null) {
                 String host = storeAPIConfig.get("host") != null ? storeAPIConfig.get("host") : "0.0.0.0";
-                String port = storeAPIConfig.get("port") != null ? storeAPIConfig.get("port") : "9390";
+                String port = storeAPIConfig.get("port") != null ? storeAPIConfig.get("port") : "7370";
                 url = host + ":" + port;
             } else {
-                url = "0.0.0.0:9390";
+                url = "0.0.0.0:7370";
             }
             return StoreQueryHTTPClient.executeStoreQuery(url, query);
         } catch (ConfigurationException e) {
