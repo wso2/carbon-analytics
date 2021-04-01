@@ -45,7 +45,8 @@ define(['require', 'log', 'jquery', 'lodash', 'console','workspace','toolEditor'
                 parentDiv.scrollTop = parentDiv.scrollHeight;
                 var childLength = this.$el.children().size();
                 //console.log("Count="+);
-                if (childLength > 2500) {
+                if (childLength > 500) {
+                    $(this.$el).children().first().remove();
                     $(this.$el).children().first().remove();
                 }
             },
