@@ -222,7 +222,7 @@ define(['require', 'log', 'lodash', 'jquery', 'tool_palette/tool-palette', 'desi
             $.ajax({
                 type: "POST",
                 url: self.designToCodeURL,
-                data: window.btoa(designViewJSON),
+                data: self.application.utils.base64EncodeUnicode(designViewJSON),
                 async: false,
                 success: function (response) {
                     result = {status: "success", responseString: self.options.application.utils.
