@@ -144,14 +144,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         }
                     }
                 },
-                // "websubpublisher": {
-                //     "sink": {
-                //         "security": {
-                //             "basic.auth.username": {"http-basic": {"type": "http", "scheme": "basic"}},
-                //             "https.truststore.file": {"type": "X509"}
-                //         }
-                //     }
-                // },
+                "websubhub": {
+                    "source": {
+                        "security": {
+                            "basic.auth.enabled": {"http-basic": {"type": "http", "scheme": "basic"}}
+                        }
+                    }
+                },
                 "websocket-server": {
                     "sink": {
                         "security": {
@@ -243,14 +242,14 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             var sources = self.siddhiAppConfig.siddhiAppConfig.sourceList;
             var sinksAvailable = false;
             for (var i = 0; i < sinks.length; i++) {
-                if (sinks[i].type === type) {
+                if (sinks[i].type.toLowerCase() === type.toLowerCase()) {
                     sinksAvailable = true;
                     break;
                 }
             }
             var sourcesAvailable = false;
             for (var i = 0; i < sources.length; i++) {
-                if (sources[i].type === type) {
+                if (sources[i].type.toLowerCase() === type.toLowerCase()) {
                     sourcesAvailable = true;
                     break;
                 }
@@ -650,8 +649,14 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 serverDetails.url = serverDetails.hostname + ":" + serverDetails.port;
                 serverDetails.channel.push(new URL(serverKeyValue[1].trim().replaceAll('"', '')).pathname);
             } else if (type === "sse") { //todo need to change when SSE is developed currently assumed it as http sink
+                var serverUrl;
                 for (i = 0; i < options.length; i++) {
-                    if (options[i].startsWith("event.source.url")) {
+                    if (ioType == "sink") {
+                        serverUrl = "event.sink.url";
+                    } else {
+                        serverUrl = "event.source.url";
+                    }
+                    if (options[i].startsWith(serverUrl)) {
                         serverKeyValue = options[i].split("=");
                         urlElements = serverKeyValue[1].trim()
                             .replaceAll('"', '').replaceAll("http://", '')
@@ -673,10 +678,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         }
                     })
                 }
-            } else if (type === "websubpublisher") {
+            } else if (type === "websubhub") {
                 //todo need to change when WebHook is developed currently assumed it as http sink
                 for (i = 0; i < options.length; i++) {
-                    if (options[i].startsWith("hub.url")) {
+                    if (options[i].startsWith("receiver.url")) {
                         serverKeyValue = options[i].split("=");
                         urlElements = serverKeyValue[1].trim().replaceAll('"', '')
                             .replaceAll("http://", '').replaceAll("https://", '').split("/");
@@ -684,18 +689,18 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         serverDetails.hostname = temp[0];
                         serverDetails.port = temp[1];
                         if (serverKeyValue[1].trim().includes("https")) {
-                            serverDetails.protocol = "https://";
+                            serverDetails.protocol = "https";
                         } else {
-                            serverDetails.protocol = "http://";
+                            serverDetails.protocol = "http";
                         }
                         serverDetails.url = serverKeyValue[1];
                     }
-                    if (options[i].startsWith("topics")) {
-                        channelKeyValue = options[i].trim().split("=");
+                    if (options[i].startsWith("topic.list")) {
+                        channelKeyValue = options[i].trim().replaceAll("\"","").split("=");
                         if (channelKeyValue != null && channelKeyValue.length === 2) {
                             var topics = channelKeyValue[1].split(",");
                             for (j = 0; j < topics.length; j++) {
-                                serverDetails.channel.push(topics[j]);
+                                serverDetails.channel.push(topics[j].trim());
                             }
                         }
 
@@ -721,7 +726,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             if (dataArray) {
                 dataArray.sort();
                 for (var i = 0; i < dataArray.length; i++) {
-                    if (dataArray[i].type === type) {
+                    if (dataArray[i].type.toLowerCase() === type.toLowerCase()) {
                         result += dataOption.replaceAll('{{dataName}}', dataArray[i].connectedElementName)
                             .replaceAll('{{options}}', dataArray[i].options.toString().replaceAll('"',"'"));
                     }
