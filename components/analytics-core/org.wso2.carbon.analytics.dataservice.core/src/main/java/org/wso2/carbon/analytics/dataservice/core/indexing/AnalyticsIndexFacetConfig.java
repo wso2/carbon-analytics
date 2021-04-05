@@ -37,9 +37,14 @@ public class AnalyticsIndexFacetConfig {
         if (facetConfig != null) {
             this.enabled = facetConfig.isEnabled();
             if (this.enabled) {
-                this.facetSplitter = facetConfig.getFacetSplitter();
-                this.facetDefaultValue = facetConfig.getFacetDefaultValue();
-                setFacetTableConfigs(facetConfig.getFacetTableConfigurations());
+                if (this.enabled) {
+                    this.facetSplitter = facetConfig.getFacetSplitter();
+                    this.facetDefaultValue = facetConfig.getFacetDefaultValue();
+                    setFacetTableConfigs(facetConfig.getFacetTableConfigurations());
+                } else {
+                    this.facetSplitter = ",";
+                    this.facetDefaultValue = AnalyticsDataIndexer.EMPTY_FACET_VALUE;
+                }
             } else {
                 this.facetSplitter = ",";
                 this.facetDefaultValue = AnalyticsDataIndexer.EMPTY_FACET_VALUE;
