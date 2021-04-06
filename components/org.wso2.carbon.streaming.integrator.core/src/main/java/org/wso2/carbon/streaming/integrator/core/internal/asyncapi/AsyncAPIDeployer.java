@@ -192,7 +192,9 @@ public class AsyncAPIDeployer implements Runnable {
         map.put("displayName", asyncAPIJson.getJSONObject("info").getString("title").replaceAll(" ", ""));
         map.put("description", asyncAPIJson.getJSONObject("info").getString("description").replaceAll(" ", ""));
         map.put("version", asyncAPIJson.getJSONObject("info").getString("version").replaceAll(" ", ""));
-        map.put("serviceUrl", asyncAPIJson.getJSONObject("servers").getJSONObject("production").getString("url"));
+        map.put("serviceUrl", asyncAPIJson.getJSONObject("servers").getJSONObject("production").
+                getString("protocol") + "://" + asyncAPIJson.getJSONObject("servers").
+                getJSONObject("production").getString("url"));
         map.put("definitionType", "ASYNC_API");
         JSONObject securitySchemes = asyncAPIJson.getJSONObject("components").getJSONObject("securitySchemes");
         Iterator keys = securitySchemes.keys();
