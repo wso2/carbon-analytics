@@ -73,7 +73,7 @@ define(['log', 'jquery', 'lodash', 'attribute', 'storeAnnotation', 'handlebar', 
             } else {
                 $('#tableName').val(name);
                 var attributeList = tableObject.getAttributeList();
-                self.formUtils.renderAttributeTemplate(attributeList)
+                self.formUtils.renderAttributeTemplate(attributeList, propertyDiv.find('#define-attribute'))
                 self.formUtils.selectTypesOfSavedAttributes(attributeList);
             }
 
