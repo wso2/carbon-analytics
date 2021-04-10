@@ -68,7 +68,7 @@ public class AsyncAPIUndeployer implements Runnable {
                 FileObject fileObject = Utils.getFileObject(zipDirectoryURI);
                 fileObject.delete(Selectors.SELECT_ALL);
                 log.error("Async api: " + asyncAPiKeyVersion +
-                        " deleted from service catalogue when undeploying Siddhi app");
+                        " deleted from service catalog when undeploying Siddhi app");
             } catch (ServiceCatalogueAPIServiceStubException e) {
                 log.error("Exception occurred when deleting async api: " +
                         asyncAPiKeyVersion + " when undeploying Siddhi app", e);

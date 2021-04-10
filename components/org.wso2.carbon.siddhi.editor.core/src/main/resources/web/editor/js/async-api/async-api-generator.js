@@ -133,12 +133,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 "sse": {
                     "source": {
                         "security": {
-                            "basic.auth.enabled": {"http-basic": {"type": "http", "scheme": "basic"}}
+                            "basic.auth.enabled": {"http-basic": {"type": "http", "scheme": "BASIC"}}
                         }
                     },
                     "sink": {
                         "security": {
-                            "basic.auth.username": {"http-basic": {"type": "http", "scheme": "basic"}},
+                            "basic.auth.username": {"http-basic": {"type": "http", "scheme": "BASIC"}},
                             "https.truststore.file": {"truststore.file": {"type": "X509"}},
                             "oauth.username": {"oauth": {"type": "oauth2"}},
                         }
@@ -147,7 +147,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 "websubhub": {
                     "source": {
                         "security": {
-                            "basic.auth.enabled": {"http-basic": {"type": "http", "scheme": "basic"}}
+                            "basic.auth.enabled": {"http-basic": {"type": "http", "scheme": "BASIC"}}
                         }
                     }
                 },
@@ -693,7 +693,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         } else {
                             serverDetails.protocol = "http";
                         }
-                        serverDetails.url = serverKeyValue[1];
+                        serverDetails.url = serverKeyValue[1].trim().replaceAll('"', '')
+                            .replaceAll("http://", '').replaceAll("https://", '');
                     }
                     if (options[i].startsWith("topic.list")) {
                         channelKeyValue = options[i].trim().replaceAll("\"","").split("=");

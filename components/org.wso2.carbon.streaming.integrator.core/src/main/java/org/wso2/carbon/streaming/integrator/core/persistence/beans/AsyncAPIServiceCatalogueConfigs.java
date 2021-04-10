@@ -20,7 +20,7 @@ package org.wso2.carbon.streaming.integrator.core.persistence.beans;
 
 import org.wso2.carbon.config.annotation.Configuration;
 
-@Configuration(namespace = "async.api.configs", description = "Service catalogue configurations for Async API definition publishing")
+@Configuration(namespace = "async.api.configs", description = "Service catalog configurations for Async API definition publishing")
 public class AsyncAPIServiceCatalogueConfigs {
     private String hostname;
     private String port;
