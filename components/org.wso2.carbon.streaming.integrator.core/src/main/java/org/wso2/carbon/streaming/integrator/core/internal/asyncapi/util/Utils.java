@@ -58,7 +58,7 @@ public class Utils {
                 log.debug("Output to Zip : " + zipFile + " started for folder/ file: " + sourceFileUri);
             }
             for (String file : fileList) {
-                if (file.compareTo(".zip")!=0) {
+                if (!file.endsWith(".zip")) {
                     if (log.isDebugEnabled()) {
                         log.debug("File Adding : " + file + " to " + zipFile + ".");
                     }
@@ -116,10 +116,10 @@ public class Utils {
             fileList.add(generateZipEntry(node.getAbsoluteFile().toString(), sourceFileUri));
         }
         if (node.isDirectory()) {
-            String[] subNote = node.list();
+            File[] subNote = node.listFiles()[0].listFiles();
             if (subNote != null) {
-                for (String filename : subNote) {
-                    generateFileList(sourceFileUri, new File(node, filename), fileList);
+                for (File file : subNote) {
+                    generateFileList(sourceFileUri, file, fileList);
                 }
             }
         }
