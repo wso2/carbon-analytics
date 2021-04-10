@@ -199,6 +199,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 $('.toggle-controls-container #asyncbtn-to-code-view').on('click', function (e) {
                     e.preventDefault();
                     self.sourceContainer.show();
+                    self.__app.workspaceManager.updateMenuItems();
                     self.asyncAPIViewContainer.hide();
                     $(self.toggleControlsContainer[0]).find('.toggle-view-button').removeClass('hide-div');
                     $(self.toggleControlsContainer[0]).find('.wizard-view-button').removeClass('hide-div');
