@@ -153,6 +153,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
                     }
                 }
                 self.updateRunMenuItem();
+                self.updateDeployToServerMenuItem();
             };
 
             this.handleUndo = function () {
@@ -248,6 +249,7 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
                 this.updateExportMenuItem();
                 this.updateRunMenuItem();
                 this.updateDeleteMenuItem();
+                this.updateDeployToServerMenuItem();
             };
 
             this.manageConsoles = function (evt) {
@@ -283,6 +285,34 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
                     }
                 } else {
                     exportMenuItem.disable();
+                }
+            };
+
+            this.updateDeployToServerMenuItem = function () {
+                var activeTab = app.tabController.getActiveTab(),
+                    deployToServerMenuItem = app.menuBar.getMenuItemByID('deploy.deploy-to-server'),
+                    file = undefined;
+
+                if (activeTab.getTitle() != "welcome-page") {
+                    file = activeTab.getFile();
+                }
+
+                if (file !== undefined) {
+                    var fileEditor = activeTab.getSiddhiFileEditor();
+                    if (fileEditor === undefined || fileEditor.isInSourceView()) {
+                        file = activeTab.getFile();
+                        if (file.isDirty()) {
+                            deployToServerMenuItem.disable();
+                        } else if (file.isPersisted()) {
+                            deployToServerMenuItem.enable();
+                        } else {
+                            deployToServerMenuItem.disable();
+                        }
+                    } else {
+                        deployToServerMenuItem.disable();
+                    }
+                } else {
+                    deployToServerMenuItem.disable();
                 }
             };
 

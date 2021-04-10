@@ -391,6 +391,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 //todo Error Handling part
                                 window.getAsyncAPIParserDoc(ayncAPIContent).then(asyncAPIDoc => {
                                     sourceContainer.hide();
+                                    options.application.workspaceManager.updateMenuItems();
                                     asyncAPIViewContainer.show();
                                     options.asyncAPIDefYaml = ayncAPIContent;
                                     this.asyncAPIYamlContainer = asyncAPIViewContainer
@@ -405,6 +406,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                                 })
                             } else {
                                 sourceContainer.hide();
+                                options.application.workspaceManager.updateMenuItems();
                                 asyncAPIViewContainer.show();
                                 options.asyncAPIViewContainer = asyncAPIViewContainer;
                                 options.editorInstance = editorInstance;
@@ -415,6 +417,7 @@ define(['require', 'jquery', 'backbone', 'lodash', 'log', 'design_view', "./sour
                     } else {
                         sourceContainer.hide();
                         asyncAPIViewContainer.show();
+                        options.application.workspaceManager.updateMenuItems();
                         options.asyncAPIViewContainer = asyncAPIViewContainer;
                         options.editorInstance = editorInstance;
                         options.parentEl =  this._$parent_el;
