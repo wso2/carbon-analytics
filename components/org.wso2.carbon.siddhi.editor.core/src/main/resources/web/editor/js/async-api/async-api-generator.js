@@ -168,6 +168,25 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             self.hideOthers();
             self.hideInternalViews();
 
+            self.compatibleSourceTypes = [];
+            self.compatibleSinkTypes = [];
+
+            _.each(self.sinkSorceTypes, function(value, key) {
+                _.each(value, function(propertyValue, type) {
+                    if (type.toLowerCase() == "source") {
+                        self.compatibleSourceTypes.push(key.toLowerCase())
+                    }
+                });
+            });
+
+            _.each(self.sinkSorceTypes, function(value, key) {
+                _.each(value, function(propertyValue, type) {
+                    if (type.toLowerCase() == "sink") {
+                        self.compatibleSinkTypes.push(key.toLowerCase())
+                    }
+                });
+            });
+
             this.siddhiAppConfig = this.preRenderForSinksSources();
 
             if (self.siddhiAppConfig !== 'undefined') {
@@ -466,20 +485,15 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 var sinks = self.JSONObject.siddhiAppConfig.sinkList;
                                 var sources = self.JSONObject.siddhiAppConfig.sourceList;
                                 var foundCompatibleType = false;
-                                var lowerCaseSinkSourceTypes = [];
-
-                                Object.keys(self.sinkSorceTypes).forEach(function (key) {
-                                    lowerCaseSinkSourceTypes.push(key.toLowerCase());
-                                })
-
+                                
                                 for (var i = 0; i < sinks.length; i++) {
-                                    if (lowerCaseSinkSourceTypes.includes(sinks[i].type.toLowerCase())) {
+                                    if (self.compatibleSinkTypes.includes(sinks[i].type.toLowerCase())) {
                                         foundCompatibleType = true;
                                         break;
                                     }
                                 }
                                 for (var i = 0; i < sources.length && !foundCompatibleType; i++) {
-                                    if (lowerCaseSinkSourceTypes.includes(sources[i].type.toLowerCase())) {
+                                    if (self.compatibleSourceTypes.includes(sources[i].type.toLowerCase())) {
                                         foundCompatibleType = true;
                                         break;
                                     }
