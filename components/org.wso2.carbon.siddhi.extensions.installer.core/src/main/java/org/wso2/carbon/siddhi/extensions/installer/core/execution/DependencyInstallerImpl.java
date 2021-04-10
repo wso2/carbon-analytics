@@ -109,10 +109,6 @@ public class DependencyInstallerImpl implements DependencyInstaller {
                 URL downloadUrl = new URL(download.getUrl());
                 String fileName = FilenameUtils.getName(downloadUrl.getPath());
                 List<File> usageDestinations = generateUsageDestinations(dependency, fileName);
-                if (ExtensionsInstallerUtils.isSelfDependency(dependency)) {
-                    // Delete the jar of the self dependency if exists, to allow downloading latest version.
-                    unInstallUsagesFor(dependency);
-                }
                 downloadOrCopyFilesTo(usageDestinations, downloadUrl);
             } catch (MalformedURLException e) {
                 throw new ExtensionsInstallerException(
@@ -129,6 +125,18 @@ public class DependencyInstallerImpl implements DependencyInstaller {
         if (usages != null) {
             List<File> fileDestinations = new ArrayList<>(usages.size());
             for (UsageConfig usage : usages) {
+                // Check if jar is already present in 'lib' directory
+                String bundleLocation = ExtensionsInstallerUtils.getBundleLocation(usage);
+                try {
+                    List<Path> matchingFiles =
+                            ExtensionsInstallerUtils.listMatchingFiles(dependency.getLookupRegex(), bundleLocation);
+                    if (!matchingFiles.isEmpty()) {
+                        continue; // Jar is already present. No need to add installation location for this usage.
+                    }
+                } catch (IOException e) {
+                    throw new ExtensionsInstallerException("Failed to list matching files for lookup regex: " +
+                            dependency.getLookupRegex() + " in: " + bundleLocation, e);
+                }
                 fileDestinations.add(new File(ExtensionsInstallerUtils.getInstallationLocation(usage), fileName));
             }
             return fileDestinations;
