@@ -81,8 +81,13 @@
     font-weight: bold;
     color: #333;
     width: 100%;
-    background-color: #ea5829;
+    background-color: #f47b20;
     margin-bottom: 10px;
+}
+
+.toggle-view-button:hover, .async-api-add-update-button:hover {
+    color: #fff;
+    transition: 0.15s;
 }
 
 .toggle-view-button, .asyncbtn-to-code-view {
@@ -94,38 +99,16 @@
     margin-bottom: 10px;
 }
 
+.toggle-view-button:hover, .asyncbtn-to-code-view:hover {
+    color: #fff;
+    transition: 0.15s;
+}
+
 .asyncapitooltip {
     position: relative;
     display: inline-block;
     border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
 }
-
-/*!* Tooltip text *!*/
-/*.asyncapitooltip .asyncapitooltiptext {*/
-/*    visibility: hidden;*/
-/*    !*width: 120px;*!*/
-/*    background-color: black;*/
-/*    color: #fff;*/
-/*    text-align: center;*/
-/*    padding: 5px 0;*/
-/*    border-radius: 6px;*/
-/*    border-color: #eee;*/
-/*    !* Position the tooltip text - see examples below! *!*/
-/*    position: absolute;*/
-/*    z-index: 1;*/
-/*}*/
-
-/*!* Show the tooltip text when you mouse over the tooltip container *!*/
-/*.asyncapitooltip:hover .asyncapitooltiptext {*/
-/*    visibility: visible;*/
-/*    color: #fff;*/
-/*    background: #000;*/
-/*    border-color: #eee;*/
-/*    border: 1px solid #eee;*/
-/*    top: -50px;*/
-/*    padding: 5px;*/
-/*    width: 100%;*/
-/*}*/
 
 .asyncapi__channels > div {
     background: rgba(51 122 183 0.3);
