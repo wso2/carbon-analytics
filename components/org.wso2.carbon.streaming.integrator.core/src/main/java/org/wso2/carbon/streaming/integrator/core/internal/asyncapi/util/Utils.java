@@ -32,6 +32,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -116,12 +117,17 @@ public class Utils {
             fileList.add(generateZipEntry(node.getAbsoluteFile().toString(), sourceFileUri));
         }
         if (node.isDirectory()) {
-            File[] subNote = node.listFiles()[0].listFiles();
-            if (subNote != null) {
-                for (File file : subNote) {
-                    generateFileList(sourceFileUri, file, fileList);
+            File[] subNodes = node.listFiles();
+            if (subNodes != null && subNodes.length > 0)
+                for (File subNode : subNodes) {
+                    File[] files = subNode.listFiles();
+                    if (files != null) {
+                        for (File file : files) {
+                            generateFileList(sourceFileUri, file, fileList);
+                        }
+                    }
                 }
-            }
+
         }
     }
 

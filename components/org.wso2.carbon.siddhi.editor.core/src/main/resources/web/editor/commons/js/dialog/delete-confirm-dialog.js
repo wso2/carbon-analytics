@@ -298,10 +298,10 @@ define(['require', 'lodash', 'jquery', 'log', 'backbone', 'file_browser',
                                     app.tabController.removeTab(fileTab, undefined, true);
                                     deleteAppModal.modal('hide');
                                     log.debug('file deleted successfully');
-                                    callback(true);
                                     app.commandManager.dispatch("open-folder", data.path);
                                     app.eventSimulator.getFeedSimulator().updateFeedCreationButtonAndNotification();
                                     app.commandManager.dispatch("remove-siddhi-apps-on-delete", trimmedSiddhiAppName);
+                                    callback(true);
                                     alertSuccess();
                                 } else {
                                     callback(false);
