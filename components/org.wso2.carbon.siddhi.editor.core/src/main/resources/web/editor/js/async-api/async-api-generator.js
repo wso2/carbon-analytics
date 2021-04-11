@@ -339,7 +339,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         sourceList[j].connectedElementName === checkedSourceList[i].value) {
                         serverDetails = getServerHostPort(
                             sourceList[j].options, sourceList[j].type.toLowerCase(), self.sinkSorceTypes, "source");
-                        serverDetails.channelType = "publish";
+                        if (serverDetails.protocol === "websub") {
+                            serverDetails.channelType = "subscribe";
+                        } else {
+                            serverDetails.channelType = "publish";
+                        }
                         serverDetails.stream = sourceList[j].connectedElementName;
                         serverDetails.payloadProperties = getPayloadSpec(
                             sourceList[j].connectedElementName, streamList, sourceList[j].type.toLowerCase());
@@ -379,11 +383,23 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             for (i = 0; i < serversDetails.length; i++) {
                 var channelRef;
                 if (serversDetails[i].channelType === "publish") {
-                    channelRef = {"publish": {"message": {"$ref": "#/components/messages/" +
-                                    serversDetails[i].stream + "Payload"}}};
+                    channelRef = {
+                        "publish": {
+                            "message": {
+                                "$ref": "#/components/messages/" +
+                                    serversDetails[i].stream + "Payload"
+                            }
+                        }
+                    };
                 } else {
-                    channelRef = {"subscribe": {"message": {"$ref": "#/components/messages/" +
-                                    serversDetails[i].stream + "Payload"}}};
+                    channelRef = {
+                        "subscribe": {
+                            "message": {
+                                "$ref": "#/components/messages/" +
+                                    serversDetails[i].stream + "Payload"
+                            }
+                        }
+                    };
                 }
                 var serverDetailChannels = serversDetails[i].channel;
                 if (serverDetailChannels !== undefined && serverDetailChannels !== null) {
@@ -430,7 +446,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             options.asyncAPIViewContainer = self.asyncAPIViewContainer;
             options.fromGenerator = true;
             options.editorInstance = self.__editorInstance;
-            options.parentEl =  this.__$parent_el_container;
+            options.parentEl = this.__$parent_el_container;
             this.asyncAPI = new AsyncAPI(options);
         }
 
@@ -665,9 +681,9 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         serverDetails.hostname = temp[0];
                         serverDetails.port = temp[1];
                         if (serverKeyValue[1].trim().includes("https")) {
-                            serverDetails.protocol = "https";
+                            serverDetails.protocol = "sse";
                         } else {
-                            serverDetails.protocol = "http";
+                            serverDetails.protocol = "sse";
                         }
                         serverDetails.url = serverDetails.hostname + ":" + serverDetails.port;
                         serverDetails.channel.push(new URL(serverKeyValue[1].trim().replaceAll('"', '')).pathname);
@@ -689,15 +705,15 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         serverDetails.hostname = temp[0];
                         serverDetails.port = temp[1];
                         if (serverKeyValue[1].trim().includes("https")) {
-                            serverDetails.protocol = "https";
+                            serverDetails.protocol = "websub";
                         } else {
-                            serverDetails.protocol = "http";
+                            serverDetails.protocol = "websub";
                         }
                         serverDetails.url = serverKeyValue[1].trim().replaceAll('"', '')
                             .replaceAll("http://", '').replaceAll("https://", '');
                     }
                     if (options[i].startsWith("topic.list")) {
-                        channelKeyValue = options[i].trim().replaceAll("\"","").split("=");
+                        channelKeyValue = options[i].trim().replaceAll("\"", "").split("=");
                         if (channelKeyValue != null && channelKeyValue.length === 2) {
                             var topics = channelKeyValue[1].split(",");
                             for (j = 0; j < topics.length; j++) {
@@ -729,7 +745,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 for (var i = 0; i < dataArray.length; i++) {
                     if (dataArray[i].type.toLowerCase() === type.toLowerCase()) {
                         result += dataOption.replaceAll('{{dataName}}', dataArray[i].connectedElementName)
-                            .replaceAll('{{options}}', dataArray[i].options.toString().replaceAll('"',"'"));
+                            .replaceAll('{{options}}', dataArray[i].options.toString().replaceAll('"', "'"));
                     }
                 }
             }
@@ -737,4 +753,5 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         };
 
         return AsyncAPIView;
-    });
+    })
+;
