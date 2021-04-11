@@ -9,6 +9,7 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
             serverList: [],
             siddhiFileList: []
         };
+        var fileOpenGloable;
         if (localStorage.getItem('items')) {
             inMemoryList = JSON.parse(localStorage.getItem('items'));
         } else {
@@ -127,6 +128,8 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
                 "</div>" +
                 "</div>"
             );
+
+            fileOpenGloable = fileOpen;
             var openConfigModal = fileOpen.filter("#openConfigModal");
             var treeContainer = fileOpen.find("div").filter("#fileTree");
             var openFileWizardError = fileOpen.find("#openFileWizardError");
@@ -151,11 +154,11 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
             }
 
             fileOpen.find("button").filter("#addNew").click(function () {
-                var host = document.getElementById("new_host").value;
-                var port = document.getElementById("new_port").value;
-                var user_name = document.getElementById("new_user_name").value;
-                var password = document.getElementById("new_password").value;
-                var alertContainer = $('#alert-container');
+                var host = fileOpen.find("input").filter("#new_host").val();
+                var port = fileOpen.find("input").filter("#new_port").val();
+                var user_name = fileOpen.find("input").filter("#new_user_name").val();
+                var password = fileOpen.find("input").filter("#new_password").val();
+                var alertContainer = fileOpen.find('#alert-container');
                 var alertHtml = [];
                 if (host != "" && port != "" && user_name != "" && password != "") {
                     inMemoryList.push({
@@ -166,10 +169,10 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
                     });
                     localStorage.setItem('items', JSON.stringify(inMemoryList));
                     inMemoryList = JSON.parse(localStorage.getItem('items'));
-                    document.getElementById("new_host").value = "";
-                    document.getElementById("new_port").value = "";
-                    document.getElementById("new_user_name").value = "";
-                    document.getElementById("new_password").value = "";
+                    fileOpen.find('input').filter('#new_host').val('');
+                    fileOpen.find("input").filter("#new_port").val('');
+                    fileOpen.find("input").filter("#new_user_name").val('');
+                    fileOpen.find("input").filter("#new_password").val('');
                     alertHtml.push("<div" +
                         "</div>");
                     alertContainer.html(alertHtml);
@@ -178,7 +181,7 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
                         "</div>");
                     alertContainer.html(alertHtml);
                 }
-                var serverContainer = $('#server-container');
+                var serverContainer = fileOpen.find("div").filter("#server-container");
                 var serverListHtml = [];
                 if (inMemoryList.length == 0) {
                     serverListHtml.push("<div id='add-server-alert' " +
@@ -213,38 +216,38 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
 
             fileOpen.find("button").filter("#servers").click(function () {
                 this.classList.toggle("servers-active");
-                var serverList = document.getElementById("server-list");
-                var newServer = document.getElementById("new-server");
+                var serverList = fileOpen.find("#server-list");
+                var newServer = fileOpen.find("#new-server");
 
-                if (serverList.style.display === "block") {
-                    serverList.style.display = "none";
-                    newServer.style.display = "none";
+                if (serverList.css('display') === "block") {
+                    serverList.css('display', 'none');
+                    newServer.css('display', 'none');
                 } else {
                     DeployFileDialog.prototype.viewServerList();
-                    serverList.style.display = "block";
-                    newServer.style.display = "block";
+                    serverList.css('display', 'block');
+                    newServer.css('display', 'block');
                 }
             });
 
             fileOpen.find("button").filter("#siddhi-apps").click(function () {
                 this.classList.toggle("servers-active");
-                var siddhiAppList = document.getElementById("siddhi-app-list");
-                if (siddhiAppList.style.display === "block") {
-                    siddhiAppList.style.display = "none";
+                var siddhiAppList = fileOpen.find("#siddhi-app-list");
+                if (siddhiAppList.css('display') === "block") {
+                    siddhiAppList.css('display', 'none');
                 } else {
-                    siddhiAppList.style.display = "block";
+                    siddhiAppList.css('display', 'block');
                 }
             });
 
             fileOpen.find("button").filter("#deployButton").click(function () {
                 openFileWizardError.hide();
-                var newServer = document.getElementById("new-server");
-                var serverList = document.getElementById("server-list");
-                var siddhiAppList = document.getElementById("siddhi-app-list");
-                var deploymentStatusContainer = document.getElementById("deployment-status-title-container");
+                var newServer = fileOpen.find("#new-server");
+                var serverList = fileOpen.find("#server-list");
+                var siddhiAppList = fileOpen.find("#siddhi-app-list");
+                var deploymentStatusContainer = fileOpen.find("#deployment-status-title-container");
                 for (var i = 0; i < inMemoryList.length; i++) {
-                    var chkBox = document.getElementById('check' + i);
-                    if (chkBox.checked === true) {
+                    var chkBox = fileOpen.find('#check' + i);
+                    if (chkBox.is(':checked') === true) {
                         payload.serverList.push({
                             host: inMemoryList[i].host,
                             port: inMemoryList[i].port,
@@ -276,7 +279,7 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
                         async: false,
                         success: function (response) {
                             data = response;
-                            var container = $('#deployment-status-container');
+                            var container = fileOpen.find('#deployment-status-container');
                             var deploymentStatusHtml = [];
                             for (var i = 0; i < data.success.length; i++) {
                                 deploymentStatusHtml.push('<div class="success-label">' + data.success[i] +
@@ -289,11 +292,12 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
                                 );
                             }
                             if (data.success.length != 0 || data.failure.length != 0) {
-                                deploymentStatusContainer.style.display = 'block';
+                                deploymentStatusContainer.css('display', 'block');
+                                ;
                             }
-                            newServer.style.display = "none";
-                            serverList.style.display = "none";
-                            siddhiAppList.style.display = "none";
+                            newServer.css('display', 'none');
+                            serverList.css('display', 'none');
+                            siddhiAppList.css('display', 'none');
                             container.html(deploymentStatusHtml);
                             payload = {
                                 serverList: [],
@@ -316,8 +320,7 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
                     if (payload.siddhiFileList.length == 0 && payload.serverList.length != 0) {
                         openFileWizardError.text("Select Siddhi Apps To Deploy");
                         openFileWizardError.show();
-                    }
-                    else if (payload.siddhiFileList.length != 0 && payload.serverList.length == 0) {
+                    } else if (payload.siddhiFileList.length != 0 && payload.serverList.length == 0) {
                         openFileWizardError.text("Select Servers To Deploy");
                         openFileWizardError.show();
                     } else {
@@ -331,8 +334,8 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
                 }
             });
 
-            fileOpen.on('show.bs.modal', function(e) {
-                var handler = setInterval(function() {
+            fileOpen.on('show.bs.modal', function (e) {
+                var handler = setInterval(function () {
                     fileBrowser.selectFiles(self.app.selectedFiles);
                     clearInterval(handler);
                 }, 200);
@@ -377,7 +380,7 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
 
         DeployFileDialog.prototype.selectAll = function () {
             selectAllServers = function (source) {
-                var checkboxes = document.getElementsByName("server-credentials");
+                var checkboxes = fileOpenGloable.find(".server-credentials");
                 for (var i = 0, n = checkboxes.length; i < n; i++) {
                     checkboxes[i].checked = source.checked;
                 }
@@ -390,7 +393,7 @@ define(['require', 'lodash', 'jquery', 'log', 'file_browser'],
         DeployFileDialog.prototype.delete = function (a) {
             deleteServer = function (i) {
                 var id = i;
-                var serverContainer = $('#server-container');
+                var serverContainer = fileOpenGloable.find('#server-container');
                 var serverListHtml = [];
                 inMemoryList.splice(id, 1);
                 localStorage.setItem('items', JSON.stringify(inMemoryList));
