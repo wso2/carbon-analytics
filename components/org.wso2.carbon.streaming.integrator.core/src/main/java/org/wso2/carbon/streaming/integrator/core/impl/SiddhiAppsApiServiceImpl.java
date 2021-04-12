@@ -500,7 +500,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             }
             if (appStatChanged) {
                 jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,
-                        "Sucessfully updated Aiddhi App : " + appFileName));
+                        "Sucessfully updated Siddhi App : " + appFileName));
             } else {
                 log.info("Stats level is already set to :" + statsEnabled.getEnabledSiddhiStatLevel());
                 jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.SUCCESS,

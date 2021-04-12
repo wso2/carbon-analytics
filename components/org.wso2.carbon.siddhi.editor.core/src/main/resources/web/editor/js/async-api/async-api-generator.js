@@ -67,11 +67,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'> Title </label> " +
                 "                    <input class='add-new-server-input' id='asyncAPITitle' " +
-                "                       placeholder='Sweet Production Application'> " +
+                "                       value='SweetProductionApplication'> " +
                 "                </div>" +
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'> Version </label> " +
-                "                    <input class='add-new-server-input' id='asyncAPIVersion' placeholder='1.0.0'> " +
+                "                    <input class='add-new-server-input' id='asyncAPIVersion' value='1.0.0'> " +
                 "                </div>" +
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'>Description</label>" +
@@ -82,7 +82,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 "                </div>" +
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'>Enter server name</label> " +
-                "                    <input class='add-new-server-input' id='serverName' placeholder='production'> " +
+                "                    <input class='add-new-server-input' id='serverName' value='production'> " +
                 "                </div>" +
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'>" +
@@ -131,11 +131,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     }
                 },
                 "sse": {
-                    "source": {
-                        "security": {
-                            "basic.auth.enabled": {"http-basic": {"type": "http", "scheme": "BASIC"}}
-                        }
-                    },
                     "sink": {
                         "security": {
                             "basic.auth.username": {"http-basic": {"type": "http", "scheme": "BASIC"}},
@@ -677,11 +672,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         }
                     })
                 }
-                //todo: check how to get channel information from each IO type
                 //adding channel information retrived by the url
                 serverDetails.url = serverDetails.hostname + ":" + serverDetails.port;
                 serverDetails.channel.push(new URL(serverKeyValue[1].trim().replaceAll('"', '')).pathname);
-            } else if (type === "sse") { //todo need to change when SSE is developed currently assumed it as http sink
+            } else if (type === "sse") {
                 var serverUrl;
                 for (i = 0; i < options.length; i++) {
                     if (ioType == "sink") {
@@ -712,7 +706,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     })
                 }
             } else if (type === "websubhub") {
-                //todo need to change when WebHook is developed currently assumed it as http sink
                 for (i = 0; i < options.length; i++) {
                     if (options[i].startsWith("receiver.url")) {
                         serverKeyValue = options[i].split("=");
