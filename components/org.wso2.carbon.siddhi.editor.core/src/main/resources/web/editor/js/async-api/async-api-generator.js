@@ -130,7 +130,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         }
                     }
                 },
-                "sse": {
+                "sse-server": {
                     "source": {
                         "security": {
                             "basic.auth.enabled": {"http-basic": {"type": "http", "scheme": "basic"}}
@@ -485,7 +485,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 var sinks = self.JSONObject.siddhiAppConfig.sinkList;
                                 var sources = self.JSONObject.siddhiAppConfig.sourceList;
                                 var foundCompatibleType = false;
-                                
+
                                 for (var i = 0; i < sinks.length; i++) {
                                     if (self.compatibleSinkTypes.includes(sinks[i].type.toLowerCase())) {
                                         foundCompatibleType = true;
