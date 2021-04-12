@@ -57,8 +57,9 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             self.editor = ace.edit(this.divId);
             self.editor.getSession().on('change', this.renderCallback);
             self._fromGenerator = initOpts.fromGenerator;
+            self._contentUpdated = false;
             self._contentChanged = false;
-            if (initOpts.fromGenerator) {
+            if (self._fromGenerator) {
                 $(self.toggleControlsContainer[0]).find('.async-api-add-update-button').html('Add Async API');
             } else {
                 $(self.toggleControlsContainer[0]).find('.async-api-add-update-button').html('Update Async API');
@@ -70,19 +71,17 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             $(self.toggleControlsContainer[0]).find('#asyncbtn-asyncapi-view').addClass('hide-div');
             $('.toggle-controls-container #asyncbtn-to-code-view').on('click', function(e) {
                 e.preventDefault();
-                if (self._contentChanged) {
+                if ((self._fromGenerator && !self._contentUpdated) || (!self._contentUpdated && self._contentChanged)) {
+                    self.__options.application.commandManager.dispatch('confirm-switch-to-code-dialog', {
+                        self: self
+                    });
+                } else if ((self._contentUpdated && self._contentChanged) ||
+                    (self._fromGenerator && self._contentUpdated)) {
                     self.__editorInstance.getSession().setValue(self._changedEditorText);
+                    self.switchToCodeView();
+                } else {
+                    self.switchToCodeView();
                 }
-                self.sourceContainer.show();
-                self.asyncAPIViewContainer.hide();
-                $(self.toggleControlsContainer[0]).find('.toggle-view-button').removeClass('hide-div');
-                $(self.toggleControlsContainer[0]).find('.wizard-view-button').removeClass('hide-div');
-                var asyncAPIAddUpdateButton = $(self.toggleControlsContainer[0]).find('.async-api-add-update-button');
-                asyncAPIAddUpdateButton.addClass('hide-div');
-                var codeViewButton = $(self.toggleControlsContainer[0]).find('#asyncbtn-to-code-view');
-                codeViewButton.addClass('hide-div');
-                var asyncAPIViewButton = $(self.toggleControlsContainer[0]).find('#asyncbtn-asyncapi-view');
-                asyncAPIViewButton.removeClass('hide-div');
             });
             $('.toggle-controls-container #btn-add-update-async-btn').on('click', function(e) {
                 e.preventDefault();
@@ -102,12 +101,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         var editorTextResponse = AsyncAPIRESTClient.getCodeView(JSON.stringify(self.JSONObject));
                         if (editorTextResponse.status === "success") {
                             self._changedEditorText = self.__app.utils.b64DecodeUnicode(editorTextResponse.responseString);
-                            if (self._fromGenerator && !self._contentChanged) {
+                            if (self._fromGenerator && !self._contentUpdated) {
                                 alerts.info("Async API Added.");
-                                self._contentChanged = true;
                             } else {
                                 alerts.info("Async API Updated.");
                             }
+                            self._contentUpdated = true;
                         } else if (response.status === "fail") {
                             alerts.error(response.errorMessage);
                         }
@@ -119,6 +118,20 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         };
         //Constructor for the AsyncAPIView
         AsyncAPIView.prototype.constructor = AsyncAPIView;
+
+        AsyncAPIView.prototype.switchToCodeView = function () {
+            var self = this;
+            self.sourceContainer.show();
+            self.asyncAPIViewContainer.hide();
+            $(self.toggleControlsContainer[0]).find('.toggle-view-button').removeClass('hide-div');
+            $(self.toggleControlsContainer[0]).find('.wizard-view-button').removeClass('hide-div');
+            var asyncAPIAddUpdateButton = $(self.toggleControlsContainer[0]).find('.async-api-add-update-button');
+            asyncAPIAddUpdateButton.addClass('hide-div');
+            var codeViewButton = $(self.toggleControlsContainer[0]).find('#asyncbtn-to-code-view');
+            codeViewButton.addClass('hide-div');
+            var asyncAPIViewButton = $(self.toggleControlsContainer[0]).find('#asyncbtn-asyncapi-view');
+            asyncAPIViewButton.removeClass('hide-div');
+        }
 
         AsyncAPIView.prototype.hideInternalViews = function () {
             var self = this;
@@ -151,6 +164,8 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         AsyncAPIView.prototype.renderCallback = function () {
             var self = this;
             if (self.editor.getSession().getValue() !== "" && self.asyncAPIDefYaml !== self.editor.getSession().getValue()) {
+                self._contentChanged = true;
+                self._contentUpdated = false;
                 window.getAsyncAPIUI(self.asyncAPISpecContainerDom, self.editor.getSession().getValue());
             }
         };

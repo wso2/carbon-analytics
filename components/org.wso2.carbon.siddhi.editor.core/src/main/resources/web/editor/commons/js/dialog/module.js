@@ -4,11 +4,11 @@
 define(['./save-to-file-dialog', './replace-confirm-dialog', './open-file-dialog','./extension-install-dialog', './error-handler-dialog', './close-confirm-dialog',
         './import-file-dialog', './export-file-dialog', './settings-dialog', './close-all-confirm-dialog',
         './delete-confirm-dialog', './open-sample-file-dialog', './export-dialog', './sample-event-dialog',
-        './query-store-dialog', './deploy-file-dialog', './export-dialog', './generate-stream-dialog'],
+        './query-store-dialog', './deploy-file-dialog', './export-dialog', './generate-stream-dialog', './confirm-switch-to-code-dialog'],
     function (SaveToFileDialog, ReplaceConfirmDialog, OpenFileDialog, ExtensionInstallDialog, ErrorHandlerDialog, CloseConfirmDialog, ImportFileDialog,
               ExportFileDialog, SettingsDialog, CloseAllConfirmDialog, DeleteConfirmDialog, OpenSampleFileDialog,
               DockerExportDialog, SampleEventDialog, QueryStoreDialog, DeployFileDialog, ExportDialog,
-              GenerateStreamDialog) {
+              GenerateStreamDialog, ConfirmSwitchToCode) {
         return {
             save_to_file_dialog: SaveToFileDialog,
             open_file_dialog: OpenFileDialog,
@@ -26,6 +26,7 @@ define(['./save-to-file-dialog', './replace-confirm-dialog', './open-file-dialog
             query_store_api: QueryStoreDialog,
             deploy_file_dialog: DeployFileDialog,
             export_dialog: ExportDialog,
-            generate_stream_dialog: GenerateStreamDialog
+            generate_stream_dialog: GenerateStreamDialog,
+            confirm_switch_to_code: ConfirmSwitchToCode
         };
     });
