@@ -715,6 +715,14 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
                 this._closeFileConfirmDialog.askConfirmation(options);
             };
 
+            this.confirmSwitchToCodeDialog = function (options) {
+                if (_.isNil(this._confirmSwitchToCodeDialog)) {
+                    this._confirmSwitchToCodeDialog = new Dialogs.confirm_switch_to_code();
+                    this._confirmSwitchToCodeDialog.render();
+                }
+                this._confirmSwitchToCodeDialog.askConfirmation(options);
+            };
+
             this.openCloseAllFileConfirmDialog = function (options) {
                 if (_.isNil(this._closeAllFileConfirmDialog)) {
                     this._closeAllFileConfirmDialog = new Dialogs.CloseAllConfirmDialog();
@@ -811,6 +819,8 @@ define(['ace/ace', 'jquery', 'lodash', 'log', 'dialogs', './service-client', 'we
                 this);
 
             app.commandManager.registerHandler('open-close-file-confirm-dialog', this.openCloseFileConfirmDialog, this);
+
+            app.commandManager.registerHandler('confirm-switch-to-code-dialog', this.confirmSwitchToCodeDialog, this);
 
             app.commandManager.registerHandler('sample-event', this.handleSampleEvent);
 

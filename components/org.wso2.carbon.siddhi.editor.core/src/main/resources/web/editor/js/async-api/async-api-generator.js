@@ -47,7 +47,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             var asyncAPIYAMLViewDynamicId = "async-api-view-yaml-container-id-" + $(this.__$parent_el_container).attr('id');
             $(this.asyncAPIYamlContainer[0]).attr('id', asyncAPIYAMLViewDynamicId);
-
+            self.inGenerator = true;
             self.__options = initOpts;
             self.__app = initOpts.application;
             self.__editorInstance = initOpts.editorInstance;
@@ -217,18 +217,20 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
                 $('.toggle-controls-container #asyncbtn-to-code-view').on('click', function (e) {
                     e.preventDefault();
-                    self.sourceContainer.show();
-                    self.__app.workspaceManager.updateMenuItems();
-                    self.asyncAPIViewContainer.hide();
-                    $(self.toggleControlsContainer[0]).find('.toggle-view-button').removeClass('hide-div');
-                    $(self.toggleControlsContainer[0]).find('.wizard-view-button').removeClass('hide-div');
-                    var asyncAPIAddUpdateButton = $(self.toggleControlsContainer[0])
-                        .find('.async-api-add-update-button');
-                    asyncAPIAddUpdateButton.addClass('hide-div');
-                    var codeViewButton = $(self.toggleControlsContainer[0]).find('#asyncbtn-to-code-view');
-                    codeViewButton.addClass('hide-div');
-                    var AsyncAPIViewButton = $(self.toggleControlsContainer[0]).find('#asyncbtn-asyncapi-view');
-                    AsyncAPIViewButton.removeClass('hide-div');
+                    if (self.inGenerator) {
+                        self.sourceContainer.show();
+                        self.__app.workspaceManager.updateMenuItems();
+                        self.asyncAPIViewContainer.hide();
+                        $(self.toggleControlsContainer[0]).find('.toggle-view-button').removeClass('hide-div');
+                        $(self.toggleControlsContainer[0]).find('.wizard-view-button').removeClass('hide-div');
+                        var asyncAPIAddUpdateButton = $(self.toggleControlsContainer[0])
+                            .find('.async-api-add-update-button');
+                        asyncAPIAddUpdateButton.addClass('hide-div');
+                        var codeViewButton = $(self.toggleControlsContainer[0]).find('#asyncbtn-to-code-view');
+                        codeViewButton.addClass('hide-div');
+                        var AsyncAPIViewButton = $(self.toggleControlsContainer[0]).find('#asyncbtn-asyncapi-view');
+                        AsyncAPIViewButton.removeClass('hide-div');
+                    }
                 });
             }
         };
@@ -459,7 +461,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     }
                 }
             }
-            console.log(asyncAPIJSON.toString());
             yaml.safeLoad(JSON.stringify(asyncAPIJSON));
             var options = _.cloneDeep(self.__options)
             options.asyncAPIDefYaml = yaml.safeDump(yaml.safeLoad(JSON.stringify(asyncAPIJSON)));
@@ -467,6 +468,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             options.fromGenerator = true;
             options.editorInstance = self.__editorInstance;
             options.parentEl = this.__$parent_el_container;
+            self.inGenerator = false;
             this.asyncAPI = new AsyncAPI(options);
         }
 
