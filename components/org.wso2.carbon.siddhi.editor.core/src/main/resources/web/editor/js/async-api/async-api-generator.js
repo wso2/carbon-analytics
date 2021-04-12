@@ -47,7 +47,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             var asyncAPIYAMLViewDynamicId = "async-api-view-yaml-container-id-" + $(this.__$parent_el_container).attr('id');
             $(this.asyncAPIYamlContainer[0]).attr('id', asyncAPIYAMLViewDynamicId);
-
+            self.inGenerator = true;
             self.__options = initOpts;
             self.__app = initOpts.application;
             self.__editorInstance = initOpts.editorInstance;
@@ -67,11 +67,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'> Title </label> " +
                 "                    <input class='add-new-server-input' id='asyncAPITitle' " +
-                "                       placeholder='Sweet Production Application'> " +
+                "                       value='SweetProductionApplication'> " +
                 "                </div>" +
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'> Version </label> " +
-                "                    <input class='add-new-server-input' id='asyncAPIVersion' placeholder='1.0.0'> " +
+                "                    <input class='add-new-server-input' id='asyncAPIVersion' value='1.0.0'> " +
                 "                </div>" +
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'>Description</label>" +
@@ -82,7 +82,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 "                </div>" +
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'>Enter server name</label> " +
-                "                    <input class='add-new-server-input' id='serverName' placeholder='production'> " +
+                "                    <input class='add-new-server-input' id='serverName' value='production'> " +
                 "                </div>" +
                 "                <div class='form-group'>" +
                 "                    <label class='clearfix'>" +
@@ -130,15 +130,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         }
                     }
                 },
-                "sse-server": {
-                    "source": {
-                        "security": {
-                            "basic.auth.enabled": {"http-basic": {"type": "http", "scheme": "basic"}}
-                        }
-                    },
+                "sse": {
                     "sink": {
                         "security": {
-                            "basic.auth.username": {"http-basic": {"type": "http", "scheme": "basic"}},
+                            "basic.auth.username": {"http-basic": {"type": "http", "scheme": "BASIC"}},
                             "https.truststore.file": {"truststore.file": {"type": "X509"}},
                             "oauth.username": {"oauth": {"type": "oauth2"}},
                         }
@@ -147,7 +142,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 "websubhub": {
                     "source": {
                         "security": {
-                            "basic.auth.enabled": {"http-basic": {"type": "http", "scheme": "basic"}}
+                            "basic.auth.enabled": {"http-basic": {"type": "http", "scheme": "BASIC"}}
                         }
                     }
                 },
@@ -217,18 +212,20 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
                 $('.toggle-controls-container #asyncbtn-to-code-view').on('click', function (e) {
                     e.preventDefault();
-                    self.sourceContainer.show();
-                    self.__app.workspaceManager.updateMenuItems();
-                    self.asyncAPIViewContainer.hide();
-                    $(self.toggleControlsContainer[0]).find('.toggle-view-button').removeClass('hide-div');
-                    $(self.toggleControlsContainer[0]).find('.wizard-view-button').removeClass('hide-div');
-                    var asyncAPIAddUpdateButton = $(self.toggleControlsContainer[0])
-                        .find('.async-api-add-update-button');
-                    asyncAPIAddUpdateButton.addClass('hide-div');
-                    var codeViewButton = $(self.toggleControlsContainer[0]).find('#asyncbtn-to-code-view');
-                    codeViewButton.addClass('hide-div');
-                    var AsyncAPIViewButton = $(self.toggleControlsContainer[0]).find('#asyncbtn-asyncapi-view');
-                    AsyncAPIViewButton.removeClass('hide-div');
+                    if (self.inGenerator) {
+                        self.sourceContainer.show();
+                        self.__app.workspaceManager.updateMenuItems();
+                        self.asyncAPIViewContainer.hide();
+                        $(self.toggleControlsContainer[0]).find('.toggle-view-button').removeClass('hide-div');
+                        $(self.toggleControlsContainer[0]).find('.wizard-view-button').removeClass('hide-div');
+                        var asyncAPIAddUpdateButton = $(self.toggleControlsContainer[0])
+                            .find('.async-api-add-update-button');
+                        asyncAPIAddUpdateButton.addClass('hide-div');
+                        var codeViewButton = $(self.toggleControlsContainer[0]).find('#asyncbtn-to-code-view');
+                        codeViewButton.addClass('hide-div');
+                        var AsyncAPIViewButton = $(self.toggleControlsContainer[0]).find('#asyncbtn-asyncapi-view');
+                        AsyncAPIViewButton.removeClass('hide-div');
+                    }
                 });
             }
         };
@@ -359,7 +356,11 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         sourceList[j].connectedElementName === checkedSourceList[i].value) {
                         serverDetails = getServerHostPort(
                             sourceList[j].options, sourceList[j].type.toLowerCase(), self.sinkSorceTypes, "source");
-                        serverDetails.channelType = "publish";
+                        if (serverDetails.protocol === "websub") {
+                            serverDetails.channelType = "subscribe";
+                        } else {
+                            serverDetails.channelType = "publish";
+                        }
                         serverDetails.stream = sourceList[j].connectedElementName;
                         serverDetails.payloadProperties = getPayloadSpec(
                             sourceList[j].connectedElementName, streamList, sourceList[j].type.toLowerCase());
@@ -399,11 +400,23 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
             for (i = 0; i < serversDetails.length; i++) {
                 var channelRef;
                 if (serversDetails[i].channelType === "publish") {
-                    channelRef = {"publish": {"message": {"$ref": "#/components/messages/" +
-                                    serversDetails[i].stream + "Payload"}}};
+                    channelRef = {
+                        "publish": {
+                            "message": {
+                                "$ref": "#/components/messages/" +
+                                    serversDetails[i].stream + "Payload"
+                            }
+                        }
+                    };
                 } else {
-                    channelRef = {"subscribe": {"message": {"$ref": "#/components/messages/" +
-                                    serversDetails[i].stream + "Payload"}}};
+                    channelRef = {
+                        "subscribe": {
+                            "message": {
+                                "$ref": "#/components/messages/" +
+                                    serversDetails[i].stream + "Payload"
+                            }
+                        }
+                    };
                 }
                 var serverDetailChannels = serversDetails[i].channel;
                 if (serverDetailChannels !== undefined && serverDetailChannels !== null) {
@@ -443,14 +456,14 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     }
                 }
             }
-            console.log(asyncAPIJSON.toString());
             yaml.safeLoad(JSON.stringify(asyncAPIJSON));
             var options = _.cloneDeep(self.__options)
             options.asyncAPIDefYaml = yaml.safeDump(yaml.safeLoad(JSON.stringify(asyncAPIJSON)));
             options.asyncAPIViewContainer = self.asyncAPIViewContainer;
             options.fromGenerator = true;
             options.editorInstance = self.__editorInstance;
-            options.parentEl =  this.__$parent_el_container;
+            options.parentEl = this.__$parent_el_container;
+            self.inGenerator = false;
             this.asyncAPI = new AsyncAPI(options);
         }
 
@@ -485,7 +498,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                 var sinks = self.JSONObject.siddhiAppConfig.sinkList;
                                 var sources = self.JSONObject.siddhiAppConfig.sourceList;
                                 var foundCompatibleType = false;
-
+                                
                                 for (var i = 0; i < sinks.length; i++) {
                                     if (self.compatibleSinkTypes.includes(sinks[i].type.toLowerCase())) {
                                         foundCompatibleType = true;
@@ -659,11 +672,10 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         }
                     })
                 }
-                //todo: check how to get channel information from each IO type
                 //adding channel information retrived by the url
                 serverDetails.url = serverDetails.hostname + ":" + serverDetails.port;
                 serverDetails.channel.push(new URL(serverKeyValue[1].trim().replaceAll('"', '')).pathname);
-            } else if (type === "sse") { //todo need to change when SSE is developed currently assumed it as http sink
+            } else if (type === "sse") {
                 var serverUrl;
                 for (i = 0; i < options.length; i++) {
                     if (ioType == "sink") {
@@ -680,9 +692,9 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         serverDetails.hostname = temp[0];
                         serverDetails.port = temp[1];
                         if (serverKeyValue[1].trim().includes("https")) {
-                            serverDetails.protocol = "https";
+                            serverDetails.protocol = "sse";
                         } else {
-                            serverDetails.protocol = "http";
+                            serverDetails.protocol = "sse";
                         }
                         serverDetails.url = serverDetails.hostname + ":" + serverDetails.port;
                         serverDetails.channel.push(new URL(serverKeyValue[1].trim().replaceAll('"', '')).pathname);
@@ -694,7 +706,6 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                     })
                 }
             } else if (type === "websubhub") {
-                //todo need to change when WebHook is developed currently assumed it as http sink
                 for (i = 0; i < options.length; i++) {
                     if (options[i].startsWith("receiver.url")) {
                         serverKeyValue = options[i].split("=");
@@ -704,14 +715,15 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         serverDetails.hostname = temp[0];
                         serverDetails.port = temp[1];
                         if (serverKeyValue[1].trim().includes("https")) {
-                            serverDetails.protocol = "https";
+                            serverDetails.protocol = "websub";
                         } else {
-                            serverDetails.protocol = "http";
+                            serverDetails.protocol = "websub";
                         }
-                        serverDetails.url = serverKeyValue[1];
+                        serverDetails.url = serverKeyValue[1].trim().replaceAll('"', '')
+                            .replaceAll("http://", '').replaceAll("https://", '');
                     }
                     if (options[i].startsWith("topic.list")) {
-                        channelKeyValue = options[i].trim().replaceAll("\"","").split("=");
+                        channelKeyValue = options[i].trim().replaceAll("\"", "").split("=");
                         if (channelKeyValue != null && channelKeyValue.length === 2) {
                             var topics = channelKeyValue[1].split(",");
                             for (j = 0; j < topics.length; j++) {
@@ -743,7 +755,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 for (var i = 0; i < dataArray.length; i++) {
                     if (dataArray[i].type.toLowerCase() === type.toLowerCase()) {
                         result += dataOption.replaceAll('{{dataName}}', dataArray[i].connectedElementName)
-                            .replaceAll('{{options}}', dataArray[i].options.toString().replaceAll('"',"'"));
+                            .replaceAll('{{options}}', dataArray[i].options.toString().replaceAll('"', "'"));
                     }
                 }
             }
@@ -751,4 +763,5 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
         };
 
         return AsyncAPIView;
-    });
+    })
+;

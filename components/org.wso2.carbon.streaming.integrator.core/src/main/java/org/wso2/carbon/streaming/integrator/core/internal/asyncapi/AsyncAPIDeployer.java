@@ -46,19 +46,18 @@ import java.util.Map;
 
 public class AsyncAPIDeployer implements Runnable {
 
+    private static final Logger log = LoggerFactory.getLogger(AsyncAPIDeployer.class);
     private final String hostAndPort;
     private final String username;
     private final String password;
     private final String asyncAPiKeyVersion;
     private final ServiceCatalogueApiHelper serviceCatalogueApiHelper;
     private final String asyncAPIContent;
-    private String metadataContent;
     private final JSONObject asyncAPIJson;
     private final String directoryURI;
     private final String zipDirectoryURI;
+    private String metadataContent;
     private String md5Calculated;
-
-    private static final Logger log = LoggerFactory.getLogger(AsyncAPIDeployer.class);
 
     public AsyncAPIDeployer(AsyncAPIServiceCatalogueConfigs asyncAPIServiceCatalogueConfigs, String asyncAPIContent) {
         hostAndPort = asyncAPIServiceCatalogueConfigs.getHostname() + ":" + asyncAPIServiceCatalogueConfigs.getPort();
@@ -91,14 +90,14 @@ public class AsyncAPIDeployer implements Runnable {
                 verifier.put("md5", md5Calculated);
                 verifiers.put(verifier);
                 boolean isUploaded = serviceCatalogueApiHelper.uploadAsyncAPIDef(new File(zipDirectoryURI +
-                        File.separator + asyncAPiKeyVersion + ".zip"), verifiers.toString(), hostAndPort,
+                                File.separator + asyncAPiKeyVersion + ".zip"), verifiers.toString(), hostAndPort,
                         username, password);
                 if (isUploaded) {
-                    log.info("Async API: " + asyncAPiKeyVersion + " uploaded to the service catalogue");
+                    log.info("Async API: " + asyncAPiKeyVersion + " uploaded to the service catalog");
                 }
             } catch (ServiceCatalogueAPIServiceStubException e) {
                 log.error("Exception occurred when deploying Async API: " + asyncAPiKeyVersion +
-                        " to the service catalogue");
+                        " to the service catalog");
             }
         }
     }
@@ -188,13 +187,12 @@ public class AsyncAPIDeployer implements Runnable {
     public String createAndGetMetadataContent(JSONObject asyncAPIJson) {
         Map<String, Object> map = new HashMap<>();
         map.put("key", asyncAPiKeyVersion);
-        map.put("name", asyncAPIJson.getJSONObject("info").getString("title"));
-        map.put("displayName", asyncAPIJson.getJSONObject("info").getString("title").replaceAll(" ", ""));
+        map.put("name", asyncAPIJson.getJSONObject("info").getString(Constants.ASYNC_API_TITLE));
+        map.put("displayName", asyncAPIJson.getJSONObject("info").getString(Constants.ASYNC_API_TITLE).replaceAll(" ", ""));
         map.put("description", asyncAPIJson.getJSONObject("info").getString("description").replaceAll(" ", ""));
-        map.put("version", asyncAPIJson.getJSONObject("info").getString("version").replaceAll(" ", ""));
-        map.put("serviceUrl", asyncAPIJson.getJSONObject("servers").getJSONObject("production").
-                getString("protocol") + "://" + asyncAPIJson.getJSONObject("servers").
-                getJSONObject("production").getString("url"));
+        map.put(Constants.ASYNC_API_VERSION, asyncAPIJson.getJSONObject("info").getString(Constants.ASYNC_API_VERSION)
+                .replaceAll(" ", ""));
+        String asyncApiServerName = asyncAPIJson.getJSONObject(Constants.SERVERS).names().get(0).toString();
         map.put("definitionType", "ASYNC_API");
         JSONObject securitySchemes = asyncAPIJson.getJSONObject("components").getJSONObject("securitySchemes");
         Iterator keys = securitySchemes.keys();
@@ -203,13 +201,43 @@ public class AsyncAPIDeployer implements Runnable {
             String key = (String) keys.next();
             if (securitySchemes.get(key) instanceof JSONObject) {
                 if (strBuilder.length() == 0) {
-                    strBuilder.append(((JSONObject) securitySchemes.get(key)).getString("type"));
+                    if (((JSONObject) securitySchemes.get(key)).getString("type")
+                            .equals(Constants.PROTOCOL_HTTP)) {
+                        strBuilder.append(((JSONObject) securitySchemes.get(key)).getString("scheme"));
+                        map.put(Constants.PROPERTY_MUTUAL_SSL_ENABLED, false);
+                    } else {
+                        strBuilder.append(((JSONObject) securitySchemes.get(key)).getString("type"));
+                        map.put(Constants.PROPERTY_MUTUAL_SSL_ENABLED, true);
+                    }
                 } else {
-                    strBuilder.append(",").append(((JSONObject) securitySchemes.get(key)).getString("type"));
+                    if (((JSONObject) securitySchemes.get(key)).getString("type")
+                            .equals(Constants.PROTOCOL_HTTP)) {
+                        strBuilder.append(",").append(((JSONObject) securitySchemes.get(key)).getString("scheme"));
+                        map.put(Constants.PROPERTY_MUTUAL_SSL_ENABLED, false);
+                    } else{
+                        strBuilder.append(",").append(((JSONObject) securitySchemes.get(key)).getString("type"));
+                        map.put(Constants.PROPERTY_MUTUAL_SSL_ENABLED, true);
+                    }
                 }
             }
         }
-        map.put("mutualSSLEnabled", false);
+        map.putIfAbsent(Constants.PROPERTY_MUTUAL_SSL_ENABLED, false);
+        String protocol = asyncAPIJson.getJSONObject(Constants.SERVERS).getJSONObject(asyncApiServerName)
+                .getString("protocol");
+        if (protocol.equalsIgnoreCase(Constants.ASYNC_API_TYPE_SSE) ||
+                protocol.equalsIgnoreCase(Constants.ASYNC_API_TYPE_WEBSUB)) {
+            if (Boolean.parseBoolean(map.get(Constants.PROPERTY_MUTUAL_SSL_ENABLED).toString())) {
+                map.put("serviceUrl", "https://" + asyncAPIJson.getJSONObject(Constants.SERVERS)
+                        .getJSONObject(asyncApiServerName).getString("url"));
+            } else {
+                map.put("serviceUrl", "http://" + asyncAPIJson.getJSONObject(Constants.SERVERS)
+                        .getJSONObject(asyncApiServerName).getString("url"));
+            }
+        } else {
+            map.put("serviceUrl", asyncAPIJson.getJSONObject(Constants.SERVERS).getJSONObject(asyncApiServerName)
+                    .getString("protocol") + "://" + asyncAPIJson.getJSONObject(Constants.SERVERS)
+                    .getJSONObject(asyncApiServerName).getString("url"));
+        }
         if (strBuilder.toString().isEmpty()) {
             map.put("securityType", "NONE");
         } else {
