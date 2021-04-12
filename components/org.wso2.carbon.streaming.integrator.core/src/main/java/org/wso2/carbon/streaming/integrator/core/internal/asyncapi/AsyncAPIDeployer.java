@@ -224,7 +224,7 @@ public class AsyncAPIDeployer implements Runnable {
         map.putIfAbsent(Constants.PROPERTY_MUTUAL_SSL_ENABLED, false);
         String protocol = asyncAPIJson.getJSONObject(Constants.SERVERS).getJSONObject(asyncApiServerName)
                 .getString("protocol");
-        if (protocol.equalsIgnoreCase(Constants.ASYNC_API_TYPE_SSC) ||
+        if (protocol.equalsIgnoreCase(Constants.ASYNC_API_TYPE_SSE) ||
                 protocol.equalsIgnoreCase(Constants.ASYNC_API_TYPE_WEBSUB)) {
             if (Boolean.parseBoolean(map.get(Constants.PROPERTY_MUTUAL_SSL_ENABLED).toString())) {
                 map.put("serviceUrl", "https://" + asyncAPIJson.getJSONObject(Constants.SERVERS)

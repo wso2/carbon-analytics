@@ -27,7 +27,7 @@ public class Constants {
     public static final String ASYNC_API_TITLE = "title";
     public static final String ASYNC_API_VERSION = "version";
     public static final String KEY_SEPARATOR = "-";
-    public static final String ASYNC_API_TYPE_SSC = "sse";
+    public static final String ASYNC_API_TYPE_SSE = "sse";
     public static final String ASYNC_API_TYPE_WEBSUB = "websub";
     public static final String PROTOCOL_HTTP = "http";
     public static final String PROTOCOL_HTTPS = "https";
