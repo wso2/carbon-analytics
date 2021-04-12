@@ -192,10 +192,7 @@ public class AsyncAPIDeployer implements Runnable {
         map.put("description", asyncAPIJson.getJSONObject("info").getString("description").replaceAll(" ", ""));
         map.put(Constants.ASYNC_API_VERSION, asyncAPIJson.getJSONObject("info").getString(Constants.ASYNC_API_VERSION)
                 .replaceAll(" ", ""));
-        String asyncApiServerName = asyncAPIJson.getJSONObject("servers").names().get(0).toString();
-        map.put("serviceUrl", asyncAPIJson.getJSONObject("servers").getJSONObject(asyncApiServerName)
-                .getString("protocol") + "://" + asyncAPIJson.getJSONObject("servers")
-                .getJSONObject(asyncApiServerName).getString("url"));
+        String asyncApiServerName = asyncAPIJson.getJSONObject(Constants.SERVERS).names().get(0).toString();
         map.put("definitionType", "ASYNC_API");
         JSONObject securitySchemes = asyncAPIJson.getJSONObject("components").getJSONObject("securitySchemes");
         Iterator keys = securitySchemes.keys();
@@ -204,21 +201,43 @@ public class AsyncAPIDeployer implements Runnable {
             String key = (String) keys.next();
             if (securitySchemes.get(key) instanceof JSONObject) {
                 if (strBuilder.length() == 0) {
-                    if (((JSONObject) securitySchemes.get(key)).getString("type").equals("http")) {
+                    if (((JSONObject) securitySchemes.get(key)).getString("type")
+                            .equals(Constants.PROTOCOL_HTTP)) {
                         strBuilder.append(((JSONObject) securitySchemes.get(key)).getString("scheme"));
+                        map.put(Constants.PROPERTY_MUTUAL_SSL_ENABLED, false);
                     } else {
                         strBuilder.append(((JSONObject) securitySchemes.get(key)).getString("type"));
+                        map.put(Constants.PROPERTY_MUTUAL_SSL_ENABLED, true);
                     }
                 } else {
-                    if (((JSONObject) securitySchemes.get(key)).getString("type").equals("http")) {
+                    if (((JSONObject) securitySchemes.get(key)).getString("type")
+                            .equals(Constants.PROTOCOL_HTTP)) {
                         strBuilder.append(",").append(((JSONObject) securitySchemes.get(key)).getString("scheme"));
-                    } else {
+                        map.put(Constants.PROPERTY_MUTUAL_SSL_ENABLED, false);
+                    } else{
                         strBuilder.append(",").append(((JSONObject) securitySchemes.get(key)).getString("type"));
+                        map.put(Constants.PROPERTY_MUTUAL_SSL_ENABLED, true);
                     }
                 }
             }
         }
-        map.put("mutualSSLEnabled", false);
+        map.putIfAbsent(Constants.PROPERTY_MUTUAL_SSL_ENABLED, false);
+        String protocol = asyncAPIJson.getJSONObject(Constants.SERVERS).getJSONObject(asyncApiServerName)
+                .getString("protocol");
+        if (protocol.equalsIgnoreCase(Constants.ASYNC_API_TYPE_SSC) ||
+                protocol.equalsIgnoreCase(Constants.ASYNC_API_TYPE_WEBSUB)) {
+            if (Boolean.parseBoolean(map.get(Constants.PROPERTY_MUTUAL_SSL_ENABLED).toString())) {
+                map.put("serviceUrl", "https://" + asyncAPIJson.getJSONObject(Constants.SERVERS)
+                        .getJSONObject(asyncApiServerName).getString("url"));
+            } else {
+                map.put("serviceUrl", "http://" + asyncAPIJson.getJSONObject(Constants.SERVERS)
+                        .getJSONObject(asyncApiServerName).getString("url"));
+            }
+        } else {
+            map.put("serviceUrl", asyncAPIJson.getJSONObject(Constants.SERVERS).getJSONObject(asyncApiServerName)
+                    .getString("protocol") + "://" + asyncAPIJson.getJSONObject(Constants.SERVERS)
+                    .getJSONObject(asyncApiServerName).getString("url"));
+        }
         if (strBuilder.toString().isEmpty()) {
             map.put("securityType", "NONE");
         } else {
