@@ -130,7 +130,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                         }
                     }
                 },
-                "sse": {
+                "sse-server": {
                     "sink": {
                         "security": {
                             "basic.auth.username": {"http-basic": {"type": "http", "scheme": "BASIC"}},
