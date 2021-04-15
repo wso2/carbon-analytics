@@ -3,7 +3,7 @@
     "extension": {
       "name": "kafka",
       "displayName": "Kafka",
-      "version": "5.0.9"
+      "version": "5.0.12"
     },
     "identifier": {
       "alternativeTypes": ["kafkaMultiDC"]
@@ -11,10 +11,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-kafka",
-        "version": "5.0.9",
+        "version": "5.0.12",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.9/siddhi-io-kafka-5.0.9.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.12/siddhi-io-kafka-5.0.12.jar"
         },
         "usages": [
           {
@@ -297,7 +297,7 @@
     "extension": {
       "name": "cdc-mysql",
       "displayName": "Change Data Capture - MySQL",
-      "version": "2.0.8"
+      "version": "2.0.10"
     },
     "identifier": {
       "type": "cdc",
@@ -307,10 +307,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.8",
+        "version": "2.0.10",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.8/siddhi-io-cdc-2.0.8.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.10/siddhi-io-cdc-2.0.10.jar"
         },
         "usages": [
           {
@@ -342,7 +342,7 @@
     "extension": {
       "name": "cdc-oracle",
       "displayName": "Change Data Capture - Oracle",
-      "version": "2.0.8"
+      "version": "2.0.10"
     },
     "identifier": {
       "type": "cdc",
@@ -352,10 +352,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.8",
+        "version": "2.0.10",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.8/siddhi-io-cdc-2.0.8.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.8/siddhi-io-cdc-2.0.10.jar"
         },
         "usages": [
           {
@@ -402,7 +402,7 @@
     "extension": {
       "name": "cdc-postgresql",
       "displayName": "Change Data Capture - PostgreSQL",
-      "version": "2.0.8"
+      "version": "2.0.10"
     },
     "identifier": {
       "type": "cdc",
@@ -412,10 +412,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.8",
+        "version": "2.0.10",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.8/siddhi-io-cdc-2.0.8.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.10/siddhi-io-cdc-2.0.10.jar"
         },
         "usages": [
           {
@@ -447,7 +447,7 @@
     "extension": {
       "name": "cdc-mssql",
       "displayName": "Change Data Capture - MS SQL",
-      "version": "2.0.8"
+      "version": "2.0.10"
     },
     "identifier": {
       "type": "cdc",
@@ -457,10 +457,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.8",
+        "version": "2.0.10",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.8/siddhi-io-cdc-2.0.8.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.10/siddhi-io-cdc-2.0.10.jar"
         },
         "usages": [
           {
@@ -492,7 +492,7 @@
     "extension": {
       "name": "cdc-mongodb",
       "displayName": "Change Data Capture - Mongo DB",
-      "version": "2.0.8"
+      "version": "2.0.10"
     },
     "identifier": {
       "type": "cdc",
@@ -502,10 +502,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.8",
+        "version": "2.0.10",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.8/siddhi-io-cdc-2.0.8.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.10/siddhi-io-cdc-2.0.10.jar"
         },
         "usages": [
           {
@@ -755,15 +755,15 @@
     "extension": {
       "name": "mongodb",
       "displayName": "MongoDB",
-      "version": "2.1.1"
+      "version": "2.1.2"
     },
     "dependencies": [
       {
         "name": "siddhi-store-mongodb",
-        "version": "2.1.1",
+        "version": "2.1.2",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/mongodb/siddhi-store-mongodb/2.1.1/siddhi-store-mongodb-2.1.1.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/mongodb/siddhi-store-mongodb/2.1.2/siddhi-store-mongodb-2.1.2.jar"
         },
         "usages": [
           {
@@ -795,7 +795,7 @@
     "extension": {
       "name": "rdbms-mysql",
       "displayName": "RDBMS - MySQL",
-      "version": "7.0.7"
+      "version": "7.0.9"
     },
     "identifier": {
       "type": "rdbms",
@@ -805,10 +805,10 @@
     "dependencies": [
       {
         "name": "siddhi-store-rdbms",
-        "version": "7.0.7",
+        "version": "7.0.9",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.7/siddhi-store-rdbms-7.0.7.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.9/siddhi-store-rdbms-7.0.9.jar"
         },
         "usages": [
           {
@@ -840,7 +840,7 @@
     "extension": {
       "name": "rdbms-mssql",
       "displayName": "RDBMS - MS SQL",
-      "version": "7.0.7"
+      "version": "7.0.9"
     },
     "identifier": {
       "type": "rdbms",
@@ -850,10 +850,10 @@
     "dependencies": [
       {
         "name": "siddhi-store-rdbms",
-        "version": "7.0.7",
+        "version": "7.0.9",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.7/siddhi-store-rdbms-7.0.7.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.9/siddhi-store-rdbms-7.0.9.jar"
         },
         "usages": [
           {
@@ -885,7 +885,7 @@
     "extension": {
       "name": "rdbms-postgresql",
       "displayName": "RDBMS - Postgre SQL",
-      "version": "7.0.7"
+      "version": "7.0.9"
     },
     "identifier": {
       "type": "rdbms",
@@ -895,10 +895,10 @@
     "dependencies": [
       {
         "name": "siddhi-store-rdbms",
-        "version": "7.0.7",
+        "version": "7.0.9",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.7/siddhi-store-rdbms-7.0.7.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.9/siddhi-store-rdbms-7.0.9.jar"
         },
         "usages": [
           {
@@ -930,7 +930,7 @@
     "extension": {
       "name": "rdbms-oracle",
       "displayName": "RDBMS - Oracle",
-      "version": "7.0.7"
+      "version": "7.0.9"
     },
     "identifier": {
       "type": "rdbms",
@@ -940,10 +940,10 @@
     "dependencies": [
       {
         "name": "siddhi-store-rdbms",
-        "version": "7.0.7",
+        "version": "7.0.9",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.7/siddhi-store-rdbms-7.0.7.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.9/siddhi-store-rdbms-7.0.9.jar"
         },
         "usages": [
           {
@@ -1110,7 +1110,7 @@
     "extension": {
       "name": "http",
       "displayName": "HTTP Transport",
-      "version": "2.2.2"
+      "version": "2.3.2"
     },
     "identifier": {
       "alternativeTypes": [
@@ -1127,10 +1127,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-http",
-        "version": "2.2.2",
+        "version": "2.3.2",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/http/siddhi-io-http/2.2.2/siddhi-io-http-2.2.2.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/http/siddhi-io-http/2.3.2/siddhi-io-http-2.3.2.jar"
         },
         "usages": [
           {
@@ -1147,7 +1147,7 @@
     "extension": {
       "name": "file",
       "displayName": "File",
-      "version": "2.0.10"
+      "version": "2.0.16"
     },
     "identifier": {
       "alternativeTypes": ["fileeventlistener"]
@@ -1155,10 +1155,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-file",
-        "version": "2.0.10",
+        "version": "2.0.16",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/file/siddhi-io-file/2.0.10/siddhi-io-file-2.0.10.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/file/siddhi-io-file/2.0.16/siddhi-io-file-2.0.16.jar"
         },
         "usages": [
           {
@@ -1300,7 +1300,7 @@
     "extension": {
       "name": "websocket",
       "displayName": "WebSockets",
-      "version": "3.0.1"
+      "version": "3.0.2"
     },
     "identifier": {
       "alternativeTypes": ["websocket-server"]
@@ -1308,10 +1308,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-websocket",
-        "version": "3.0.1",
+        "version": "3.0.2",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/websocket/siddhi-io-websocket/3.0.1/siddhi-io-websocket-3.0.1.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/websocket/siddhi-io-websocket/3.0.2/siddhi-io-websocket-3.0.2.jar"
         },
         "usages": [
           {
