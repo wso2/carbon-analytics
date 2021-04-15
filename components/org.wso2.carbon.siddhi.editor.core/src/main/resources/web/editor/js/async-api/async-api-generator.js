@@ -675,13 +675,13 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                 //adding channel information retrived by the url
                 serverDetails.url = serverDetails.hostname + ":" + serverDetails.port;
                 serverDetails.channel.push(new URL(serverKeyValue[1].trim().replaceAll('"', '')).pathname);
-            } else if (type === "sse") {
+            } else if (type === "sse-server") {
                 var serverUrl;
                 for (i = 0; i < options.length; i++) {
                     if (ioType == "sink") {
-                        serverUrl = "event.sink.url";
+                        serverUrl = "server.url";
                     } else {
-                        serverUrl = "event.source.url";
+                        serverUrl = "receiver.url";
                     }
                     if (options[i].startsWith(serverUrl)) {
                         serverKeyValue = options[i].split("=");
