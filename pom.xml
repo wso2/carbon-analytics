@@ -1732,7 +1732,7 @@
         <carbon.deployment.version>5.2.1</carbon.deployment.version>
         <carbon.deployment.export.version>5.2.0</carbon.deployment.export.version>
 
-        <carbon.datasources.version>1.1.8</carbon.datasources.version>
+        <carbon.datasources.version>1.1.9</carbon.datasources.version>
         <carbon.metrics.version>2.3.8</carbon.metrics.version>
         <carbon.jndi.version>1.0.5</carbon.jndi.version>
 
