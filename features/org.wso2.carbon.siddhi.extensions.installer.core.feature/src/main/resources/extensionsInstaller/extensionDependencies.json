@@ -795,7 +795,7 @@
     "extension": {
       "name": "rdbms-mysql",
       "displayName": "RDBMS - MySQL",
-      "version": "7.0.9"
+      "version": "7.0.11"
     },
     "identifier": {
       "type": "rdbms",
@@ -805,10 +805,10 @@
     "dependencies": [
       {
         "name": "siddhi-store-rdbms",
-        "version": "7.0.9",
+        "version": "7.0.11",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.9/siddhi-store-rdbms-7.0.9.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.11/siddhi-store-rdbms-7.0.11.jar"
         },
         "usages": [
           {
@@ -840,7 +840,7 @@
     "extension": {
       "name": "rdbms-mssql",
       "displayName": "RDBMS - MS SQL",
-      "version": "7.0.9"
+      "version": "7.0.11"
     },
     "identifier": {
       "type": "rdbms",
@@ -850,10 +850,10 @@
     "dependencies": [
       {
         "name": "siddhi-store-rdbms",
-        "version": "7.0.9",
+        "version": "7.0.11",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.9/siddhi-store-rdbms-7.0.9.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.11/siddhi-store-rdbms-7.0.11.jar"
         },
         "usages": [
           {
@@ -885,7 +885,7 @@
     "extension": {
       "name": "rdbms-postgresql",
       "displayName": "RDBMS - Postgre SQL",
-      "version": "7.0.9"
+      "version": "7.0.11"
     },
     "identifier": {
       "type": "rdbms",
@@ -895,10 +895,10 @@
     "dependencies": [
       {
         "name": "siddhi-store-rdbms",
-        "version": "7.0.9",
+        "version": "7.0.11",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.9/siddhi-store-rdbms-7.0.9.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.11/siddhi-store-rdbms-7.0.11.jar"
         },
         "usages": [
           {
@@ -930,7 +930,7 @@
     "extension": {
       "name": "rdbms-oracle",
       "displayName": "RDBMS - Oracle",
-      "version": "7.0.9"
+      "version": "7.0.11"
     },
     "identifier": {
       "type": "rdbms",
@@ -940,10 +940,10 @@
     "dependencies": [
       {
         "name": "siddhi-store-rdbms",
-        "version": "7.0.9",
+        "version": "7.0.11",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.9/siddhi-store-rdbms-7.0.9.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.11/siddhi-store-rdbms-7.0.11.jar"
         },
         "usages": [
           {
@@ -1110,7 +1110,7 @@
     "extension": {
       "name": "http",
       "displayName": "HTTP Transport",
-      "version": "2.3.2"
+      "version": "2.3.3"
     },
     "identifier": {
       "alternativeTypes": [
@@ -1127,10 +1127,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-http",
-        "version": "2.3.2",
+        "version": "2.3.3",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/http/siddhi-io-http/2.3.2/siddhi-io-http-2.3.2.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/http/siddhi-io-http/2.3.3/siddhi-io-http-2.3.3.jar"
         },
         "usages": [
           {
