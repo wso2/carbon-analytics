@@ -246,7 +246,7 @@ public class StreamProcessorService {
                             getSiddhiAnnotationValue(StreamProcessorDataHolder.getStreamProcessorService().getSiddhiAppMap().get(siddhiAppName).getSiddhiApp(),
                                     SiddhiAppProcessorConstants.ANNOTATION_ASYNC_API_NAME, siddhiAppName);
                     AsyncAPIUndeployer asyncAPIUndeployer = new AsyncAPIUndeployer(asyncAPIServiceCatalogueConfigs, asyncAPIValue);
-                    asyncAPIUndeployExecutorService.execute(asyncAPIUndeployer);
+                    asyncAPIUndeployer.run();
                 }
             } catch (SiddhiAppConfigurationException e){
                 if (log.isDebugEnabled()) {

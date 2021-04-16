@@ -115,6 +115,8 @@ public class AsyncAPIDeployer implements Runnable {
 
     public void createFiles() {
         FileObject fileObject = Utils.getFileObject(directoryURI);
+        OutputStream metadataYamlFileOutputStream = null;
+        OutputStream asyncAPIYamlFileOutputStream = null;
         try {
             if (!fileObject.exists()) {
                 fileObject.createFolder();
@@ -127,22 +129,32 @@ public class AsyncAPIDeployer implements Runnable {
             if (asyncAPIYamlFile.exists()) {
                 asyncAPIYamlFile.delete(Selectors.SELECT_ALL);
             }
+
             if (!metadataYamlFile.exists()) {
                 metadataYamlFile.createFile();
                 metadataYamlFile.refresh();
-                OutputStream outputStream = metadataYamlFile.getContent().getOutputStream();
-                outputStream.write(metadataContent.getBytes(StandardCharsets.UTF_8));
-                outputStream.flush();
+                metadataYamlFileOutputStream = metadataYamlFile.getContent().getOutputStream();
+                metadataYamlFileOutputStream.write(metadataContent.getBytes(StandardCharsets.UTF_8));
+                metadataYamlFileOutputStream.flush();
             }
             if (!asyncAPIYamlFile.exists()) {
                 asyncAPIYamlFile.createFile();
                 asyncAPIYamlFile.refresh();
-                OutputStream outputStream = asyncAPIYamlFile.getContent().getOutputStream();
-                outputStream.write(asyncAPIContent.getBytes(StandardCharsets.UTF_8));
-                outputStream.flush();
+                asyncAPIYamlFileOutputStream = asyncAPIYamlFile.getContent().getOutputStream();
+                asyncAPIYamlFileOutputStream.write(asyncAPIContent.getBytes(StandardCharsets.UTF_8));
+                asyncAPIYamlFileOutputStream.flush();
             }
         } catch (IOException e) {
             log.error("Exception occurred when creating service definition files for " + asyncAPiKeyVersion, e);
+        } finally {
+            if (null != metadataYamlFileOutputStream && null != asyncAPIYamlFileOutputStream) {
+                try {
+                    metadataYamlFileOutputStream.close();
+                    asyncAPIYamlFileOutputStream.close();
+                } catch (IOException e) {
+                    log.error("Exception occurred when closing the stream.", e);
+                }
+            }
         }
     }
 
