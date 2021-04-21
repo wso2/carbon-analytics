@@ -22,7 +22,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])kafka([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])kafka([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "kafka-clients",
@@ -161,7 +161,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])jms([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])jms([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "activemq-client",
@@ -258,7 +258,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])ibmmq([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])ibmmq([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "com.ibm.mq.allclient",
@@ -318,7 +318,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "mysql-connector-java",
@@ -363,7 +363,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "ojdbc8",
@@ -423,7 +423,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "postgresql",
@@ -468,7 +468,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "mssql-jdbc",
@@ -513,7 +513,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])cdc([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "mongo-java-driver",
@@ -553,7 +553,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])prometheus([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])prometheus([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "simpleclient",
@@ -653,7 +653,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])nats([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])nats([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "jnats",
@@ -731,7 +731,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])grpc([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])grpc([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "protobuf-java",
@@ -771,7 +771,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])store([_-])mongodb([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])store([_-])mongodb([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "mongo-java-driver",
@@ -816,7 +816,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])store([_-])rdbms([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])store([_-])rdbms([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "mysql-connector-java",
@@ -861,7 +861,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])store([_-])rdbms([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])store([_-])rdbms([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "mssql-jdbc",
@@ -906,7 +906,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])store([_-])rdbms([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])store([_-])rdbms([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "postgresql",
@@ -951,7 +951,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])store([_-])rdbms([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])store([_-])rdbms([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "ojdbc8",
@@ -991,7 +991,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])store([_-])hbase([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])store([_-])hbase([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "hbase-shaded-client",
@@ -1046,7 +1046,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])store([_-])cassandra([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])store([_-])cassandra([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "cassandra-driver-core",
@@ -1086,7 +1086,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])store([_-])redis([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])store([_-])redis([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
         "name": "jedis",
@@ -1138,7 +1138,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])http([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])http([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -1166,7 +1166,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])file([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])file([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -1191,7 +1191,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])tcp([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])tcp([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -1216,7 +1216,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])email([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])email([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -1241,7 +1241,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])rabbitmq([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])rabbitmq([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -1266,7 +1266,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])mqtt([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])mqtt([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -1291,7 +1291,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])sqs([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])sqs([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -1319,7 +1319,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])websocket([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])websocket([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -1344,7 +1344,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])googlepubsub([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])googlepubsub([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -1369,7 +1369,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])hl7([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])hl7([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -1394,7 +1394,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])snmp([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])snmp([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -1419,7 +1419,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])gcs([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])gcs([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -1444,7 +1444,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])s3([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])s3([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -1469,7 +1469,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])store([_-])elasticsearch([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])store([_-])elasticsearch([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -1494,7 +1494,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "siddhi([_-])io([_-])azuredatalake([_-])[0-9]+.[0-9]+.[0-9]+.jar"
+        "lookupRegex": "siddhi([_-])io([_-])azuredatalake([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   }
