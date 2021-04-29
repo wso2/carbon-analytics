@@ -33,5 +33,5 @@ public interface DataProviderAuthorizer {
      * @return authorization results.
      * @throws DataProviderException if the authorization failed due to exception.
      */
-    boolean authorize(DataProviderConfigRoot dataProviderConfigRoot) throws DataProviderException;
+    boolean authorize(DataProviderConfigRoot dataProviderConfigRoot, String username) throws DataProviderException;
 }

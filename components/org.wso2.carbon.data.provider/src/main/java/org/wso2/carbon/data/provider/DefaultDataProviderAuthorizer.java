@@ -33,7 +33,8 @@ import org.wso2.carbon.data.provider.exception.DataProviderException;
 public class DefaultDataProviderAuthorizer implements DataProviderAuthorizer {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDataProviderAuthorizer.class);
     @Override
-    public boolean authorize(DataProviderConfigRoot dataProviderConfigRoot) throws DataProviderException {
+    public boolean authorize(DataProviderConfigRoot dataProviderConfigRoot, String username)
+            throws DataProviderException {
         LOGGER.debug("Authorized via the '{}' class.", this.getClass().getName());
         return true;
     }

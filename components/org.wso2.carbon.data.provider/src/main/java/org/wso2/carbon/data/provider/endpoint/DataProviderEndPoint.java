@@ -25,6 +25,9 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
+import org.wso2.carbon.analytics.idp.client.core.exception.AuthenticationException;
+import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.data.provider.AbstractDataProvider;
 import org.wso2.carbon.data.provider.DataProvider;
@@ -35,6 +38,7 @@ import org.wso2.carbon.data.provider.siddhi.SiddhiProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.msf4j.websocket.WebSocketEndpoint;
 import org.wso2.transport.http.netty.contract.websocket.WebSocketConnection;
+import org.wso2.transport.http.netty.message.HttpCarbonRequest;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -63,6 +67,7 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
     private static final String WEB_SOCKET_AUTHORIZING_CLASS_CONFIG_HEADER = "authorizingClass";
     private static final String DEFAULT_WEBSOCKET_AUTHORIZING_CLASS
             = "org.wso2.carbon.data.provider.DefaultDataProviderAuthorizer";
+    private static final Map<String, String> usernameMap = new ConcurrentHashMap<>();
 
     @Reference(
             name = "org.wso2.carbon.datasource.DataSourceService",
@@ -106,14 +111,46 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
         LOGGER.debug("Data Provider Authorizer '{}' unregistered.", dataProviderAuthorizer.getClass().getName());
     }
 
+    @Reference(
+            name = "org.wso2.carbon.analytics.idp.client.core.api.IdPClient",
+            service = IdPClient.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetIdpClient"
+    )
+    protected void setIdpClient(IdPClient idpClient) {
+        getDataProviderHelper().setIdpClient(idpClient);
+    }
+
+    protected void unsetIdpClient(IdPClient idpClient) {
+        getDataProviderHelper().setIdpClient(null);
+    }
+
     /**
      * Handle initiation of the connection map the session object in the session map.
      *
      * @param webSocketConnection webSocketConnection object associated with the connection
      */
     @OnOpen
-    public static void onOpen(WebSocketConnection webSocketConnection) {
+    public static void onOpen(WebSocketConnection webSocketConnection, HttpCarbonRequest request)
+            throws AuthenticationException, IdPClientException {
         sessionMap.put(webSocketConnection.getChannelId(), webSocketConnection);
+
+        // Get the access token
+        String[] cookies = request.getHeader("Cookie").split(";");
+        String accessTokenPart1 = "";
+        String accessTokenPart2 = "";
+        for (String cookie : cookies) {
+            String[] cookieParts = cookie.trim().split("=");
+            if ("DID".equals(cookieParts[0])) {
+                accessTokenPart2 = cookieParts[1];
+            } else if ("DATA_PROVIDER_USER".equals(cookieParts[0])) {
+                accessTokenPart1 = new Gson().fromJson(cookieParts[1], Map.class).get("SDID").toString();
+            }
+        }
+        String accessToken = accessTokenPart1 + accessTokenPart2;
+        String username = getDataProviderHelper().getIdpClient().authenticate(accessToken);
+        usernameMap.put(webSocketConnection.getChannelId(), username);
     }
 
     /**
@@ -126,6 +163,7 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
     public void onMessage(String message, WebSocketConnection webSocketConnection) {
         DataProviderConfigRoot dataProviderConfigRoot = new Gson().fromJson(message, DataProviderConfigRoot.class);
         String authoringClassName;
+
         try {
             Map webSocketConfiguration = null;
             if (!(getDataProviderHelper().getConfigProvider().getConfigurationObject(WEB_SOCKET_CONFIG_HEADER)
@@ -149,7 +187,8 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
             }
             DataProviderAuthorizer dataProviderAuthorizer
                     = getDataProviderHelper().getDataProviderAuthorizer(authoringClassName);
-            boolean authorizerResult = dataProviderAuthorizer.authorize(dataProviderConfigRoot);
+            boolean authorizerResult = dataProviderAuthorizer
+                    .authorize(dataProviderConfigRoot, usernameMap.get(webSocketConnection.getChannelId()));
             if (!authorizerResult) {
                 throw new Exception("Access denied to data provider.");
             }
@@ -248,6 +287,7 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
             }
         }
         getDataProviderHelper().removeSessionData(webSocketConnection.getChannelId());
+        usernameMap.remove(webSocketConnection.getChannelId());
     }
 
     /**
