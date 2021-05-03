@@ -17,11 +17,13 @@
 package org.wso2.carbon.streaming.integrator.core.api;
 
 import org.osgi.service.component.annotations.Component;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AnalyticsResponseInterceptor;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.streaming.integrator.core.factories.RunTimeApiServiceFactory;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
+import org.wso2.msf4j.interceptor.annotation.ResponseInterceptor;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -40,6 +42,7 @@ import javax.ws.rs.core.Response;
 @Path("/nodeDetails")
 
 @RequestInterceptor(AuthenticationInterceptor.class)
+@ResponseInterceptor(AnalyticsResponseInterceptor.class)
 @io.swagger.annotations.Api(description = "the runTime API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
                             date = "2018-02-20T10:49:25.745Z")

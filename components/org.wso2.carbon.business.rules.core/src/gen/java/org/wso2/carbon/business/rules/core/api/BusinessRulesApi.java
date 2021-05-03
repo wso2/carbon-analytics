@@ -19,6 +19,7 @@ package org.wso2.carbon.business.rules.core.api;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AnalyticsResponseInterceptor;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.business.rules.core.api.factories.BusinessRulesApiServiceFactory;
 import org.wso2.msf4j.Microservice;
@@ -40,8 +41,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.ApiParam;
+import org.wso2.msf4j.interceptor.annotation.ResponseInterceptor;
 
 @RequestInterceptor(AuthenticationInterceptor.class)
+@ResponseInterceptor(AnalyticsResponseInterceptor.class)
 @io.swagger.annotations.Api(description = "the business-rules API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-10-11T05:39:16.839Z")

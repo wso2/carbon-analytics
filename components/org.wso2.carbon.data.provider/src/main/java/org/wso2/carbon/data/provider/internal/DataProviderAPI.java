@@ -22,11 +22,13 @@ import com.google.gson.JsonElement;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AnalyticsResponseInterceptor;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.data.provider.DataProvider;
 import org.wso2.carbon.data.provider.exception.DataProviderException;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
+import org.wso2.msf4j.interceptor.annotation.ResponseInterceptor;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -43,6 +45,7 @@ import static org.wso2.carbon.data.provider.utils.DataProviderValueHolder.getDat
  * Data provider api service component.
  */
 @RequestInterceptor(AuthenticationInterceptor.class)
+@ResponseInterceptor(AnalyticsResponseInterceptor.class)
 public class DataProviderAPI implements Microservice {
 
     public static final String API_CONTEXT_PATH = "/apis/data-provider";

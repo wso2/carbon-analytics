@@ -27,12 +27,14 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AnalyticsResponseInterceptor;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.streaming.integrator.statistics.factories.SystemDetailsApiServiceFactory;
 import org.wso2.carbon.streaming.integrator.statistics.internal.service.ConfigServiceComponent;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
+import org.wso2.msf4j.interceptor.annotation.ResponseInterceptor;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -42,6 +44,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/system-details")
 @RequestInterceptor(AuthenticationInterceptor.class)
+@ResponseInterceptor(AnalyticsResponseInterceptor.class)
 @Component(
         name = "org.wso2.carbon.streaming.integrator.statistic.api.SystemDetailsApi",
         service = Microservice.class,

@@ -1722,7 +1722,7 @@
         <carbon.kernel.pax.version>5.2.13</carbon.kernel.pax.version>
 
         <netty.version>4.1.34.Final</netty.version>
-        <org.wso2.transport.http.netty.version>6.1.9</org.wso2.transport.http.netty.version>
+        <org.wso2.transport.http.netty.version>6.3.24</org.wso2.transport.http.netty.version>
         <commons-vfs2.wso2.version>2.2-wso2v1</commons-vfs2.wso2.version>
         <carbon.transport.package.import.version.range>[6.0.0, 7.0.0)</carbon.transport.package.import.version.range>
 
@@ -1792,7 +1792,7 @@
         <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.7.7</msf4j.version>
+        <msf4j.version>2.8.2</msf4j.version>
         <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
         <com.fasterxml.jackson.core.version>2.9.8</com.fasterxml.jackson.core.version>
         <com.fasterxml.jackson.core.version.range>[2.9.0, 2.10.0)</com.fasterxml.jackson.core.version.range>

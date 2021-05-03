@@ -26,6 +26,8 @@ public class InterceptorConstants {
     public static final String BEARER_PREFIX = "Bearer";
     public static final String BASIC_PREFIX = "Basic";
 
+    public static final String HTTP_STRICT_TRANSPORT_SECURITY_HEADER = "Strict-Transport-Security";
+
     private InterceptorConstants() {
 
     }

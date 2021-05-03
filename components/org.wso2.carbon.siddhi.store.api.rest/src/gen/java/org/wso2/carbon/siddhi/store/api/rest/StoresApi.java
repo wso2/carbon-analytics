@@ -23,6 +23,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AnalyticsResponseInterceptor;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
@@ -40,7 +41,10 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.ApiParam;
 import org.wso2.msf4j.MicroservicesRunner;
-import org.wso2.msf4j.config.TransportsFileConfiguration;
+import org.wso2.transport.http.netty.contract.config.ListenerConfiguration;
+import org.wso2.transport.http.netty.contract.config.TransportsConfiguration;
+
+import java.util.Set;
 
 @Component(
         name = "siddhi-store-query-service",
@@ -54,7 +58,7 @@ import org.wso2.msf4j.config.TransportsFileConfiguration;
 public class StoresApi implements HAStateChangeListener {
     private Logger log = LoggerFactory.getLogger(StoresApi.class);
     private final StoresApiService delegate = StoresApiServiceFactory.getStoresApi();
-    private static TransportsFileConfiguration transportsFileConfiguration;
+    private static TransportsConfiguration transportsConfiguration;
     private static MicroservicesRunner microservicesRunner;
     private static volatile boolean microserviceActive;
     private static final String ROOT_CONFIG_ELEMENT = "siddhi.stores.query.api";
@@ -87,14 +91,18 @@ public class StoresApi implements HAStateChangeListener {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        log.debug("Siddhi Store REST API activated.");
-        microservicesRunner = new MicroservicesRunner(transportsFileConfiguration);
+        microservicesRunner = new MicroservicesRunner(transportsConfiguration);
         if (SiddhiStoreDataHolder.getInstance().getAuthenticationInterceptor() != null) {
             microservicesRunner.addGlobalRequestInterceptor(SiddhiStoreDataHolder.getInstance().
                     getAuthenticationInterceptor());
         }
+        if (SiddhiStoreDataHolder.getInstance().getAnalyticsResponseInterceptor() != null) {
+            microservicesRunner.addGlobalResponseInterceptor(SiddhiStoreDataHolder.getInstance().
+                    getAnalyticsResponseInterceptor());
+        }
         microservicesRunner.deploy(new StoresApi());
         startStoresApiMicroservice();
+        log.debug("Siddhi Store REST API activated.");
     }
 
     /**
@@ -154,8 +162,8 @@ public class StoresApi implements HAStateChangeListener {
     protected void registerConfigProvider(ConfigProvider configProvider) {
         SiddhiStoreDataHolder.getInstance().setConfigProvider(configProvider);
         try {
-            transportsFileConfiguration = configProvider.getConfigurationObject(ROOT_CONFIG_ELEMENT,
-                    TransportsFileConfiguration.class);
+            transportsConfiguration = configProvider.getConfigurationObject(ROOT_CONFIG_ELEMENT,
+                    TransportsConfiguration.class);
         } catch (ConfigurationException e) {
             log.error("Error while loading TransportsConfiguration for " + ROOT_CONFIG_ELEMENT, e);
         }
@@ -178,6 +186,21 @@ public class StoresApi implements HAStateChangeListener {
 
     protected void unregisterAuthenticationInterceptor(AuthenticationInterceptor authenticationInterceptor) {
         SiddhiStoreDataHolder.getInstance().setAuthenticationInterceptor(null);
+    }
+
+    @Reference(
+            name = "org.wso2.carbon.analytics.msf4j.interceptor.common.AnalyticsResponseInterceptor",
+            service = AnalyticsResponseInterceptor.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unregisterAuthenticationInterceptor"
+    )
+    protected void registerAnalyticsResponseInterceptor(AnalyticsResponseInterceptor authenticationInterceptor) {
+        SiddhiStoreDataHolder.getInstance().setAnalyticsResponseInterceptor(authenticationInterceptor);
+    }
+
+    protected void unregisterAnalyticsResponseInterceptor(AnalyticsResponseInterceptor authenticationInterceptor) {
+        SiddhiStoreDataHolder.getInstance().setAnalyticsResponseInterceptor(null);
     }
 
     @Override

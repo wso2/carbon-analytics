@@ -79,6 +79,7 @@
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
             javax.ws.rs.*;version="${javax.ws.rs.version.range}",
             org.slf4j.*;version="${slf4j.version.range}",
+            org.wso2.transport.http.netty.*,
         </import.package>
         <private.package>
             org.wso2.carbon.analytics.msf4j.interceptor.common.internal,
