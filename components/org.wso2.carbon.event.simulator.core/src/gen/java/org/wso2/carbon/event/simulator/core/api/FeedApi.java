@@ -6,6 +6,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AnalyticsResponseInterceptor;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
 import org.wso2.carbon.event.simulator.core.factories.FeedApiServiceFactory;
@@ -13,6 +14,7 @@ import org.wso2.carbon.event.simulator.core.model.InlineResponse200;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
+import org.wso2.msf4j.interceptor.annotation.ResponseInterceptor;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -34,6 +36,7 @@ import javax.ws.rs.core.Response;
 )
 @Path("/simulation/feed")
 @RequestInterceptor(AuthenticationInterceptor.class)
+@ResponseInterceptor(AnalyticsResponseInterceptor.class)
 @io.swagger.annotations.Api(description = "the feed API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-07-20T09:30:14.336Z")

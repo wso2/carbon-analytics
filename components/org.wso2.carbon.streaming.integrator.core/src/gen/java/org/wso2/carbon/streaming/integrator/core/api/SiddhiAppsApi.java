@@ -18,6 +18,7 @@ package org.wso2.carbon.streaming.integrator.core.api;
 
 import io.swagger.annotations.ApiParam;
 import org.osgi.service.component.annotations.Component;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AnalyticsResponseInterceptor;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.streaming.integrator.core.factories.SiddhiAppsApiServiceFactory;
 import org.wso2.carbon.streaming.integrator.core.model.InlineResponse200;
@@ -27,6 +28,7 @@ import org.wso2.carbon.streaming.integrator.core.util.StatsEnable;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
+import org.wso2.msf4j.interceptor.annotation.ResponseInterceptor;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -51,6 +53,7 @@ import javax.ws.rs.core.Response;
 )
 @Path("/siddhi-apps")
 @RequestInterceptor(AuthenticationInterceptor.class)
+@ResponseInterceptor(AnalyticsResponseInterceptor.class)
 @io.swagger.annotations.Api(description = "The siddhi-apps API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-05-31T15:43:24.557Z")

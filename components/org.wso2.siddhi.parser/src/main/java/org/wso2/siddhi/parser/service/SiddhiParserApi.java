@@ -47,7 +47,7 @@ import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.msf4j.MicroservicesRunner;
-import org.wso2.msf4j.config.TransportsFileConfiguration;
+import org.wso2.transport.http.netty.contract.config.TransportsConfiguration;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -77,7 +77,7 @@ public class SiddhiParserApi {
     private static final Logger log = LoggerFactory.getLogger(SiddhiParserApi.class);
     private static final String TRANSPORT_ROOT_CONFIG_ELEMENT = "wso2.transport.http";
     private static final String SIDDHI_PARSER_ACTIVATION_SYS_PROPERTY = "siddhi-parser";
-    private static TransportsFileConfiguration transportsFileConfiguration;
+    private static TransportsConfiguration transportsConfiguration;
     private static MicroservicesRunner microservicesRunner;
     private static volatile boolean microserviceActive;
     private static SiddhiAppCreator appCreator = new NatsSiddhiAppCreator();
@@ -203,8 +203,8 @@ public class SiddhiParserApi {
      */
     @Activate
     protected void start(BundleContext bundleContext) throws Exception {
-        if (transportsFileConfiguration != null) {
-            microservicesRunner = new MicroservicesRunner(transportsFileConfiguration);
+        if (transportsConfiguration != null) {
+            microservicesRunner = new MicroservicesRunner(transportsConfiguration);
         }
         String toolIdentifier = System.getProperty(SIDDHI_PARSER_ACTIVATION_SYS_PROPERTY);
         Optional.ofNullable(toolIdentifier)
@@ -257,10 +257,10 @@ public class SiddhiParserApi {
     protected void registerConfigProvider(ConfigProvider configProvider) {
         SiddhiParserDataHolder.setConfigProvider(configProvider);
         try {
-            transportsFileConfiguration = configProvider.getConfigurationObject(TRANSPORT_ROOT_CONFIG_ELEMENT,
-                    TransportsFileConfiguration.class);
+            transportsConfiguration = configProvider.getConfigurationObject(TRANSPORT_ROOT_CONFIG_ELEMENT,
+                    TransportsConfiguration.class);
             CarbonConfiguration carbonConfig = configProvider.getConfigurationObject(CarbonConfiguration.class);
-            transportsFileConfiguration.getListenerConfigurations().forEach(
+            transportsConfiguration.getListenerConfigurations().forEach(
                     listenerConfiguration -> listenerConfiguration.setPort(
                             listenerConfiguration.getPort() + carbonConfig.getPortsConfig().getOffset()));
         } catch (ConfigurationException e) {
