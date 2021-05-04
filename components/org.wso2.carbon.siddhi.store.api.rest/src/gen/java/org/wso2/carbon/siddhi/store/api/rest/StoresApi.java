@@ -193,13 +193,13 @@ public class StoresApi implements HAStateChangeListener {
             service = AnalyticsResponseInterceptor.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
-            unbind = "unregisterAuthenticationInterceptor"
+            unbind = "unregisterAnalyticsResponseInterceptor"
     )
-    protected void registerAnalyticsResponseInterceptor(AnalyticsResponseInterceptor authenticationInterceptor) {
-        SiddhiStoreDataHolder.getInstance().setAnalyticsResponseInterceptor(authenticationInterceptor);
+    protected void registerAnalyticsResponseInterceptor(AnalyticsResponseInterceptor analyticsResponseInterceptor) {
+        SiddhiStoreDataHolder.getInstance().setAnalyticsResponseInterceptor(analyticsResponseInterceptor);
     }
 
-    protected void unregisterAnalyticsResponseInterceptor(AnalyticsResponseInterceptor authenticationInterceptor) {
+    protected void unregisterAnalyticsResponseInterceptor(AnalyticsResponseInterceptor analyticsResponseInterceptor) {
         SiddhiStoreDataHolder.getInstance().setAnalyticsResponseInterceptor(null);
     }
 
