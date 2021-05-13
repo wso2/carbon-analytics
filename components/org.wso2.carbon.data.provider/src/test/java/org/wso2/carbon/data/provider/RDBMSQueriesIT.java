@@ -26,6 +26,11 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
+import org.wso2.carbon.analytics.idp.client.core.exception.AuthenticationException;
+import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
+import org.wso2.carbon.analytics.idp.client.core.models.Role;
+import org.wso2.carbon.analytics.idp.client.core.models.User;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.data.provider.bean.DataModel;
@@ -48,6 +53,7 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RDBMSQueriesIT {
@@ -79,6 +85,47 @@ public class RDBMSQueriesIT {
                     .getSimpleName(), new RDBMSBatchDataProvider());
             DataProviderValueHolder.getDataProviderHelper().setDataProvider(RDBMSStreamingDataProvider.class
                     .getSimpleName(), new RDBMSStreamingDataProvider());
+            IdPClient idPClient = new IdPClient() {
+                @Override
+                public List<Role> getAllRoles() throws IdPClientException {
+                    return null;
+                }
+
+                @Override
+                public List<Role> getAllRolesOfTenant(String s) throws IdPClientException {
+                    return null;
+                }
+
+                @Override
+                public Role getAdminRole() throws IdPClientException {
+                    return null;
+                }
+
+                @Override
+                public User getUser(String s) throws IdPClientException {
+                    return null;
+                }
+
+                @Override
+                public List<Role> getUserRoles(String s) throws IdPClientException {
+                    return null;
+                }
+
+                @Override
+                public Map<String, String> login(Map<String, String> map) throws IdPClientException {
+                    return null;
+                }
+
+                @Override
+                public Map<String, String> logout(Map<String, String> map) throws IdPClientException {
+                    return null;
+                }
+
+                @Override
+                public String authenticate(String s) throws AuthenticationException, IdPClientException {
+                    return "admin";
+                }
+            };
             DataSourceService dataSourceService = new DataSourceService() {
                 public Object getDataSource(String s) throws DataSourceException {
                     return RDBMSTableTestUtils.getDataSource();
@@ -124,6 +171,7 @@ public class RDBMSQueriesIT {
                 }
             };
             DataProviderValueHolder.getDataProviderHelper().setDataSourceService(dataSourceService);
+            DataProviderValueHolder.getDataProviderHelper().setIdpClient(idPClient);
             DataProviderValueHolder.getDataProviderHelper().setConfigProvider(configProvider);
             DataProviderValueHolder.getDataProviderHelper().setDataProviderAuthorizer(
                     DefaultDataProviderAuthorizer.class.getName(),
