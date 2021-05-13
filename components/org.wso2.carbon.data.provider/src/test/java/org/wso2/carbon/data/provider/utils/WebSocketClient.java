@@ -105,6 +105,7 @@ public class WebSocketClient {
         group = new NioEventLoopGroup();
 
         HttpHeaders headers = new DefaultHttpHeaders();
+        headers.add("Cookie", "DUMMY_COOKIE");
         try {
             // Connect with V13 (RFC 6455 aka HyBi-17). You can change it to V08 or V00.
             // If you change it to V00, ping is not supported and remember to change

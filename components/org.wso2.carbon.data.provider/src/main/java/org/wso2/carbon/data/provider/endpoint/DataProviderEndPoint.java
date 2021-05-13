@@ -132,11 +132,13 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
      * @param webSocketConnection webSocketConnection object associated with the connection
      */
     @OnOpen
-    public static void onOpen(WebSocketConnection webSocketConnection, HttpCarbonRequest request)
-            throws AuthenticationException, IdPClientException {
-        sessionMap.put(webSocketConnection.getChannelId(), webSocketConnection);
-
+    public static void onOpen(WebSocketConnection webSocketConnection, HttpCarbonRequest request) {
         // Get the access token
+        if (request.getHeader("Cookie") == null || request.getHeader("Cookie").isEmpty()) {
+            webSocketConnection.terminateConnection();
+            LOGGER.error("Unauthorised access to data provider denied.");
+            return;
+        }
         String[] cookies = request.getHeader("Cookie").split(";");
         String accessTokenPart1 = "";
         String accessTokenPart2 = "";
@@ -149,7 +151,15 @@ public class DataProviderEndPoint implements WebSocketEndpoint {
             }
         }
         String accessToken = accessTokenPart1 + accessTokenPart2;
-        String username = getDataProviderHelper().getIdpClient().authenticate(accessToken);
+        String username;
+        try {
+            username = getDataProviderHelper().getIdpClient().authenticate(accessToken);
+        } catch (AuthenticationException | IdPClientException e) {
+            webSocketConnection.terminateConnection();
+            LOGGER.error("Unauthorised access to data provider denied.", e);
+            return;
+        }
+        sessionMap.put(webSocketConnection.getChannelId(), webSocketConnection);
         usernameMap.put(webSocketConnection.getChannelId(), username);
     }
 
