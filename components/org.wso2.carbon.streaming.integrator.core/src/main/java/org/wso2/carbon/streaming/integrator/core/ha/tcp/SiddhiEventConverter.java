@@ -35,7 +35,7 @@ import java.util.zip.Inflater;
  * This class is a implementation EventConverter to create the event from the Binary message.
  * This is used within data bridge to create the event from the row message received.
  */
-public class SiddhiEventConverter {//todo
+public class SiddhiEventConverter {
     static final Logger LOG = Logger.getLogger(SiddhiEventConverter.class);
     private static int count = 0;
 
@@ -94,6 +94,9 @@ public class SiddhiEventConverter {//todo
                         break;
                     case "BOOL":
                         objects[i] = byteBuffer.get() == 1;
+                        break;
+                    case "OBJECT":
+                        byteBuffer.getInt();
                         break;
                     default:
                         // will not occur
