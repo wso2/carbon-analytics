@@ -101,45 +101,54 @@ public class HandlerUtils {
     public static String getUserNameIN(MessageContext messageContext) {
         //getting username from messageContext
         String userName = "";
-        if(messageContext == null) {
+        if (messageContext == null) {
             return userName;
         }
-        HttpServletRequest request = (HttpServletRequest) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+        HttpServletRequest request = (HttpServletRequest) messageContext
+                .getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
         HttpSession session;
         if (request != null && (session = request.getSession(false)) != null) {
             String tenantDomain = (String) session.getAttribute(MultitenantConstants.TENANT_DOMAIN);
             userName = (String) session.getAttribute(ServerConstants.USER_LOGGED_IN);
-            if(userName != null && tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(tenantDomain)){
+            if (userName != null && tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME
+                    .equalsIgnoreCase(tenantDomain)) {
                 userName = userName + tenantDomain;
             }
         }
-        if(userName != null && !userName.isEmpty()) {
+        if (userName != null && !userName.isEmpty()) {
             return userName;
         } else {
             Object transportHeaders = messageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
-            if(transportHeaders != null) {
-                String basicAuthHeader = (String)((Map)transportHeaders).get("Authorization");
-                if(basicAuthHeader != null && !basicAuthHeader.isEmpty()) {
-
-                    String basicAuthHeaderValue = new String(Base64.decodeBase64(basicAuthHeader.replace("Basic", "").trim().getBytes()));
-                    String[] basicAuth = basicAuthHeaderValue.split(":");
-                    if(basicAuth.length >= 2) {
-                        userName = basicAuth[0];
-                        return userName;
+            if (transportHeaders != null) {
+                String basicAuthHeader = (String) ((Map) transportHeaders).get("Authorization");
+                if (basicAuthHeader != null && !basicAuthHeader.isEmpty()) {
+                    if (basicAuthHeader.contains("Basic")) {
+                        String basicAuthHeaderValue = new String(
+                                Base64.decodeBase64(basicAuthHeader.replace("Basic", "").trim().getBytes()));
+                        String[] basicAuth = basicAuthHeaderValue.split(":");
+                        if (basicAuth.length >= 2) {
+                            userName = basicAuth[0];
+                            return userName;
+                        }
+                    } else {
+                        return "";
                     }
                 }
             }
         }
-        if(MessageTracerConstants.AUTHENTICATION_ADMIN.equalsIgnoreCase(messageContext.getAxisService().getName()) &&
-           MessageTracerConstants.MESSAGE_DIRECTION.equalsIgnoreCase(messageContext.getAxisMessage().getDirection())
-           && MessageTracerConstants.AUTHENTICATION_OPERATION.equalsIgnoreCase(messageContext.getAxisOperation().getName().getLocalPart())) {
+        if (MessageTracerConstants.AUTHENTICATION_ADMIN.equalsIgnoreCase(messageContext.getAxisService().getName())
+                && MessageTracerConstants.MESSAGE_DIRECTION
+                .equalsIgnoreCase(messageContext.getAxisMessage().getDirection())
+                && MessageTracerConstants.AUTHENTICATION_OPERATION
+                .equalsIgnoreCase(messageContext.getAxisOperation().getName().getLocalPart())) {
             try {
                 OMElement responsePayload = messageContext.getEnvelope().getBody().getFirstElement();
-                if(responsePayload != null) {
-                    userName = responsePayload.getFirstChildWithName(new QName(responsePayload.getNamespace().getNamespaceURI()
-                            , "username", responsePayload.getNamespace().getPrefix())).getText();
+                if (responsePayload != null) {
+                    userName = responsePayload.getFirstChildWithName(
+                            new QName(responsePayload.getNamespace().getNamespaceURI(), "username",
+                                    responsePayload.getNamespace().getPrefix())).getText();
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 LOG.error("Error while trying to get the user name form authentication request", e);
             }
             return userName;
@@ -151,27 +160,28 @@ public class HandlerUtils {
     public static String getUserNameOUT(MessageContext messageContext) {
         //getting username from messageContext
         String userName = "";
-        if(messageContext == null) {
+        if (messageContext == null) {
             return userName;
         }
         userName = CarbonContext.getThreadLocalCarbonContext().getUsername();
-        if(userName != null && !userName.isEmpty()) {
+        if (userName != null && !userName.isEmpty()) {
             return userName;
         } else {
             Object transportHeaders = messageContext.getProperty(MessageContext.TRANSPORT_HEADERS);
-            if(transportHeaders != null) {
-                String basicAuthHeader = (String)((Map)transportHeaders).get("Authorization");
-                if(basicAuthHeader != null && !basicAuthHeader.isEmpty()) {
-                    String basicAuthHeaderValue = new String(Base64.decodeBase64(basicAuthHeader.replace("Basic", "").trim().getBytes()));
+            if (transportHeaders != null) {
+                String basicAuthHeader = (String) ((Map) transportHeaders).get("Authorization");
+                if (basicAuthHeader != null && !basicAuthHeader.isEmpty()) {
+                    String basicAuthHeaderValue = new String(
+                            Base64.decodeBase64(basicAuthHeader.replace("Basic", "").trim().getBytes()));
                     String[] basicAuth = basicAuthHeaderValue.split(":");
-                    if(basicAuth.length >= 2) {
+                    if (basicAuth.length >= 2) {
                         userName = basicAuth[0];
                         return userName;
                     }
                 }
             }
+            //returning empty value if unable to fetch the username
+            return "";
         }
-        //returning empty value if unable to fetch the username
-        return "";
     }
 }
