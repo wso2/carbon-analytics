@@ -97,7 +97,9 @@ queries:
   -
    mappings:
      IS_TABLE_EXIST: SELECT 1 FROM {{TABLE_NAME}} WHERE rownum=1
-     CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id NUMBER(10) NOT NULL, timestamp LONG, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event BLOB, cause VARCHAR(1000), stackTrace BLOB, originalPayload BLOB, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50)); ALTER TABLE {{TABLE_NAME}} ADD (CONSTRAINT err_store_pk PRIMARY KEY (id)); CREATE SEQUENCE err_store_seq START WITH 1;
+     # Below CREATE_TABLE query is valid for oracle 12 or higher only. If using with lower version need to run create table query manually in below format.
+     # eg: CREATE TABLE SIDDHI_ERROR_STORE_TABLE (id NUMBER(10) NOT NULL, timestamp LONG, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event BLOB, cause VARCHAR(1000), stackTrace BLOB, originalPayload BLOB, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50)); ALTER TABLE SIDDHI_ERROR_STORE_TABLE ADD (CONSTRAINT err_store_pk PRIMARY KEY (id)); CREATE SEQUENCE err_store_seq START WITH 1; CREATE OR REPLACE TRIGGER err_store_trigger BEFORE INSERT ON SIDDHI_ERROR_STORE_TABLE FOR EACH ROW BEGIN SELECT err_store_seq.NEXTVAL INTO   :new.id FROM   dual; END;
+     CREATE_TABLE: CREATE TABLE {{TABLE_NAME}} (id NUMBER(10) GENERATED ALWAYS as IDENTITY(START with 1 INCREMENT by 1) NOT NULL, timestamp LONG, siddhiAppName VARCHAR(100), streamName VARCHAR(100), event BLOB, cause VARCHAR(1000), stackTrace BLOB, originalPayload BLOB, errorOccurrence VARCHAR(50), eventType VARCHAR(50), errorType VARCHAR(50))
      INSERT: INSERT INTO {{TABLE_NAME}} (timestamp, siddhiAppName, streamName, event, cause, stackTrace, originalPayload, errorOccurrence, eventType, errorType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      SELECT: SELECT * FROM {{TABLE_NAME}} WHERE siddhiAppName = ?
      SELECT_SINGLE: SELECT * FROM {{TABLE_NAME}} WHERE id = ?
