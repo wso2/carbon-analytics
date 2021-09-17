@@ -667,23 +667,26 @@ SiddhiQLLexer.prototype.action = function(localctx, ruleIndex, actionIndex) {
 	}
 };
 
-SiddhiQLLexer.prototype.ID_QUOTES_action = function(localctx , actionIndex) {
-	switch (actionIndex) {
-	case 0:
-		setText(getText().substring(1, getText().length()-1));
-		break;
-	default:
-		throw "No registered action for:" + actionIndex;
-	}
+SiddhiQLLexer.prototype.ID_QUOTES_action = function (localctx, actionIndex) {
+    switch (actionIndex) {
+        case 0:
+            // setText(getText().substring(1, getText().length()-1));
+            this.text = this.text.substring(1, this.text.length - 1);
+            break;
+        default:
+            throw "No registered action for:" + actionIndex;
+    }
 };
 
 SiddhiQLLexer.prototype.STRING_LITERAL_action = function(localctx , actionIndex) {
 	switch (actionIndex) {
 	case 1:
-		setText(getText().substring(1, getText().length()-1));
+        // setText(getText().substring(1, getText().length()-1));
+        this.text = this.text.substring(1, this.text.length - 1);
 		break;
 	case 2:
-		setText(getText().substring(3, getText().length()-3));
+		//setText(getText().substring(3, getText().length()-3));
+        this.text = this.text.substring(3, this.text.length - 3);
 		break;
 	default:
 		throw "No registered action for:" + actionIndex;
