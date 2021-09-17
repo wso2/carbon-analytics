@@ -1,6 +1,6 @@
 // Generated from SiddhiQL.g4 by ANTLR 4.5
 // jshint ignore: start
-var antlr4 = require('../../antlr4-js-runtime/index');
+var antlr4 = require('antlr4/index');
 
 // This class defines a complete listener for a parse tree produced by SiddhiQLParser.
 function SiddhiQLListener() {

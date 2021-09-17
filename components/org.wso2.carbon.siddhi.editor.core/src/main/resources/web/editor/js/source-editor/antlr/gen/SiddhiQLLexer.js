@@ -1,6 +1,6 @@
 // Generated from SiddhiQL.g4 by ANTLR 4.5
 // jshint ignore: start
-var antlr4 = require('../../antlr4-js-runtime/index');
+var antlr4 = require('antlr4/index');
 
 
 	//import io.siddhi.query.compiler.exception.SiddhiParserException;
@@ -667,28 +667,28 @@ SiddhiQLLexer.prototype.action = function(localctx, ruleIndex, actionIndex) {
 	}
 };
 
-SiddhiQLLexer.prototype.ID_QUOTES_action = function (localctx, actionIndex) {
-    switch (actionIndex) {
-        case 0:
-            // setText(getText().substring(1, getText().length()-1));
-            this.text = this.text.substring(1, this.text.length - 1);
-            break;
-        default:
-            throw "No registered action for:" + actionIndex;
-    }
+SiddhiQLLexer.prototype.ID_QUOTES_action = function(localctx , actionIndex) {
+	switch (actionIndex) {
+	case 0:
+		setText(getText().substring(1, getText().length()-1));
+		break;
+	default:
+		throw "No registered action for:" + actionIndex;
+	}
 };
 
-SiddhiQLLexer.prototype.STRING_LITERAL_action = function (localctx, actionIndex) {
-    switch (actionIndex) {
-        case 1:
-            // setText(getText().substring(1, getText().length()-1));
-            this.text = this.text.substring(1, this.text.length - 1);
-            break;
-        default:
-            throw "No registered action for:" + actionIndex;
-    }
+SiddhiQLLexer.prototype.STRING_LITERAL_action = function(localctx , actionIndex) {
+	switch (actionIndex) {
+	case 1:
+		setText(getText().substring(1, getText().length()-1));
+		break;
+	case 2:
+		setText(getText().substring(3, getText().length()-3));
+		break;
+	default:
+		throw "No registered action for:" + actionIndex;
+	}
 };
-
 
 
 exports.SiddhiQLLexer = SiddhiQLLexer;
