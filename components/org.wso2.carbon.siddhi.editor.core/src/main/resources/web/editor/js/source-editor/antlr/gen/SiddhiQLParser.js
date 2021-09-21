@@ -1,7 +1,6 @@
 // Generated from SiddhiQL.g4 by ANTLR 4.5
 // jshint ignore: start
 var antlr4 = require('../../antlr4-js-runtime/index');
-
 var SiddhiQLListener = require('./SiddhiQLListener').SiddhiQLListener;
 
 	//import io.siddhi.query.compiler.exception.SiddhiParserException;
@@ -130,117 +129,117 @@ var serializedATN = ["\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u00cc\u00ce\u00d0\u00d2\u00d4\u00d6\u00d8\u00da\u00dc\u00de\u00e0\u00e2",
     "\u00e4\u00e6\u00e8\u00ea\u00ec\u00ee\u00f0\u00f2\u00f4\u00f6\u00f8\u00fa",
     "\u00fc\u00fe\u0100\u0102\u0104\u0106\u0108\u010a\u010c\u010e\u0110\2",
-    "\13\3\2Y_\3\2\60\61\3\2OQ\5\2\b\b\n\n\25\25\3\2ci\3\2mn\b\2!\"%.\60",
-    "\65\67ACDFi\4\2\23\23\25\25\3\2ab\u0714\2\u0112\3\2\2\2\4\u0115\3\2",
-    "\2\2\6\u011b\3\2\2\2\b\u0145\3\2\2\2\n\u0147\3\2\2\2\f\u0150\3\2\2\2",
-    "\16\u0164\3\2\2\2\20\u016d\3\2\2\2\22\u0181\3\2\2\2\24\u018a\3\2\2\2",
-    "\26\u01a2\3\2\2\2\30\u01c2\3\2\2\2\32\u01c4\3\2\2\2\34\u01d2\3\2\2\2",
-    "\36\u01d8\3\2\2\2 \u01e2\3\2\2\2\"\u01e4\3\2\2\2$\u01e6\3\2\2\2&\u01e8",
-    "\3\2\2\2(\u01ee\3\2\2\2*\u01f7\3\2\2\2,\u01f9\3\2\2\2.\u0202\3\2\2\2",
-    "\60\u0213\3\2\2\2\62\u0217\3\2\2\2\64\u0219\3\2\2\2\66\u021b\3\2\2\2",
-    "8\u021f\3\2\2\2:\u0227\3\2\2\2<\u023c\3\2\2\2>\u0250\3\2\2\2@\u0257",
-    "\3\2\2\2B\u027a\3\2\2\2D\u0288\3\2\2\2F\u028a\3\2\2\2H\u0292\3\2\2\2",
-    "J\u0296\3\2\2\2L\u029f\3\2\2\2N\u02b1\3\2\2\2P\u02b3\3\2\2\2R\u02bd",
-    "\3\2\2\2T\u02d2\3\2\2\2V\u02e5\3\2\2\2X\u02f4\3\2\2\2Z\u0304\3\2\2\2",
-    "\\\u0318\3\2\2\2^\u032a\3\2\2\2`\u0347\3\2\2\2b\u0358\3\2\2\2d\u0362",
-    "\3\2\2\2f\u038a\3\2\2\2h\u038d\3\2\2\2j\u0391\3\2\2\2l\u0395\3\2\2\2",
-    "n\u039d\3\2\2\2p\u03a1\3\2\2\2r\u03a6\3\2\2\2t\u03ac\3\2\2\2v\u03b6",
-    "\3\2\2\2x\u03b9\3\2\2\2z\u03cd\3\2\2\2|\u03d6\3\2\2\2~\u03e5\3\2\2\2",
-    "\u0080\u03ff\3\2\2\2\u0082\u0412\3\2\2\2\u0084\u0420\3\2\2\2\u0086\u0422",
-    "\3\2\2\2\u0088\u043c\3\2\2\2\u008a\u043f\3\2\2\2\u008c\u0445\3\2\2\2",
-    "\u008e\u0448\3\2\2\2\u0090\u044d\3\2\2\2\u0092\u045c\3\2\2\2\u0094\u0477",
-    "\3\2\2\2\u0096\u0481\3\2\2\2\u0098\u0484\3\2\2\2\u009a\u048e\3\2\2\2",
-    "\u009c\u0492\3\2\2\2\u009e\u0494\3\2\2\2\u00a0\u0497\3\2\2\2\u00a2\u04c8",
-    "\3\2\2\2\u00a4\u04d7\3\2\2\2\u00a6\u04d9\3\2\2\2\u00a8\u04e2\3\2\2\2",
-    "\u00aa\u04ee\3\2\2\2\u00ac\u04fe\3\2\2\2\u00ae\u0500\3\2\2\2\u00b0\u0502",
-    "\3\2\2\2\u00b2\u0505\3\2\2\2\u00b4\u0508\3\2\2\2\u00b6\u050e\3\2\2\2",
-    "\u00b8\u0516\3\2\2\2\u00ba\u0518\3\2\2\2\u00bc\u051a\3\2\2\2\u00be\u0527",
-    "\3\2\2\2\u00c0\u0555\3\2\2\2\u00c2\u0567\3\2\2\2\u00c4\u056c\3\2\2\2",
-    "\u00c6\u0573\3\2\2\2\u00c8\u0595\3\2\2\2\u00ca\u059d\3\2\2\2\u00cc\u059f",
-    "\3\2\2\2\u00ce\u05a1\3\2\2\2\u00d0\u05a3\3\2\2\2\u00d2\u05a5\3\2\2\2",
-    "\u00d4\u05a7\3\2\2\2\u00d6\u05b3\3\2\2\2\u00d8\u05b5\3\2\2\2\u00da\u05b7",
-    "\3\2\2\2\u00dc\u05b9\3\2\2\2\u00de\u05bb\3\2\2\2\u00e0\u05bf\3\2\2\2",
-    "\u00e2\u05c3\3\2\2\2\u00e4\u05c5\3\2\2\2\u00e6\u05c9\3\2\2\2\u00e8\u05d3",
-    "\3\2\2\2\u00ea\u05d5\3\2\2\2\u00ec\u05e6\3\2\2\2\u00ee\u05ef\3\2\2\2",
-    "\u00f0\u05f1\3\2\2\2\u00f2\u05f3\3\2\2\2\u00f4\u0651\3\2\2\2\u00f6\u0653",
-    "\3\2\2\2\u00f8\u0656\3\2\2\2\u00fa\u0659\3\2\2\2\u00fc\u065c\3\2\2\2",
-    "\u00fe\u065f\3\2\2\2\u0100\u0662\3\2\2\2\u0102\u0665\3\2\2\2\u0104\u0668",
-    "\3\2\2\2\u0106\u066c\3\2\2\2\u0108\u0671\3\2\2\2\u010a\u0676\3\2\2\2",
-    "\u010c\u067b\3\2\2\2\u010e\u067f\3\2\2\2\u0110\u0681\3\2\2\2\u0112\u0113",
-    "\5\6\4\2\u0113\u0114\7\2\2\3\u0114\3\3\2\2\2\u0115\u0116\7s\2\2\u0116",
-    "\5\3\2\2\2\u0117\u011a\5<\37\2\u0118\u011a\5\4\3\2\u0119\u0117\3\2\2",
-    "\2\u0119\u0118\3\2\2\2\u011a\u011d\3\2\2\2\u011b\u0119\3\2\2\2\u011b",
-    "\u011c\3\2\2\2\u011c\u0125\3\2\2\2\u011d\u011b\3\2\2\2\u011e\u0126\5",
-    "\f\7\2\u011f\u0126\5\20\t\2\u0120\u0126\5(\25\2\u0121\u0126\5\36\20",
-    "\2\u0122\u0126\5\24\13\2\u0123\u0126\5.\30\2\u0124\u0126\5\4\3\2\u0125",
-    "\u011e\3\2\2\2\u0125\u011f\3\2\2\2\u0125\u0120\3\2\2\2\u0125\u0121\3",
-    "\2\2\2\u0125\u0122\3\2\2\2\u0125\u0123\3\2\2\2\u0125\u0124\3\2\2\2\u0126",
-    "\u0133\3\2\2\2\u0127\u012f\7\t\2\2\u0128\u0130\5\f\7\2\u0129\u0130\5",
-    "\20\t\2\u012a\u0130\5(\25\2\u012b\u0130\5\36\20\2\u012c\u0130\5\24\13",
-    "\2\u012d\u0130\5.\30\2\u012e\u0130\5\4\3\2\u012f\u0128\3\2\2\2\u012f",
-    "\u0129\3\2\2\2\u012f\u012a\3\2\2\2\u012f\u012b\3\2\2\2\u012f\u012c\3",
-    "\2\2\2\u012f\u012d\3\2\2\2\u012f\u012e\3\2\2\2\u0130\u0132\3\2\2\2\u0131",
-    "\u0127\3\2\2\2\u0132\u0135\3\2\2\2\u0133\u0131\3\2\2\2\u0133\u0134\3",
-    "\2\2\2\u0134\u013d\3\2\2\2\u0135\u0133\3\2\2\2\u0136\u0139\7\t\2\2\u0137",
-    "\u013a\5\b\5\2\u0138\u013a\5\4\3\2\u0139\u0137\3\2\2\2\u0139\u0138\3",
-    "\2\2\2\u013a\u013c\3\2\2\2\u013b\u0136\3\2\2\2\u013c\u013f\3\2\2\2\u013d",
-    "\u013b\3\2\2\2\u013d\u013e\3\2\2\2\u013e\u0141\3\2\2\2\u013f\u013d\3",
-    "\2\2\2\u0140\u0142\7\t\2\2\u0141\u0140\3\2\2\2\u0141\u0142\3\2\2\2\u0142",
-    "\7\3\2\2\2\u0143\u0146\5L\'\2\u0144\u0146\5@!\2\u0145\u0143\3\2\2\2",
-    "\u0145\u0144\3\2\2\2\u0146\t\3\2\2\2\u0147\u0149\5\f\7\2\u0148\u014a",
-    "\7\t\2\2\u0149\u0148\3\2\2\2\u0149\u014a\3\2\2\2\u014a\u014b\3\2\2\2",
-    "\u014b\u014c\7\2\2\3\u014c\13\3\2\2\2\u014d\u014f\5:\36\2\u014e\u014d",
-    "\3\2\2\2\u014f\u0152\3\2\2\2\u0150\u014e\3\2\2\2\u0150\u0151\3\2\2\2",
-    "\u0151\u0153\3\2\2\2\u0152\u0150\3\2\2\2\u0153\u0154\7\"\2\2\u0154\u0155",
-    "\7!\2\2\u0155\u0156\5\u00e0q\2\u0156\u0157\7\f\2\2\u0157\u0158\5\u00d8",
-    "m\2\u0158\u015f\5\u00eav\2\u0159\u015a\7\20\2\2\u015a\u015b\5\u00d8",
-    "m\2\u015b\u015c\5\u00eav\2\u015c\u015e\3\2\2\2\u015d\u0159\3\2\2\2\u015e",
-    "\u0161\3\2\2\2\u015f\u015d\3\2\2\2\u015f\u0160\3\2\2\2\u0160\u0162\3",
-    "\2\2\2\u0161\u015f\3\2\2\2\u0162\u0163\7\r\2\2\u0163\r\3\2\2\2\u0164",
-    "\u0166\5\20\t\2\u0165\u0167\7\t\2\2\u0166\u0165\3\2\2\2\u0166\u0167",
-    "\3\2\2\2\u0167\u0168\3\2\2\2\u0168\u0169\7\2\2\3\u0169\17\3\2\2\2\u016a",
-    "\u016c\5:\36\2\u016b\u016a\3\2\2\2\u016c\u016f\3\2\2\2\u016d\u016b\3",
-    "\2\2\2\u016d\u016e\3\2\2\2\u016e\u0170\3\2\2\2\u016f\u016d\3\2\2\2\u0170",
-    "\u0171\7\"\2\2\u0171\u0172\7%\2\2\u0172\u0173\5\u00e0q\2\u0173\u0174",
-    "\7\f\2\2\u0174\u0175\5\u00d8m\2\u0175\u017c\5\u00eav\2\u0176\u0177\7",
-    "\20\2\2\u0177\u0178\5\u00d8m\2\u0178\u0179\5\u00eav\2\u0179\u017b\3",
-    "\2\2\2\u017a\u0176\3\2\2\2\u017b\u017e\3\2\2\2\u017c\u017a\3\2\2\2\u017c",
-    "\u017d\3\2\2\2\u017d\u017f\3\2\2\2\u017e\u017c\3\2\2\2\u017f\u0180\7",
-    "\r\2\2\u0180\21\3\2\2\2\u0181\u0183\5\24\13\2\u0182\u0184\7\t\2\2\u0183",
-    "\u0182\3\2\2\2\u0183\u0184\3\2\2\2\u0184\u0185\3\2\2\2\u0185\u0186\7",
-    "\2\2\3\u0186\23\3\2\2\2\u0187\u0189\5:\36\2\u0188\u0187\3\2\2\2\u0189",
-    "\u018c\3\2\2\2\u018a\u0188\3\2\2\2\u018a\u018b\3\2\2\2\u018b\u018d\3",
-    "\2\2\2\u018c\u018a\3\2\2\2\u018d\u018e\7\"\2\2\u018e\u018f\7)\2\2\u018f",
-    "\u0190\5\u00e0q\2\u0190\u0191\7\f\2\2\u0191\u0192\5\u00d8m\2\u0192\u0199",
-    "\5\u00eav\2\u0193\u0194\7\20\2\2\u0194\u0195\5\u00d8m\2\u0195\u0196",
-    "\5\u00eav\2\u0196\u0198\3\2\2\2\u0197\u0193\3\2\2\2\u0198\u019b\3\2",
-    "\2\2\u0199\u0197\3\2\2\2\u0199\u019a\3\2\2\2\u019a\u019c\3\2\2\2\u019b",
-    "\u0199\3\2\2\2\u019c\u019d\7\r\2\2\u019d\u01a0\5\u00c0a\2\u019e\u019f",
-    "\7:\2\2\u019f\u01a1\5\u00aaV\2\u01a0\u019e\3\2\2\2\u01a0\u01a1\3\2\2",
-    "\2\u01a1\25\3\2\2\2\u01a2\u01a4\5\30\r\2\u01a3\u01a5\7\t\2\2\u01a4\u01a3",
-    "\3\2\2\2\u01a4\u01a5\3\2\2\2\u01a5\u01a6\3\2\2\2\u01a6\u01a7\7\2\2\3",
-    "\u01a7\27\3\2\2\2\u01a8\u01a9\7\'\2\2\u01a9\u01ab\5\32\16\2\u01aa\u01ac",
-    "\5\u0092J\2\u01ab\u01aa\3\2\2\2\u01ab\u01ac\3\2\2\2\u01ac\u01c3\3\2",
-    "\2\2\u01ad\u01ae\5\u0092J\2\u01ae\u01af\7\63\2\2\u01af\u01b0\79\2\2",
-    "\u01b0\u01b1\5\u00e2r\2\u01b1\u01c3\3\2\2\2\u01b2\u01b3\5\u0092J\2\u01b3",
-    "\u01b4\7\65\2\2\u01b4\u01b5\7C\2\2\u01b5\u01b6\7\63\2\2\u01b6\u01b7",
-    "\79\2\2\u01b7\u01b9\5\u00e2r\2\u01b8\u01ba\5\u00a6T\2\u01b9\u01b8\3",
-    "\2\2\2\u01b9\u01ba\3\2\2\2\u01ba\u01bb\3\2\2\2\u01bb\u01bc\7F\2\2\u01bc",
-    "\u01bd\5\u00bc_\2\u01bd\u01c3\3\2\2\2\u01be\u01c0\5\u0092J\2\u01bf\u01be",
-    "\3\2\2\2\u01bf\u01c0\3\2\2\2\u01c0\u01c1\3\2\2\2\u01c1\u01c3\5\u00a4",
-    "S\2\u01c2\u01a8\3\2\2\2\u01c2\u01ad\3\2\2\2\u01c2\u01b2\3\2\2\2\u01c2",
-    "\u01bf\3\2\2\2\u01c3\31\3\2\2\2\u01c4\u01c7\5\u00d2j\2\u01c5\u01c6\7",
-    "A\2\2\u01c6\u01c8\5\u00d4k\2\u01c7\u01c5\3\2\2\2\u01c7\u01c8\3\2\2\2",
-    "\u01c8\u01cb\3\2\2\2\u01c9\u01ca\7F\2\2\u01ca\u01cc\5\u00bc_\2\u01cb",
-    "\u01c9\3\2\2\2\u01cb\u01cc\3\2\2\2\u01cc\u01d0\3\2\2\2\u01cd\u01ce\5",
-    "\u00b4[\2\u01ce\u01cf\5\u00b6\\\2\u01cf\u01d1\3\2\2\2\u01d0\u01cd\3",
-    "\2\2\2\u01d0\u01d1\3\2\2\2\u01d1\33\3\2\2\2\u01d2\u01d4\5\36\20\2\u01d3",
-    "\u01d5\7\t\2\2\u01d4\u01d3\3\2\2\2\u01d4\u01d5\3\2\2\2\u01d5\u01d6\3",
-    "\2\2\2\u01d6\u01d7\7\2\2\3\u01d7\35\3\2\2\2\u01d8\u01d9\7\"\2\2\u01d9",
-    "\u01da\7#\2\2\u01da\u01db\5 \21\2\u01db\u01dc\7\16\2\2\u01dc\u01dd\5",
-    "\"\22\2\u01dd\u01de\7\17\2\2\u01de\u01df\7\67\2\2\u01df\u01e0\5\u00ea",
-    "v\2\u01e0\u01e1\5$\23\2\u01e1\37\3\2\2\2\u01e2\u01e3\5\u00f0y\2\u01e3",
-    "!\3\2\2\2\u01e4\u01e5\5\u00f0y\2\u01e5#\3\2\2\2\u01e6\u01e7\7t\2\2\u01e7",
+    "\13\3\2Y_\3\2\60\61\3\2OQ\5\2\b\b\n\n\25\25\3\2ci\3\2mn\3\2!l\4\2\23",
+    "\23\25\25\3\2ab\u0714\2\u0112\3\2\2\2\4\u0115\3\2\2\2\6\u011b\3\2\2",
+    "\2\b\u0145\3\2\2\2\n\u0147\3\2\2\2\f\u0150\3\2\2\2\16\u0164\3\2\2\2",
+    "\20\u016d\3\2\2\2\22\u0181\3\2\2\2\24\u018a\3\2\2\2\26\u01a2\3\2\2\2",
+    "\30\u01c2\3\2\2\2\32\u01c4\3\2\2\2\34\u01d2\3\2\2\2\36\u01d8\3\2\2\2",
+    " \u01e2\3\2\2\2\"\u01e4\3\2\2\2$\u01e6\3\2\2\2&\u01e8\3\2\2\2(\u01ee",
+    "\3\2\2\2*\u01f7\3\2\2\2,\u01f9\3\2\2\2.\u0202\3\2\2\2\60\u0213\3\2\2",
+    "\2\62\u0217\3\2\2\2\64\u0219\3\2\2\2\66\u021b\3\2\2\28\u021f\3\2\2\2",
+    ":\u0227\3\2\2\2<\u023c\3\2\2\2>\u0250\3\2\2\2@\u0257\3\2\2\2B\u027a",
+    "\3\2\2\2D\u0288\3\2\2\2F\u028a\3\2\2\2H\u0292\3\2\2\2J\u0296\3\2\2\2",
+    "L\u029f\3\2\2\2N\u02b1\3\2\2\2P\u02b3\3\2\2\2R\u02bd\3\2\2\2T\u02d2",
+    "\3\2\2\2V\u02e5\3\2\2\2X\u02f4\3\2\2\2Z\u0304\3\2\2\2\\\u0318\3\2\2",
+    "\2^\u032a\3\2\2\2`\u0347\3\2\2\2b\u0358\3\2\2\2d\u0362\3\2\2\2f\u038a",
+    "\3\2\2\2h\u038d\3\2\2\2j\u0391\3\2\2\2l\u0395\3\2\2\2n\u039d\3\2\2\2",
+    "p\u03a1\3\2\2\2r\u03a6\3\2\2\2t\u03ac\3\2\2\2v\u03b6\3\2\2\2x\u03b9",
+    "\3\2\2\2z\u03cd\3\2\2\2|\u03d6\3\2\2\2~\u03e5\3\2\2\2\u0080\u03ff\3",
+    "\2\2\2\u0082\u0412\3\2\2\2\u0084\u0420\3\2\2\2\u0086\u0422\3\2\2\2\u0088",
+    "\u043c\3\2\2\2\u008a\u043f\3\2\2\2\u008c\u0445\3\2\2\2\u008e\u0448\3",
+    "\2\2\2\u0090\u044d\3\2\2\2\u0092\u045c\3\2\2\2\u0094\u0477\3\2\2\2\u0096",
+    "\u0481\3\2\2\2\u0098\u0484\3\2\2\2\u009a\u048e\3\2\2\2\u009c\u0492\3",
+    "\2\2\2\u009e\u0494\3\2\2\2\u00a0\u0497\3\2\2\2\u00a2\u04c8\3\2\2\2\u00a4",
+    "\u04d7\3\2\2\2\u00a6\u04d9\3\2\2\2\u00a8\u04e2\3\2\2\2\u00aa\u04ee\3",
+    "\2\2\2\u00ac\u04fe\3\2\2\2\u00ae\u0500\3\2\2\2\u00b0\u0502\3\2\2\2\u00b2",
+    "\u0505\3\2\2\2\u00b4\u0508\3\2\2\2\u00b6\u050e\3\2\2\2\u00b8\u0516\3",
+    "\2\2\2\u00ba\u0518\3\2\2\2\u00bc\u051a\3\2\2\2\u00be\u0527\3\2\2\2\u00c0",
+    "\u0555\3\2\2\2\u00c2\u0567\3\2\2\2\u00c4\u056c\3\2\2\2\u00c6\u0573\3",
+    "\2\2\2\u00c8\u0595\3\2\2\2\u00ca\u059d\3\2\2\2\u00cc\u059f\3\2\2\2\u00ce",
+    "\u05a1\3\2\2\2\u00d0\u05a3\3\2\2\2\u00d2\u05a5\3\2\2\2\u00d4\u05a7\3",
+    "\2\2\2\u00d6\u05b3\3\2\2\2\u00d8\u05b5\3\2\2\2\u00da\u05b7\3\2\2\2\u00dc",
+    "\u05b9\3\2\2\2\u00de\u05bb\3\2\2\2\u00e0\u05bf\3\2\2\2\u00e2\u05c3\3",
+    "\2\2\2\u00e4\u05c5\3\2\2\2\u00e6\u05c9\3\2\2\2\u00e8\u05d3\3\2\2\2\u00ea",
+    "\u05d5\3\2\2\2\u00ec\u05e6\3\2\2\2\u00ee\u05ef\3\2\2\2\u00f0\u05f1\3",
+    "\2\2\2\u00f2\u05f3\3\2\2\2\u00f4\u0651\3\2\2\2\u00f6\u0653\3\2\2\2\u00f8",
+    "\u0656\3\2\2\2\u00fa\u0659\3\2\2\2\u00fc\u065c\3\2\2\2\u00fe\u065f\3",
+    "\2\2\2\u0100\u0662\3\2\2\2\u0102\u0665\3\2\2\2\u0104\u0668\3\2\2\2\u0106",
+    "\u066c\3\2\2\2\u0108\u0671\3\2\2\2\u010a\u0676\3\2\2\2\u010c\u067b\3",
+    "\2\2\2\u010e\u067f\3\2\2\2\u0110\u0681\3\2\2\2\u0112\u0113\5\6\4\2\u0113",
+    "\u0114\7\2\2\3\u0114\3\3\2\2\2\u0115\u0116\7s\2\2\u0116\5\3\2\2\2\u0117",
+    "\u011a\5<\37\2\u0118\u011a\5\4\3\2\u0119\u0117\3\2\2\2\u0119\u0118\3",
+    "\2\2\2\u011a\u011d\3\2\2\2\u011b\u0119\3\2\2\2\u011b\u011c\3\2\2\2\u011c",
+    "\u0125\3\2\2\2\u011d\u011b\3\2\2\2\u011e\u0126\5\f\7\2\u011f\u0126\5",
+    "\20\t\2\u0120\u0126\5(\25\2\u0121\u0126\5\36\20\2\u0122\u0126\5\24\13",
+    "\2\u0123\u0126\5.\30\2\u0124\u0126\5\4\3\2\u0125\u011e\3\2\2\2\u0125",
+    "\u011f\3\2\2\2\u0125\u0120\3\2\2\2\u0125\u0121\3\2\2\2\u0125\u0122\3",
+    "\2\2\2\u0125\u0123\3\2\2\2\u0125\u0124\3\2\2\2\u0126\u0133\3\2\2\2\u0127",
+    "\u012f\7\t\2\2\u0128\u0130\5\f\7\2\u0129\u0130\5\20\t\2\u012a\u0130",
+    "\5(\25\2\u012b\u0130\5\36\20\2\u012c\u0130\5\24\13\2\u012d\u0130\5.",
+    "\30\2\u012e\u0130\5\4\3\2\u012f\u0128\3\2\2\2\u012f\u0129\3\2\2\2\u012f",
+    "\u012a\3\2\2\2\u012f\u012b\3\2\2\2\u012f\u012c\3\2\2\2\u012f\u012d\3",
+    "\2\2\2\u012f\u012e\3\2\2\2\u0130\u0132\3\2\2\2\u0131\u0127\3\2\2\2\u0132",
+    "\u0135\3\2\2\2\u0133\u0131\3\2\2\2\u0133\u0134\3\2\2\2\u0134\u013d\3",
+    "\2\2\2\u0135\u0133\3\2\2\2\u0136\u0139\7\t\2\2\u0137\u013a\5\b\5\2\u0138",
+    "\u013a\5\4\3\2\u0139\u0137\3\2\2\2\u0139\u0138\3\2\2\2\u013a\u013c\3",
+    "\2\2\2\u013b\u0136\3\2\2\2\u013c\u013f\3\2\2\2\u013d\u013b\3\2\2\2\u013d",
+    "\u013e\3\2\2\2\u013e\u0141\3\2\2\2\u013f\u013d\3\2\2\2\u0140\u0142\7",
+    "\t\2\2\u0141\u0140\3\2\2\2\u0141\u0142\3\2\2\2\u0142\7\3\2\2\2\u0143",
+    "\u0146\5L\'\2\u0144\u0146\5@!\2\u0145\u0143\3\2\2\2\u0145\u0144\3\2",
+    "\2\2\u0146\t\3\2\2\2\u0147\u0149\5\f\7\2\u0148\u014a\7\t\2\2\u0149\u0148",
+    "\3\2\2\2\u0149\u014a\3\2\2\2\u014a\u014b\3\2\2\2\u014b\u014c\7\2\2\3",
+    "\u014c\13\3\2\2\2\u014d\u014f\5:\36\2\u014e\u014d\3\2\2\2\u014f\u0152",
+    "\3\2\2\2\u0150\u014e\3\2\2\2\u0150\u0151\3\2\2\2\u0151\u0153\3\2\2\2",
+    "\u0152\u0150\3\2\2\2\u0153\u0154\7\"\2\2\u0154\u0155\7!\2\2\u0155\u0156",
+    "\5\u00e0q\2\u0156\u0157\7\f\2\2\u0157\u0158\5\u00d8m\2\u0158\u015f\5",
+    "\u00eav\2\u0159\u015a\7\20\2\2\u015a\u015b\5\u00d8m\2\u015b\u015c\5",
+    "\u00eav\2\u015c\u015e\3\2\2\2\u015d\u0159\3\2\2\2\u015e\u0161\3\2\2",
+    "\2\u015f\u015d\3\2\2\2\u015f\u0160\3\2\2\2\u0160\u0162\3\2\2\2\u0161",
+    "\u015f\3\2\2\2\u0162\u0163\7\r\2\2\u0163\r\3\2\2\2\u0164\u0166\5\20",
+    "\t\2\u0165\u0167\7\t\2\2\u0166\u0165\3\2\2\2\u0166\u0167\3\2\2\2\u0167",
+    "\u0168\3\2\2\2\u0168\u0169\7\2\2\3\u0169\17\3\2\2\2\u016a\u016c\5:\36",
+    "\2\u016b\u016a\3\2\2\2\u016c\u016f\3\2\2\2\u016d\u016b\3\2\2\2\u016d",
+    "\u016e\3\2\2\2\u016e\u0170\3\2\2\2\u016f\u016d\3\2\2\2\u0170\u0171\7",
+    "\"\2\2\u0171\u0172\7%\2\2\u0172\u0173\5\u00e0q\2\u0173\u0174\7\f\2\2",
+    "\u0174\u0175\5\u00d8m\2\u0175\u017c\5\u00eav\2\u0176\u0177\7\20\2\2",
+    "\u0177\u0178\5\u00d8m\2\u0178\u0179\5\u00eav\2\u0179\u017b\3\2\2\2\u017a",
+    "\u0176\3\2\2\2\u017b\u017e\3\2\2\2\u017c\u017a\3\2\2\2\u017c\u017d\3",
+    "\2\2\2\u017d\u017f\3\2\2\2\u017e\u017c\3\2\2\2\u017f\u0180\7\r\2\2\u0180",
+    "\21\3\2\2\2\u0181\u0183\5\24\13\2\u0182\u0184\7\t\2\2\u0183\u0182\3",
+    "\2\2\2\u0183\u0184\3\2\2\2\u0184\u0185\3\2\2\2\u0185\u0186\7\2\2\3\u0186",
+    "\23\3\2\2\2\u0187\u0189\5:\36\2\u0188\u0187\3\2\2\2\u0189\u018c\3\2",
+    "\2\2\u018a\u0188\3\2\2\2\u018a\u018b\3\2\2\2\u018b\u018d\3\2\2\2\u018c",
+    "\u018a\3\2\2\2\u018d\u018e\7\"\2\2\u018e\u018f\7)\2\2\u018f\u0190\5",
+    "\u00e0q\2\u0190\u0191\7\f\2\2\u0191\u0192\5\u00d8m\2\u0192\u0199\5\u00ea",
+    "v\2\u0193\u0194\7\20\2\2\u0194\u0195\5\u00d8m\2\u0195\u0196\5\u00ea",
+    "v\2\u0196\u0198\3\2\2\2\u0197\u0193\3\2\2\2\u0198\u019b\3\2\2\2\u0199",
+    "\u0197\3\2\2\2\u0199\u019a\3\2\2\2\u019a\u019c\3\2\2\2\u019b\u0199\3",
+    "\2\2\2\u019c\u019d\7\r\2\2\u019d\u01a0\5\u00c0a\2\u019e\u019f\7:\2\2",
+    "\u019f\u01a1\5\u00aaV\2\u01a0\u019e\3\2\2\2\u01a0\u01a1\3\2\2\2\u01a1",
+    "\25\3\2\2\2\u01a2\u01a4\5\30\r\2\u01a3\u01a5\7\t\2\2\u01a4\u01a3\3\2",
+    "\2\2\u01a4\u01a5\3\2\2\2\u01a5\u01a6\3\2\2\2\u01a6\u01a7\7\2\2\3\u01a7",
+    "\27\3\2\2\2\u01a8\u01a9\7\'\2\2\u01a9\u01ab\5\32\16\2\u01aa\u01ac\5",
+    "\u0092J\2\u01ab\u01aa\3\2\2\2\u01ab\u01ac\3\2\2\2\u01ac\u01c3\3\2\2",
+    "\2\u01ad\u01ae\5\u0092J\2\u01ae\u01af\7\63\2\2\u01af\u01b0\79\2\2\u01b0",
+    "\u01b1\5\u00e2r\2\u01b1\u01c3\3\2\2\2\u01b2\u01b3\5\u0092J\2\u01b3\u01b4",
+    "\7\65\2\2\u01b4\u01b5\7C\2\2\u01b5\u01b6\7\63\2\2\u01b6\u01b7\79\2\2",
+    "\u01b7\u01b9\5\u00e2r\2\u01b8\u01ba\5\u00a6T\2\u01b9\u01b8\3\2\2\2\u01b9",
+    "\u01ba\3\2\2\2\u01ba\u01bb\3\2\2\2\u01bb\u01bc\7F\2\2\u01bc\u01bd\5",
+    "\u00bc_\2\u01bd\u01c3\3\2\2\2\u01be\u01c0\5\u0092J\2\u01bf\u01be\3\2",
+    "\2\2\u01bf\u01c0\3\2\2\2\u01c0\u01c1\3\2\2\2\u01c1\u01c3\5\u00a4S\2",
+    "\u01c2\u01a8\3\2\2\2\u01c2\u01ad\3\2\2\2\u01c2\u01b2\3\2\2\2\u01c2\u01bf",
+    "\3\2\2\2\u01c3\31\3\2\2\2\u01c4\u01c7\5\u00d2j\2\u01c5\u01c6\7A\2\2",
+    "\u01c6\u01c8\5\u00d4k\2\u01c7\u01c5\3\2\2\2\u01c7\u01c8\3\2\2\2\u01c8",
+    "\u01cb\3\2\2\2\u01c9\u01ca\7F\2\2\u01ca\u01cc\5\u00bc_\2\u01cb\u01c9",
+    "\3\2\2\2\u01cb\u01cc\3\2\2\2\u01cc\u01d0\3\2\2\2\u01cd\u01ce\5\u00b4",
+    "[\2\u01ce\u01cf\5\u00b6\\\2\u01cf\u01d1\3\2\2\2\u01d0\u01cd\3\2\2\2",
+    "\u01d0\u01d1\3\2\2\2\u01d1\33\3\2\2\2\u01d2\u01d4\5\36\20\2\u01d3\u01d5",
+    "\7\t\2\2\u01d4\u01d3\3\2\2\2\u01d4\u01d5\3\2\2\2\u01d5\u01d6\3\2\2\2",
+    "\u01d6\u01d7\7\2\2\3\u01d7\35\3\2\2\2\u01d8\u01d9\7\"\2\2\u01d9\u01da",
+    "\7#\2\2\u01da\u01db\5 \21\2\u01db\u01dc\7\16\2\2\u01dc\u01dd\5\"\22",
+    "\2\u01dd\u01de\7\17\2\2\u01de\u01df\7\67\2\2\u01df\u01e0\5\u00eav\2",
+    "\u01e0\u01e1\5$\23\2\u01e1\37\3\2\2\2\u01e2\u01e3\5\u00f0y\2\u01e3!",
+    "\3\2\2\2\u01e4\u01e5\5\u00f0y\2\u01e5#\3\2\2\2\u01e6\u01e7\7t\2\2\u01e7",
     "%\3\2\2\2\u01e8\u01ea\5(\25\2\u01e9\u01eb\7\t\2\2\u01ea\u01e9\3\2\2",
     "\2\u01ea\u01eb\3\2\2\2\u01eb\u01ec\3\2\2\2\u01ec\u01ed\7\2\2\3\u01ed",
     "\'\3\2\2\2\u01ee\u01ef\7\"\2\2\u01ef\u01f0\7$\2\2\u01f0\u01f1\5*\26",
@@ -3814,6 +3813,8 @@ SiddhiQLParser.prototype.annotation = function() {
             switch(this._input.LA(1)) {
             case SiddhiQLParser.STREAM:
             case SiddhiQLParser.DEFINE:
+            case SiddhiQLParser.FUNCTION:
+            case SiddhiQLParser.TRIGGER:
             case SiddhiQLParser.TABLE:
             case SiddhiQLParser.APP:
             case SiddhiQLParser.FROM:
@@ -3824,12 +3825,14 @@ SiddhiQLParser.prototype.annotation = function() {
             case SiddhiQLParser.BY:
             case SiddhiQLParser.ORDER:
             case SiddhiQLParser.LIMIT:
+            case SiddhiQLParser.OFFSET:
             case SiddhiQLParser.ASC:
             case SiddhiQLParser.DESC:
             case SiddhiQLParser.HAVING:
             case SiddhiQLParser.INSERT:
             case SiddhiQLParser.DELETE:
             case SiddhiQLParser.UPDATE:
+            case SiddhiQLParser.SET:
             case SiddhiQLParser.RETURN:
             case SiddhiQLParser.EVENTS:
             case SiddhiQLParser.INTO:
@@ -3841,8 +3844,10 @@ SiddhiQLParser.prototype.annotation = function() {
             case SiddhiQLParser.RAW:
             case SiddhiQLParser.OF:
             case SiddhiQLParser.AS:
+            case SiddhiQLParser.AT:
             case SiddhiQLParser.OR:
             case SiddhiQLParser.AND:
+            case SiddhiQLParser.IN:
             case SiddhiQLParser.ON:
             case SiddhiQLParser.IS:
             case SiddhiQLParser.NOT:
@@ -3879,6 +3884,9 @@ SiddhiQLParser.prototype.annotation = function() {
             case SiddhiQLParser.DOUBLE:
             case SiddhiQLParser.BOOL:
             case SiddhiQLParser.OBJECT:
+            case SiddhiQLParser.AGGREGATION:
+            case SiddhiQLParser.AGGREGATE:
+            case SiddhiQLParser.PER:
             case SiddhiQLParser.ID_QUOTES:
             case SiddhiQLParser.ID:
             case SiddhiQLParser.STRING_LITERAL:
@@ -3902,6 +3910,8 @@ SiddhiQLParser.prototype.annotation = function() {
                 switch(this._input.LA(1)) {
                 case SiddhiQLParser.STREAM:
                 case SiddhiQLParser.DEFINE:
+                case SiddhiQLParser.FUNCTION:
+                case SiddhiQLParser.TRIGGER:
                 case SiddhiQLParser.TABLE:
                 case SiddhiQLParser.APP:
                 case SiddhiQLParser.FROM:
@@ -3912,12 +3922,14 @@ SiddhiQLParser.prototype.annotation = function() {
                 case SiddhiQLParser.BY:
                 case SiddhiQLParser.ORDER:
                 case SiddhiQLParser.LIMIT:
+                case SiddhiQLParser.OFFSET:
                 case SiddhiQLParser.ASC:
                 case SiddhiQLParser.DESC:
                 case SiddhiQLParser.HAVING:
                 case SiddhiQLParser.INSERT:
                 case SiddhiQLParser.DELETE:
                 case SiddhiQLParser.UPDATE:
+                case SiddhiQLParser.SET:
                 case SiddhiQLParser.RETURN:
                 case SiddhiQLParser.EVENTS:
                 case SiddhiQLParser.INTO:
@@ -3929,8 +3941,10 @@ SiddhiQLParser.prototype.annotation = function() {
                 case SiddhiQLParser.RAW:
                 case SiddhiQLParser.OF:
                 case SiddhiQLParser.AS:
+                case SiddhiQLParser.AT:
                 case SiddhiQLParser.OR:
                 case SiddhiQLParser.AND:
+                case SiddhiQLParser.IN:
                 case SiddhiQLParser.ON:
                 case SiddhiQLParser.IS:
                 case SiddhiQLParser.NOT:
@@ -3967,6 +3981,9 @@ SiddhiQLParser.prototype.annotation = function() {
                 case SiddhiQLParser.DOUBLE:
                 case SiddhiQLParser.BOOL:
                 case SiddhiQLParser.OBJECT:
+                case SiddhiQLParser.AGGREGATION:
+                case SiddhiQLParser.AGGREGATE:
+                case SiddhiQLParser.PER:
                 case SiddhiQLParser.ID_QUOTES:
                 case SiddhiQLParser.ID:
                 case SiddhiQLParser.STRING_LITERAL:
@@ -8399,6 +8416,8 @@ SiddhiQLParser.prototype.group_by_query_selection = function() {
         case SiddhiQLParser.HASH:
         case SiddhiQLParser.STREAM:
         case SiddhiQLParser.DEFINE:
+        case SiddhiQLParser.FUNCTION:
+        case SiddhiQLParser.TRIGGER:
         case SiddhiQLParser.TABLE:
         case SiddhiQLParser.APP:
         case SiddhiQLParser.FROM:
@@ -8409,12 +8428,14 @@ SiddhiQLParser.prototype.group_by_query_selection = function() {
         case SiddhiQLParser.BY:
         case SiddhiQLParser.ORDER:
         case SiddhiQLParser.LIMIT:
+        case SiddhiQLParser.OFFSET:
         case SiddhiQLParser.ASC:
         case SiddhiQLParser.DESC:
         case SiddhiQLParser.HAVING:
         case SiddhiQLParser.INSERT:
         case SiddhiQLParser.DELETE:
         case SiddhiQLParser.UPDATE:
+        case SiddhiQLParser.SET:
         case SiddhiQLParser.RETURN:
         case SiddhiQLParser.EVENTS:
         case SiddhiQLParser.INTO:
@@ -8426,8 +8447,10 @@ SiddhiQLParser.prototype.group_by_query_selection = function() {
         case SiddhiQLParser.RAW:
         case SiddhiQLParser.OF:
         case SiddhiQLParser.AS:
+        case SiddhiQLParser.AT:
         case SiddhiQLParser.OR:
         case SiddhiQLParser.AND:
+        case SiddhiQLParser.IN:
         case SiddhiQLParser.ON:
         case SiddhiQLParser.IS:
         case SiddhiQLParser.NOT:
@@ -8464,6 +8487,9 @@ SiddhiQLParser.prototype.group_by_query_selection = function() {
         case SiddhiQLParser.DOUBLE:
         case SiddhiQLParser.BOOL:
         case SiddhiQLParser.OBJECT:
+        case SiddhiQLParser.AGGREGATION:
+        case SiddhiQLParser.AGGREGATE:
+        case SiddhiQLParser.PER:
         case SiddhiQLParser.ID_QUOTES:
         case SiddhiQLParser.ID:
         case SiddhiQLParser.STRING_LITERAL:
@@ -8600,6 +8626,8 @@ SiddhiQLParser.prototype.query_section = function() {
         case SiddhiQLParser.HASH:
         case SiddhiQLParser.STREAM:
         case SiddhiQLParser.DEFINE:
+        case SiddhiQLParser.FUNCTION:
+        case SiddhiQLParser.TRIGGER:
         case SiddhiQLParser.TABLE:
         case SiddhiQLParser.APP:
         case SiddhiQLParser.FROM:
@@ -8610,12 +8638,14 @@ SiddhiQLParser.prototype.query_section = function() {
         case SiddhiQLParser.BY:
         case SiddhiQLParser.ORDER:
         case SiddhiQLParser.LIMIT:
+        case SiddhiQLParser.OFFSET:
         case SiddhiQLParser.ASC:
         case SiddhiQLParser.DESC:
         case SiddhiQLParser.HAVING:
         case SiddhiQLParser.INSERT:
         case SiddhiQLParser.DELETE:
         case SiddhiQLParser.UPDATE:
+        case SiddhiQLParser.SET:
         case SiddhiQLParser.RETURN:
         case SiddhiQLParser.EVENTS:
         case SiddhiQLParser.INTO:
@@ -8627,8 +8657,10 @@ SiddhiQLParser.prototype.query_section = function() {
         case SiddhiQLParser.RAW:
         case SiddhiQLParser.OF:
         case SiddhiQLParser.AS:
+        case SiddhiQLParser.AT:
         case SiddhiQLParser.OR:
         case SiddhiQLParser.AND:
+        case SiddhiQLParser.IN:
         case SiddhiQLParser.ON:
         case SiddhiQLParser.IS:
         case SiddhiQLParser.NOT:
@@ -8665,6 +8697,9 @@ SiddhiQLParser.prototype.query_section = function() {
         case SiddhiQLParser.DOUBLE:
         case SiddhiQLParser.BOOL:
         case SiddhiQLParser.OBJECT:
+        case SiddhiQLParser.AGGREGATION:
+        case SiddhiQLParser.AGGREGATE:
+        case SiddhiQLParser.PER:
         case SiddhiQLParser.ID_QUOTES:
         case SiddhiQLParser.ID:
         case SiddhiQLParser.STRING_LITERAL:
@@ -11196,7 +11231,7 @@ SiddhiQLParser.prototype.function_operation = function() {
         this.match(SiddhiQLParser.OPEN_PAR);
         this.state = 1368;
         _la = this._input.LA(1);
-        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << SiddhiQLParser.T__0) | (1 << SiddhiQLParser.INT_LITERAL) | (1 << SiddhiQLParser.LONG_LITERAL) | (1 << SiddhiQLParser.FLOAT_LITERAL) | (1 << SiddhiQLParser.DOUBLE_LITERAL) | (1 << SiddhiQLParser.OPEN_PAR) | (1 << SiddhiQLParser.STAR) | (1 << SiddhiQLParser.PLUS) | (1 << SiddhiQLParser.MINUS) | (1 << SiddhiQLParser.HASH) | (1 << SiddhiQLParser.STREAM))) !== 0) || ((((_la - 32)) & ~0x1f) == 0 && ((1 << (_la - 32)) & ((1 << (SiddhiQLParser.DEFINE - 32)) | (1 << (SiddhiQLParser.TABLE - 32)) | (1 << (SiddhiQLParser.APP - 32)) | (1 << (SiddhiQLParser.FROM - 32)) | (1 << (SiddhiQLParser.PARTITION - 32)) | (1 << (SiddhiQLParser.WINDOW - 32)) | (1 << (SiddhiQLParser.SELECT - 32)) | (1 << (SiddhiQLParser.GROUP - 32)) | (1 << (SiddhiQLParser.BY - 32)) | (1 << (SiddhiQLParser.ORDER - 32)) | (1 << (SiddhiQLParser.LIMIT - 32)) | (1 << (SiddhiQLParser.ASC - 32)) | (1 << (SiddhiQLParser.DESC - 32)) | (1 << (SiddhiQLParser.HAVING - 32)) | (1 << (SiddhiQLParser.INSERT - 32)) | (1 << (SiddhiQLParser.DELETE - 32)) | (1 << (SiddhiQLParser.UPDATE - 32)) | (1 << (SiddhiQLParser.RETURN - 32)) | (1 << (SiddhiQLParser.EVENTS - 32)) | (1 << (SiddhiQLParser.INTO - 32)) | (1 << (SiddhiQLParser.OUTPUT - 32)) | (1 << (SiddhiQLParser.EXPIRED - 32)) | (1 << (SiddhiQLParser.CURRENT - 32)) | (1 << (SiddhiQLParser.SNAPSHOT - 32)) | (1 << (SiddhiQLParser.FOR - 32)) | (1 << (SiddhiQLParser.RAW - 32)) | (1 << (SiddhiQLParser.OF - 32)) | (1 << (SiddhiQLParser.AS - 32)))) !== 0) || ((((_la - 65)) & ~0x1f) == 0 && ((1 << (_la - 65)) & ((1 << (SiddhiQLParser.OR - 65)) | (1 << (SiddhiQLParser.AND - 65)) | (1 << (SiddhiQLParser.ON - 65)) | (1 << (SiddhiQLParser.IS - 65)) | (1 << (SiddhiQLParser.NOT - 65)) | (1 << (SiddhiQLParser.WITHIN - 65)) | (1 << (SiddhiQLParser.WITH - 65)) | (1 << (SiddhiQLParser.BEGIN - 65)) | (1 << (SiddhiQLParser.END - 65)) | (1 << (SiddhiQLParser.NULL - 65)) | (1 << (SiddhiQLParser.EVERY - 65)) | (1 << (SiddhiQLParser.LAST - 65)) | (1 << (SiddhiQLParser.ALL - 65)) | (1 << (SiddhiQLParser.FIRST - 65)) | (1 << (SiddhiQLParser.JOIN - 65)) | (1 << (SiddhiQLParser.INNER - 65)) | (1 << (SiddhiQLParser.OUTER - 65)) | (1 << (SiddhiQLParser.RIGHT - 65)) | (1 << (SiddhiQLParser.LEFT - 65)) | (1 << (SiddhiQLParser.FULL - 65)) | (1 << (SiddhiQLParser.UNIDIRECTIONAL - 65)) | (1 << (SiddhiQLParser.YEARS - 65)) | (1 << (SiddhiQLParser.MONTHS - 65)) | (1 << (SiddhiQLParser.WEEKS - 65)) | (1 << (SiddhiQLParser.DAYS - 65)) | (1 << (SiddhiQLParser.HOURS - 65)) | (1 << (SiddhiQLParser.MINUTES - 65)) | (1 << (SiddhiQLParser.SECONDS - 65)) | (1 << (SiddhiQLParser.MILLISECONDS - 65)) | (1 << (SiddhiQLParser.FALSE - 65)) | (1 << (SiddhiQLParser.TRUE - 65)))) !== 0) || ((((_la - 97)) & ~0x1f) == 0 && ((1 << (_la - 97)) & ((1 << (SiddhiQLParser.STRING - 97)) | (1 << (SiddhiQLParser.INT - 97)) | (1 << (SiddhiQLParser.LONG - 97)) | (1 << (SiddhiQLParser.FLOAT - 97)) | (1 << (SiddhiQLParser.DOUBLE - 97)) | (1 << (SiddhiQLParser.BOOL - 97)) | (1 << (SiddhiQLParser.OBJECT - 97)) | (1 << (SiddhiQLParser.ID_QUOTES - 97)) | (1 << (SiddhiQLParser.ID - 97)) | (1 << (SiddhiQLParser.STRING_LITERAL - 97)))) !== 0)) {
+        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << SiddhiQLParser.T__0) | (1 << SiddhiQLParser.INT_LITERAL) | (1 << SiddhiQLParser.LONG_LITERAL) | (1 << SiddhiQLParser.FLOAT_LITERAL) | (1 << SiddhiQLParser.DOUBLE_LITERAL) | (1 << SiddhiQLParser.OPEN_PAR) | (1 << SiddhiQLParser.STAR) | (1 << SiddhiQLParser.PLUS) | (1 << SiddhiQLParser.MINUS) | (1 << SiddhiQLParser.HASH) | (1 << SiddhiQLParser.STREAM))) !== 0) || ((((_la - 32)) & ~0x1f) == 0 && ((1 << (_la - 32)) & ((1 << (SiddhiQLParser.DEFINE - 32)) | (1 << (SiddhiQLParser.FUNCTION - 32)) | (1 << (SiddhiQLParser.TRIGGER - 32)) | (1 << (SiddhiQLParser.TABLE - 32)) | (1 << (SiddhiQLParser.APP - 32)) | (1 << (SiddhiQLParser.FROM - 32)) | (1 << (SiddhiQLParser.PARTITION - 32)) | (1 << (SiddhiQLParser.WINDOW - 32)) | (1 << (SiddhiQLParser.SELECT - 32)) | (1 << (SiddhiQLParser.GROUP - 32)) | (1 << (SiddhiQLParser.BY - 32)) | (1 << (SiddhiQLParser.ORDER - 32)) | (1 << (SiddhiQLParser.LIMIT - 32)) | (1 << (SiddhiQLParser.OFFSET - 32)) | (1 << (SiddhiQLParser.ASC - 32)) | (1 << (SiddhiQLParser.DESC - 32)) | (1 << (SiddhiQLParser.HAVING - 32)) | (1 << (SiddhiQLParser.INSERT - 32)) | (1 << (SiddhiQLParser.DELETE - 32)) | (1 << (SiddhiQLParser.UPDATE - 32)) | (1 << (SiddhiQLParser.SET - 32)) | (1 << (SiddhiQLParser.RETURN - 32)) | (1 << (SiddhiQLParser.EVENTS - 32)) | (1 << (SiddhiQLParser.INTO - 32)) | (1 << (SiddhiQLParser.OUTPUT - 32)) | (1 << (SiddhiQLParser.EXPIRED - 32)) | (1 << (SiddhiQLParser.CURRENT - 32)) | (1 << (SiddhiQLParser.SNAPSHOT - 32)) | (1 << (SiddhiQLParser.FOR - 32)) | (1 << (SiddhiQLParser.RAW - 32)) | (1 << (SiddhiQLParser.OF - 32)) | (1 << (SiddhiQLParser.AS - 32)))) !== 0) || ((((_la - 64)) & ~0x1f) == 0 && ((1 << (_la - 64)) & ((1 << (SiddhiQLParser.AT - 64)) | (1 << (SiddhiQLParser.OR - 64)) | (1 << (SiddhiQLParser.AND - 64)) | (1 << (SiddhiQLParser.IN - 64)) | (1 << (SiddhiQLParser.ON - 64)) | (1 << (SiddhiQLParser.IS - 64)) | (1 << (SiddhiQLParser.NOT - 64)) | (1 << (SiddhiQLParser.WITHIN - 64)) | (1 << (SiddhiQLParser.WITH - 64)) | (1 << (SiddhiQLParser.BEGIN - 64)) | (1 << (SiddhiQLParser.END - 64)) | (1 << (SiddhiQLParser.NULL - 64)) | (1 << (SiddhiQLParser.EVERY - 64)) | (1 << (SiddhiQLParser.LAST - 64)) | (1 << (SiddhiQLParser.ALL - 64)) | (1 << (SiddhiQLParser.FIRST - 64)) | (1 << (SiddhiQLParser.JOIN - 64)) | (1 << (SiddhiQLParser.INNER - 64)) | (1 << (SiddhiQLParser.OUTER - 64)) | (1 << (SiddhiQLParser.RIGHT - 64)) | (1 << (SiddhiQLParser.LEFT - 64)) | (1 << (SiddhiQLParser.FULL - 64)) | (1 << (SiddhiQLParser.UNIDIRECTIONAL - 64)) | (1 << (SiddhiQLParser.YEARS - 64)) | (1 << (SiddhiQLParser.MONTHS - 64)) | (1 << (SiddhiQLParser.WEEKS - 64)) | (1 << (SiddhiQLParser.DAYS - 64)) | (1 << (SiddhiQLParser.HOURS - 64)) | (1 << (SiddhiQLParser.MINUTES - 64)) | (1 << (SiddhiQLParser.SECONDS - 64)) | (1 << (SiddhiQLParser.MILLISECONDS - 64)) | (1 << (SiddhiQLParser.FALSE - 64)))) !== 0) || ((((_la - 96)) & ~0x1f) == 0 && ((1 << (_la - 96)) & ((1 << (SiddhiQLParser.TRUE - 96)) | (1 << (SiddhiQLParser.STRING - 96)) | (1 << (SiddhiQLParser.INT - 96)) | (1 << (SiddhiQLParser.LONG - 96)) | (1 << (SiddhiQLParser.FLOAT - 96)) | (1 << (SiddhiQLParser.DOUBLE - 96)) | (1 << (SiddhiQLParser.BOOL - 96)) | (1 << (SiddhiQLParser.OBJECT - 96)) | (1 << (SiddhiQLParser.AGGREGATION - 96)) | (1 << (SiddhiQLParser.AGGREGATE - 96)) | (1 << (SiddhiQLParser.PER - 96)) | (1 << (SiddhiQLParser.ID_QUOTES - 96)) | (1 << (SiddhiQLParser.ID - 96)) | (1 << (SiddhiQLParser.STRING_LITERAL - 96)))) !== 0)) {
             this.state = 1367;
             this.attribute_list();
         }
@@ -11280,6 +11315,8 @@ SiddhiQLParser.prototype.attribute_list = function() {
         case SiddhiQLParser.HASH:
         case SiddhiQLParser.STREAM:
         case SiddhiQLParser.DEFINE:
+        case SiddhiQLParser.FUNCTION:
+        case SiddhiQLParser.TRIGGER:
         case SiddhiQLParser.TABLE:
         case SiddhiQLParser.APP:
         case SiddhiQLParser.FROM:
@@ -11290,12 +11327,14 @@ SiddhiQLParser.prototype.attribute_list = function() {
         case SiddhiQLParser.BY:
         case SiddhiQLParser.ORDER:
         case SiddhiQLParser.LIMIT:
+        case SiddhiQLParser.OFFSET:
         case SiddhiQLParser.ASC:
         case SiddhiQLParser.DESC:
         case SiddhiQLParser.HAVING:
         case SiddhiQLParser.INSERT:
         case SiddhiQLParser.DELETE:
         case SiddhiQLParser.UPDATE:
+        case SiddhiQLParser.SET:
         case SiddhiQLParser.RETURN:
         case SiddhiQLParser.EVENTS:
         case SiddhiQLParser.INTO:
@@ -11307,8 +11346,10 @@ SiddhiQLParser.prototype.attribute_list = function() {
         case SiddhiQLParser.RAW:
         case SiddhiQLParser.OF:
         case SiddhiQLParser.AS:
+        case SiddhiQLParser.AT:
         case SiddhiQLParser.OR:
         case SiddhiQLParser.AND:
+        case SiddhiQLParser.IN:
         case SiddhiQLParser.ON:
         case SiddhiQLParser.IS:
         case SiddhiQLParser.NOT:
@@ -11345,6 +11386,9 @@ SiddhiQLParser.prototype.attribute_list = function() {
         case SiddhiQLParser.DOUBLE:
         case SiddhiQLParser.BOOL:
         case SiddhiQLParser.OBJECT:
+        case SiddhiQLParser.AGGREGATION:
+        case SiddhiQLParser.AGGREGATE:
+        case SiddhiQLParser.PER:
         case SiddhiQLParser.ID_QUOTES:
         case SiddhiQLParser.ID:
         case SiddhiQLParser.STRING_LITERAL:
@@ -11544,6 +11588,8 @@ SiddhiQLParser.prototype.stream_reference = function() {
         	break;
         case SiddhiQLParser.STREAM:
         case SiddhiQLParser.DEFINE:
+        case SiddhiQLParser.FUNCTION:
+        case SiddhiQLParser.TRIGGER:
         case SiddhiQLParser.TABLE:
         case SiddhiQLParser.APP:
         case SiddhiQLParser.FROM:
@@ -11554,12 +11600,14 @@ SiddhiQLParser.prototype.stream_reference = function() {
         case SiddhiQLParser.BY:
         case SiddhiQLParser.ORDER:
         case SiddhiQLParser.LIMIT:
+        case SiddhiQLParser.OFFSET:
         case SiddhiQLParser.ASC:
         case SiddhiQLParser.DESC:
         case SiddhiQLParser.HAVING:
         case SiddhiQLParser.INSERT:
         case SiddhiQLParser.DELETE:
         case SiddhiQLParser.UPDATE:
+        case SiddhiQLParser.SET:
         case SiddhiQLParser.RETURN:
         case SiddhiQLParser.EVENTS:
         case SiddhiQLParser.INTO:
@@ -11571,8 +11619,10 @@ SiddhiQLParser.prototype.stream_reference = function() {
         case SiddhiQLParser.RAW:
         case SiddhiQLParser.OF:
         case SiddhiQLParser.AS:
+        case SiddhiQLParser.AT:
         case SiddhiQLParser.OR:
         case SiddhiQLParser.AND:
+        case SiddhiQLParser.IN:
         case SiddhiQLParser.ON:
         case SiddhiQLParser.IS:
         case SiddhiQLParser.NOT:
@@ -11609,6 +11659,9 @@ SiddhiQLParser.prototype.stream_reference = function() {
         case SiddhiQLParser.DOUBLE:
         case SiddhiQLParser.BOOL:
         case SiddhiQLParser.OBJECT:
+        case SiddhiQLParser.AGGREGATION:
+        case SiddhiQLParser.AGGREGATE:
+        case SiddhiQLParser.PER:
         case SiddhiQLParser.ID_QUOTES:
         case SiddhiQLParser.ID:
         	break;
@@ -11731,6 +11784,8 @@ SiddhiQLParser.prototype.attribute_reference = function() {
             	break;
             case SiddhiQLParser.STREAM:
             case SiddhiQLParser.DEFINE:
+            case SiddhiQLParser.FUNCTION:
+            case SiddhiQLParser.TRIGGER:
             case SiddhiQLParser.TABLE:
             case SiddhiQLParser.APP:
             case SiddhiQLParser.FROM:
@@ -11741,12 +11796,14 @@ SiddhiQLParser.prototype.attribute_reference = function() {
             case SiddhiQLParser.BY:
             case SiddhiQLParser.ORDER:
             case SiddhiQLParser.LIMIT:
+            case SiddhiQLParser.OFFSET:
             case SiddhiQLParser.ASC:
             case SiddhiQLParser.DESC:
             case SiddhiQLParser.HAVING:
             case SiddhiQLParser.INSERT:
             case SiddhiQLParser.DELETE:
             case SiddhiQLParser.UPDATE:
+            case SiddhiQLParser.SET:
             case SiddhiQLParser.RETURN:
             case SiddhiQLParser.EVENTS:
             case SiddhiQLParser.INTO:
@@ -11758,8 +11815,10 @@ SiddhiQLParser.prototype.attribute_reference = function() {
             case SiddhiQLParser.RAW:
             case SiddhiQLParser.OF:
             case SiddhiQLParser.AS:
+            case SiddhiQLParser.AT:
             case SiddhiQLParser.OR:
             case SiddhiQLParser.AND:
+            case SiddhiQLParser.IN:
             case SiddhiQLParser.ON:
             case SiddhiQLParser.IS:
             case SiddhiQLParser.NOT:
@@ -11796,6 +11855,9 @@ SiddhiQLParser.prototype.attribute_reference = function() {
             case SiddhiQLParser.DOUBLE:
             case SiddhiQLParser.BOOL:
             case SiddhiQLParser.OBJECT:
+            case SiddhiQLParser.AGGREGATION:
+            case SiddhiQLParser.AGGREGATE:
+            case SiddhiQLParser.PER:
             case SiddhiQLParser.ID_QUOTES:
             case SiddhiQLParser.ID:
             	break;
@@ -12311,6 +12373,8 @@ SiddhiQLParser.prototype.property_name = function() {
         switch(this._input.LA(1)) {
         case SiddhiQLParser.STREAM:
         case SiddhiQLParser.DEFINE:
+        case SiddhiQLParser.FUNCTION:
+        case SiddhiQLParser.TRIGGER:
         case SiddhiQLParser.TABLE:
         case SiddhiQLParser.APP:
         case SiddhiQLParser.FROM:
@@ -12321,12 +12385,14 @@ SiddhiQLParser.prototype.property_name = function() {
         case SiddhiQLParser.BY:
         case SiddhiQLParser.ORDER:
         case SiddhiQLParser.LIMIT:
+        case SiddhiQLParser.OFFSET:
         case SiddhiQLParser.ASC:
         case SiddhiQLParser.DESC:
         case SiddhiQLParser.HAVING:
         case SiddhiQLParser.INSERT:
         case SiddhiQLParser.DELETE:
         case SiddhiQLParser.UPDATE:
+        case SiddhiQLParser.SET:
         case SiddhiQLParser.RETURN:
         case SiddhiQLParser.EVENTS:
         case SiddhiQLParser.INTO:
@@ -12338,8 +12404,10 @@ SiddhiQLParser.prototype.property_name = function() {
         case SiddhiQLParser.RAW:
         case SiddhiQLParser.OF:
         case SiddhiQLParser.AS:
+        case SiddhiQLParser.AT:
         case SiddhiQLParser.OR:
         case SiddhiQLParser.AND:
+        case SiddhiQLParser.IN:
         case SiddhiQLParser.ON:
         case SiddhiQLParser.IS:
         case SiddhiQLParser.NOT:
@@ -12376,6 +12444,9 @@ SiddhiQLParser.prototype.property_name = function() {
         case SiddhiQLParser.DOUBLE:
         case SiddhiQLParser.BOOL:
         case SiddhiQLParser.OBJECT:
+        case SiddhiQLParser.AGGREGATION:
+        case SiddhiQLParser.AGGREGATE:
+        case SiddhiQLParser.PER:
         case SiddhiQLParser.ID_QUOTES:
         case SiddhiQLParser.ID:
             this.enterOuterAlt(localctx, 1);
@@ -12724,6 +12795,8 @@ SiddhiQLParser.prototype.source = function() {
         	break;
         case SiddhiQLParser.STREAM:
         case SiddhiQLParser.DEFINE:
+        case SiddhiQLParser.FUNCTION:
+        case SiddhiQLParser.TRIGGER:
         case SiddhiQLParser.TABLE:
         case SiddhiQLParser.APP:
         case SiddhiQLParser.FROM:
@@ -12734,12 +12807,14 @@ SiddhiQLParser.prototype.source = function() {
         case SiddhiQLParser.BY:
         case SiddhiQLParser.ORDER:
         case SiddhiQLParser.LIMIT:
+        case SiddhiQLParser.OFFSET:
         case SiddhiQLParser.ASC:
         case SiddhiQLParser.DESC:
         case SiddhiQLParser.HAVING:
         case SiddhiQLParser.INSERT:
         case SiddhiQLParser.DELETE:
         case SiddhiQLParser.UPDATE:
+        case SiddhiQLParser.SET:
         case SiddhiQLParser.RETURN:
         case SiddhiQLParser.EVENTS:
         case SiddhiQLParser.INTO:
@@ -12751,8 +12826,10 @@ SiddhiQLParser.prototype.source = function() {
         case SiddhiQLParser.RAW:
         case SiddhiQLParser.OF:
         case SiddhiQLParser.AS:
+        case SiddhiQLParser.AT:
         case SiddhiQLParser.OR:
         case SiddhiQLParser.AND:
+        case SiddhiQLParser.IN:
         case SiddhiQLParser.ON:
         case SiddhiQLParser.IS:
         case SiddhiQLParser.NOT:
@@ -12789,6 +12866,9 @@ SiddhiQLParser.prototype.source = function() {
         case SiddhiQLParser.DOUBLE:
         case SiddhiQLParser.BOOL:
         case SiddhiQLParser.OBJECT:
+        case SiddhiQLParser.AGGREGATION:
+        case SiddhiQLParser.AGGREGATE:
+        case SiddhiQLParser.PER:
         case SiddhiQLParser.ID_QUOTES:
         case SiddhiQLParser.ID:
         	break;
@@ -12985,6 +13065,8 @@ SiddhiQLParser.prototype.name = function() {
             break;
         case SiddhiQLParser.STREAM:
         case SiddhiQLParser.DEFINE:
+        case SiddhiQLParser.FUNCTION:
+        case SiddhiQLParser.TRIGGER:
         case SiddhiQLParser.TABLE:
         case SiddhiQLParser.APP:
         case SiddhiQLParser.FROM:
@@ -12995,12 +13077,14 @@ SiddhiQLParser.prototype.name = function() {
         case SiddhiQLParser.BY:
         case SiddhiQLParser.ORDER:
         case SiddhiQLParser.LIMIT:
+        case SiddhiQLParser.OFFSET:
         case SiddhiQLParser.ASC:
         case SiddhiQLParser.DESC:
         case SiddhiQLParser.HAVING:
         case SiddhiQLParser.INSERT:
         case SiddhiQLParser.DELETE:
         case SiddhiQLParser.UPDATE:
+        case SiddhiQLParser.SET:
         case SiddhiQLParser.RETURN:
         case SiddhiQLParser.EVENTS:
         case SiddhiQLParser.INTO:
@@ -13012,8 +13096,10 @@ SiddhiQLParser.prototype.name = function() {
         case SiddhiQLParser.RAW:
         case SiddhiQLParser.OF:
         case SiddhiQLParser.AS:
+        case SiddhiQLParser.AT:
         case SiddhiQLParser.OR:
         case SiddhiQLParser.AND:
+        case SiddhiQLParser.IN:
         case SiddhiQLParser.ON:
         case SiddhiQLParser.IS:
         case SiddhiQLParser.NOT:
@@ -13050,6 +13136,9 @@ SiddhiQLParser.prototype.name = function() {
         case SiddhiQLParser.DOUBLE:
         case SiddhiQLParser.BOOL:
         case SiddhiQLParser.OBJECT:
+        case SiddhiQLParser.AGGREGATION:
+        case SiddhiQLParser.AGGREGATE:
+        case SiddhiQLParser.PER:
             this.enterOuterAlt(localctx, 2);
             this.state = 1478;
             this.keyword();
@@ -13872,6 +13961,42 @@ KeywordContext.prototype.OBJECT = function() {
     return this.getToken(SiddhiQLParser.OBJECT, 0);
 };
 
+KeywordContext.prototype.FUNCTION = function() {
+    return this.getToken(SiddhiQLParser.FUNCTION, 0);
+};
+
+KeywordContext.prototype.TRIGGER = function() {
+    return this.getToken(SiddhiQLParser.TRIGGER, 0);
+};
+
+KeywordContext.prototype.OFFSET = function() {
+    return this.getToken(SiddhiQLParser.OFFSET, 0);
+};
+
+KeywordContext.prototype.SET = function() {
+    return this.getToken(SiddhiQLParser.SET, 0);
+};
+
+KeywordContext.prototype.AT = function() {
+    return this.getToken(SiddhiQLParser.AT, 0);
+};
+
+KeywordContext.prototype.IN = function() {
+    return this.getToken(SiddhiQLParser.IN, 0);
+};
+
+KeywordContext.prototype.AGGREGATION = function() {
+    return this.getToken(SiddhiQLParser.AGGREGATION, 0);
+};
+
+KeywordContext.prototype.AGGREGATE = function() {
+    return this.getToken(SiddhiQLParser.AGGREGATE, 0);
+};
+
+KeywordContext.prototype.PER = function() {
+    return this.getToken(SiddhiQLParser.PER, 0);
+};
+
 KeywordContext.prototype.enterRule = function(listener) {
     if(listener instanceof SiddhiQLListener ) {
         listener.enterKeyword(this);
@@ -13898,7 +14023,7 @@ SiddhiQLParser.prototype.keyword = function() {
         this.enterOuterAlt(localctx, 1);
         this.state = 1521;
         _la = this._input.LA(1);
-        if(!(((((_la - 31)) & ~0x1f) == 0 && ((1 << (_la - 31)) & ((1 << (SiddhiQLParser.STREAM - 31)) | (1 << (SiddhiQLParser.DEFINE - 31)) | (1 << (SiddhiQLParser.TABLE - 31)) | (1 << (SiddhiQLParser.APP - 31)) | (1 << (SiddhiQLParser.FROM - 31)) | (1 << (SiddhiQLParser.PARTITION - 31)) | (1 << (SiddhiQLParser.WINDOW - 31)) | (1 << (SiddhiQLParser.SELECT - 31)) | (1 << (SiddhiQLParser.GROUP - 31)) | (1 << (SiddhiQLParser.BY - 31)) | (1 << (SiddhiQLParser.ORDER - 31)) | (1 << (SiddhiQLParser.LIMIT - 31)) | (1 << (SiddhiQLParser.ASC - 31)) | (1 << (SiddhiQLParser.DESC - 31)) | (1 << (SiddhiQLParser.HAVING - 31)) | (1 << (SiddhiQLParser.INSERT - 31)) | (1 << (SiddhiQLParser.DELETE - 31)) | (1 << (SiddhiQLParser.UPDATE - 31)) | (1 << (SiddhiQLParser.RETURN - 31)) | (1 << (SiddhiQLParser.EVENTS - 31)) | (1 << (SiddhiQLParser.INTO - 31)) | (1 << (SiddhiQLParser.OUTPUT - 31)) | (1 << (SiddhiQLParser.EXPIRED - 31)) | (1 << (SiddhiQLParser.CURRENT - 31)) | (1 << (SiddhiQLParser.SNAPSHOT - 31)) | (1 << (SiddhiQLParser.FOR - 31)) | (1 << (SiddhiQLParser.RAW - 31)) | (1 << (SiddhiQLParser.OF - 31)))) !== 0) || ((((_la - 63)) & ~0x1f) == 0 && ((1 << (_la - 63)) & ((1 << (SiddhiQLParser.AS - 63)) | (1 << (SiddhiQLParser.OR - 63)) | (1 << (SiddhiQLParser.AND - 63)) | (1 << (SiddhiQLParser.ON - 63)) | (1 << (SiddhiQLParser.IS - 63)) | (1 << (SiddhiQLParser.NOT - 63)) | (1 << (SiddhiQLParser.WITHIN - 63)) | (1 << (SiddhiQLParser.WITH - 63)) | (1 << (SiddhiQLParser.BEGIN - 63)) | (1 << (SiddhiQLParser.END - 63)) | (1 << (SiddhiQLParser.NULL - 63)) | (1 << (SiddhiQLParser.EVERY - 63)) | (1 << (SiddhiQLParser.LAST - 63)) | (1 << (SiddhiQLParser.ALL - 63)) | (1 << (SiddhiQLParser.FIRST - 63)) | (1 << (SiddhiQLParser.JOIN - 63)) | (1 << (SiddhiQLParser.INNER - 63)) | (1 << (SiddhiQLParser.OUTER - 63)) | (1 << (SiddhiQLParser.RIGHT - 63)) | (1 << (SiddhiQLParser.LEFT - 63)) | (1 << (SiddhiQLParser.FULL - 63)) | (1 << (SiddhiQLParser.UNIDIRECTIONAL - 63)) | (1 << (SiddhiQLParser.YEARS - 63)) | (1 << (SiddhiQLParser.MONTHS - 63)) | (1 << (SiddhiQLParser.WEEKS - 63)) | (1 << (SiddhiQLParser.DAYS - 63)) | (1 << (SiddhiQLParser.HOURS - 63)) | (1 << (SiddhiQLParser.MINUTES - 63)) | (1 << (SiddhiQLParser.SECONDS - 63)) | (1 << (SiddhiQLParser.MILLISECONDS - 63)))) !== 0) || ((((_la - 95)) & ~0x1f) == 0 && ((1 << (_la - 95)) & ((1 << (SiddhiQLParser.FALSE - 95)) | (1 << (SiddhiQLParser.TRUE - 95)) | (1 << (SiddhiQLParser.STRING - 95)) | (1 << (SiddhiQLParser.INT - 95)) | (1 << (SiddhiQLParser.LONG - 95)) | (1 << (SiddhiQLParser.FLOAT - 95)) | (1 << (SiddhiQLParser.DOUBLE - 95)) | (1 << (SiddhiQLParser.BOOL - 95)) | (1 << (SiddhiQLParser.OBJECT - 95)))) !== 0))) {
+        if(!(((((_la - 31)) & ~0x1f) == 0 && ((1 << (_la - 31)) & ((1 << (SiddhiQLParser.STREAM - 31)) | (1 << (SiddhiQLParser.DEFINE - 31)) | (1 << (SiddhiQLParser.FUNCTION - 31)) | (1 << (SiddhiQLParser.TRIGGER - 31)) | (1 << (SiddhiQLParser.TABLE - 31)) | (1 << (SiddhiQLParser.APP - 31)) | (1 << (SiddhiQLParser.FROM - 31)) | (1 << (SiddhiQLParser.PARTITION - 31)) | (1 << (SiddhiQLParser.WINDOW - 31)) | (1 << (SiddhiQLParser.SELECT - 31)) | (1 << (SiddhiQLParser.GROUP - 31)) | (1 << (SiddhiQLParser.BY - 31)) | (1 << (SiddhiQLParser.ORDER - 31)) | (1 << (SiddhiQLParser.LIMIT - 31)) | (1 << (SiddhiQLParser.OFFSET - 31)) | (1 << (SiddhiQLParser.ASC - 31)) | (1 << (SiddhiQLParser.DESC - 31)) | (1 << (SiddhiQLParser.HAVING - 31)) | (1 << (SiddhiQLParser.INSERT - 31)) | (1 << (SiddhiQLParser.DELETE - 31)) | (1 << (SiddhiQLParser.UPDATE - 31)) | (1 << (SiddhiQLParser.SET - 31)) | (1 << (SiddhiQLParser.RETURN - 31)) | (1 << (SiddhiQLParser.EVENTS - 31)) | (1 << (SiddhiQLParser.INTO - 31)) | (1 << (SiddhiQLParser.OUTPUT - 31)) | (1 << (SiddhiQLParser.EXPIRED - 31)) | (1 << (SiddhiQLParser.CURRENT - 31)) | (1 << (SiddhiQLParser.SNAPSHOT - 31)) | (1 << (SiddhiQLParser.FOR - 31)) | (1 << (SiddhiQLParser.RAW - 31)) | (1 << (SiddhiQLParser.OF - 31)))) !== 0) || ((((_la - 63)) & ~0x1f) == 0 && ((1 << (_la - 63)) & ((1 << (SiddhiQLParser.AS - 63)) | (1 << (SiddhiQLParser.AT - 63)) | (1 << (SiddhiQLParser.OR - 63)) | (1 << (SiddhiQLParser.AND - 63)) | (1 << (SiddhiQLParser.IN - 63)) | (1 << (SiddhiQLParser.ON - 63)) | (1 << (SiddhiQLParser.IS - 63)) | (1 << (SiddhiQLParser.NOT - 63)) | (1 << (SiddhiQLParser.WITHIN - 63)) | (1 << (SiddhiQLParser.WITH - 63)) | (1 << (SiddhiQLParser.BEGIN - 63)) | (1 << (SiddhiQLParser.END - 63)) | (1 << (SiddhiQLParser.NULL - 63)) | (1 << (SiddhiQLParser.EVERY - 63)) | (1 << (SiddhiQLParser.LAST - 63)) | (1 << (SiddhiQLParser.ALL - 63)) | (1 << (SiddhiQLParser.FIRST - 63)) | (1 << (SiddhiQLParser.JOIN - 63)) | (1 << (SiddhiQLParser.INNER - 63)) | (1 << (SiddhiQLParser.OUTER - 63)) | (1 << (SiddhiQLParser.RIGHT - 63)) | (1 << (SiddhiQLParser.LEFT - 63)) | (1 << (SiddhiQLParser.FULL - 63)) | (1 << (SiddhiQLParser.UNIDIRECTIONAL - 63)) | (1 << (SiddhiQLParser.YEARS - 63)) | (1 << (SiddhiQLParser.MONTHS - 63)) | (1 << (SiddhiQLParser.WEEKS - 63)) | (1 << (SiddhiQLParser.DAYS - 63)) | (1 << (SiddhiQLParser.HOURS - 63)) | (1 << (SiddhiQLParser.MINUTES - 63)) | (1 << (SiddhiQLParser.SECONDS - 63)) | (1 << (SiddhiQLParser.MILLISECONDS - 63)))) !== 0) || ((((_la - 95)) & ~0x1f) == 0 && ((1 << (_la - 95)) & ((1 << (SiddhiQLParser.FALSE - 95)) | (1 << (SiddhiQLParser.TRUE - 95)) | (1 << (SiddhiQLParser.STRING - 95)) | (1 << (SiddhiQLParser.INT - 95)) | (1 << (SiddhiQLParser.LONG - 95)) | (1 << (SiddhiQLParser.FLOAT - 95)) | (1 << (SiddhiQLParser.DOUBLE - 95)) | (1 << (SiddhiQLParser.BOOL - 95)) | (1 << (SiddhiQLParser.OBJECT - 95)) | (1 << (SiddhiQLParser.AGGREGATION - 95)) | (1 << (SiddhiQLParser.AGGREGATE - 95)) | (1 << (SiddhiQLParser.PER - 95)))) !== 0))) {
         this._errHandler.recoverInline(this);
         }
         else {
