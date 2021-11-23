@@ -21,6 +21,7 @@ package org.wso2.carbon.streaming.integrator.common.utils;
  * Streaming Integrator Constants.
  */
 public class SPConstants {
+    public static final String WSO2_SP_TOKEN_1 = "DID";
     public static final String WSO2_SP_TOKEN_2 = "HID";
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String COOKIE_HEADER = "Cookie";
@@ -31,6 +32,7 @@ public class SPConstants {
 
     public static final String DATASOURCES_ROOT_ELEMENT = "wso2.datasources";
     public static final String DATASOURCE_NAMESPACE = "dataSources";
+    public static final String DATA_PROVIDER_CONTEXT = "/data-provider";
 
     private SPConstants() {
     }
