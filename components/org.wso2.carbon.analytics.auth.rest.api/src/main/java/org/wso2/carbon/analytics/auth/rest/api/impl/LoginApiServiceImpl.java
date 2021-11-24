@@ -178,6 +178,9 @@ public class LoginApiServiceImpl extends LoginApiService {
                     NewCookie accessTokenhttpOnlyCookie = AuthUtil
                             .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, accessTokenSecondHalf, appContext, true, true,
                                     -1);
+                    NewCookie accessTokenhttpOnlyCookieDP = AuthUtil
+                            .cookieBuilder(SPConstants.WSO2_SP_TOKEN_1, accessTokenSecondHalf,
+                                    SPConstants.DATA_PROVIDER_CONTEXT, true, true, -1);
 
                     NewCookie logoutContextAccessToken;
                     IdPClientConfiguration authConfigurations = DataHolder.getInstance()
@@ -212,18 +215,20 @@ public class LoginApiServiceImpl extends LoginApiService {
                             String idToken = loginResponse.get(IdPClientConstants.ID_TOKEN_KEY);
                             NewCookie logoutContextIdToken
                                     = getLogoutContextIdTokenCookie(idToken, userDTO, appContext);
-                            return Response.ok(userDTO, MediaType.APPLICATION_JSON)
-                                    .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
-                                            loginContextRefreshTokenCookie, logoutContextIdToken)
+                            return Response
+                                    .ok(userDTO, MediaType.APPLICATION_JSON)
+                                    .cookie(accessTokenhttpOnlyCookie, accessTokenhttpOnlyCookieDP,
+                                            logoutContextAccessToken, loginContextRefreshTokenCookie,
+                                            logoutContextIdToken)
                                     .build();
                         }
                         return Response.ok(userDTO, MediaType.APPLICATION_JSON)
-                                .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken,
-                                        loginContextRefreshTokenCookie)
+                                .cookie(accessTokenhttpOnlyCookie, accessTokenhttpOnlyCookieDP,
+                                        logoutContextAccessToken, loginContextRefreshTokenCookie)
                                 .build();
                     }
                     return Response.ok(userDTO, MediaType.APPLICATION_JSON)
-                            .cookie(accessTokenhttpOnlyCookie, logoutContextAccessToken)
+                            .cookie(accessTokenhttpOnlyCookie, accessTokenhttpOnlyCookieDP, logoutContextAccessToken)
                             .build();
                 case IdPClientConstants.LoginStatus.LOGIN_FAILURE:
                     if (LOG.isDebugEnabled()) {
@@ -334,8 +339,8 @@ public class LoginApiServiceImpl extends LoginApiService {
                             .cookieBuilder(SPConstants.WSO2_SP_TOKEN_2, accessTokenSecondHalf, appContext, true, true,
                                     -1);
                     NewCookie accessTokenhttpOnlyCookieForDP = AuthUtil
-                            .cookieBuilder("DID", accessTokenSecondHalf, "/data-provider", true, true,
-                                    -1);
+                            .cookieBuilder(SPConstants.WSO2_SP_TOKEN_1, accessTokenSecondHalf,
+                                    SPConstants.DATA_PROVIDER_CONTEXT, true, true, -1);
                     NewCookie logoutContextAccessToken = AuthUtil
                             .cookieBuilder(AuthRESTAPIConstants.WSO2_SP_TOKEN, accessTokenSecondHalf,
                                     AuthRESTAPIConstants.LOGOUT_CONTEXT + AuthRESTAPIConstants.LOGOUT_SSO_CONTEXT +
