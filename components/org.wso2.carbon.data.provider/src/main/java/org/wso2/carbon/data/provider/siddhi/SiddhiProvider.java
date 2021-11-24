@@ -21,7 +21,7 @@ package org.wso2.carbon.data.provider.siddhi;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.siddhi.query.api.execution.query.StoreQuery;
+import io.siddhi.query.api.execution.query.OnDemandQuery;
 import io.siddhi.query.compiler.SiddhiCompiler;
 import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.data.provider.AbstractDataProvider;
@@ -78,9 +78,9 @@ public class SiddhiProvider extends AbstractDataProvider {
         super.init(topic, sessionId, siddhiDataProviderConfig);
         this.siddhiAppRuntime = SiddhiAppRuntimeHolder.
                 getSiddhiAppRuntime(siddhiDataProviderConfig.getSiddhiAppContext());
-        StoreQuery storeQuery = SiddhiCompiler.parseStoreQuery(siddhiDataProviderConfig.getQueryData()
+        OnDemandQuery onDemandQuery = SiddhiCompiler.parseOnDemandQuery(siddhiDataProviderConfig.getQueryData()
                 .getAsJsonObject().get(QUERY).getAsString());
-        Attribute[] outputAttributeList = siddhiAppRuntime.getStoreQueryOutputAttributes(storeQuery);
+        Attribute[] outputAttributeList = siddhiAppRuntime.getOnDemandQueryOutputAttributes(onDemandQuery);
         metadata = new DataSetMetadata(outputAttributeList.length);
         Attribute outputAttribute;
         for (int i = 0; i < outputAttributeList.length; i++) {
