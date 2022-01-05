@@ -70,6 +70,9 @@
                         <Export-Package>
                             org.wso2.carbon.editor.log.appender.*
                         </Export-Package>
+                        <Private-Package>
+                            org.owasp.encoder.*
+                        </Private-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Import-Package>
                             !org.wso2.carbon.editor.log.appender.*
