@@ -74,17 +74,7 @@
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
+        
         <dependency>
             <groupId>org.wso2.msf4j</groupId>
             <artifactId>msf4j-core</artifactId>
@@ -137,7 +127,6 @@
         <import.package>
             org.osgi.framework.*;version="${osgi.framework.import.version.range}",
             org.wso2.msf4j.*;version="${msf4j.import.version.range}",
-            org.slf4j.*;version="${slf4j.logging.package.import.version.range}",
             javax.ws.rs.*;version="${javax.ws.rs.version.range}",
             org.wso2.carbon.kernel.config.model.*;version="${carbon.kernel.package.import.version.range}",
             *;resolution:=optional
