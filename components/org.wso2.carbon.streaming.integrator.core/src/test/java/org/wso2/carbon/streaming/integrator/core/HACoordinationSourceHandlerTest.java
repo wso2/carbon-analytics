@@ -18,8 +18,9 @@
 
 package org.wso2.carbon.streaming.integrator.core;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
@@ -30,10 +31,6 @@ import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.metrics.core.Metrics;
 import org.wso2.carbon.si.metrics.core.internal.MetricsDataHolder;
 import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSourceHandler;
-
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.spy;
-import static org.powermock.api.mockito.PowerMockito.mock;
 
 public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
     protected static Metrics metrics;
@@ -65,7 +62,7 @@ public class HACoordinationSourceHandlerTest extends PowerMockTestCase {
     }
     @BeforeTest
     public void setDebugLogLevel() {
-        Logger.getLogger(HACoordinationSourceHandler.class.getName()).setLevel(Level.DEBUG);
+        ((Logger) LogManager.getLogger(HACoordinationSourceHandler.class)).setLevel(Level.DEBUG);
     }
 
     private static final String SOURCE_1 = "source-1";

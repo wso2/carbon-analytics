@@ -19,14 +19,15 @@
 package org.wso2.carbon.siddhi.editor.core.util.designview.utilities;
 
 import io.siddhi.query.api.SiddhiElement;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Has methods involved in converting Siddhi elements to Design view Config objects.
  */
 public class ConfigBuildingUtilities {
 
-    private static final Logger log = Logger.getLogger(ConfigBuildingUtilities.class);
+    private static final Log log = LogFactory.getLog(ConfigBuildingUtilities.class);
 
     /**
      * Avoids Instantiation.

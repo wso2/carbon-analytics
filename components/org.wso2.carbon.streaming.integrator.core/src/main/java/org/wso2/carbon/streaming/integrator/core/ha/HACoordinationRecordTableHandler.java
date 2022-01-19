@@ -16,17 +16,18 @@
 
 package org.wso2.carbon.streaming.integrator.core.ha;
 
-import io.siddhi.core.util.snapshot.state.State;
-import io.siddhi.core.util.snapshot.state.StateFactory;
-import org.apache.log4j.Logger;
 import io.siddhi.core.exception.ConnectionUnavailableException;
 import io.siddhi.core.table.record.RecordTableHandler;
 import io.siddhi.core.table.record.RecordTableHandlerCallback;
 import io.siddhi.core.util.collection.operator.CompiledCondition;
 import io.siddhi.core.util.collection.operator.CompiledExpression;
 import io.siddhi.core.util.collection.operator.CompiledSelection;
+import io.siddhi.core.util.snapshot.state.State;
+import io.siddhi.core.util.snapshot.state.StateFactory;
 import io.siddhi.query.api.definition.Attribute;
 import io.siddhi.query.api.definition.TableDefinition;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -41,7 +42,7 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler<HACoord
     private boolean isActiveNode;
     private long lastEventChunkTimestamp;
     private TableDefinition tableDefinition;
-    private static final Logger log = Logger.getLogger(HACoordinationRecordTableHandler.class);
+    private static final Log log = LogFactory.getLog(HACoordinationRecordTableHandler.class);
 
     @Override
     public StateFactory<TableState> init(String elementId, TableDefinition tableDefinition) {

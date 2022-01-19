@@ -22,10 +22,17 @@ import com.codahale.metrics.MetricRegistry;
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.dropwizard.DropwizardExports;
-import io.prometheus.client.dropwizard.samplebuilder.CustomMappingSampleBuilder;
-import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
 import io.prometheus.client.dropwizard.samplebuilder.SampleBuilder;
 import io.prometheus.client.exporter.HTTPServer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.metrics.core.reporter.impl.AbstractReporter;
+import org.wso2.carbon.si.metrics.prometheus.reporter.config.CustomMapperConfig;
+import org.wso2.carbon.si.metrics.prometheus.reporter.config.CustomMappingBuilder;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
+import org.yaml.snakeyaml.introspector.BeanAccess;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -34,20 +41,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.apache.log4j.Logger;
-import org.wso2.carbon.metrics.core.reporter.impl.AbstractReporter;
-import org.wso2.carbon.si.metrics.prometheus.reporter.config.CustomMapperConfig;
-import org.wso2.carbon.si.metrics.prometheus.reporter.config.CustomMappingBuilder;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
-import org.yaml.snakeyaml.introspector.BeanAccess;
 
 /**
  * A reporter which outputs measurements to prometheus.
  */
 public class PrometheusReporter extends AbstractReporter {
 
-    private static final Logger log = Logger.getLogger(PrometheusReporter.class);
+    private static final Log log = LogFactory.getLog(PrometheusReporter.class);
     private static final String MAPPINGS_RESOURCE_FILE = "configuration.yaml";
     private final MetricRegistry metricRegistry;
     private final MetricFilter metricFilter;

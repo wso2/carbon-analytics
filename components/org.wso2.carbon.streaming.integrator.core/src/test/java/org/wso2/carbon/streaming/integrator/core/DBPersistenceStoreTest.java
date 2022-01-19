@@ -17,8 +17,9 @@
 package org.wso2.carbon.streaming.integrator.core;
 
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.annotations.BeforeTest;
@@ -44,7 +45,7 @@ public class DBPersistenceStoreTest extends PowerMockTestCase {
 
     @BeforeTest
     public void setDebugLogLevel() {
-        Logger.getLogger(DBPersistenceStore.class.getName()).setLevel(Level.DEBUG);
+        ((Logger) LogManager.getLogger(DBPersistenceStore.class)).setLevel(Level.DEBUG);
     }
 
     @Test(expectedExceptions = DatasourceConfigurationException.class)

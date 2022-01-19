@@ -16,6 +16,15 @@
 
 package org.wso2.carbon.analytics.test.osgi;
 
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.stream.output.StreamCallback;
+import io.siddhi.core.util.EventPrinter;
+import io.siddhi.core.util.SiddhiTestHelper;
+import io.siddhi.core.util.statistics.metrics.Level;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
 import org.ops4j.pax.exam.Option;
@@ -33,22 +42,15 @@ import org.wso2.carbon.metrics.core.MetricManagementService;
 import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.metrics.core.jmx.MetricsMXBean;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
-import io.siddhi.core.SiddhiAppRuntime;
-import io.siddhi.core.event.Event;
-import io.siddhi.core.stream.input.InputHandler;
-import io.siddhi.core.stream.output.StreamCallback;
-import io.siddhi.core.util.EventPrinter;
-import io.siddhi.core.util.SiddhiTestHelper;
-import io.siddhi.core.util.statistics.metrics.Level;
 
-import javax.inject.Inject;
-import javax.management.JMX;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.inject.Inject;
+import javax.management.JMX;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 
 import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
@@ -60,7 +62,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class SiddhiMetricsTestcase {
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SiddhiMetricsTestcase.class);
+    private static final Log log = LogFactory.getLog(SiddhiMetricsTestcase.class);
 
     private static final String LOAD_AVG_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.os.system.load.average";
     private static final String SYSTEM_CPU_MBEAN_NAME = "org.wso2.carbon.metrics:name=jvm.os.cpu.load.system";

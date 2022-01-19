@@ -21,9 +21,9 @@ package org.wso2.carbon.data.provider.utils;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import javax.sql.DataSource;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
@@ -32,10 +32,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+import javax.sql.DataSource;
 
 public class RDBMSTableTestUtils {
 
-    private static final Logger log = Logger.getLogger(RDBMSTableTestUtils.class);
+    private static final Log log = LogFactory.getLog(RDBMSTableTestUtils.class);
     private static String connectionUrlMysql = "jdbc:mysql://{{container.ip}}:{{container.port}}/dasdb";
     private static String connectionUrlPostgres = "jdbc:postgresql://{{container.ip}}:{{container.port}}/dasdb";
     private static String connectionUrlOracle = "jdbc:oracle:thin:@{{container.ip}}:{{container.port}}/XE";

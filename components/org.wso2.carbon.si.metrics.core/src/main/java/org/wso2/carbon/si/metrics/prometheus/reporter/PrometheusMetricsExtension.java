@@ -17,15 +17,12 @@
  */
 package org.wso2.carbon.si.metrics.prometheus.reporter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.metrics.core.MetricManagementService;
@@ -34,6 +31,10 @@ import org.wso2.carbon.metrics.core.reporter.ReporterBuildException;
 import org.wso2.carbon.metrics.core.spi.MetricsExtension;
 import org.wso2.carbon.si.metrics.prometheus.reporter.config.PrometheusMetricsConfig;
 import org.wso2.carbon.si.metrics.prometheus.reporter.config.PrometheusReporterConfig;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * * Metrics Extension to support Prometheus Reporter.
@@ -44,7 +45,7 @@ import org.wso2.carbon.si.metrics.prometheus.reporter.config.PrometheusReporterC
 )
 public class PrometheusMetricsExtension implements MetricsExtension {
 
-    private static final Logger logger = LoggerFactory.getLogger(PrometheusMetricsExtension.class);
+    private static final Log logger = LogFactory.getLog(PrometheusMetricsExtension.class);
     List<String> reporterNames = new ArrayList<>();
 
     @Override

@@ -18,7 +18,8 @@
 package org.wso2.carbon.siddhi.editor.core.util.restclients.storequery;
 
 import feign.Response;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.siddhi.editor.core.exception.SiddhiStoreQueryHelperException;
@@ -33,7 +34,7 @@ import java.util.Map;
  */
 public class StoreQueryAPIHelper {
 
-    private static final Logger logger = Logger.getLogger(StoreQueryAPIHelper.class);
+    private static final Log logger = LogFactory.getLog(StoreQueryAPIHelper.class);
     private static final String STORE_API_CONFIG = "storeRESTAPI";
     private ConfigProvider configProvider;
 

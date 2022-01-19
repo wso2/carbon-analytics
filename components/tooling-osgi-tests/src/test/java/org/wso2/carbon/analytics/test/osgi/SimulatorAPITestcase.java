@@ -15,6 +15,8 @@
  */
 package org.wso2.carbon.analytics.test.osgi;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
 import org.ops4j.pax.exam.Option;
@@ -43,7 +45,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class SimulatorAPITestcase {
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SimulatorAPITestcase.class);
+    private static final Log log = LogFactory.getLog(SimulatorAPITestcase.class);
 
     private static final int HTTP_PORT = 9390;
     private static final String HOSTNAME = "localhost";

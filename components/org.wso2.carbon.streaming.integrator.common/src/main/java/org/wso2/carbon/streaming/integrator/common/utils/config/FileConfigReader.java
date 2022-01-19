@@ -17,8 +17,9 @@
  */
 package org.wso2.carbon.streaming.integrator.common.utils.config;
 
-import org.apache.log4j.Logger;
 import io.siddhi.core.util.config.ConfigReader;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +28,7 @@ import java.util.Map;
  * Siddhi file configuration reader.
  */
 public class FileConfigReader implements ConfigReader {
-    static final Logger LOGGER = Logger.getLogger(FileConfigReader.class);
+    static final Log LOGGER = LogFactory.getLog(FileConfigReader.class);
     Map<String, String> propertyMap;
 
     public FileConfigReader(Map<String, String> propertyMap) {

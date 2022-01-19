@@ -17,6 +17,8 @@
 package org.wso2.carbon.analytics.test.osgi.util;
 
 import io.netty.handler.codec.http.HttpMethod;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.awaitility.Duration;
 import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
@@ -54,7 +56,7 @@ public class TestUtil {
     private OutputStream outputStream = null;
     private PrintWriter writer = null;
     private String boundary = null;
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TestUtil.class);
+    private static final Log logger = LogFactory.getLog(TestUtil.class);
 
     public TestUtil(URI baseURI, String path, Boolean auth, Boolean keepAlive, String methodType,
                     String contentType, String userName, String password) {

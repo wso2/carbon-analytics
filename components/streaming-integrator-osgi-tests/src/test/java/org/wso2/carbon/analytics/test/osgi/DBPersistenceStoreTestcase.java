@@ -17,7 +17,11 @@
 package org.wso2.carbon.analytics.test.osgi;
 
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.log4j.Logger;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.awaitility.Awaitility;
 import org.awaitility.Duration;
 import org.ops4j.pax.exam.Configuration;
@@ -38,9 +42,7 @@ import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
-import io.siddhi.core.SiddhiAppRuntime;
-import io.siddhi.core.SiddhiManager;
-import io.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
+import org.wso2.carbon.streaming.integrator.core.persistence.DBPersistenceStore;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -71,7 +73,7 @@ public class DBPersistenceStoreTestcase {
     @Inject
     private DataSourceService dataSourceService;
 
-    private static final Logger log = Logger.getLogger(DBPersistenceStoreTestcase.class);
+    private static final Log log = LogFactory.getLog(DBPersistenceStore.class);
     private static final String CARBON_YAML_FILENAME = "deployment.yaml";
     private static final String TABLE_NAME = "PERSISTENCE_TABLE";
     private static final String SIDDHIAPP_NAME = "SiddhiAppPersistence";

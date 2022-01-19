@@ -18,7 +18,11 @@
 
 package org.wso2.carbon.streaming.integrator.core.event.queue;
 
-import org.apache.log4j.Logger;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.input.source.Source;
+import io.siddhi.core.util.SiddhiConstants;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.si.metrics.core.ThroughputMetric;
 import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSourceHandler;
 import org.wso2.carbon.streaming.integrator.core.ha.exception.InvalidByteMessageException;
@@ -28,9 +32,6 @@ import org.wso2.carbon.streaming.integrator.core.internal.SiddhiAppData;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.carbon.streaming.integrator.core.util.BinaryMessageConverterUtil;
-import io.siddhi.core.event.Event;
-import io.siddhi.core.stream.input.source.Source;
-import io.siddhi.core.util.SiddhiConstants;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -45,7 +46,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 public class EventListMapManager {
     private static ConcurrentSkipListMap<Long,QueuedEvent> eventListMap;
     private static Map<String,Long> perAppLastControlMessageSequenceNumberList = new HashMap<>();
-    private static final Logger log = Logger.getLogger(EventListMapManager.class);
+    private static final Log log = LogFactory.getLog(EventListMapManager.class);
     private static long startTime = new Date().getTime();;
     private static long endTime;
     private static int count = 0;

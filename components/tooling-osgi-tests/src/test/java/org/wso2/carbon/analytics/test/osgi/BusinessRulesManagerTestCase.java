@@ -19,7 +19,8 @@ package org.wso2.carbon.analytics.test.osgi;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
 import org.ops4j.pax.exam.Option;
@@ -50,8 +51,8 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSG
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class BusinessRulesManagerTestCase {
-    private static final Logger logger = Logger.getLogger(BusinessRulesManagerTestCase.class);
 
+    private static final Log logger = LogFactory.getLog(BusinessRulesManagerTestCase.class);
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
     private URI baseURI = URI.create(String.format("https://%s:%d", "localhost", 9743));

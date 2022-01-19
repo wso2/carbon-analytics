@@ -17,7 +17,11 @@
 package org.wso2.carbon.analytics.test.osgi;
 
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.log4j.Logger;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.awaitility.Awaitility;
 import org.awaitility.Duration;
 import org.ops4j.pax.exam.Configuration;
@@ -38,12 +42,7 @@ import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
-import io.siddhi.core.SiddhiAppRuntime;
-import io.siddhi.core.SiddhiManager;
-import io.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
 
-import javax.inject.Inject;
-import javax.sql.DataSource;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -52,6 +51,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.sql.DataSource;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
@@ -71,7 +72,7 @@ public class IncrementalDBPersistenceStoreTestcase {
     @Inject
     private DataSourceService dataSourceService;
 
-    private static final Logger log = Logger.getLogger(IncrementalDBPersistenceStoreTestcase.class);
+    private static final Log log = LogFactory.getLog(IncrementalDBPersistenceStoreTestcase.class);
     private static final String CARBON_YAML_FILENAME = "deployment.yaml";
     private static final String TABLE_NAME = "PERSISTENCE_TABLE";
     private static final String SIDDHIAPP_NAME = "SiddhiAppPersistence";

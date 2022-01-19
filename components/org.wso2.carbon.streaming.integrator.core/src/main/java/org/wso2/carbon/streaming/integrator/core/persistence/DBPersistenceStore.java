@@ -19,7 +19,10 @@
 package org.wso2.carbon.streaming.integrator.core.persistence;
 
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.log4j.Logger;
+import io.siddhi.core.exception.CannotClearSiddhiAppStateException;
+import io.siddhi.core.util.persistence.PersistenceStore;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.streaming.integrator.core.ha.util.CompressionUtil;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
@@ -30,8 +33,6 @@ import org.wso2.carbon.streaming.integrator.core.persistence.util.DBPersistenceS
 import org.wso2.carbon.streaming.integrator.core.persistence.util.ExecutionInfo;
 import org.wso2.carbon.streaming.integrator.core.persistence.util.PersistenceConstants;
 import org.wso2.carbon.streaming.integrator.core.persistence.util.RDBMSConfiguration;
-import io.siddhi.core.exception.CannotClearSiddhiAppStateException;
-import io.siddhi.core.util.persistence.PersistenceStore;
 
 import java.io.IOException;
 import java.sql.Blob;
@@ -50,7 +51,7 @@ import javax.sql.rowset.serial.SerialBlob;
  */
 public class DBPersistenceStore implements PersistenceStore {
 
-    private static final Logger log = Logger.getLogger(DBPersistenceStore.class);
+    private static final Log log = LogFactory.getLog(DBPersistenceStore.class);
     private static final String MSSQL_DATABASE_TYPE = "microsoft sql server";
     private static final String POSTGRES_DATABASE_TYPE = "postgresql";
 

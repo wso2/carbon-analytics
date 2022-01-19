@@ -812,9 +812,9 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${log4j.version}</version>
             </dependency>
 
             <!-- JSON dependencies -->
@@ -1255,11 +1255,6 @@
                 <artifactId>findbugs</artifactId>
                 <version>1.0.0</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.log4j.wso2</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.17.wso2v1</version>
-            </dependency>
 
             <!-- Carbon external dependencies -->
             <dependency>
@@ -1623,15 +1618,21 @@
                 <artifactId>commons-vfs2</artifactId>
                 <version>${commons-vfs2.wso2.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
         <carbon.analytics.version>3.0.57-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>5.1.20</siddhi.version>
-        <siddhi.bundle.version>5.1.20</siddhi.bundle.version>
+        <siddhi.version>5.1.21-SNAPSHOT</siddhi.version>
+        <siddhi.bundle.version>5.1.21-SNAPSHOT</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.1.55</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.1.56-SNAPSHOT</carbon.analytics-common.version>
+        <log4j.version>2.17.0</log4j.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[3.0.0, 4.0.0)</carbon.analytics.version.range>
         <com.spotify.docker.client.version>8.16.0</com.spotify.docker.client.version>
@@ -1654,7 +1655,7 @@
         <apache.commons.io.version>2.4</apache.commons.io.version>
         <wso2.slf4j.version>1.5.10.wso2v1</wso2.slf4j.version>
         <equinox.osgi.services.version>3.4.0.v20140312-2051</equinox.osgi.services.version>
-        <pax.logging.log4j2.version>1.10.1</pax.logging.log4j2.version>
+        <pax.logging.log4j2.version>1.11.12</pax.logging.log4j2.version>
         <pax.exam.container.native.version>4.6.0</pax.exam.container.native.version>
         <pax.url.aether.version>1.6.0</pax.url.aether.version>
         <org.jacoco.ant.version>0.8.3</org.jacoco.ant.version>
@@ -1717,7 +1718,7 @@
         <osgi.service.tracker.import.version.range>[1.5.1, 2.0.0)</osgi.service.tracker.import.version.range>
 
         <!-- Dependencies -->
-        <carbon.kernel.version>5.2.13</carbon.kernel.version>
+        <carbon.kernel.version>5.2.14-SNAPSHOT</carbon.kernel.version>
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
         <carbon.kernel.pax.version>5.2.13</carbon.kernel.pax.version>
 
@@ -1744,7 +1745,7 @@
         <carbon.securevault.version>5.0.13</carbon.securevault.version>
 
         <!-- Clustering Dependencies -->
-        <carbon.coordination.version>2.1.7</carbon.coordination.version>
+        <carbon.coordination.version>2.1.8-SNAPSHOT</carbon.coordination.version>
 
         <slf4j.version>1.7.12</slf4j.version>
         <slf4j.logging.package.import.version.range>[1.7.1, 2.0.0)
@@ -1798,7 +1799,7 @@
         <com.fasterxml.jackson.core.version.range>[2.9.0, 2.10.0)</com.fasterxml.jackson.core.version.range>
         <io.swagger.version>1.5.22</io.swagger.version>
         <javax.ws.rs-api.version>2.0</javax.ws.rs-api.version>
-        <pax.logging.api.version>1.10.1</pax.logging.api.version>
+        <pax.logging.api.version>1.11.12</pax.logging.api.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
         <javax.websocket.api.version>1.1</javax.websocket.api.version>
 

@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.event.simulator.core.internal.util;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
@@ -40,7 +41,7 @@ import static org.wso2.carbon.event.simulator.core.internal.util.CommonOperation
  * This class is responsible for saving, modifying and deleting the simulation configurations
  */
 public class SimulationConfigUploader {
-    private static final Logger log = Logger.getLogger(SimulationConfigUploader.class);
+    private static final Log log = LogFactory.getLog(SimulationConfigUploader.class);
     private static final SimulationConfigUploader configUploader =
             new SimulationConfigUploader();
 

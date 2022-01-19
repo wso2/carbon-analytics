@@ -19,6 +19,8 @@ package org.wso2.carbon.analytics.test.osgi;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
 import org.ops4j.pax.exam.Option;
@@ -53,7 +55,7 @@ import com.google.gson.JsonObject;
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class SiddhiEditorTestCase {
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SiddhiEditorTestCase.class);
+    private static final Log log = LogFactory.getLog(SiddhiEditorTestCase.class);
 
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";

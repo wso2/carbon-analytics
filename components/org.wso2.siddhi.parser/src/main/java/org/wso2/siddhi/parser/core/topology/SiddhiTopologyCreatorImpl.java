@@ -25,11 +25,6 @@ import io.siddhi.core.stream.input.source.Source;
 import io.siddhi.core.stream.output.sink.Sink;
 import io.siddhi.core.table.Table;
 import io.siddhi.core.window.Window;
-import org.wso2.siddhi.parser.SiddhiParserDataHolder;
-import org.wso2.siddhi.parser.core.SiddhiTopologyCreator;
-import org.wso2.siddhi.parser.core.util.EventHolder;
-import org.wso2.siddhi.parser.core.util.SiddhiTopologyCreatorConstants;
-import org.wso2.siddhi.parser.core.util.TransportStrategy;
 import io.siddhi.query.api.SiddhiApp;
 import io.siddhi.query.api.annotation.Annotation;
 import io.siddhi.query.api.annotation.Element;
@@ -47,7 +42,13 @@ import io.siddhi.query.api.util.AnnotationHelper;
 import io.siddhi.query.api.util.ExceptionUtil;
 import io.siddhi.query.compiler.SiddhiCompiler;
 import org.apache.commons.lang3.text.StrSubstitutor;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.siddhi.parser.SiddhiParserDataHolder;
+import org.wso2.siddhi.parser.core.SiddhiTopologyCreator;
+import org.wso2.siddhi.parser.core.util.EventHolder;
+import org.wso2.siddhi.parser.core.util.SiddhiTopologyCreatorConstants;
+import org.wso2.siddhi.parser.core.util.TransportStrategy;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,7 +66,7 @@ import java.util.UUID;
 
 public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
 
-    private static final Logger log = Logger.getLogger(SiddhiTopologyCreatorImpl.class);
+    private static final Log log = LogFactory.getLog(SiddhiTopologyCreatorImpl.class);
     private static final String DEFAULT_MESSAGING_SYSTEM = "nats";
     private SiddhiTopologyDataHolder siddhiTopologyDataHolder;
     private SiddhiApp siddhiApp;

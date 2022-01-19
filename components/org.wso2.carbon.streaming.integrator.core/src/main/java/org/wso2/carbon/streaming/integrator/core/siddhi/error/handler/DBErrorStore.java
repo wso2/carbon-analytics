@@ -24,7 +24,8 @@ import io.siddhi.core.util.error.handler.store.ErrorStore;
 import io.siddhi.core.util.error.handler.util.ErroneousEventType;
 import io.siddhi.core.util.error.handler.util.ErrorOccurrence;
 import io.siddhi.core.util.error.handler.util.ErrorType;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.dto.RDBMSQueryConfigurationEntry;
@@ -35,8 +36,6 @@ import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.util.Execu
 import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.util.RDBMSConfiguration;
 import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.util.SiddhiErrorHandlerConstants;
 
-import javax.sql.DataSource;
-import javax.sql.rowset.serial.SerialBlob;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,13 +49,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
+import javax.sql.rowset.serial.SerialBlob;
 
 /**
  * Denotes an Error Store which stores erroneous events collected from Siddhi in a configured database.
  */
 public class DBErrorStore extends ErrorStore {
 
-    private static final Logger log = Logger.getLogger(DBErrorStore.class);
+    private static final Log log = LogFactory.getLog(DBErrorStore.class);
     private static final String POSTGRES_DATABASE_TYPE = "postgresql";
     private static final String MSSQL_DATABASE_TYPE = "microsoft sql server";
     private static final String ORACLE_DATABASE_TYPE = "oracle";

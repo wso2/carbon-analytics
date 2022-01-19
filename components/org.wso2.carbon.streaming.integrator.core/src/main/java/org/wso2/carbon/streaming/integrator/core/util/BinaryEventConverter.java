@@ -18,12 +18,13 @@
 
 package org.wso2.carbon.streaming.integrator.core.util;
 
-import org.apache.log4j.Logger;
+import io.siddhi.core.event.Event;
+import io.siddhi.query.api.definition.Attribute;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.streaming.integrator.core.event.queue.EventDataMetaInfo;
 import org.wso2.carbon.streaming.integrator.core.event.queue.EventMetaInfo;
 import org.wso2.carbon.streaming.integrator.core.event.queue.QueuedEvent;
-import io.siddhi.core.event.Event;
-import io.siddhi.query.api.definition.Attribute;
 import org.wso2.carbon.streaming.integrator.core.ha.util.HAConstants;
 
 import java.io.IOException;
@@ -37,7 +38,7 @@ import java.util.Arrays;
  * This is a Util class help to convert from Siddhi event to Binary message.
  */
 public class BinaryEventConverter {
-    private static final Logger log = Logger.getLogger(BinaryEventConverter.class);
+    private static final Log log = LogFactory.getLog(BinaryEventConverter.class);
 
     public static ByteBuffer convertToBinaryMessage(QueuedEvent[] queuedEvents)
             throws IOException {

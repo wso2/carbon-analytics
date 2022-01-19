@@ -23,7 +23,8 @@ import io.siddhi.core.exception.CannotClearSiddhiAppStateException;
 import io.siddhi.core.util.persistence.IncrementalPersistenceStore;
 import io.siddhi.core.util.persistence.util.IncrementalSnapshotInfo;
 import io.siddhi.core.util.persistence.util.PersistenceHelper;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.streaming.integrator.core.ha.util.CompressionUtil;
 import org.wso2.carbon.streaming.integrator.core.persistence.util.PersistenceConstants;
 
@@ -38,7 +39,7 @@ import java.util.Map;
  */
 public class IncrementalFileSystemPersistenceStore implements IncrementalPersistenceStore {
 
-    private static final Logger log = Logger.getLogger(IncrementalFileSystemPersistenceStore.class);
+    private static final Log log = LogFactory.getLog(IncrementalFileSystemPersistenceStore.class);
     private String folder;
 
     public IncrementalFileSystemPersistenceStore() {

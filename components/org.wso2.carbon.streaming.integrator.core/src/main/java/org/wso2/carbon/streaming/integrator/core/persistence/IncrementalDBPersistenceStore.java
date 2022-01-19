@@ -19,7 +19,12 @@
 package org.wso2.carbon.streaming.integrator.core.persistence;
 
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.log4j.Logger;
+import io.siddhi.core.exception.CannotClearSiddhiAppStateException;
+import io.siddhi.core.util.persistence.IncrementalPersistenceStore;
+import io.siddhi.core.util.persistence.util.IncrementalSnapshotInfo;
+import io.siddhi.core.util.persistence.util.PersistenceHelper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.streaming.integrator.core.ha.util.CompressionUtil;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
@@ -30,13 +35,7 @@ import org.wso2.carbon.streaming.integrator.core.persistence.util.DBPersistenceS
 import org.wso2.carbon.streaming.integrator.core.persistence.util.ExecutionInfo;
 import org.wso2.carbon.streaming.integrator.core.persistence.util.PersistenceConstants;
 import org.wso2.carbon.streaming.integrator.core.persistence.util.RDBMSConfiguration;
-import io.siddhi.core.exception.CannotClearSiddhiAppStateException;
-import io.siddhi.core.util.persistence.IncrementalPersistenceStore;
-import io.siddhi.core.util.persistence.util.IncrementalSnapshotInfo;
-import io.siddhi.core.util.persistence.util.PersistenceHelper;
 
-import javax.sql.DataSource;
-import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -48,9 +47,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
+import javax.sql.rowset.serial.SerialBlob;
 
 public class IncrementalDBPersistenceStore implements IncrementalPersistenceStore {
-    private static final Logger log = Logger.getLogger(IncrementalDBPersistenceStore.class);
+    private static final Log log = LogFactory.getLog(IncrementalDBPersistenceStore.class);
 
     private static final String MSSQL_DATABASE_TYPE = "microsoft sql server";
     private static final String POSTGRES_DATABASE_TYPE = "postgresql";

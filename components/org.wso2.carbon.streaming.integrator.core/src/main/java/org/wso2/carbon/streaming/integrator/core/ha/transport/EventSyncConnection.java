@@ -29,9 +29,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.apache.log4j.Logger;
-import org.wso2.carbon.streaming.integrator.core.ha.transport.handlers.MessageEncoder;
 import io.siddhi.core.exception.ConnectionUnavailableException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.streaming.integrator.core.ha.transport.handlers.MessageEncoder;
 
 import java.util.UUID;
 
@@ -39,7 +40,7 @@ import java.util.UUID;
  * Tcp Netty Client.
  */
 public class EventSyncConnection {
-    private static final Logger log = Logger.getLogger(EventSyncConnection.class);
+    private static final Log log = LogFactory.getLog(EventSyncConnection.class);
     private EventLoopGroup group;
     private Bootstrap bootstrap;
 

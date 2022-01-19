@@ -16,6 +16,8 @@
 
 package org.wso2.carbon.analytics.test.osgi;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.awaitility.Duration;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
@@ -49,7 +51,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class SiddhiAsAPITestcase {
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SiddhiAsAPITestcase.class);
+    private static final Log logger = LogFactory.getLog(SiddhiAsAPITestcase.class);
 
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
