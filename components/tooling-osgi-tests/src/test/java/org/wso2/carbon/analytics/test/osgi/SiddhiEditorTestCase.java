@@ -16,9 +16,8 @@
 
 package org.wso2.carbon.analytics.test.osgi;
 
-import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
-import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ops4j.pax.exam.Configuration;
@@ -33,7 +32,6 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.HTTPResponseMessage;
 import org.wso2.carbon.analytics.test.osgi.util.TestUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
-import org.wso2.carbon.container.options.CarbonDistributionOption;
 import org.wso2.carbon.kernel.CarbonServerInfo;
 
 import java.net.URI;
@@ -41,11 +39,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Map;
-
 import javax.inject.Inject;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
 
 /**
  * OSGI Tests for siddhi-server.
@@ -55,7 +52,7 @@ import com.google.gson.JsonObject;
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class SiddhiEditorTestCase {
-    private static final Log log = LogFactory.getLog(SiddhiEditorTestCase.class);
+    private static final Log logger = LogFactory.getLog(SiddhiEditorTestCase.class);
 
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";

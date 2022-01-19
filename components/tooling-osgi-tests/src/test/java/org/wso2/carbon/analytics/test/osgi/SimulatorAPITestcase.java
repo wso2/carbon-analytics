@@ -45,7 +45,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class SimulatorAPITestcase {
-    private static final Log log = LogFactory.getLog(SimulatorAPITestcase.class);
+    private static final Log logger = LogFactory.getLog(SimulatorAPITestcase.class);
 
     private static final int HTTP_PORT = 9390;
     private static final String HOSTNAME = "localhost";
