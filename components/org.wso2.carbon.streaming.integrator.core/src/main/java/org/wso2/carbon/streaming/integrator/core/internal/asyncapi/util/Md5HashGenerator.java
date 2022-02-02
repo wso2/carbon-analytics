@@ -19,8 +19,8 @@
 package org.wso2.carbon.streaming.integrator.core.internal.asyncapi.util;
 
 import org.apache.commons.io.comparator.NameFileComparator;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Objects;
 
 
 /**
@@ -36,7 +35,7 @@ import java.util.Objects;
  * using MD5 as the hashing algorithm.
  */
 public class Md5HashGenerator {
-    private static final Log log = LogFactory.getLog(Md5HashGenerator.class);
+    private static final Logger log = LoggerFactory.getLogger(Md5HashGenerator.class);
     /**
      * This generates the md5 hash value using the given algorithm
      *

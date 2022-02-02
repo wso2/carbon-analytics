@@ -20,8 +20,8 @@ package org.wso2.carbon.event.simulator.core.internal.generator.csv.util;
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.FileAlreadyExistsException;
 import org.wso2.carbon.event.simulator.core.exception.FileLimitExceededException;
 import org.wso2.carbon.event.simulator.core.exception.FileOperationsException;
@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
  */
 
 public class FileUploader {
-    private static final Log log = LogFactory.getLog(FileUploader.class);
+    private static final Logger log = LoggerFactory.getLogger(FileUploader.class);
     private static final FileUploader fileUploader = new FileUploader(FileStore.getFileStore());
     /**
      * FileStore object which holds details of uploaded file

@@ -24,14 +24,14 @@ import io.siddhi.core.event.Event;
 import io.siddhi.core.query.output.callback.QueryCallback;
 import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.core.util.EventPrinter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
 
 public class IsLeaderStreamFunctionProcessorTestCase {
     protected static SiddhiManager siddhiManager;
-    private static final Log logger = LogFactory.getLog(IsLeaderStreamFunctionProcessorTestCase.class);
+    private static final Logger logger = LoggerFactory.getLogger(IsLeaderStreamFunctionProcessorTestCase.class);
 
     @Test
     public void testProcess() throws Exception {

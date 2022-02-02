@@ -15,8 +15,8 @@
  */
 package org.wso2.carbon.streaming.integrator.core.internal.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
@@ -31,7 +31,7 @@ import java.io.OutputStreamWriter;
 import java.util.LinkedHashMap;
 
 public class SiddhiAppFilesystemInvoker {
-    private static final Log log = LogFactory.getLog(SiddhiAppFilesystemInvoker.class);
+    private static final Logger log = LoggerFactory.getLogger(SiddhiAppFilesystemInvoker.class);
     private static String directoryPath;
 
     public static boolean save(String siddhiApp, String siddhiAppName)

@@ -42,8 +42,8 @@ import io.siddhi.query.api.util.AnnotationHelper;
 import io.siddhi.query.api.util.ExceptionUtil;
 import io.siddhi.query.compiler.SiddhiCompiler;
 import org.apache.commons.lang3.text.StrSubstitutor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.parser.SiddhiParserDataHolder;
 import org.wso2.siddhi.parser.core.SiddhiTopologyCreator;
 import org.wso2.siddhi.parser.core.util.EventHolder;
@@ -66,7 +66,7 @@ import java.util.UUID;
 
 public class SiddhiTopologyCreatorImpl implements SiddhiTopologyCreator {
 
-    private static final Log log = LogFactory.getLog(SiddhiTopologyCreatorImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(SiddhiTopologyCreatorImpl.class);
     private static final String DEFAULT_MESSAGING_SYSTEM = "nats";
     private SiddhiTopologyDataHolder siddhiTopologyDataHolder;
     private SiddhiApp siddhiApp;

@@ -21,8 +21,8 @@ package org.wso2.carbon.streaming.integrator.core.ha.transport.handlers;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.util.Date;
@@ -38,7 +38,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
     private static long endTime;
     private static int count = 0;
     private static final int TPS_EVENT_BATCH_THRESHOLD = 10000;
-    private static final Log log = LogFactory.getLog(MessageDecoder.class);
+    private static final Logger log = LoggerFactory.getLogger(MessageDecoder.class);
 
     public MessageDecoder(BlockingQueue<ByteBuffer> byteBufferQueue) {
         this.byteBufferQueue = byteBufferQueue;

@@ -26,8 +26,8 @@ import io.siddhi.core.util.snapshot.state.State;
 import io.siddhi.core.util.snapshot.state.StateFactory;
 import io.siddhi.query.api.definition.Attribute;
 import io.siddhi.query.api.definition.TableDefinition;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -42,7 +42,7 @@ public class HACoordinationRecordTableHandler extends RecordTableHandler<HACoord
     private boolean isActiveNode;
     private long lastEventChunkTimestamp;
     private TableDefinition tableDefinition;
-    private static final Log log = LogFactory.getLog(HACoordinationRecordTableHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(HACoordinationRecordTableHandler.class);
 
     @Override
     public StateFactory<TableState> init(String elementId, TableDefinition tableDefinition) {

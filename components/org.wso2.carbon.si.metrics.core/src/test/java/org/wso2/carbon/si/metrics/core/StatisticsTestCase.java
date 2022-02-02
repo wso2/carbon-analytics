@@ -27,9 +27,9 @@ import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.core.stream.output.StreamCallback;
 import io.siddhi.core.util.EventPrinter;
 import io.siddhi.core.util.statistics.EventBufferHolder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.awaitility.Awaitility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.annotations.AfterSuite;
@@ -50,7 +50,7 @@ import java.util.concurrent.TimeUnit;
  * Test case for carbon metrics inside siddhi.
  */
 public class StatisticsTestCase {
-    private static final Log log = LogFactory.getLog(StatisticsTestCase.class);
+    private static final Logger log = LoggerFactory.getLogger(StatisticsTestCase.class);
     private int count;
     private boolean eventArrived;
     protected static Metrics metrics;

@@ -18,8 +18,8 @@
 package org.wso2.siddhi.parser.core.appcreator;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.siddhi.parser.core.topology.InputStreamDataHolder;
 import org.wso2.siddhi.parser.core.topology.OutputStreamDataHolder;
 import org.wso2.siddhi.parser.core.topology.PublishingStrategyDataHolder;
@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class NatsSiddhiAppCreator extends AbstractSiddhiAppCreator {
 
-    private static final Log log = LogFactory.getLog(NatsSiddhiAppCreator.class);
+    private static final Logger log = LoggerFactory.getLogger(NatsSiddhiAppCreator.class);
     //App creator constants
     public static final String APP_NAME = "appName";
     public static final String TOPIC_LIST = "topicList";

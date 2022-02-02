@@ -29,8 +29,8 @@ import io.siddhi.core.stream.output.sink.SinkHandlerManager;
 import io.siddhi.core.table.record.RecordTableHandler;
 import io.siddhi.core.table.record.RecordTableHandlerManager;
 import io.siddhi.core.util.transport.BackoffRetryCounter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
@@ -79,7 +79,7 @@ public class HAManager {
     private int port;
 
     private final static Map<String, Object> passiveNodeDetailsPropertiesMap = new HashMap<>();
-    private static final Log log = LogFactory.getLog(HAManager.class);
+    private static final Logger log = LoggerFactory.getLogger(HAManager.class);
 
     public HAManager(ClusterCoordinator clusterCoordinator, String nodeId, String clusterId,
                      DeploymentConfig deploymentConfig) {

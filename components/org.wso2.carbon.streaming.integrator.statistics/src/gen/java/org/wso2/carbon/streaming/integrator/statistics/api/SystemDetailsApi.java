@@ -19,14 +19,14 @@
 
 package org.wso2.carbon.streaming.integrator.statistics.api;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AnalyticsResponseInterceptor;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.streaming.integrator.statistics.factories.SystemDetailsApiServiceFactory;
@@ -53,7 +53,7 @@ import javax.ws.rs.core.Response;
 @io.swagger.annotations.Api(description = "the system-details API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-19T13:30:25.867Z")
 public class SystemDetailsApi implements Microservice {
-    private static final Log log = LogFactory.getLog(SystemDetailsApi.class);
+    private static final Logger log = LoggerFactory.getLogger(SystemDetailsApi.class);
     private final SystemDetailsApiService delegate = SystemDetailsApiServiceFactory.getSystemDetailsApi();
 
     /**

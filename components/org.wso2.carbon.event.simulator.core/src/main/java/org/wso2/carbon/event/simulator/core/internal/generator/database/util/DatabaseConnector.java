@@ -21,8 +21,8 @@ package org.wso2.carbon.event.simulator.core.internal.generator.database.util;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.event.simulator.core.exception.EventGenerationException;
 import org.wso2.carbon.event.simulator.core.exception.SimulatorInitializationException;
 import org.wso2.carbon.event.simulator.core.model.DBConnectionModel;
@@ -48,7 +48,7 @@ import java.util.Properties;
  */
 public class DatabaseConnector {
 
-    private static final Log log = LogFactory.getLog(DatabaseConnector.class);
+    private static final Logger log = LoggerFactory.getLogger(DatabaseConnector.class);
     private static final String query_attribute_OnlyStartTime = "SELECT %s,%s FROM %s WHERE %s >= %d ORDER BY ABS(%s);";
     private static final String query_attribute_WithBothLimits = "SELECT %s,%s FROM %s WHERE %s >= %d AND %s <= %d " +
             "ORDER BY ABS(%s);";

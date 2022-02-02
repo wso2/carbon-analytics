@@ -18,15 +18,15 @@
 
 package org.wso2.carbon.si.coordination.listener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.commons.MemberEventListener;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.si.coordination.listener.internal.CoordinationListenerDataHolder;
 
 public class CoordinationEventListener extends MemberEventListener {
-    private static final Log log = LogFactory.getLog(CoordinationEventListener.class);
+    private static final Logger log = LoggerFactory.getLogger(CoordinationEventListener.class);
 
     @Override
     public void memberAdded(NodeDetail nodeDetail) {

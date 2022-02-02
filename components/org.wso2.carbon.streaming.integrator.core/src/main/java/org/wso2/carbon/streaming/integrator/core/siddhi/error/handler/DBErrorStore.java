@@ -24,8 +24,8 @@ import io.siddhi.core.util.error.handler.store.ErrorStore;
 import io.siddhi.core.util.error.handler.util.ErroneousEventType;
 import io.siddhi.core.util.error.handler.util.ErrorOccurrence;
 import io.siddhi.core.util.error.handler.util.ErrorType;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.dto.RDBMSQueryConfigurationEntry;
@@ -57,7 +57,7 @@ import javax.sql.rowset.serial.SerialBlob;
  */
 public class DBErrorStore extends ErrorStore {
 
-    private static final Log log = LogFactory.getLog(DBErrorStore.class);
+    private static final Logger log = LoggerFactory.getLogger(DBErrorStore.class);
     private static final String POSTGRES_DATABASE_TYPE = "postgresql";
     private static final String MSSQL_DATABASE_TYPE = "microsoft sql server";
     private static final String ORACLE_DATABASE_TYPE = "oracle";

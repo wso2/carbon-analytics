@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.streaming.integrator.core.persistence.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.util.DBErrorStoreUtils;
 
 import java.sql.Connection;
@@ -29,7 +29,7 @@ import java.sql.Statement;
 import javax.sql.DataSource;
 
 public class DBPersistenceStoreUtils {
-    private static final Log log = LogFactory.getLog(DBErrorStoreUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(DBErrorStoreUtils.class);
 
     /**
      * Method that would create the persistence table

@@ -19,8 +19,8 @@
 package org.wso2.carbon.streaming.integrator.statistics.impl;
 
 import com.google.gson.Gson;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.streaming.integrator.statistics.api.NotFoundException;
 import org.wso2.carbon.streaming.integrator.statistics.api.SystemDetailsApiService;
@@ -36,7 +36,7 @@ import static org.wso2.carbon.streaming.integrator.core.internal.StreamProcessor
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-19T13:30:25.867Z")
 public class SystemDetailsApiServiceImpl extends SystemDetailsApiService {
-    private static final Log log = LogFactory.getLog(SystemDetailsApiServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(SystemDetailsApiServiceImpl.class);
     private static final String PERMISSION_APP_NAME = "SAPP";
     private static final String MANAGE_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.manage";
     private static final String VIEW_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.view";

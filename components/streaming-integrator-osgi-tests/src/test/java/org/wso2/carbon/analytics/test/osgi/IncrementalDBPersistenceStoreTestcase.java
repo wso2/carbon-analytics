@@ -20,8 +20,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.awaitility.Awaitility;
 import org.awaitility.Duration;
 import org.ops4j.pax.exam.Configuration;
@@ -31,6 +29,8 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.exam.testng.listener.PaxExam;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -72,7 +72,7 @@ public class IncrementalDBPersistenceStoreTestcase {
     @Inject
     private DataSourceService dataSourceService;
 
-    private static final Log log = LogFactory.getLog(IncrementalDBPersistenceStoreTestcase.class);
+    private static final Logger log = LoggerFactory.getLogger(IncrementalDBPersistenceStoreTestcase.class);
     private static final String CARBON_YAML_FILENAME = "deployment.yaml";
     private static final String TABLE_NAME = "PERSISTENCE_TABLE";
     private static final String SIDDHIAPP_NAME = "SiddhiAppPersistence";

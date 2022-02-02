@@ -18,8 +18,9 @@
 package org.wso2.carbon.streaming.integrator.statistics.impl;
 
 import com.google.gson.Gson;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import io.siddhi.core.util.statistics.metrics.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.permissions.bean.Permission;
 import org.wso2.carbon.streaming.integrator.statistics.api.ApiResponseMessage;
 import org.wso2.carbon.streaming.integrator.statistics.api.NotFoundException;
@@ -28,7 +29,6 @@ import org.wso2.carbon.streaming.integrator.statistics.bean.WorkerStatistics;
 import org.wso2.carbon.streaming.integrator.statistics.internal.OperatingSystemMetricSet;
 import org.wso2.carbon.streaming.integrator.statistics.internal.exception.MetricsConfigException;
 import org.wso2.msf4j.Request;
-import io.siddhi.core.util.statistics.metrics.Level;
 
 import javax.ws.rs.core.Response;
 
@@ -37,7 +37,7 @@ import static org.wso2.carbon.streaming.integrator.core.internal.StreamProcessor
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen",
         date = "2017-09-19T09:20:55.612Z")
 public class StatisticsApiServiceImpl extends StatisticsApiService {
-    private static final Log log = LogFactory.getLog(StatisticsApiServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(StatisticsApiServiceImpl.class);
     private OperatingSystemMetricSet operatingSystemMetricSet = new OperatingSystemMetricSet();
     private static final String PERMISSION_APP_NAME = "SAPP";
     private static final String MANAGE_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.manage";

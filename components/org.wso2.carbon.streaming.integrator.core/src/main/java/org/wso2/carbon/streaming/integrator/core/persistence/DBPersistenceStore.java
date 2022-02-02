@@ -21,8 +21,8 @@ package org.wso2.carbon.streaming.integrator.core.persistence;
 import com.zaxxer.hikari.HikariDataSource;
 import io.siddhi.core.exception.CannotClearSiddhiAppStateException;
 import io.siddhi.core.util.persistence.PersistenceStore;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.streaming.integrator.core.ha.util.CompressionUtil;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
@@ -51,7 +51,7 @@ import javax.sql.rowset.serial.SerialBlob;
  */
 public class DBPersistenceStore implements PersistenceStore {
 
-    private static final Log log = LogFactory.getLog(DBPersistenceStore.class);
+    private static final Logger log = LoggerFactory.getLogger(DBPersistenceStore.class);
     private static final String MSSQL_DATABASE_TYPE = "microsoft sql server";
     private static final String POSTGRES_DATABASE_TYPE = "postgresql";
 

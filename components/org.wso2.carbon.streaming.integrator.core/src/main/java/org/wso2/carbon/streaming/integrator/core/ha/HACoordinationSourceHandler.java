@@ -28,9 +28,9 @@ import io.siddhi.core.util.snapshot.state.State;
 import io.siddhi.core.util.snapshot.state.StateFactory;
 import io.siddhi.core.util.statistics.ThroughputTracker;
 import io.siddhi.query.api.definition.StreamDefinition;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.streaming.integrator.core.event.queue.QueuedEvent;
 import org.wso2.carbon.streaming.integrator.core.ha.transport.EventSyncConnection;
 import org.wso2.carbon.streaming.integrator.core.ha.transport.EventSyncConnectionPoolManager;
@@ -63,7 +63,7 @@ public class HACoordinationSourceHandler extends SourceHandler<HACoordinationSou
     private AtomicBoolean isWaitingForPassiveNode = new AtomicBoolean(false);
     private AtomicLong lastConnRefusedTimestamp = new AtomicLong(-1);
 
-    private static final Log log = LogFactory.getLog(HACoordinationSourceHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(HACoordinationSourceHandler.class);
 
     public HACoordinationSourceHandler(ThroughputTracker throughputTracker, String sourceType) {
         this.sequenceIDGenerator = EventSyncConnectionPoolManager.getSequenceID();

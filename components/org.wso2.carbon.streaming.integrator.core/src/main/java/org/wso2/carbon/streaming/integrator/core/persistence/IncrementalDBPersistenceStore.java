@@ -23,8 +23,8 @@ import io.siddhi.core.exception.CannotClearSiddhiAppStateException;
 import io.siddhi.core.util.persistence.IncrementalPersistenceStore;
 import io.siddhi.core.util.persistence.util.IncrementalSnapshotInfo;
 import io.siddhi.core.util.persistence.util.PersistenceHelper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
 import org.wso2.carbon.streaming.integrator.core.ha.util.CompressionUtil;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
@@ -51,7 +51,7 @@ import javax.sql.DataSource;
 import javax.sql.rowset.serial.SerialBlob;
 
 public class IncrementalDBPersistenceStore implements IncrementalPersistenceStore {
-    private static final Log log = LogFactory.getLog(IncrementalDBPersistenceStore.class);
+    private static final Logger log = LoggerFactory.getLogger(IncrementalDBPersistenceStore.class);
 
     private static final String MSSQL_DATABASE_TYPE = "microsoft sql server";
     private static final String POSTGRES_DATABASE_TYPE = "postgresql";
