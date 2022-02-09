@@ -1628,8 +1628,8 @@
 
     <properties>
         <carbon.analytics.version>3.0.57-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>5.1.21-SNAPSHOT</siddhi.version>
-        <siddhi.bundle.version>5.1.21-SNAPSHOT</siddhi.bundle.version>
+        <siddhi.version>5.1.21</siddhi.version>
+        <siddhi.bundle.version>5.1.21</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.1.56-SNAPSHOT</carbon.analytics-common.version>
         <log4j.version>2.17.1</log4j.version>
