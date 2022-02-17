@@ -38,7 +38,7 @@ define(['require', 'lodash', 'jquery', 'version'],
                     self.dockerImageNameForm.show();
                     self.templateContainer.find("#docker-image-type-tobuild").prop("checked", false);
                     if (self.dockerImageNameForm.find("#built-docker-image-name-input-field").val() == "") {
-                        self.dockerImageNameForm.find("#built-docker-image-name-input-field").val("wso2/streaming-integrator:1.1.0");
+                        self.dockerImageNameForm.find("#built-docker-image-name-input-field").val("wso2/wso2si:4.1.0");
                     }
                 } else {
                     self.dockerImageNameForm.hide();

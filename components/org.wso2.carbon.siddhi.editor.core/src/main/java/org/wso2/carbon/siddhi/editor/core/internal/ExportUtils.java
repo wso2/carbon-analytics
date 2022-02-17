@@ -19,9 +19,6 @@
 package org.wso2.carbon.siddhi.editor.core.internal;
 
 import io.siddhi.core.stream.input.source.Source;
-import java.nio.file.InvalidPathException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
@@ -51,6 +48,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -62,6 +60,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -563,6 +563,9 @@ public class ExportUtils {
         // EditorDataHolder.getBundleContext().getBundle().getVersion().toString();
         if (version != null && !version.isEmpty()) {
             dockerBaseImgName = dockerBaseImgName.concat(":").concat(version.toLowerCase());
+        }
+        if (!dockerBaseImgName.equals(this.exportAppsRequest.getDockerConfiguration().getImageName())) {
+            dockerBaseImgName = this.exportAppsRequest.getDockerConfiguration().getImageName();
         }
         if (configProvider.getConfigurationObject(Constants.EXPORT_PROPERTIES_NAMESPACE) != null) {
             dockerBaseImgName = (String) ((Map) configProvider

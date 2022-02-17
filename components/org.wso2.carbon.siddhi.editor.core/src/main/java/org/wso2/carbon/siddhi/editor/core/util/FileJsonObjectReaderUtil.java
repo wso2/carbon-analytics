@@ -41,9 +41,17 @@ public class FileJsonObjectReaderUtil {
         Path ioPath = Paths.get(path);
         JsonArray dirs = new JsonArray();
         Iterator<Path> iterator = Files.list(ioPath).iterator();
+        boolean hiddenDirectoriesNeedToBeProcessed = false;
+        for (String dir : directories) {
+            if (dir.contains(".")) {
+                hiddenDirectoriesNeedToBeProcessed = true;
+                break;
+            }
+        }
         while (iterator.hasNext()) {
             Path next = iterator.next();
-            if (Files.isDirectory(next) && !Files.isHidden(next)) {
+            if (Files.isDirectory(next) && !Files.isHidden(next) || Files.isDirectory(next) &&
+                    hiddenDirectoriesNeedToBeProcessed) {
                 JsonObject jsnObj = getJsonObjForFile(next, true);
                 if (directories.contains(jsnObj.get("text").toString())) {
                     dirs.add(jsnObj);

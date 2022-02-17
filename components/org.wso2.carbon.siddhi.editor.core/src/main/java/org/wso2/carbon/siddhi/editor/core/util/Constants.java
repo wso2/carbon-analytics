@@ -72,9 +72,9 @@ public class Constants {
     public static final String FAULT_STREAM_PREFIX = "!";
     public static final String EXPORT_PROPERTIES_NAMESPACE = "exportConfigs";
     public static final String DOCKER_BASE_IMAGE_PROPERTY = "dockerBaseImage";
-    public static final String DEFAULT_SI_DOCKER_BASE_IMAGE_NAME = "wso2/streaming-integrator";
-    public static final String DEFAULT_SI_DOCKER_IMAGE_NAME = "wso2/streaming-integrator:1.0.0";
-    public static final String DEFAULT_SI_DOCKER_IMAGE_VERSION = "1.0.0";
+    public static final String DEFAULT_SI_DOCKER_BASE_IMAGE_NAME = "wso2/wso2si";
+    public static final String DEFAULT_SI_DOCKER_IMAGE_NAME = "wso2/wso2si:4.1.0";
+    public static final String DEFAULT_SI_DOCKER_IMAGE_VERSION = "4.1.0";
     public static final String COLLON = ":";
     public static final String JDBC = "jdbc";
     public static final String DB_URL = "url";
