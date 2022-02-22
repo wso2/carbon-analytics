@@ -358,12 +358,6 @@
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>io.siddhi.extension.io.kafka</groupId>
-                                    <artifactId>siddhi-io-kafka</artifactId>
-                                    <version>${siddhi.io.kafka.version}</version>
-                                    <type>jar</type>
-                                </artifactItem>
-                                <artifactItem>
                                     <groupId>io.siddhi.extension.io.http</groupId>
                                     <artifactId>siddhi-io-http</artifactId>
                                     <version>${siddhi.io.http.version}</version>

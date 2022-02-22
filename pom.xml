@@ -1019,11 +1019,6 @@
                 <version>${siddhi.io.tcp.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.siddhi.extension.io.kafka</groupId>
-                <artifactId>siddhi-io-kafka</artifactId>
-                <version>${siddhi.io.kafka.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>io.siddhi.extension.io.http</groupId>
                 <artifactId>siddhi-io-http</artifactId>
                 <version>${siddhi.io.http.version}</version>
@@ -1355,11 +1350,6 @@
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka_2.11</artifactId>
-                <version>${kafka-2.11.version}</version>
             </dependency>
 
             <!-- Siddhi Metrics related -->
@@ -1789,7 +1779,6 @@
         <quartz.version>2.1.1.wso2v1</quartz.version>
         <metrics.version>3.2.5</metrics.version>
         <commons-lang3.version>3.3.2</commons-lang3.version>
-        <kafka-2.11.version>0.10.0.0</kafka-2.11.version>
         <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
@@ -1837,7 +1826,6 @@
 
         <siddhi.io.tcp.version>3.0.6</siddhi.io.tcp.version>
         <siddhi.io.email.version>2.0.7</siddhi.io.email.version>
-        <siddhi.io.kafka.version>5.0.15</siddhi.io.kafka.version>
         <siddhi.io.http.version>2.2.0</siddhi.io.http.version>
 
         <siddhi.map.json.version>5.2.2</siddhi.map.json.version>
