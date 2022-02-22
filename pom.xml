@@ -1739,7 +1739,7 @@
 
         <carbon.cache.version>1.1.3</carbon.cache.version>
         <carbon.touchpoint.version>1.1.1</carbon.touchpoint.version>
-        <carbon.utils.version>2.1.1-SNAPSHOT</carbon.utils.version>
+        <carbon.utils.version>2.1.1</carbon.utils.version>
         <carbon.config.version>2.1.16</carbon.config.version>
         <carbon.config.version.range>[2.1.5, 3.0.0)</carbon.config.version.range>
         <carbon.securevault.version>5.0.13</carbon.securevault.version>
@@ -1793,7 +1793,7 @@
         <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.8.4-SNAPSHOT</msf4j.version>
+        <msf4j.version>2.8.4</msf4j.version>
         <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
         <com.fasterxml.jackson.core.version>2.9.8</com.fasterxml.jackson.core.version>
         <com.fasterxml.jackson.core.version.range>[2.9.0, 2.10.0)</com.fasterxml.jackson.core.version.range>
@@ -1835,14 +1835,14 @@
 
         <!--Siddhi Extension Versions-->
 
-        <siddhi.io.tcp.version>3.0.4</siddhi.io.tcp.version>
-        <siddhi.io.email.version>2.0.3</siddhi.io.email.version>
-        <siddhi.io.kafka.version>5.0.4</siddhi.io.kafka.version>
+        <siddhi.io.tcp.version>3.0.6</siddhi.io.tcp.version>
+        <siddhi.io.email.version>2.0.7</siddhi.io.email.version>
+        <siddhi.io.kafka.version>5.0.15</siddhi.io.kafka.version>
         <siddhi.io.http.version>2.2.0</siddhi.io.http.version>
 
-        <siddhi.map.json.version>5.1.0</siddhi.map.json.version>
-        <siddhi.map.binary.version>2.1.0</siddhi.map.binary.version>
-        <siddhi.map.xml.version>5.1.0</siddhi.map.xml.version>
+        <siddhi.map.json.version>5.2.2</siddhi.map.json.version>
+        <siddhi.map.binary.version>2.1.1</siddhi.map.binary.version>
+        <siddhi.map.xml.version>5.2.2</siddhi.map.xml.version>
 
         <siddhi.store.rdbms.version>6.0.4</siddhi.store.rdbms.version>
         <siddhi.store.solr.version>2.0.0</siddhi.store.solr.version>
