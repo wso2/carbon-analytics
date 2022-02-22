@@ -18,15 +18,24 @@
 
 package org.wso2.carbon.streaming.integrator.core.ha;
 
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.stream.input.source.SourceHandler;
 import io.siddhi.core.stream.input.source.SourceHandlerManager;
+import io.siddhi.core.stream.output.sink.SinkHandler;
 import io.siddhi.core.stream.output.sink.SinkHandlerManager;
+import io.siddhi.core.table.record.RecordTableHandler;
 import io.siddhi.core.table.record.RecordTableHandlerManager;
-import org.apache.log4j.Logger;
+import io.siddhi.core.util.transport.BackoffRetryCounter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.cluster.coordinator.commons.node.NodeDetail;
 import org.wso2.carbon.cluster.coordinator.service.ClusterCoordinator;
 import org.wso2.carbon.databridge.commons.ServerEventListener;
-import org.wso2.carbon.streaming.integrator.core.DeploymentMode;
 import org.wso2.carbon.streaming.integrator.common.HAStateChangeListener;
+import org.wso2.carbon.streaming.integrator.core.DeploymentMode;
 import org.wso2.carbon.streaming.integrator.core.NodeInfo;
 import org.wso2.carbon.streaming.integrator.core.event.queue.EventListMapManager;
 import org.wso2.carbon.streaming.integrator.core.ha.tcp.TCPServer;
@@ -37,14 +46,6 @@ import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHol
 import org.wso2.carbon.streaming.integrator.core.internal.beans.DeploymentConfig;
 import org.wso2.carbon.streaming.integrator.core.internal.beans.EventSyncClientPoolConfig;
 import org.wso2.carbon.streaming.integrator.core.persistence.PersistenceManager;
-import io.siddhi.core.SiddhiAppRuntime;
-import io.siddhi.core.SiddhiManager;
-import io.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
-import io.siddhi.core.stream.input.InputHandler;
-import io.siddhi.core.stream.input.source.SourceHandler;
-import io.siddhi.core.stream.output.sink.SinkHandler;
-import io.siddhi.core.table.record.RecordTableHandler;
-import io.siddhi.core.util.transport.BackoffRetryCounter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -78,7 +79,7 @@ public class HAManager {
     private int port;
 
     private final static Map<String, Object> passiveNodeDetailsPropertiesMap = new HashMap<>();
-    private static final Logger log = Logger.getLogger(HAManager.class);
+    private static final Logger log = LoggerFactory.getLogger(HAManager.class);
 
     public HAManager(ClusterCoordinator clusterCoordinator, String nodeId, String clusterId,
                      DeploymentConfig deploymentConfig) {

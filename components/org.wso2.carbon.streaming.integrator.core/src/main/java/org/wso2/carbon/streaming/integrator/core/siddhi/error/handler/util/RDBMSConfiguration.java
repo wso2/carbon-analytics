@@ -18,14 +18,12 @@
 
 package org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.util;
 
-import org.apache.log4j.Logger;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
 import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.dto.RDBMSQueryConfigurationEntry;
-import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.query.QueryManager;
 import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.exception.DatasourceConfigurationException;
-
+import org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.query.QueryManager;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -37,7 +35,6 @@ public class RDBMSConfiguration {
 
     private static RDBMSConfiguration config = new RDBMSConfiguration();
 
-    private static final Logger log = Logger.getLogger(RDBMSConfiguration.class);
     private static final String DB2_DB_TYPE = "db2";
 
     private RDBMSConfiguration() {

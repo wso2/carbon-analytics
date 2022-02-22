@@ -18,16 +18,15 @@
  */
 package org.wso2.carbon.streaming.integrator.statistics.api;
 
-
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AnalyticsResponseInterceptor;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.streaming.integrator.core.util.StatsEnable;
@@ -58,7 +57,7 @@ import javax.ws.rs.core.Response;
 @io.swagger.annotations.Api(description = "The statistics API")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-09-11T07:22:13.522Z")
 public class StatisticsApi implements Microservice   {
-    private static final Log log = LogFactory.getLog(StatisticsApi.class);
+    private static final Logger log = LoggerFactory.getLogger(StatisticsApi.class);
     private final StatisticsApiService delegate = StatisticsApiServiceFactory.getStatisticsApi();
     /**
      * This is the activation method of ServiceComponent. This will be called when it's references are fulfilled

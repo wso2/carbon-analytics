@@ -3074,6 +3074,30 @@
 
 <!-- Docker export unique steps -->
 <div id="docker-path-step-5" class="export-selector">
+    <div class='docker-config-container' id='docker-image-type-container-id'>
+        <div class='step-description' id="docker-image-type">Select Docker image:</div>
+        <div class="docker-config-form">
+            <div id='k8s-path-missing-docker-build-type-error-message' class='alert alert-danger' hidden>
+                Required to fill Docker Configurations
+            </div>
+            <div id='k8s-path-missing-docker-build-type-upper-error' class='alert alert-danger' hidden>
+                Docker Image Tag cannot contain uppercase letters.
+            </div>
+            <input class="docker-checkbox" type="radio" name="docker-image-type-name" id="docker-image-type-existing"
+                   value="existing">
+            <label class="label-description">Use an existing Docker image</label>
+            <br>
+            <div class="docker-details-form" id="k8s-path-docker-image-name-form" hidden>
+                <div class="docker-details-row">
+                    <label class="clearfix">* Docker Image:</label>
+                    <input class="export-file-dialog-form-control" type="text" id="built-docker-image-name-input-field"
+                           placeholder="<DOCKER_REGISTRY_NAME>/<IMAGE_NAME>:<IMAGE_VERSION>">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="docker-path-step-6" class="export-selector">
     <div class='export-siddhi-app-list' id='docker-additional-bundles-list'>
         <div class='step-description'>Add additional libraries</div>
         <div class='form-group'>

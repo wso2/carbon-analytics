@@ -18,7 +18,6 @@
 package org.wso2.carbon.streaming.integrator.core.ha.tcp;
 
 
-import org.apache.log4j.Logger;
 import org.wso2.carbon.streaming.integrator.core.ha.util.HAConstants;
 import org.wso2.carbon.streaming.integrator.core.util.BinaryMessageConverterUtil;
 import io.siddhi.core.event.Event;
@@ -36,7 +35,6 @@ import java.util.zip.Inflater;
  * This is used within data bridge to create the event from the row message received.
  */
 public class SiddhiEventConverter {
-    static final Logger LOG = Logger.getLogger(SiddhiEventConverter.class);
     private static int count = 0;
 
 

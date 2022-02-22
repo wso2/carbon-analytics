@@ -18,19 +18,20 @@
 
 package org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.sql.DataSource;
 
 /**
  * Contains utility methods for {@link org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.DBErrorStore}.
  */
 public class DBErrorStoreUtils {
-    private static final Logger log = Logger.getLogger(DBErrorStoreUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(DBErrorStoreUtils.class);
 
     public static void createTableIfNotExists(ExecutionInfo executionInfo, DataSource dataSource, String dataSourceName,
                                              String tableName) {

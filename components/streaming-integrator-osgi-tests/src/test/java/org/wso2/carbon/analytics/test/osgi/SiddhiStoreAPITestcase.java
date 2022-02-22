@@ -20,6 +20,7 @@
 package org.wso2.carbon.analytics.test.osgi;
 
 import com.google.gson.Gson;
+import io.siddhi.core.event.Event;
 import org.awaitility.Duration;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
@@ -29,6 +30,8 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.exam.testng.listener.PaxExam;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -43,7 +46,6 @@ import org.wso2.carbon.siddhi.store.api.rest.model.Query;
 import org.wso2.carbon.streaming.integrator.common.EventStreamService;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import org.wso2.msf4j.MicroservicesRegistry;
-import io.siddhi.core.event.Event;
 
 import java.net.URI;
 import java.nio.file.Path;
@@ -54,13 +56,12 @@ import javax.ws.rs.core.Response;
 import static org.awaitility.Awaitility.await;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.carbonDistribution;
 import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFile;
-import static org.wso2.carbon.container.options.CarbonDistributionOption.debug;
 
 @Listeners(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class SiddhiStoreAPITestcase {
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SiddhiStoreAPITestcase.class);
+    private static final Logger log = LoggerFactory.getLogger(SiddhiStoreAPITestcase.class);
     private static final String APP_NAME = "StoreApiTest";
     private static final String SIDDHI_EXTENSION = ".siddhi";
     private static final String STORE_API_BUNDLE_NAME = "org.wso2.carbon.siddhi.store.api.rest";

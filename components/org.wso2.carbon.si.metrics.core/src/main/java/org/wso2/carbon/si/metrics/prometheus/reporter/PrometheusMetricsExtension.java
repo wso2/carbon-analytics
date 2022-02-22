@@ -17,9 +17,6 @@
  */
 package org.wso2.carbon.si.metrics.prometheus.reporter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -34,6 +31,10 @@ import org.wso2.carbon.metrics.core.reporter.ReporterBuildException;
 import org.wso2.carbon.metrics.core.spi.MetricsExtension;
 import org.wso2.carbon.si.metrics.prometheus.reporter.config.PrometheusMetricsConfig;
 import org.wso2.carbon.si.metrics.prometheus.reporter.config.PrometheusReporterConfig;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * * Metrics Extension to support Prometheus Reporter.

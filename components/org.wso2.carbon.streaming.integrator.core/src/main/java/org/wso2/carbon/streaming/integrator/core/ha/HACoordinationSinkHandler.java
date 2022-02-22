@@ -20,7 +20,7 @@ package org.wso2.carbon.streaming.integrator.core.ha;
 
 import io.siddhi.core.util.snapshot.state.State;
 import io.siddhi.core.util.snapshot.state.StateFactory;
-import org.apache.log4j.Logger;
+
 import io.siddhi.core.event.Event;
 import io.siddhi.core.stream.output.sink.SinkHandler;
 import io.siddhi.core.stream.output.sink.SinkHandlerCallback;
@@ -32,7 +32,6 @@ import java.util.Map;
  * Implementation of {@link SinkHandler} used for 2 node minimum HA
  */
 public class HACoordinationSinkHandler extends SinkHandler<HACoordinationSinkHandler.SinkState> {
-    private static final Logger log = Logger.getLogger(HACoordinationSinkHandler.class);
 
     private boolean isActiveNode;
     private long lastPublishedEventTimestamp = 0L;

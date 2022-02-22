@@ -787,6 +787,9 @@ define(['app/main', 'jquery'],
         export_docker_path_step_5: {
             selector: "#docker-path-step-5"
         },
+        export_docker_path_step_6: {
+            selector: "#docker-path-step-6"
+        },
         export_docker_config_common_step: {
             selector: "#docker-config-common-step"
         }

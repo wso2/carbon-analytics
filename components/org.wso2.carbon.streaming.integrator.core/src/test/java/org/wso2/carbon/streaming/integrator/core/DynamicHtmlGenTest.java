@@ -16,18 +16,20 @@
 
 package org.wso2.carbon.streaming.integrator.core;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.wso2.carbon.streaming.integrator.core.codegen.DynamicHtmlGen;
+import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSourceHandler;
 
 public class DynamicHtmlGenTest {
 
     @BeforeTest
     public void setDebugLogLevel() {
-        Logger.getLogger(DynamicHtmlGenTest.class.getName()).setLevel(Level.DEBUG);
+        ((Logger) LogManager.getLogger(HACoordinationSourceHandler.class)).setLevel(Level.DEBUG);
     }
 
     @Test

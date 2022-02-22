@@ -17,8 +17,8 @@
  */
 package org.wso2.carbon.streaming.integrator.statistics.internal;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
@@ -32,7 +32,7 @@ import java.util.Date;
  * This is a bean class for keeping the worker general details.
  */
 public class WorkerGeneralDetails {
-    private static final Log logger = LogFactory.getLog(WorkerGeneralDetails.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkerGeneralDetails.class);
     private static WorkerGeneralDetails instance = new WorkerGeneralDetails();
     private String carbonId;
     private String javaRuntimeName;

@@ -16,8 +16,9 @@
 //
 //package org.wso2.carbon.streaming.integrator.core;
 //
-//import org.apache.log4j.Level;
-//import org.apache.log4j.Logger;
+//import org.apache.logging.log4j.Level;
+//import org.apache.logging.log4j.LogManager;
+//import org.apache.logging.log4j.core.Logger;
 //import org.mockito.Mockito;
 //import org.powermock.modules.testng.PowerMockTestCase;
 //import org.testng.Assert;
@@ -42,7 +43,7 @@
 //
 //    @BeforeTest
 //    public void setDebugLogLevel() {
-//        Logger.getLogger(HACoordinationRecordTableHandler.class.getName()).setLevel(Level.DEBUG);
+//        ((Logger) LogManager.getLogger(HACoordinationRecordTableHandler.class)).setLevel(Level.DEBUG);
 //    }
 //
 //    @Test

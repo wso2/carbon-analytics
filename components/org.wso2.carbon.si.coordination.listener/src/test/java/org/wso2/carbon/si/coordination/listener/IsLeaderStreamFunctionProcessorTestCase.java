@@ -18,19 +18,20 @@
 
 package org.wso2.carbon.si.coordination.listener;
 
-import org.apache.log4j.Logger;
-import org.testng.AssertJUnit;
-import org.testng.annotations.Test;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.event.Event;
 import io.siddhi.core.query.output.callback.QueryCallback;
 import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.core.util.EventPrinter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
 public class IsLeaderStreamFunctionProcessorTestCase {
     protected static SiddhiManager siddhiManager;
-    private static Logger logger = Logger.getLogger(IsLeaderStreamFunctionProcessorTestCase.class);
+    private static final Logger logger = LoggerFactory.getLogger(IsLeaderStreamFunctionProcessorTestCase.class);
 
     @Test
     public void testProcess() throws Exception {

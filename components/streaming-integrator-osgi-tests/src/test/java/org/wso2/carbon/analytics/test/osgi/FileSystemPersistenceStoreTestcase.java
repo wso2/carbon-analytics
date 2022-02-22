@@ -16,7 +16,11 @@
 
 package org.wso2.carbon.analytics.test.osgi;
 
-import org.apache.log4j.Logger;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.awaitility.Awaitility;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.ExamFactory;
@@ -31,9 +35,6 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.analytics.test.osgi.util.SiddhiAppUtil;
 import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
-import io.siddhi.core.SiddhiAppRuntime;
-import io.siddhi.core.SiddhiManager;
-import io.siddhi.core.exception.CannotRestoreSiddhiAppStateException;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -50,7 +51,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 @ExamFactory(CarbonContainerFactory.class)
 public class FileSystemPersistenceStoreTestcase {
 
-    private static final Logger log = Logger.getLogger(FileSystemPersistenceStoreTestcase.class);
+    private static final Log log = LogFactory.getLog(FileSystemPersistenceStoreTestcase.class);
     private static final String DEPLOYMENT_FILENAME = "deployment.yaml";
     private static final String PERSISTENCE_FOLDER = "siddhi-app-persistence";
     private static final String SIDDHIAPP_NAME = "SiddhiAppPersistence";

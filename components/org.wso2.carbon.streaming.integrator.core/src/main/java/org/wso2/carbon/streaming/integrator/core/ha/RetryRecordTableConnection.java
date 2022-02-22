@@ -16,10 +16,11 @@
 
 package org.wso2.carbon.streaming.integrator.core.ha;
 
-import org.apache.log4j.Logger;
 import io.siddhi.core.exception.ConnectionUnavailableException;
 import io.siddhi.core.table.record.RecordTableHandler;
 import io.siddhi.core.util.transport.BackoffRetryCounter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +35,7 @@ public class RetryRecordTableConnection implements Runnable {
     private final ScheduledExecutorService scheduledExecutorService;
     private int count = 0;
 
-    private static final Logger log = Logger.getLogger(RetryRecordTableConnection.class);
+    private static final Logger log = LoggerFactory.getLogger(RetryRecordTableConnection.class);
 
     public RetryRecordTableConnection(BackoffRetryCounter backoffRetryCounter, RecordTableHandler recordTableHandler,
                                       ScheduledExecutorService scheduledExecutorService) {

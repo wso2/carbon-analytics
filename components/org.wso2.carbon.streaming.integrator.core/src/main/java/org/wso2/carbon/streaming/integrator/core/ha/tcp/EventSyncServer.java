@@ -28,7 +28,8 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.streaming.integrator.core.event.queue.EventListMapManager;
 import org.wso2.carbon.streaming.integrator.core.ha.transport.handlers.MessageDecoder;
 import org.wso2.carbon.streaming.integrator.core.ha.util.HAConstants;
@@ -38,12 +39,9 @@ import org.wso2.carbon.streaming.integrator.core.util.BinaryMessageConverterUtil
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -59,7 +57,7 @@ public class EventSyncServer {
     private ChannelFuture channelFuture;
     private String hostAndPort;
     private EventSyncServerConfig serverConfig;
-    private static final Logger log = Logger.getLogger(EventSyncServer.class);
+    private static final Logger log = LoggerFactory.getLogger(EventSyncServer.class);
     private EventListMapManager eventListMapManager = new EventListMapManager();
     private BlockingQueue<ByteBuffer> eventByteBufferQueue;
     private ExecutorService eventBufferExtractorExecutorService;

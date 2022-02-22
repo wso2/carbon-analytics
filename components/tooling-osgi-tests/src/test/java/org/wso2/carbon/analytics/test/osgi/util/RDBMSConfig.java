@@ -17,7 +17,8 @@
 package org.wso2.carbon.analytics.test.osgi.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.test.osgi.DBPersistenceStoreTestcase;
 
 import java.io.BufferedReader;
@@ -31,7 +32,7 @@ import java.net.URISyntaxException;
 
 public class RDBMSConfig {
 
-    private static final Logger log = Logger.getLogger(RDBMSConfig.class);
+    private static final Log log = LogFactory.getLog(RDBMSConfig.class);
     private static final String YAML_DATASOURCE_CONFIG_JDBC_URL = "          jdbcUrl:";
     private static final String YAML_DATASOURCE_CONFIG_USERNAME = "          username:";
     private static final String YAML_DATASOURCE_CONFIG_PASSWORD = "          password:";

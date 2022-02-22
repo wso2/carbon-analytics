@@ -19,8 +19,17 @@
 
 package org.wso2.carbon.si.metrics.core;
 
-import org.apache.log4j.Logger;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.config.StatisticsConfiguration;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.stream.output.StreamCallback;
+import io.siddhi.core.util.EventPrinter;
+import io.siddhi.core.util.statistics.EventBufferHolder;
 import org.awaitility.Awaitility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.annotations.AfterSuite;
@@ -33,23 +42,15 @@ import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.metrics.core.Metrics;
 import org.wso2.carbon.si.metrics.core.internal.MetricsDataHolder;
 import org.wso2.carbon.si.metrics.core.internal.MetricsManager;
-import io.siddhi.core.SiddhiAppRuntime;
-import io.siddhi.core.SiddhiManager;
-import io.siddhi.core.config.StatisticsConfiguration;
-import io.siddhi.core.event.Event;
-import io.siddhi.core.stream.input.InputHandler;
-import io.siddhi.core.stream.output.StreamCallback;
-import io.siddhi.core.util.EventPrinter;
-import io.siddhi.core.util.statistics.EventBufferHolder;
+import org.wso2.carbon.si.metrics.core.util.TestUtils;
 
 import java.util.concurrent.TimeUnit;
-import org.wso2.carbon.si.metrics.core.util.TestUtils;
 
 /**
  * Test case for carbon metrics inside siddhi.
  */
 public class StatisticsTestCase {
-    private static final Logger log = Logger.getLogger(StatisticsTestCase.class);
+    private static final Logger log = LoggerFactory.getLogger(StatisticsTestCase.class);
     private int count;
     private boolean eventArrived;
     protected static Metrics metrics;

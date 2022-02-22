@@ -18,8 +18,12 @@
 
 package org.wso2.carbon.streaming.integrator.core;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import io.siddhi.core.event.Event;
+import io.siddhi.core.stream.output.sink.SinkHandlerCallback;
+import io.siddhi.query.api.definition.StreamDefinition;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.modules.testng.PowerMockTestCase;
@@ -28,9 +32,6 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSinkHandler;
 import org.wso2.carbon.streaming.integrator.core.ha.HACoordinationSinkHandlerManager;
-import io.siddhi.core.event.Event;
-import io.siddhi.core.stream.output.sink.SinkHandlerCallback;
-import io.siddhi.query.api.definition.StreamDefinition;
 
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -42,7 +43,7 @@ public class HACoordinationSinkHandlerTest extends PowerMockTestCase {
 
     @BeforeTest
     public void setDebugLogLevel() {
-        Logger.getLogger(HACoordinationSinkHandler.class.getName()).setLevel(Level.DEBUG);
+        ((Logger) LogManager.getLogger(HACoordinationSinkHandler.class.getName())).setLevel(Level.DEBUG);
     }
 
     @Test (enabled = false)

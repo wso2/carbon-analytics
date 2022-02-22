@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.streaming.integrator.core.persistence.util;
 
-import org.apache.log4j.Logger;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 import org.wso2.carbon.streaming.integrator.core.internal.StreamProcessorDataHolder;
@@ -36,7 +35,6 @@ public class RDBMSConfiguration {
 
     private static RDBMSConfiguration config = new RDBMSConfiguration();
 
-    private static final Logger log = Logger.getLogger(RDBMSConfiguration.class);
     private static final String DB2_DB_TYPE = "db2";
 
     private RDBMSConfiguration() {

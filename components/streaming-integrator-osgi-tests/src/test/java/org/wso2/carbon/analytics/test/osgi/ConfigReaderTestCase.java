@@ -23,6 +23,8 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.exam.testng.listener.PaxExam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -46,7 +48,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 @ExamReactorStrategy(PerClass.class)
 @ExamFactory(CarbonContainerFactory.class)
 public class ConfigReaderTestCase {
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ConfigReaderTestCase.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigReaderTestCase.class);
     private static final String DEFAULT_USER_NAME = "admin";
     private static final String DEFAULT_PASSWORD = "admin";
     private static final String CARBON_YAML_FILENAME = "deployment.yaml";

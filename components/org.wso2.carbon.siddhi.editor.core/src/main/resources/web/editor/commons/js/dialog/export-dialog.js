@@ -26,13 +26,15 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                     var exportKubeStep6 = _.cloneDeep(_.get(options.config, 'export_k8s_path_step_6'));
                     var exportKubeStep8 = _.cloneDeep(_.get(options.config, 'export_k8s_path_step_8'));
                     var exportDockerStep5 = _.cloneDeep(_.get(options.config, 'export_docker_path_step_5'));
+                    var exportDockerStep6 = _.cloneDeep(_.get(options.config, 'export_docker_path_step_6'));
                     var exportConfigCommonStep = _.cloneDeep(_.get(options.config, 'export_docker_config_common_step'));
                     this._exportKubeStep5Container = $(_.get(exportKubeStep5, 'selector')).clone();
                     this._exportKubeStep6Container = $(_.get(exportKubeStep6, 'selector')).clone();
                     this._exportKubeStep7Container = $(_.get(exportConfigCommonStep, 'selector')).clone();
                     this._exportKubeStep8Container = $(_.get(exportKubeStep8, 'selector')).clone();
                     this._exportDockerStep5Container = $(_.get(exportDockerStep5, 'selector')).clone();
-                    this._exportDockerStep6Container = $(_.get(exportConfigCommonStep, 'selector')).clone();
+                    this._exportDockerStep6Container = $(_.get(exportDockerStep6, 'selector')).clone();
+                    this._exportDockerStep7Container = $(_.get(exportConfigCommonStep, 'selector')).clone();
 
                     this._isExportDockerFlow = options.isExportDockerFlow;
 
@@ -83,19 +85,23 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
 
                     if (this._isExportDockerFlow) {
                         heading.text('Export Siddhi Apps for Docker image');
-                        var dockerStepWidth = 100.0/6;
+                        var dockerStepWidth = 100.0/7;
                         var formSteps = form.find('#form-steps');
                         for (i = 0; i < formSteps.children().length; i++) {
                             formSteps.children()[i].setAttribute("style", "max-width: " + dockerStepWidth.toString() + "%;")
                         }
                         formSteps.append('<li style="max-width: ' + dockerStepWidth.toString()  + '%;"><a href="#docker-path-step-5" ' +
-                            'class="link-disabled">Step 5<br/><small>Configure Custom Docker Image</small>' +
+                            'class="link-disabled">Step 5<br/><small>Select Docker Image</small>' +
+                            '</a></li>');
+                        formSteps.append('<li style="max-width: ' + dockerStepWidth.toString()  + '%;"><a href="#docker-path-step-6" ' +
+                            'class="link-disabled">Step 6<br/><small>Configure Custom Docker Image</small>' +
                             '</a></li>');
                         formSteps.append('<li style="max-width: ' + dockerStepWidth.toString()  + '%;"><a href="#docker-config-common-step" ' +
-                            'class="link-disabled">Step 6<br/><small>Export Custom Docker Image</small>' +
+                            'class="link-disabled">Step 7<br/><small>Export Custom Docker Image</small>' +
                             '</a></li>');
                         form.find('#form-containers').append(this._exportDockerStep5Container);
                         form.find('#form-containers').append(this._exportDockerStep6Container);
+                        form.find('#form-containers').append(this._exportDockerStep7Container);
                     } else {
                         heading.text('Export Siddhi Apps For Kubernetes CRD');
                         var k8sStepWidth = 100.0/8;
@@ -220,15 +226,12 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                 });
                                 self._configTemplateModel.render();
                             } else if (stepNumber === 4) {
-                                if (self._exportType === 'kubernetes') {
+                                if (self._exportType === 'kubernetes' || self._exportType === "docker") {
                                     self._dockerImageTypeModel = new DockerImageTypeDialog({
                                         templateHeader: exportContainer.find('#docker-image-type-container-id'),
                                         baseUrl: self._baseUrl,
                                     });
                                     self._dockerImageTypeModel.render();
-                                } else {
-                                    self._jarsSelectorDialog = new JarsSelectorDialog(options, form);
-                                    self._jarsSelectorDialog.render();
                                 }
                             } else if (stepNumber === 3) {
                                 var fillTemplateContainer
@@ -253,19 +256,10 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                         self._jarsSelectorDialog = new JarsSelectorDialog(options, form);
                                         self._jarsSelectorDialog.render();
                                     }
-                                } else {
-                                    var dockerImageName = "";
-                                    if (self._siddhiAppSelector.getSiddhiProcessName() != "sample-siddhi-process") {
-                                        dockerImageName = self._siddhiAppSelector.getSiddhiProcessName();
-                                    }
-                                    self._dockerConfigModel = new DockerConfigDialog({
-                                        app: self._options,
-                                        templateHeader: exportContainer.find('#docker-config-container-id'),
-                                        exportType: self._exportType,
-                                        payload: self._payload,
-                                        dockerImageName: dockerImageName
-                                    });
-                                    self._dockerConfigModel.render();
+                                } else if (self._exportType === 'docker') {
+                                    self._isSkippedDockerConfigSteps = false;
+                                    self._jarsSelectorDialog = new JarsSelectorDialog(options, form);
+                                    self._jarsSelectorDialog.render();
                                 }
                             } else if (stepNumber === 6 && self._exportType === 'kubernetes') {
                                 self._dockerConfigModel = new DockerConfigDialog({
@@ -274,6 +268,19 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                                     exportType:self._exportType,
                                     payload: self._payload,
                                     dockerImageName: self._siddhiAppSelector.getSiddhiProcessName()
+                                });
+                                self._dockerConfigModel.render();
+                            } else if (stepNumber === 6 && self._exportType === 'docker') {
+                                var dockerImageName = "";
+                                if (self._siddhiAppSelector.getSiddhiProcessName() != "sample-siddhi-process") {
+                                    dockerImageName = self._siddhiAppSelector.getSiddhiProcessName();
+                                }
+                                self._dockerConfigModel = new DockerConfigDialog({
+                                    app: self._options,
+                                    templateHeader: exportContainer.find('#docker-config-container-id'),
+                                    exportType: self._exportType,
+                                    payload: self._payload,
+                                    dockerImageName: dockerImageName
                                 });
                                 self._dockerConfigModel.render();
                             } else if (stepNumber === 7 && self._exportType === 'kubernetes') {
@@ -323,8 +330,8 @@ define(['require', 'jquery', 'log', 'backbone', 'smart_wizard', 'siddhiAppSelect
                         this._payload.bundles = []
                         this._payload.jars = []
                     } else {
-                        this._payload.bundles = this._jarsSelectorDialog.getSelected('bundles');
-                        this._payload.jars = this._jarsSelectorDialog.getSelected('jars');
+                        this._payload.bundles = this._jarsSelectorDialog.getSelected('.bundles');
+                        this._payload.jars = this._jarsSelectorDialog.getSelected('.jars');
                     }
 
                     var payloadInputField = $('<input id="payload" name="payload" type="text" style="display: none;"/>')

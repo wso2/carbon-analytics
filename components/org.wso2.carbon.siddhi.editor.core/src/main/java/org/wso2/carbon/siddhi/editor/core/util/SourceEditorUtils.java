@@ -27,7 +27,8 @@ import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.query.api.definition.AbstractDefinition;
 import io.siddhi.query.api.definition.AggregationDefinition;
 import io.siddhi.query.api.definition.StreamDefinition;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.AttributeMetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.ExampleMetaData;
 import org.wso2.carbon.siddhi.editor.core.commons.metadata.MetaData;
@@ -60,7 +61,7 @@ import java.util.regex.Pattern;
  */
 public class SourceEditorUtils {
 
-    static final Logger LOGGER = Logger.getLogger(SourceEditorUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourceEditorUtils.class);
 
     private SourceEditorUtils() {
 

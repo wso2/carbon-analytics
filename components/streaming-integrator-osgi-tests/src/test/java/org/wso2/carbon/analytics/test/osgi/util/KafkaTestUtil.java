@@ -28,15 +28,16 @@ import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.curator.test.TestingServer;
-import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
 public class KafkaTestUtil {
-    private static final Logger log = Logger.getLogger(KafkaTestUtil.class);
+    private static final Log log = LogFactory.getLog(KafkaTestUtil.class);
     private static TestingServer zkTestServer;
     private static KafkaServerStartable kafkaServer;
     private static final String kafkaLogDir = "tmp_kafka_dir";

@@ -19,11 +19,12 @@
 package org.wso2.carbon.streaming.integrator.core.persistence;
 
 import com.google.common.io.Files;
-import org.apache.log4j.Logger;
-import org.wso2.carbon.streaming.integrator.core.ha.util.CompressionUtil;
-import org.wso2.carbon.streaming.integrator.core.persistence.util.PersistenceConstants;
 import io.siddhi.core.exception.CannotClearSiddhiAppStateException;
 import io.siddhi.core.util.persistence.PersistenceStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.wso2.carbon.streaming.integrator.core.ha.util.CompressionUtil;
+import org.wso2.carbon.streaming.integrator.core.persistence.util.PersistenceConstants;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +35,7 @@ import java.util.Map;
  */
 public class FileSystemPersistenceStore implements PersistenceStore {
 
-    private static final Logger log = Logger.getLogger(FileSystemPersistenceStore.class);
+    private static final Logger log = LoggerFactory.getLogger(FileSystemPersistenceStore.class);
     private int numberOfRevisionsToSave;
     private String folder;
 
