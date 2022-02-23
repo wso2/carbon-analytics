@@ -210,7 +210,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "protobuf([_-])java([_-])3.17.3.jar"
+        "lookupRegex": "protobuf([_-])java([_-])3.17.3(.*).jar"
       },
       {
         "name": "wire-runtime",
@@ -225,7 +225,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "wire([_-])runtime([_-])3.17.3.jar"
+        "lookupRegex": "wire([_-])runtime([_-])3.6.1(.*).jar"
       },
       {
         "name": "wire-schema",
@@ -240,7 +240,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "wire([_-])schema([_-])3.17.3.jar"
+        "lookupRegex": "wire([_-])schema([_-])3.6.1(.*).jar"
       }
     ]
   },
