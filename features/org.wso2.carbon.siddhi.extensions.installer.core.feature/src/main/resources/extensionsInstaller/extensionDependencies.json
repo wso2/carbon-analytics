@@ -272,7 +272,7 @@
         "version": "5.9.0",
         "download": {
           "autoDownloadable": false,
-          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/org/apache/activemq/activemq-client/5.9.0/activemq-client-5.9.0.jar'.<br/>2. Navigate to '{WSO2SIHome}/bin' and run the following command:<br/>&nbsp;For Linux: './icf-provider.sh org.apache.activemq.jndi.ActiveMQInitialContextFactory downloaded/jar/path/activemq-client-5.x.x.jar carbon_home/lib'.<br/>&nbsp;For Windows: './icf-provider.bat org.apache.activemq.jndi.ActiveMQInitialContextFactory downloaded\\jar\\path\\activemq-client-5.x.x.jar carbon_home\\lib'."
+          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/org/apache/activemq/activemq-client/5.9.0/activemq-client-5.9.0.jar'.<br/>2. Navigate to '{WSO2SI/Tooling_Home}/bin' and run the following command:<br/>&nbsp;For Linux: './icf-provider.sh org.apache.activemq.jndi.ActiveMQInitialContextFactory downloaded/jar/path/activemq-client-5.x.x.jar carbon_home/lib'.<br/>&nbsp;For Windows: './icf-provider.bat org.apache.activemq.jndi.ActiveMQInitialContextFactory downloaded\\jar\\path\\activemq-client-5.x.x.jar carbon_home\\lib'."
         },
         "usages": [
           {
@@ -694,7 +694,7 @@
         "version": "0.5.0",
         "download": {
           "autoDownloadable": false,
-          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/io/prometheus/simpleclient_httpserver/0.5.0/simpleclient_httpserver-0.5.0.jar'.<br/>2. Copy the jar to '{WSO2SIHome}/lib' directory"
+          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/io/prometheus/simpleclient_httpserver/0.5.0/simpleclient_httpserver-0.5.0.jar'.<br/>2. Copy the jar to '{WSO2SI/Tooling_Home}/lib' directory"
         },
         "usages": [
           {
@@ -709,7 +709,7 @@
         "version": "0.5.0",
         "download": {
           "autoDownloadable": false,
-          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/io/prometheus/simpleclient_pushgateway/0.5.0/simpleclient_pushgateway-0.5.0.jar'.<br/>2. Copy the jar to '{WSO2SIHome}/lib' directory"
+          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/io/prometheus/simpleclient_pushgateway/0.5.0/simpleclient_pushgateway-0.5.0.jar'.<br/>2. Copy the jar to '{WSO2SI/Tooling_Home}/lib' directory"
         },
         "usages": [
           {
