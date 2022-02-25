@@ -1601,5 +1601,45 @@
         "lookupRegex": "siddhi([_-])io([_-])azuredatalake([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
+  },
+
+  "wso2event": {
+    "extension": {
+      "name": "wso2event",
+      "displayName": "WSO2 Event",
+      "version": "5.0.1"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-wso2event",
+        "version": "5.0.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/io/wso2event/siddhi-io-wso2event/5.0.1/siddhi-io-wso2event-5.0.1.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])wso2event([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
+      },
+      {
+        "name": "siddhi-map-wso2event",
+        "version": "5.0.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/map/wso2event/siddhi-map-wso2event/5.0.2/siddhi-map-wso2event-5.0.2.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])map([_-])wso2event([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
+      }
+    ]
   }
 }
