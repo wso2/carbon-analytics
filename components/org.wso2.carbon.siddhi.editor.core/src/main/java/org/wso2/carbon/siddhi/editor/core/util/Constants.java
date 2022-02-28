@@ -75,6 +75,7 @@ public class Constants {
     public static final String DEFAULT_SI_DOCKER_BASE_IMAGE_NAME = "wso2/wso2si";
     public static final String DEFAULT_SI_DOCKER_IMAGE_NAME = "wso2/wso2si:4.1.0";
     public static final String DEFAULT_SI_DOCKER_IMAGE_VERSION = "4.1.0";
+    public static final String DEFAULT_SI_DOCKER_RUNTIME_PATH = "/home/wso2carbon/wso2si-4.1.0";
     public static final String COLLON = ":";
     public static final String JDBC = "jdbc";
     public static final String DB_URL = "url";
