@@ -269,10 +269,10 @@
       },
       {
         "name": "activemq-client",
-        "version": "5.9.0",
+        "version": "5.16.4",
         "download": {
           "autoDownloadable": false,
-          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/org/apache/activemq/activemq-client/5.9.0/activemq-client-5.9.0.jar'.<br/>2. Navigate to '{WSO2SI/Tooling_Home}/bin' and run the following command:<br/>&nbsp;For Linux: './icf-provider.sh org.apache.activemq.jndi.ActiveMQInitialContextFactory downloaded/jar/path/activemq-client-5.x.x.jar carbon_home/lib'.<br/>&nbsp;For Windows: './icf-provider.bat org.apache.activemq.jndi.ActiveMQInitialContextFactory downloaded\\jar\\path\\activemq-client-5.x.x.jar carbon_home\\lib'."
+          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/org/apache/activemq/activemq-client/5.16.4/activemq-client-5.16.4.jar'.<br/>2. Navigate to '{WSO2SI/Tooling_Home}/bin' and run the following command:<br/>&nbsp;For Linux: './icf-provider.sh org.apache.activemq.jndi.ActiveMQInitialContextFactory downloaded/jar/path/activemq-client-5.x.x.jar carbon_home/lib'.<br/>&nbsp;For Windows: './icf-provider.bat org.apache.activemq.jndi.ActiveMQInitialContextFactory downloaded\\jar\\path\\activemq-client-5.x.x.jar carbon_home\\lib'."
         },
         "usages": [
           {
@@ -280,7 +280,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "activemq([_-])client([_-])5.9.0(.*).jar"
+        "lookupRegex": "activemq([_-])client([_-])5.16.4(.*).jar"
       },
       {
         "name": "hawtbuf",
