@@ -41,7 +41,7 @@ public class StreamDefinitionConfigGenerator extends CodeSegmentsPreserver {
 
         List<String> annotationConfigs = new ArrayList<>();
         List<Annotation> annotationListObjects = new ArrayList<>();
-        List<String> streamElementAnnotationNames = new ArrayList<>(Arrays.asList("SOURCE", "SINK", "STORE"));
+        List<String> streamElementAnnotationNames = new ArrayList<>(Arrays.asList("SOURCE", "SINK"));
         AnnotationConfigGenerator annotationConfigGenerator = new AnnotationConfigGenerator();
         for (Annotation annotation : streamDefinition.getAnnotations()) {
             if (!streamElementAnnotationNames.contains(annotation.getName().toUpperCase())) {
