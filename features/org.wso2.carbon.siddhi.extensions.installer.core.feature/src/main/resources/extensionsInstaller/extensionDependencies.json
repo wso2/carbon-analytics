@@ -25,6 +25,21 @@
         "lookupRegex": "siddhi([_-])io([_-])kafka([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
+        "name": "siddhi-map-protobuf",
+        "version": "1.1.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/map/protobuf/siddhi-map-protobuf/1.1.1/siddhi-map-protobuf-1.1.1.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])map([_-])protobuf([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
+      },
+      {
         "name": "kafka-clients",
         "version": "3.0.0",
         "download": {
@@ -199,10 +214,10 @@
       },
       {
         "name": "protobuf-java",
-        "version": "3.17.3",
+        "version": "3.19.4",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.17.3/protobuf-java-3.17.3.jar"
+          "url": "https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.19.4/protobuf-java-3.19.4.jar"
         },
         "usages": [
           {
@@ -210,7 +225,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "protobuf([_-])java([_-])3.17.3(.*).jar"
+        "lookupRegex": "protobuf([_-])java([_-])3.19.4.jar"
       },
       {
         "name": "wire-runtime",
@@ -269,10 +284,10 @@
       },
       {
         "name": "activemq-client",
-        "version": "5.9.0",
+        "version": "5.16.4",
         "download": {
           "autoDownloadable": false,
-          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/org/apache/activemq/activemq-client/5.9.0/activemq-client-5.9.0.jar'.<br/>2. Navigate to '{WSO2SI/Tooling_Home}/bin' and run the following command:<br/>&nbsp;For Linux: './icf-provider.sh org.apache.activemq.jndi.ActiveMQInitialContextFactory downloaded/jar/path/activemq-client-5.x.x.jar carbon_home/lib'.<br/>&nbsp;For Windows: './icf-provider.bat org.apache.activemq.jndi.ActiveMQInitialContextFactory downloaded\\jar\\path\\activemq-client-5.x.x.jar carbon_home\\lib'."
+          "instructions": "1. Download the jar from 'https://repo1.maven.org/maven2/org/apache/activemq/activemq-client/5.16.4/activemq-client-5.16.4.jar'.<br/>2. Navigate to '{WSO2SI/Tooling_Home}/bin' and run the following command:<br/>&nbsp;For Linux: './icf-provider.sh org.apache.activemq.jndi.ActiveMQInitialContextFactory downloaded/jar/path/activemq-client-5.x.x.jar carbon_home/lib'.<br/>&nbsp;For Windows: './icf-provider.bat org.apache.activemq.jndi.ActiveMQInitialContextFactory downloaded\\jar\\path\\activemq-client-5.x.x.jar carbon_home\\lib'."
         },
         "usages": [
           {
@@ -280,7 +295,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "activemq([_-])client([_-])5.9.0(.*).jar"
+        "lookupRegex": "activemq([_-])client([_-])[0-9]+.[0-9]+.[\\.0-9]+(.*).jar"
       },
       {
         "name": "hawtbuf",
@@ -838,11 +853,11 @@
         "lookupRegex": "siddhi([_-])io([_-])grpc([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
-        "name": "protobuf-java",
-        "version": "3.9.1",
+        "name": "siddhi-map-protobuf",
+        "version": "1.1.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.9.1/protobuf-java-3.9.1.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/map/protobuf/siddhi-map-protobuf/1.1.1/siddhi-map-protobuf-1.1.1.jar"
         },
         "usages": [
           {
@@ -850,7 +865,22 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "protobuf([_-])java([_-])3.9.1.jar"
+        "lookupRegex": "siddhi([_-])map([_-])protobuf([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
+      },
+      {
+        "name": "protobuf-java",
+        "version": "3.19.4",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.19.4/protobuf-java-3.19.4.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "protobuf([_-])java([_-])3.19.4.jar"
       }
     ]
   },
@@ -1599,6 +1629,46 @@
           }
         ],
         "lookupRegex": "siddhi([_-])io([_-])azuredatalake([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
+      }
+    ]
+  },
+
+  "wso2event": {
+    "extension": {
+      "name": "wso2event",
+      "displayName": "WSO2 Event",
+      "version": "5.0.1"
+    },
+    "dependencies": [
+      {
+        "name": "siddhi-io-wso2event",
+        "version": "5.0.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/io/wso2event/siddhi-io-wso2event/5.0.1/siddhi-io-wso2event-5.0.1.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])io([_-])wso2event([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
+      },
+      {
+        "name": "siddhi-map-wso2event",
+        "version": "5.0.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/map/wso2event/siddhi-map-wso2event/5.0.2/siddhi-map-wso2event-5.0.2.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])map([_-])wso2event([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   }
