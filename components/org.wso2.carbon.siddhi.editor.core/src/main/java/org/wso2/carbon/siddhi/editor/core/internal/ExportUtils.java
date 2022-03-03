@@ -73,6 +73,7 @@ public class ExportUtils {
     private static final Logger log = LoggerFactory.getLogger(ExportUtils.class);
     private static final String CONFIG_BLOCK_TEMPLATE = "\\{\\{CONFIGURATION_BLOCK}}";
     private static final String CONFIG_PARAMETER_TEMPLATE = "\\{\\{CONFIGURATION_PARAMETER_BLOCK}}";
+    private static final String RUNTIME_PATH_TEMPLATE = "\\{\\{RUNTIME_PATH}}";
     private static final String JARS_BLOCK_TEMPLATE = "\\{\\{JARS_BLOCK}}";
     private static final String BUNDLES_BLOCK_TEMPLATE = "\\{\\{BUNDLES_BLOCK}}";
     private static final String ENV_BLOCK_TEMPLATE = "\\{\\{ENV_BLOCK}}";
@@ -560,12 +561,26 @@ public class ExportUtils {
         String content = new String(data, StandardCharsets.UTF_8);
         String dockerBaseImgName = Constants.DEFAULT_SI_DOCKER_BASE_IMAGE_NAME;
         String version = Constants.DEFAULT_SI_DOCKER_IMAGE_VERSION;
+        String runtimePath = Constants.DEFAULT_SI_DOCKER_RUNTIME_PATH;
         // EditorDataHolder.getBundleContext().getBundle().getVersion().toString();
         if (version != null && !version.isEmpty()) {
             dockerBaseImgName = dockerBaseImgName.concat(":").concat(version.toLowerCase());
         }
         if (!dockerBaseImgName.equals(this.exportAppsRequest.getDockerConfiguration().getImageName())) {
             dockerBaseImgName = this.exportAppsRequest.getDockerConfiguration().getImageName();
+            String baseImageNameWithVersion = dockerBaseImgName.split("/")[1];
+            String baseImageName;
+            String baseImageVersion;
+            if (baseImageNameWithVersion != null && !baseImageNameWithVersion.isEmpty()) {
+                String[] imageNameAndVersionArray = baseImageNameWithVersion.split(":");
+                baseImageName = imageNameAndVersionArray[0];
+                baseImageVersion = imageNameAndVersionArray[1];
+                if (baseImageName != null && !baseImageName.isEmpty() && baseImageVersion != null &&
+                        !baseImageVersion.isEmpty()) {
+                    runtimePath = "/home/wso2carbon/" + baseImageName + "-" + baseImageVersion;
+                }
+            }
+
         }
         if (configProvider.getConfigurationObject(Constants.EXPORT_PROPERTIES_NAMESPACE) != null) {
             dockerBaseImgName = (String) ((Map) configProvider
@@ -573,6 +588,7 @@ public class ExportUtils {
                     .get(Constants.DOCKER_BASE_IMAGE_PROPERTY);
         }
         content = content.replaceAll(DOCKER_BASE_IMAGE_TEMPLATE, dockerBaseImgName);
+        content = content.replaceAll(RUNTIME_PATH_TEMPLATE, runtimePath);
 
         if (EXPORT_TYPE_KUBERNETES.equals(exportType)) {
             content = content.replaceAll(APPS_BLOCK_TEMPLATE, "");
