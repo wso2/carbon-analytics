@@ -25,6 +25,21 @@
         "lookupRegex": "siddhi([_-])io([_-])kafka([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
+        "name": "siddhi-map-protobuf",
+        "version": "1.1.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/map/protobuf/siddhi-map-protobuf/1.1.1/siddhi-map-protobuf-1.1.1.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "siddhi([_-])map([_-])protobuf([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
+      },
+      {
         "name": "kafka-clients",
         "version": "3.0.0",
         "download": {
@@ -199,10 +214,10 @@
       },
       {
         "name": "protobuf-java",
-        "version": "3.17.3",
+        "version": "3.19.4",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.17.3/protobuf-java-3.17.3.jar"
+          "url": "https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.19.4/protobuf-java-3.19.4.jar"
         },
         "usages": [
           {
@@ -210,7 +225,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "protobuf([_-])java([_-])3.17.3(.*).jar"
+        "lookupRegex": "protobuf([_-])java([_-])3.19.4.jar"
       },
       {
         "name": "wire-runtime",
@@ -838,11 +853,11 @@
         "lookupRegex": "siddhi([_-])io([_-])grpc([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
-        "name": "protobuf-java",
-        "version": "3.9.1",
+        "name": "siddhi-map-protobuf",
+        "version": "1.1.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.9.1/protobuf-java-3.9.1.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/map/protobuf/siddhi-map-protobuf/1.1.1/siddhi-map-protobuf-1.1.1.jar"
         },
         "usages": [
           {
@@ -850,7 +865,22 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "protobuf([_-])java([_-])3.9.1.jar"
+        "lookupRegex": "siddhi([_-])map([_-])protobuf([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
+      },
+      {
+        "name": "protobuf-java",
+        "version": "3.19.4",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.19.4/protobuf-java-3.19.4.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "protobuf([_-])java([_-])3.19.4.jar"
       }
     ]
   },
