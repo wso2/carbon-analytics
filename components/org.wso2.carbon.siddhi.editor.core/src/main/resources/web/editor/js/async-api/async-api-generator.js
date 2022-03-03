@@ -184,7 +184,7 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
 
             this.siddhiAppConfig = this.preRenderForSinksSources();
 
-            if (self.siddhiAppConfig !== 'undefined') {
+            if (self.siddhiAppConfig && self.siddhiAppConfig !== 'undefined') {
                 var initialOptionValue = '<option selected="selected" value = "-1" ' +
                     'disabled>-- Please Sink or Source Type --</option>';
                 var sinkSourceSelectorHTML = generateOptions(this.sinkSorceTypes, initialOptionValue);
@@ -516,15 +516,12 @@ define(['require', 'jquery', 'lodash', 'log', 'smart_wizard', 'app/source-editor
                                         "generate Async API");
                                     self.sourceContainer.show();
                                     self.asyncAPIViewContainer.hide();
+
                                     $(self.toggleControlsContainer[0]).find('.toggle-view-button').removeClass('hide-div');
                                     $(self.toggleControlsContainer[0]).find('.wizard-view-button').removeClass('hide-div');
-                                    var asyncAPIAddUpdateButton = $(self.toggleControlsContainer[0])
-                                        .find('.async-api-add-update-button');
-                                    asyncAPIAddUpdateButton.addClass('hide-div');
-                                    var codeViewButton = $(self.toggleControlsContainer[0]).find('.asyncbtn-to-code-view');
-                                    codeViewButton.addClass('hide-div');
-                                    var AsyncAPIViewButton = $(self.toggleControlsContainer[0]).find('.async-api-view-button');
-                                    AsyncAPIViewButton.removeClass('hide-div');
+                                    $(self.toggleControlsContainer[0]).find('.async-api-add-update-button').addClass('hide-div');
+                                    $(self.toggleControlsContainer[0]).find('.asyncbtn-to-code-view').addClass('hide-div');
+                                    $(self.toggleControlsContainer[0]).find('.async-api-view-button').removeClass('hide-div');
                                 } else {
                                     return self.JSONObject;
                                 }
