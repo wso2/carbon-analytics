@@ -9,7 +9,7 @@ queries:
     version: default
   -
     mappings:
-      record_delete: "DELETE TOP {{LIMIT_VALUE}} FROM {{TABLE_NAME}}"
+      record_delete: "DELETE FROM {{TABLE_NAME}} WHERE ROWNUM <= {{LIMIT_VALUE}}"
       total_record_count: "SELECT COUNT(*) FROM {{TABLE_NAME}}"
       record_limit: "{{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} DESC LIMIT {{LIMIT_VALUE}}"
       record_greater_than: "SELECT * FROM ({{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} DESC ) WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}}"

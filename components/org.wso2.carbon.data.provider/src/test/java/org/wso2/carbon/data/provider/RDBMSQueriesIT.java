@@ -144,7 +144,7 @@ public class RDBMSQueriesIT {
             queriesMap.put("record_greater_than", "SELECT * FROM ({{CUSTOM_QUERY}} ORDER BY {{INCREMENTAL_COLUMN}} " +
                     "DESC ) WHERE {{INCREMENTAL_COLUMN}} > {{LAST_RECORD_VALUE}}");
             queriesMap.put("total_record_count", "SELECT COUNT(*) FROM {{TABLE_NAME}}");
-            queriesMap.put("record_delete", "DELETE TOP {{LIMIT_VALUE}} FROM {{TABLE_NAME}}");
+            queriesMap.put("record_delete", "DELETE FROM {{TABLE_NAME}} WHERE ROWNUM <= {{LIMIT_VALUE}}");
             queries.setMappings(queriesMap);
             ArrayList<Queries> arrayList = new ArrayList<>();
             arrayList.add(queries);
@@ -207,7 +207,7 @@ public class RDBMSQueriesIT {
                 "}";
         DataSetMetadata dataSetMetadata = new DataSetMetadata(2);
         dataSetMetadata.put(0, "RECIPE_ID", DataSetMetadata.Types.LINEAR);
-        dataSetMetadata.put(1, "RECIPE_NAME", DataSetMetadata.Types.ORDINAL);
+        dataSetMetadata.put(1, "RECIPE_NAME", DataSetMetadata.Types.OBJECT);
 
         String actualMessage;
         webSocketClient.sendText(message);
@@ -256,7 +256,7 @@ public class RDBMSQueriesIT {
                 "}";
         DataSetMetadata dataSetMetadata = new DataSetMetadata(2);
         dataSetMetadata.put(0, "RECIPE_ID", DataSetMetadata.Types.LINEAR);
-        dataSetMetadata.put(1, "RECIPE_NAME", DataSetMetadata.Types.ORDINAL);
+        dataSetMetadata.put(1, "RECIPE_NAME", DataSetMetadata.Types.OBJECT);
 
         String actualMessage;
         webSocketClient.sendText(message);
@@ -304,7 +304,7 @@ public class RDBMSQueriesIT {
                 "}";
         DataSetMetadata dataSetMetadata = new DataSetMetadata(2);
         dataSetMetadata.put(0, "RECIPE_ID", DataSetMetadata.Types.LINEAR);
-        dataSetMetadata.put(1, "RECIPE_NAME", DataSetMetadata.Types.ORDINAL);
+        dataSetMetadata.put(1, "RECIPE_NAME", DataSetMetadata.Types.OBJECT);
 
         String actualMessage1;
         String actualMessage2;
@@ -360,14 +360,14 @@ public class RDBMSQueriesIT {
                 "}";
         DataSetMetadata dataSetMetadata = new DataSetMetadata(2);
         dataSetMetadata.put(0, "RECIPE_ID", DataSetMetadata.Types.LINEAR);
-        dataSetMetadata.put(1, "RECIPE_NAME", DataSetMetadata.Types.ORDINAL);
+        dataSetMetadata.put(1, "RECIPE_NAME", DataSetMetadata.Types.OBJECT);
 
         webSocketClient.sendText(message);
         Thread.sleep(sleepTime);
         String actualMessage = webSocketClient.getTextReceived();
         Assert.assertNotNull(actualMessage);
 
-        Object[][] data = {{3.0, "Grilled Cheese"}, {2.0, "Tomato Soup"}};
+        Object[][] data = {{2.0, "Tomato Soup"}, {1.0, "Tacos"}};
         DataModel expected = new DataModel(dataSetMetadata, data, -1, "test-topic");
         DataModel dataModel = new Gson().fromJson(actualMessage, DataModel.class);
         Assert.assertEquals(dataModel.getTopic(), expected.getTopic());
