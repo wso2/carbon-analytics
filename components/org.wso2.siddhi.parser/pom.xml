@@ -18,7 +18,7 @@
     <parent>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
         <groupId>org.wso2.carbon.analytics</groupId>
-        <version>3.0.58</version>
+        <version>3.0.59-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
