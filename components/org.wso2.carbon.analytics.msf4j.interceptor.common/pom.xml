@@ -61,7 +61,6 @@
                 <configuration>
                     <basedir>${project.build.outputDirectory}/org/wso2/carbon/analytics/msf4j/interceptor/common
                     </basedir>
-                    <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
                 </configuration>
             </plugin>
             <plugin>
