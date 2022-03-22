@@ -839,10 +839,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-grpc",
-        "version": "1.0.10",
+        "version": "1.0.12",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/grpc/siddhi-io-grpc/1.0.10/siddhi-io-grpc-1.0.10.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/grpc/siddhi-io-grpc/1.0.12/siddhi-io-grpc-1.0.12.jar"
         },
         "usages": [
           {
