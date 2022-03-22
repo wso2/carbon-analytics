@@ -806,10 +806,10 @@
       },
       {
         "name": "protobuf-java",
-        "version": "3.9.1",
+        "version": "3.19.4",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.9.1/protobuf-java-3.9.1.jar"
+          "url": "https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.19.4/protobuf-java-3.19.4.jar"
         },
         "usages": [
           {
@@ -817,7 +817,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "protobuf([_-])java([_-])3.9.1.jar"
+        "lookupRegex": "protobuf([_-])java([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
@@ -839,10 +839,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-grpc",
-        "version": "1.0.10",
+        "version": "1.0.12",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/grpc/siddhi-io-grpc/1.0.10/siddhi-io-grpc-1.0.10.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/grpc/siddhi-io-grpc/1.0.12/siddhi-io-grpc-1.0.12.jar"
         },
         "usages": [
           {
@@ -880,7 +880,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "protobuf([_-])java([_-])3.19.4.jar"
+        "lookupRegex": "protobuf([_-])java([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       }
     ]
   },
