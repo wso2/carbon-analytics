@@ -24,7 +24,7 @@ queries:
    version: default
    mappings:
       CHECK_FOR_BUSINESS_RULES_TABLE: SELECT 1 FROM business_rules LIMIT 1
-      CREATE_BUSINESS_RULES_TABLE: CREATE TABLE IF NOT EXISTS business_rules ( uuid varchar(255) PRIMARY KEY, business_rule blob, deployment_status tinyInt(1), artifact_count int )
+      CREATE_BUSINESS_RULES_TABLE: CREATE TABLE IF NOT EXISTS business_rules ( uuid varchar(255) PRIMARY KEY, business_rule blob, deployment_status tinyInt, artifact_count int )
       ADD_BUSINESS_RULE: INSERT INTO business_rules VALUES (?, ?, ?, ?)
       UPDATE_BUSINESS_RULE: UPDATE business_rules SET business_rule = ?, deployment_status = ? WHERE business_rules.uuid = ?
       UPDATE_DEPLOYMENT_STATUS: UPDATE business_rules SET deployment_status = ? WHERE business_rules.uuid = ?
