@@ -1212,7 +1212,7 @@
         "version": "3.1.3",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/redis/siddhi-store-redis/3.1.3/siddhi-store-redis-3.1.3.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/store/redis/siddhi-store-redis/3.1.3/siddhi-store-redis-3.1.3.jar"
         },
         "usages": [
           {
@@ -1367,7 +1367,7 @@
         "version": "3.0.7",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/rabbitmq/siddhi-io-rabbitmq/3.0./siddhi-io-rabbitmq-3.0.7.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/rabbitmq/siddhi-io-rabbitmq/3.0.7/siddhi-io-rabbitmq-3.0.7.jar"
         },
         "usages": [
           {
@@ -1595,7 +1595,7 @@
         "version": "3.2.2",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/elasticsearch/siddhi-store-elasticsearch/3.2.2/siddhi-store-elasticsearch-3.2.2.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/store/elasticsearch/siddhi-store-elasticsearch/3.2.2/siddhi-store-elasticsearch-3.2.2.jar"
         },
         "usages": [
           {
