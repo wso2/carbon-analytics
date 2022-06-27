@@ -20,6 +20,7 @@
 package org.wso2.carbon.siddhi.store.api.rest;
 
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
+import org.wso2.carbon.siddhi.store.api.rest.model.Trigger;
 
 import javax.ws.rs.core.Response;
 
@@ -27,5 +28,7 @@ import javax.ws.rs.core.Response;
         date = "2017-11-01T11:26:25.925Z")
 public abstract class StoresApiService {
     public abstract Response query(Query body
+    ) throws NotFoundException;
+    public abstract Response initAgg(Trigger body
     ) throws NotFoundException;
 }

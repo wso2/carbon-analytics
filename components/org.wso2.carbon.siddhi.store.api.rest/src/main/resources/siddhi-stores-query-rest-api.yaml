@@ -21,7 +21,7 @@ tags:
 schemes:
   - http
 paths:
-  /stores/query:
+  /stores/initAgg:
     post:
       tags:
         - store
@@ -49,6 +49,17 @@ paths:
         '405':
           description: Invalid input
 definitions:
+  trigger:
+    type: object
+    required:
+      - string
+    properties:
+      appName:
+        description: "Name of the siddhi app in which the aggregation resides"
+        type: string
+      aggName:
+        description: "Name of the Aggregation to be initialized"
+        type: string
   query:
     type: object
     required:
