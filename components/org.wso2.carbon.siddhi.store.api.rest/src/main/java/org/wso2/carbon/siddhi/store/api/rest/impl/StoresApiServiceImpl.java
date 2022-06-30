@@ -34,7 +34,7 @@ import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
 import org.wso2.carbon.siddhi.store.api.rest.model.Record;
 import org.wso2.carbon.siddhi.store.api.rest.model.RecordDetail;
-import org.wso2.carbon.siddhi.store.api.rest.model.Trigger;
+import org.wso2.carbon.siddhi.store.api.rest.model.InitAggregationDTO;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.event.Event;
@@ -53,7 +53,7 @@ public class StoresApiServiceImpl extends StoresApiService {
     private static final Logger log = LoggerFactory.getLogger(StoresApiServiceImpl.class);
 
     @Override
-    public Response initAgg(Trigger body) throws NotFoundException {
+    public Response initAgg(InitAggregationDTO body) throws NotFoundException {
         SiddhiAppRuntimeService siddhiAppRuntimeService =
                 SiddhiStoreDataHolder.getInstance().getSiddhiAppRuntimeService();
         Map<String, SiddhiAppRuntime> siddhiAppRuntimes = siddhiAppRuntimeService.getActiveSiddhiAppRuntimes();

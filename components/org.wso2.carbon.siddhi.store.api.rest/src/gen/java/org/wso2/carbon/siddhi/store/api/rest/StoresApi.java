@@ -30,7 +30,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.siddhi.store.api.rest.factories.StoresApiServiceFactory;
 import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
-import org.wso2.carbon.siddhi.store.api.rest.model.Trigger;
+import org.wso2.carbon.siddhi.store.api.rest.model.InitAggregationDTO;
 import org.wso2.carbon.streaming.integrator.common.HAStateChangeListener;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 
@@ -77,7 +77,7 @@ public class StoresApi implements HAStateChangeListener {
                  response = ModelApiResponse
                          .class)})
      public Response initAgg(@ApiParam(value = "Object which contains app and the aggregation to be initialized",
-            required = true) Trigger body)
+            required = true) InitAggregationDTO body)
             throws NotFoundException {
      return delegate.initAgg(body);
       }

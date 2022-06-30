@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *   Copyright (c) 2022 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *   WSO2 Inc. licenses this file to you under the Apache License,
  *   Version 2.0 (the "License"); you may not use this file except
@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiModelProperty;
  * This clss represents the bean class or the query reqest body
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaMSF4JServerCodegen", date = "2017-11-01T11:26:25.925Z")
-public class Trigger {
+public class InitAggregationDTO {
 
     @JsonProperty("appName")
     private String appName = null;
@@ -35,7 +35,7 @@ public class Trigger {
     @JsonProperty("aggName")
     private String aggName = null;
 
-    public Trigger trigger(String appName, String aggName) {
+    public InitAggregationDTO trigger(String appName, String aggName) {
         this.appName = appName;
         this.aggName = aggName;
         return this;

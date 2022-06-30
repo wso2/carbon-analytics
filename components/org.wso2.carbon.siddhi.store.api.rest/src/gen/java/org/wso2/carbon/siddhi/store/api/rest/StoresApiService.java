@@ -20,7 +20,7 @@
 package org.wso2.carbon.siddhi.store.api.rest;
 
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
-import org.wso2.carbon.siddhi.store.api.rest.model.Trigger;
+import org.wso2.carbon.siddhi.store.api.rest.model.InitAggregationDTO;
 
 import javax.ws.rs.core.Response;
 
@@ -29,6 +29,6 @@ import javax.ws.rs.core.Response;
 public abstract class StoresApiService {
     public abstract Response query(Query body
     ) throws NotFoundException;
-    public abstract Response initAgg(Trigger body
+    public abstract Response initAgg(InitAggregationDTO body
     ) throws NotFoundException;
 }
