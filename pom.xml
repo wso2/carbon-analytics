@@ -20,7 +20,9 @@
     <parent>
         <groupId>org.wso2</groupId>
         <artifactId>wso2</artifactId>
-        <version>5.1</version>
+        <!-- TODO commented bcz running in Java8 -->
+<!--        <version>5.3-SNAPSHOT</version> &lt;!&ndash; TODO release and bump &ndash;&gt;-->
+        <version>5.1</version> <!-- TODO comment if running in Java11 -->
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -30,54 +32,54 @@
     <version>3.0.63-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
-        <module>components/org.wso2.carbon.streaming.integrator.common</module>
-        <module>components/org.wso2.carbon.streaming.integrator.core</module>
-        <module>components/org.wso2.carbon.event.simulator.core</module>
-        <module>components/org.wso2.carbon.editor.log.appender</module>
-        <module>components/org.wso2.carbon.siddhi.editor.core</module>
-        <module>components/org.wso2.carbon.siddhi.extensions.installer.cli</module>
-        <module>components/org.wso2.carbon.siddhi.extensions.installer.core</module>
-        <module>components/org.wso2.carbon.siddhi.error.handler.core</module>
-        <module>components/org.wso2.carbon.business.rules.templates.editor.core</module>
-        <module>components/org.wso2.carbon.business.rules.core</module>
-        <module>components/org.wso2.carbon.business.rules.web</module>
-        <module>components/org.wso2.carbon.si.coordination.listener</module>
-        <module>components/org.wso2.carbon.si.metrics.core</module>
-        <module>components/org.wso2.carbon.streaming.integrator.statistics</module>
-        <module>components/org.wso2.carbon.siddhi.store.api.rest</module>
-        <module>components/org.wso2.carbon.analytics.auth.rest.api</module>
-        <module>components/org.wso2.carbon.permissions.rest.api</module>
-        <module>components/org.wso2.carbon.data.provider</module>
-        <module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>
-        <module>components/org.wso2.carbon.health.check.core</module>
-        <module>components/org.wso2.siddhi.parser</module>
+<!--        <module>components/org.wso2.carbon.streaming.integrator.common</module>-->
+<!--        <module>components/org.wso2.carbon.streaming.integrator.core</module>-->
+<!--        <module>components/org.wso2.carbon.event.simulator.core</module>-->
+<!--        <module>components/org.wso2.carbon.editor.log.appender</module>-->
+<!--        <module>components/org.wso2.carbon.siddhi.editor.core</module>-->
+<!--        <module>components/org.wso2.carbon.siddhi.extensions.installer.cli</module>-->
+<!--        <module>components/org.wso2.carbon.siddhi.extensions.installer.core</module>-->
+<!--        <module>components/org.wso2.carbon.siddhi.error.handler.core</module>-->
+<!--        <module>components/org.wso2.carbon.business.rules.templates.editor.core</module>-->
+<!--        <module>components/org.wso2.carbon.business.rules.core</module>-->
+<!--        <module>components/org.wso2.carbon.business.rules.web</module>-->
+<!--        <module>components/org.wso2.carbon.si.coordination.listener</module>-->
+<!--        <module>components/org.wso2.carbon.si.metrics.core</module>-->
+<!--        <module>components/org.wso2.carbon.streaming.integrator.statistics</module>-->
+<!--        <module>components/org.wso2.carbon.siddhi.store.api.rest</module>-->
+<!--        <module>components/org.wso2.carbon.analytics.auth.rest.api</module>-->
+<!--        <module>components/org.wso2.carbon.permissions.rest.api</module>-->
+<!--        <module>components/org.wso2.carbon.data.provider</module>-->
+<!--        <module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>-->
+<!--        <module>components/org.wso2.carbon.health.check.core</module>-->
+<!--        <module>components/org.wso2.siddhi.parser</module>-->
 
-        <module>features/org.wso2.carbon.streaming.integrator.core.feature</module>
-        <module>features/org.wso2.carbon.streaming.integrator.common.feature</module>
-        <module>features/org.wso2.carbon.event.simulator.core.feature</module>
+<!--        <module>features/org.wso2.carbon.streaming.integrator.core.feature</module>-->
+<!--        <module>features/org.wso2.carbon.streaming.integrator.common.feature</module>-->
+<!--        <module>features/org.wso2.carbon.event.simulator.core.feature</module>-->
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
-        <module>features/org.wso2.carbon.siddhi.extensions.installer.core.feature</module>
-        <module>features/org.wso2.carbon.siddhi.error.handler.core.feature</module>
-        <module>features/org.wso2.carbon.business.rules.templates.editor.core.feature</module>
-        <module>features/org.wso2.carbon.business.rules.core.feature</module>
-        <module>features/org.wso2.carbon.business.rules.web.feature</module>
+<!--        <module>features/org.wso2.carbon.siddhi.extensions.installer.core.feature</module>-->
+<!--        <module>features/org.wso2.carbon.siddhi.error.handler.core.feature</module>-->
+<!--        <module>features/org.wso2.carbon.business.rules.templates.editor.core.feature</module>-->
+<!--        <module>features/org.wso2.carbon.business.rules.core.feature</module>-->
+<!--        <module>features/org.wso2.carbon.business.rules.web.feature</module>-->
         <module>features/org.wso2.siddhi.feature</module>
-        <module>features/org.wso2.carbon.si.metrics.core.feature</module>
-        <module>features/org.wso2.carbon.si.coordination.listener.feature</module>
-        <module>features/org.wso2.carbon.streaming.integrator.statistics.feature</module>
-        <module>features/org.wso2.carbon.siddhi.store.api.rest.feature</module>
-        <module>features/org.wso2.carbon.analytics.auth.rest.api.feature</module>
-        <module>features/org.wso2.carbon.permissions.rest.api.feature</module>
-        <module>features/org.wso2.carbon.data.provider.feature</module>
-        <module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>
-        <module>features/org.wso2.carbon.health.check.core.feature</module>
-        <module>features/org.wso2.siddhi.parser.service.feature</module>
+<!--        <module>features/org.wso2.carbon.si.metrics.core.feature</module>-->
+<!--        <module>features/org.wso2.carbon.si.coordination.listener.feature</module>-->
+<!--        <module>features/org.wso2.carbon.streaming.integrator.statistics.feature</module>-->
+<!--        <module>features/org.wso2.carbon.siddhi.store.api.rest.feature</module>-->
+<!--        <module>features/org.wso2.carbon.analytics.auth.rest.api.feature</module>-->
+<!--        <module>features/org.wso2.carbon.permissions.rest.api.feature</module>-->
+<!--        <module>features/org.wso2.carbon.data.provider.feature</module>-->
+<!--        <module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>-->
+<!--        <module>features/org.wso2.carbon.health.check.core.feature</module>-->
+<!--        <module>features/org.wso2.siddhi.parser.service.feature</module>-->
 
         <module>components/si-tooling-distribution</module>
-        <module>components/si-distribution</module>
-        <module>components/streaming-integrator-osgi-tests</module>
+<!--        <module>components/si-distribution</module>-->
+<!--        <module>components/streaming-integrator-osgi-tests</module>-->
         <module>components/tooling-osgi-tests</module>
-        <module>coverage-reports</module>
+<!--        <module>coverage-reports</module>-->
     </modules>
 
     <build>
@@ -111,7 +113,6 @@
                         <excludeFilterFile>${maven.findbugsplugin.version.exclude}</excludeFilterFile>
                         <!--Exclude generated sources-->
                     </configuration>
-                    <version>${maven.findbugsplugin.version}</version>
                     <executions>
                         <execution>
                             <id>analyze-compile</id>
@@ -122,6 +123,31 @@
                         </execution>
                     </executions>
                 </plugin>
+                <!-- TODO commenting cz running on Java8 -->
+<!--                <plugin>&lt;!&ndash; Overridden from parent pom to exclude generated sources &ndash;&gt;-->
+<!--                    <groupId>com.github.spotbugs</groupId>-->
+<!--                    <artifactId>spotbugs-maven-plugin</artifactId>-->
+<!--                    <version>${maven.spotbugsplugin.version}</version>-->
+<!--                    <configuration combine.self="override">-->
+<!--                        <effort>Max</effort>-->
+<!--                        <threshold>Low</threshold>-->
+<!--                        <xmlOutput>true</xmlOutput>-->
+<!--                        <spotbugsXmlOutputDirectory>${project.build.directory}/findbugs-->
+<!--                        </spotbugsXmlOutputDirectory>-->
+<!--                        <excludeFilterFile>${maven.findbugsplugin.version.exclude}</excludeFilterFile>-->
+<!--                        &lt;!&ndash;Exclude generated sources&ndash;&gt;-->
+<!--                    </configuration>-->
+<!--                    <executions>-->
+<!--                        <execution>-->
+<!--                            <id>analyze-compile</id>-->
+<!--                            <phase>compile</phase>-->
+<!--                            <goals>-->
+<!--                                <goal>check</goal>-->
+<!--                            </goals>-->
+<!--                        </execution>-->
+<!--                    </executions>-->
+<!--                </plugin>-->
+
                 <plugin><!-- Overridden from parent pom to exclude generated sources -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
@@ -212,6 +238,31 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- TODO commenting cz running on Java8 -->
+<!--            <plugin>&lt;!&ndash; Overridden from parent pom to exclude generated sources &ndash;&gt;-->
+<!--                <groupId>com.github.spotbugs</groupId>-->
+<!--                <artifactId>spotbugs-maven-plugin</artifactId>-->
+<!--                <version>${maven.spotbugsplugin.version}</version>-->
+<!--                <configuration>-->
+<!--                    <effort>Max</effort>-->
+<!--                    <threshold>Medium</threshold>-->
+<!--                    <xmlOutput>true</xmlOutput>-->
+<!--                    <spotbugsXmlOutputDirectory>${project.build.directory}/findbugs</spotbugsXmlOutputDirectory>-->
+<!--                    &lt;!&ndash;Exclude sources&ndash;&gt;-->
+<!--                    <excludeFilterFile>${mavan.findbugsplugin.exclude.file}</excludeFilterFile>-->
+<!--                </configuration>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>analyze-compile</id>-->
+<!--                        <phase>compile</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>check</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -510,7 +561,7 @@
                 <version>${equinox.concurrent.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.eclipse.equinox</groupId>
+                <groupId>org.eclipse.platform</groupId>
                 <artifactId>org.eclipse.equinox.console</artifactId>
                 <version>${equinox.console.version}</version>
             </dependency>
@@ -797,7 +848,7 @@
                 <version>${osgi.api.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.eclipse.osgi</groupId>
+                <groupId>org.eclipse.platform</groupId>
                 <artifactId>org.eclipse.osgi</artifactId>
                 <version>${equinox.osgi.version}</version>
             </dependency>
@@ -1061,6 +1112,11 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>failureaccess</artifactId>
+                <version>${guava.failureaccess.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.org.quartz-scheduler</groupId>
@@ -1613,6 +1669,44 @@
                 <artifactId>log4j-core</artifactId>
                 <version>${log4j.version}</version>
             </dependency>
+            <!-- TODO commented bcz running in Java8 -->
+<!--            &lt;!&ndash;Java 11 related dependencies&ndash;&gt;-->
+<!--            <dependency>-->
+<!--                <groupId>org.wso2.orbit.javax.xml.bind</groupId>-->
+<!--                <artifactId>jaxb-api</artifactId>-->
+<!--                <version>${org.wso2.orbit.javax.xml.bind.version}</version>-->
+<!--                <type>jar</type>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.wso2.orbit.sun.xml.bind</groupId>-->
+<!--                <artifactId>jaxb</artifactId>-->
+<!--                <version>${org.wso2.orbit.sun.xml.bind.version}</version>-->
+<!--                <type>jar</type>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.wso2.orbit.javax.activation</groupId>-->
+<!--                <artifactId>activation</artifactId>-->
+<!--                <version>${org.wso2.orbit.javax.activation.version}</version>-->
+<!--                <type>jar</type>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.wso2.orbit.xml-apis</groupId>-->
+<!--                <artifactId>xml-apis</artifactId>-->
+<!--                <version>${org.wso2.orbit.xml-apis.version}</version>-->
+<!--                <type>jar</type>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.apache.geronimo.specs</groupId>-->
+<!--                <artifactId>geronimo-activation_1.1_spec</artifactId>-->
+<!--                <version>${org.apache.geronimo.spec.version}</version>-->
+<!--                <type>jar</type>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.sun.istack</groupId>-->
+<!--                <artifactId>istack-commons-runtime</artifactId>-->
+<!--                <version>${com.sun.istack.version}</version>-->
+<!--                <type>jar</type>-->
+<!--            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
@@ -1658,7 +1752,8 @@
         <equinox.app.version>1.3.200.v20130910-1609</equinox.app.version>
         <equinox.common.version>3.6.200.v20130402-1505</equinox.common.version>
         <equinox.concurrent.version>1.1.0.v20130327-1442</equinox.concurrent.version>
-        <equinox.console.version>1.1.0.v20140131-1639</equinox.console.version>
+        <equinox.console.version>1.3.300</equinox.console.version>
+        <equinox.console.bundle.version>1.3.300.v20190516-1504</equinox.console.bundle.version> <!-- TODO remove if not needed -->
         <equinox.ds.version>1.4.200.v20131126-2331</equinox.ds.version>
         <equinox.frameworkadmin.version>2.0.100.v20131209-2144</equinox.frameworkadmin.version>
         <equinox.frameworkadmin.equinox.version>1.0.500.v20131211-1531</equinox.frameworkadmin.equinox.version>
@@ -1669,7 +1764,7 @@
         </equinox.simpleconfigurator.manipulator.version>
         <equinox.util.version>1.0.500.v20130404-1337</equinox.util.version>
         <org.eclipse.equinox.cm.version>1.1.0.v20131021-1936</org.eclipse.equinox.cm.version>
-        <org.snakeyaml.version>1.30</org.snakeyaml.version>
+        <org.snakeyaml.version>1.31</org.snakeyaml.version>
         <org.wso2.eclipse.osgi.version>3.4.0.v20140312-2051</org.wso2.eclipse.osgi.version>
         <junit.version>4.10</junit.version>
         <apache.commons.text.version>1.1</apache.commons.text.version>
@@ -1682,12 +1777,15 @@
 
         <!-- Maven plugins -->
         <!--Bundle Plugin - Overridden from parent due to a bug in latest version related to capability providers-->
-        <maven.bundle.plugin.version>2.5.4</maven.bundle.plugin.version>
+        <maven.bundle.plugin.version>2.5.4</maven.bundle.plugin.version> <!-- TODO should bump to 3.3.0 -->
         <build.helper.maven.plugin.version>1.9.1</build.helper.maven.plugin.version>
         <maven.findbugsplugin.version.exclude>findbugs-exclude.xml</maven.findbugsplugin.version.exclude>
         <maven.build.helper.plugin.version>1.9.1</maven.build.helper.plugin.version>
         <carbon.p2.plugin.version>1.5.4</carbon.p2.plugin.version>
-        <carbon.feature.plugin.version>3.1.3</carbon.feature.plugin.version>
+
+        <!-- TODO commented bcz running in Java8 -->
+<!--        <carbon.feature.plugin.version>3.1.5</carbon.feature.plugin.version>-->
+        <carbon.feature.plugin.version>3.1.3</carbon.feature.plugin.version> <!-- TODO revert if running in Java11 -->
 
         <testng.version>6.9.4</testng.version>
         <plugin.version.antlr>4.7.2</plugin.version.antlr>
@@ -1702,14 +1800,15 @@
 
         <!-- OSGI -->
         <osgi.api.version>6.0.0</osgi.api.version>
-        <equinox.osgi.version>3.11.0.v20160603-1336</equinox.osgi.version>
+        <equinox.osgi.version>3.14.0</equinox.osgi.version>
+        <equinox.osgi.bundle.version>3.14.0.v20190517-1309</equinox.osgi.bundle.version> <!-- TODO remove if not needed -->
         <equinox.osgi.services.version>3.4.0.v20140312-2051</equinox.osgi.services.version>
 
         <osgi.framework.import.version.range>[1.8.0, 2.0.0)</osgi.framework.import.version.range>
         <osgi.service.tracker.import.version.range>[1.5.1, 2.0.0)</osgi.service.tracker.import.version.range>
 
         <!-- Dependencies -->
-        <carbon.kernel.version>5.2.17</carbon.kernel.version>
+        <carbon.kernel.version>5.2.18-SNAPSHOT</carbon.kernel.version> <!-- TODO release and bump -->
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
 
         <netty.version>4.1.74.Final</netty.version>
@@ -1774,21 +1873,22 @@
 
         <!-- Streaming Integrator Dependencies -->
         <disruptor.version>3.4.2.wso2v1</disruptor.version>
-        <guava.version>23.0</guava.version>
-        <guava.bundle.version>23.0.0</guava.bundle.version>
-        <quartz.version>2.3.0.wso2v2</quartz.version>
+        <guava.version>31.1-jre</guava.version>
+        <guava.bundle.version>31.1.0.jre</guava.bundle.version>
+        <guava.failureaccess.version>1.0.1</guava.failureaccess.version>
+        <quartz.version>2.3.0.wso2v3</quartz.version>
         <mchange.version>0.9.5.5</mchange.version>
         <metrics.version>3.2.5</metrics.version>
         <commons-lang3.version>3.3.2</commons-lang3.version>
         <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.8.5</msf4j.version>
+        <msf4j.version>2.8.7-SNAPSHOT</msf4j.version>
         <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
-        <com.fasterxml.jackson.core.version>2.9.10</com.fasterxml.jackson.core.version>
-        <com.fasterxml.jackson.databind.version>2.9.10.8</com.fasterxml.jackson.databind.version>
+        <com.fasterxml.jackson.core.version>2.13.4</com.fasterxml.jackson.core.version>
+        <com.fasterxml.jackson.databind.version>2.13.4</com.fasterxml.jackson.databind.version>
         <com.fasterxml.jackson.core.version.range>[2.9.0, 2.14.0)</com.fasterxml.jackson.core.version.range>
-        <io.swagger.version>1.5.22</io.swagger.version>
+        <io.swagger.version>1.6.7</io.swagger.version>
         <javax.ws.rs-api.version>2.0</javax.ws.rs-api.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
         <javax.websocket.api.version>1.1</javax.websocket.api.version>
@@ -1813,7 +1913,7 @@
 
         <swagger.codegen.maven.plugin.version>2.1.6</swagger.codegen.maven.plugin.version>
         <swagger.codegen.version>2.2.0.wso2v2</swagger.codegen.version>
-        <swagger.models.version>1.5.22</swagger.models.version>
+        <swagger.models.version>1.6.7</swagger.models.version>
 
         <mockito.version>1.10.19</mockito.version>
         <powermock.version>1.6.2</powermock.version>
@@ -1827,7 +1927,7 @@
 
         <siddhi.io.tcp.version>3.0.6</siddhi.io.tcp.version>
         <siddhi.io.email.version>2.0.7</siddhi.io.email.version>
-        <siddhi.io.http.version>2.2.0</siddhi.io.http.version>
+        <siddhi.io.http.version>2.3.5</siddhi.io.http.version>
 
         <siddhi.map.json.version>5.2.3</siddhi.map.json.version>
         <siddhi.map.binary.version>2.1.1</siddhi.map.binary.version>
@@ -1870,7 +1970,21 @@
         <dropwizard.metrics.version>3.1.2</dropwizard.metrics.version>
         <prometheus.simpleclient.httpserver.version>0.8.0</prometheus.simpleclient.httpserver.version>
 
+        <!-- Java 11 related dependencies -->
+        <javax.annotation.version>1.3.2</javax.annotation.version>
+        <org.wso2.orbit.xml-apis.version>1.4.01.wso2v1</org.wso2.orbit.xml-apis.version>
+        <org.wso2.orbit.javax.xml.bind.version>2.3.1.wso2v1</org.wso2.orbit.javax.xml.bind.version>
+        <org.wso2.orbit.sun.xml.bind.version>2.3.2.wso2v1</org.wso2.orbit.sun.xml.bind.version>
+        <com.sun.xml.bind.version>2.4.0-b180830.0438</com.sun.xml.bind.version>
+        <org.apache.geronimo.spec.version>1.1</org.apache.geronimo.spec.version>
+        <com.sun.istack.version>3.0.8</com.sun.istack.version>
+        <org.wso2.orbit.javax.activation.version>1.1.1.wso2v3</org.wso2.orbit.javax.activation.version>
+        <com.sun.activation.version>1.2.0</com.sun.activation.version>
+        <com.sun.xml.bind.version>2.3.0</com.sun.xml.bind.version>
+        <com.sun.activation.javax.activation.version>1.2.0</com.sun.activation.javax.activation.version>
+        <org.wso2.orbit.javax.transaction.jta.version>1.1.0.wso2v2</org.wso2.orbit.javax.transaction.jta.version>
+
         <xerces.version>2.12.2</xerces.version>
-        <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
+        <maven.spotbugsplugin.version>3.1.10</maven.spotbugsplugin.version>
     </properties>
 </project>

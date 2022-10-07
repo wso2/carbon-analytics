@@ -37,7 +37,7 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.siddhi.editor.core</artifactId>
         </dependency>
-        <dependency>
+        <dependency> <!-- TODO log appender removal -->
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.editor.log.appender</artifactId>
         </dependency>
@@ -61,7 +61,7 @@
 
     <build>
         <plugins>
-            <plugin>
+            <plugin> <!-- TODO log appender removal -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <inherited>false</inherited>
@@ -120,7 +120,7 @@
                                     <symbolicName>commons-io</symbolicName>
                                     <version>${commons.io.version}</version>
                                 </bundle>
-                                <bundle>
+                                <bundle> <!-- TODO log appender removal -->
                                     <symbolicName>org.wso2.carbon.editor.log.appender</symbolicName>
                                     <version>${project.version}</version>
                                 </bundle>

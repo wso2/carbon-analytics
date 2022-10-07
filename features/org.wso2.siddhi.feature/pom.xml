@@ -34,7 +34,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.eclipse.osgi</groupId>
+            <groupId>org.eclipse.platform</groupId>
             <artifactId>org.eclipse.osgi</artifactId>
         </dependency>
         <dependency>
@@ -80,6 +80,10 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>failureaccess</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.quartz-scheduler</groupId>
@@ -193,7 +197,7 @@
                             <bundles>
                                 <bundle>
                                     <symbolicName>org.eclipse.osgi</symbolicName>
-                                    <version>${equinox.osgi.version}</version>
+                                    <version>${equinox.osgi.bundle.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>org.eclipse.osgi.services</symbolicName>
@@ -240,6 +244,10 @@
                                 <bundle>
                                     <symbolicName>com.google.guava</symbolicName>
                                     <version>${guava.bundle.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>com.google.guava.failureaccess</symbolicName>
+                                    <version>${guava.failureaccess.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>quartz</symbolicName>

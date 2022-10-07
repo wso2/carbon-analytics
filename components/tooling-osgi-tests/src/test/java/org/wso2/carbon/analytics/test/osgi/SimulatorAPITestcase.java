@@ -118,6 +118,10 @@ public class SimulatorAPITestcase {
         logger.info("Simulation REST API");
         HTTPResponseMessage httpResponseMessage = sendHRequest(VALID_SINGLE_EVENT_CONFIG, baseURI, path, contentType,
                 method, true, DEFAULT_USER_NAME, DEFAULT_PASSWORD);
+        logger.info(">>>>>>>>>>>>>>>>>> Response Message:");
+        logger.info(httpResponseMessage.getMessage());
+        logger.info(">>>>>>>>>>>>>>>>>> Error Content toString:");
+        logger.info(httpResponseMessage.getErrorContent().toString());
         Assert.assertEquals(httpResponseMessage.getResponseCode(), 200);
         Assert.assertEquals(httpResponseMessage.getContentType(), "application/json");
     }

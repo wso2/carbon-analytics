@@ -225,6 +225,7 @@
                         <version>2.18.1</version>
                         <configuration>
                             <skipTests>true</skipTests>
+                            <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -441,6 +442,7 @@
                         <version>2.18.1</version>
                         <configuration>
                             <skipTests>true</skipTests>
+                            <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -608,6 +610,7 @@
                         <version>2.18.1</version>
                         <configuration>
                             <skipTests>true</skipTests>
+                            <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -824,6 +827,7 @@
                         <version>2.18.1</version>
                         <configuration>
                             <skipTests>true</skipTests>
+                            <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
                         </configuration>
                     </plugin>
                     <plugin>
