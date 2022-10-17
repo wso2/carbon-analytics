@@ -18,7 +18,7 @@ limitations under the License.
     <test name="carbon-analytics-tests" preserve-order="true" parallel="false" thread-count="1">
         <classes>
             <class name="org.wso2.carbon.analytics.test.osgi.SiddhiEditorTestCase"/>
-<!--            <class name="org.wso2.carbon.analytics.test.osgi.SimulatorAPITestcase"/>-->
+            <class name="org.wso2.carbon.analytics.test.osgi.SimulatorAPITestcase"/>
             <!--<class name="org.wso2.carbon.analytics.test.osgi.BusinessRulesManagerTestCase"/>-->
         </classes>
     </test>

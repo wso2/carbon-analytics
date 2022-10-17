@@ -131,5 +131,8 @@
         <log.appender.launch.property.entry>
             file\:plugins/${project.artifactId}_${parsedVersion.osgiVersion}.jar@1\:false
         </log.appender.launch.property.entry>
+        <org.wso2.orbit.javax.activation.activation.entry>
+            file\:plugins/org.wso2.orbit.javax.activation.activation_${org.wso2.orbit.javax.activation.version}.jar@1\:true
+        </org.wso2.orbit.javax.activation.activation.entry>
     </properties>
 </project>

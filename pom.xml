@@ -20,9 +20,7 @@
     <parent>
         <groupId>org.wso2</groupId>
         <artifactId>wso2</artifactId>
-        <!-- TODO commented bcz running in Java8 -->
-<!--        <version>5.3-SNAPSHOT</version> &lt;!&ndash; TODO release and bump &ndash;&gt;-->
-        <version>5.1</version> <!-- TODO comment if running in Java11 -->
+        <version>5.1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -32,54 +30,54 @@
     <version>3.0.63-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
-<!--        <module>components/org.wso2.carbon.streaming.integrator.common</module>-->
-<!--        <module>components/org.wso2.carbon.streaming.integrator.core</module>-->
-<!--        <module>components/org.wso2.carbon.event.simulator.core</module>-->
-<!--        <module>components/org.wso2.carbon.editor.log.appender</module>-->
-<!--        <module>components/org.wso2.carbon.siddhi.editor.core</module>-->
-<!--        <module>components/org.wso2.carbon.siddhi.extensions.installer.cli</module>-->
-<!--        <module>components/org.wso2.carbon.siddhi.extensions.installer.core</module>-->
-<!--        <module>components/org.wso2.carbon.siddhi.error.handler.core</module>-->
-<!--        <module>components/org.wso2.carbon.business.rules.templates.editor.core</module>-->
-<!--        <module>components/org.wso2.carbon.business.rules.core</module>-->
-<!--        <module>components/org.wso2.carbon.business.rules.web</module>-->
-<!--        <module>components/org.wso2.carbon.si.coordination.listener</module>-->
-<!--        <module>components/org.wso2.carbon.si.metrics.core</module>-->
-<!--        <module>components/org.wso2.carbon.streaming.integrator.statistics</module>-->
-<!--        <module>components/org.wso2.carbon.siddhi.store.api.rest</module>-->
-<!--        <module>components/org.wso2.carbon.analytics.auth.rest.api</module>-->
-<!--        <module>components/org.wso2.carbon.permissions.rest.api</module>-->
-<!--        <module>components/org.wso2.carbon.data.provider</module>-->
-<!--        <module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>-->
-<!--        <module>components/org.wso2.carbon.health.check.core</module>-->
-<!--        <module>components/org.wso2.siddhi.parser</module>-->
+        <module>components/org.wso2.carbon.streaming.integrator.common</module>
+        <module>components/org.wso2.carbon.streaming.integrator.core</module>
+        <module>components/org.wso2.carbon.event.simulator.core</module>
+        <module>components/org.wso2.carbon.editor.log.appender</module>
+        <module>components/org.wso2.carbon.siddhi.editor.core</module>
+        <module>components/org.wso2.carbon.siddhi.extensions.installer.cli</module>
+        <module>components/org.wso2.carbon.siddhi.extensions.installer.core</module>
+        <module>components/org.wso2.carbon.siddhi.error.handler.core</module>
+        <module>components/org.wso2.carbon.business.rules.templates.editor.core</module>
+        <module>components/org.wso2.carbon.business.rules.core</module>
+        <module>components/org.wso2.carbon.business.rules.web</module>
+        <module>components/org.wso2.carbon.si.coordination.listener</module>
+        <module>components/org.wso2.carbon.si.metrics.core</module>
+        <module>components/org.wso2.carbon.streaming.integrator.statistics</module>
+        <module>components/org.wso2.carbon.siddhi.store.api.rest</module>
+        <module>components/org.wso2.carbon.analytics.auth.rest.api</module>
+        <module>components/org.wso2.carbon.permissions.rest.api</module>
+        <module>components/org.wso2.carbon.data.provider</module>
+        <module>components/org.wso2.carbon.analytics.msf4j.interceptor.common</module>
+        <module>components/org.wso2.carbon.health.check.core</module>
+        <module>components/org.wso2.siddhi.parser</module>
 
-<!--        <module>features/org.wso2.carbon.streaming.integrator.core.feature</module>-->
-<!--        <module>features/org.wso2.carbon.streaming.integrator.common.feature</module>-->
-<!--        <module>features/org.wso2.carbon.event.simulator.core.feature</module>-->
+        <module>features/org.wso2.carbon.streaming.integrator.core.feature</module>
+        <module>features/org.wso2.carbon.streaming.integrator.common.feature</module>
+        <module>features/org.wso2.carbon.event.simulator.core.feature</module>
         <module>features/org.wso2.carbon.siddhi.editor.core.feature</module>
-<!--        <module>features/org.wso2.carbon.siddhi.extensions.installer.core.feature</module>-->
-<!--        <module>features/org.wso2.carbon.siddhi.error.handler.core.feature</module>-->
-<!--        <module>features/org.wso2.carbon.business.rules.templates.editor.core.feature</module>-->
-<!--        <module>features/org.wso2.carbon.business.rules.core.feature</module>-->
-<!--        <module>features/org.wso2.carbon.business.rules.web.feature</module>-->
+        <module>features/org.wso2.carbon.siddhi.extensions.installer.core.feature</module>
+        <module>features/org.wso2.carbon.siddhi.error.handler.core.feature</module>
+        <module>features/org.wso2.carbon.business.rules.templates.editor.core.feature</module>
+        <module>features/org.wso2.carbon.business.rules.core.feature</module>
+        <module>features/org.wso2.carbon.business.rules.web.feature</module>
         <module>features/org.wso2.siddhi.feature</module>
-<!--        <module>features/org.wso2.carbon.si.metrics.core.feature</module>-->
-<!--        <module>features/org.wso2.carbon.si.coordination.listener.feature</module>-->
-<!--        <module>features/org.wso2.carbon.streaming.integrator.statistics.feature</module>-->
-<!--        <module>features/org.wso2.carbon.siddhi.store.api.rest.feature</module>-->
-<!--        <module>features/org.wso2.carbon.analytics.auth.rest.api.feature</module>-->
-<!--        <module>features/org.wso2.carbon.permissions.rest.api.feature</module>-->
-<!--        <module>features/org.wso2.carbon.data.provider.feature</module>-->
-<!--        <module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>-->
-<!--        <module>features/org.wso2.carbon.health.check.core.feature</module>-->
-<!--        <module>features/org.wso2.siddhi.parser.service.feature</module>-->
+        <module>features/org.wso2.carbon.si.metrics.core.feature</module>
+        <module>features/org.wso2.carbon.si.coordination.listener.feature</module>
+        <module>features/org.wso2.carbon.streaming.integrator.statistics.feature</module>
+        <module>features/org.wso2.carbon.siddhi.store.api.rest.feature</module>
+        <module>features/org.wso2.carbon.analytics.auth.rest.api.feature</module>
+        <module>features/org.wso2.carbon.permissions.rest.api.feature</module>
+        <module>features/org.wso2.carbon.data.provider.feature</module>
+        <module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>
+        <module>features/org.wso2.carbon.health.check.core.feature</module>
+        <module>features/org.wso2.siddhi.parser.service.feature</module>
 
         <module>components/si-tooling-distribution</module>
-<!--        <module>components/si-distribution</module>-->
-<!--        <module>components/streaming-integrator-osgi-tests</module>-->
+        <module>components/si-distribution</module>
+        <module>components/streaming-integrator-osgi-tests</module>
         <module>components/tooling-osgi-tests</module>
-<!--        <module>coverage-reports</module>-->
+        <module>coverage-reports</module>
     </modules>
 
     <build>
@@ -123,31 +121,6 @@
                         </execution>
                     </executions>
                 </plugin>
-                <!-- TODO commenting cz running on Java8 -->
-<!--                <plugin>&lt;!&ndash; Overridden from parent pom to exclude generated sources &ndash;&gt;-->
-<!--                    <groupId>com.github.spotbugs</groupId>-->
-<!--                    <artifactId>spotbugs-maven-plugin</artifactId>-->
-<!--                    <version>${maven.spotbugsplugin.version}</version>-->
-<!--                    <configuration combine.self="override">-->
-<!--                        <effort>Max</effort>-->
-<!--                        <threshold>Low</threshold>-->
-<!--                        <xmlOutput>true</xmlOutput>-->
-<!--                        <spotbugsXmlOutputDirectory>${project.build.directory}/findbugs-->
-<!--                        </spotbugsXmlOutputDirectory>-->
-<!--                        <excludeFilterFile>${maven.findbugsplugin.version.exclude}</excludeFilterFile>-->
-<!--                        &lt;!&ndash;Exclude generated sources&ndash;&gt;-->
-<!--                    </configuration>-->
-<!--                    <executions>-->
-<!--                        <execution>-->
-<!--                            <id>analyze-compile</id>-->
-<!--                            <phase>compile</phase>-->
-<!--                            <goals>-->
-<!--                                <goal>check</goal>-->
-<!--                            </goals>-->
-<!--                        </execution>-->
-<!--                    </executions>-->
-<!--                </plugin>-->
-
                 <plugin><!-- Overridden from parent pom to exclude generated sources -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
@@ -861,6 +834,12 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.wso2.org.ops4j.pax.logging</groupId>
+                        <artifactId>pax-logging-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
@@ -1712,8 +1691,8 @@
 
     <properties>
         <carbon.analytics.version>3.0.63-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>5.1.24</siddhi.version>
-        <siddhi.bundle.version>5.1.24</siddhi.bundle.version>
+        <siddhi.version>5.1.25-SNAPSHOT</siddhi.version> <!-- TODO release Siddhi -->
+        <siddhi.bundle.version>5.1.25-SNAPSHOT</siddhi.bundle.version> <!-- TODO release Siddhi -->
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.1.59</carbon.analytics-common.version>
         <log4j.version>2.17.1</log4j.version>

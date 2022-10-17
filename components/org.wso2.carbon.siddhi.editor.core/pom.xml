@@ -342,9 +342,7 @@
                                     jni.*,
                                     jersey.repackaged.com.*,
                                     com.jayway.jsonpath.*,
-                                    net.minidev.*,
-<!--                                    com.google.guava.*,-->
-<!--                                    org.apache.axiom.om.*,-->
+                                    net.minidev.*
                                 </Private-Package><!-- org.apache.ws.commons.*, -->
                                 <Export-Package>
                                     org.wso2.carbon.siddhi.editor.core.*
@@ -353,9 +351,8 @@
                                     org.osgi.framework.*;version="${osgi.framework.import.version.range}",
                                     org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
                                     io.siddhi.*;version="${siddhi.version.range}",
-                                    org.apache.axiom.om.*, <!-- TODO this worked with javax.activation not found -->
+                                    org.apache.axiom.om.*,
                                     org.wso2.carbon.streaming.integrator.common.*;version="${carbon.analytics.version.range}",
-<!--                                    TODO log appender removal below-->
                                     org.wso2.carbon.editor.log.appender.*,
                                     org.wso2.msf4j.*;version="${msf4j.import.version.range}",
                                     javax.management.*,

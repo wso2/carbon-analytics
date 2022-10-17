@@ -143,15 +143,6 @@
                 <exclude>empty.txt</exclude>
             </excludes>
         </fileSet>
-        <!-- TODO testing -->
-        <fileSet>
-            <directory>target/java-dependencies</directory>
-            <outputDirectory>bin/bootstrap</outputDirectory>
-            <includes>
-                <include>**/*.jar</include>
-            </includes>
-            <fileMode>644</fileMode>
-        </fileSet>
     </fileSets>
     <files>
         <file>
@@ -173,7 +164,7 @@
             <fileMode>644</fileMode>
         </file>
         <file>
-            <source>carbon-home/runtime/default/bin/carbon.bat</source>
+            <source>carbon-home/runtime/default/bin/carbon.bat</source> <!-- TODO Accomodate changes from sh script -->
             <outputDirectory>wso2/server/bin/</outputDirectory>
             <filtered>true</filtered>
             <fileMode>644</fileMode>
