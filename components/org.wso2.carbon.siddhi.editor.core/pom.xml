@@ -342,8 +342,9 @@
                                     jni.*,
                                     jersey.repackaged.com.*,
                                     com.jayway.jsonpath.*,
-                                    net.minidev.*
-                                </Private-Package><!-- org.apache.ws.commons.*, -->
+                                    net.minidev.*,
+                                    org.apache.axiom.om.*
+                                </Private-Package>
                                 <Export-Package>
                                     org.wso2.carbon.siddhi.editor.core.*
                                 </Export-Package>
@@ -351,7 +352,6 @@
                                     org.osgi.framework.*;version="${osgi.framework.import.version.range}",
                                     org.wso2.carbon.kernel;version="${carbon.kernel.package.import.version.range}",
                                     io.siddhi.*;version="${siddhi.version.range}",
-                                    org.apache.axiom.om.*,
                                     org.wso2.carbon.streaming.integrator.common.*;version="${carbon.analytics.version.range}",
                                     org.wso2.carbon.editor.log.appender.*,
                                     org.wso2.msf4j.*;version="${msf4j.import.version.range}",

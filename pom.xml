@@ -499,7 +499,7 @@
                 <version>${wso2.slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.eclipse.equinox</groupId>
+                <groupId>org.eclipse.platform</groupId>
                 <artifactId>org.eclipse.equinox.simpleconfigurator</artifactId>
                 <version>${equinox.simpleconfigurator.version}</version>
             </dependency>
@@ -564,7 +564,7 @@
                 <version>${equinox.registry.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.eclipse.equinox</groupId>
+                <groupId>org.eclipse.platform</groupId>
                 <artifactId>org.eclipse.equinox.simpleconfigurator.manipulator</artifactId>
                 <version>${equinox.simpleconfigurator.manipulator.version}</version>
             </dependency>
@@ -1381,7 +1381,7 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>commons-io</groupId>
+                <groupId>commons-io.wso2</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
                 <scope>test</scope>
@@ -1691,10 +1691,10 @@
 
     <properties>
         <carbon.analytics.version>3.0.63-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>5.1.25-SNAPSHOT</siddhi.version> <!-- TODO release Siddhi -->
-        <siddhi.bundle.version>5.1.25-SNAPSHOT</siddhi.bundle.version> <!-- TODO release Siddhi -->
+        <siddhi.version>5.1.25</siddhi.version>
+        <siddhi.bundle.version>5.1.25</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.1.59</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.1.60</carbon.analytics-common.version>
         <log4j.version>2.17.1</log4j.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[3.0.0, 4.0.0)</carbon.analytics.version.range>
@@ -1702,7 +1702,7 @@
 
         <geronimo.jms.spec.version>1.1.1</geronimo.jms.spec.version>
         <apache.activemq.version>5.7.0</apache.activemq.version>
-        <commons.io.version>2.4.0.wso2v1</commons.io.version>
+        <commons.io.version>2.11.0.wso2v1</commons.io.version>
         <commons.pool.version>1.5.6.wso2v1</commons.pool.version>
         <commons.collections.version>3.0</commons.collections.version>
         <hadoop-version>2.7.2</hadoop-version>
@@ -1723,7 +1723,7 @@
         <pax.exam.container.native.version>4.6.0</pax.exam.container.native.version>
         <pax.url.aether.version>1.6.0</pax.url.aether.version>
         <org.jacoco.ant.version>0.8.3</org.jacoco.ant.version>
-        <equinox.simpleconfigurator.version>1.1.0.v20131217-1203</equinox.simpleconfigurator.version>
+        <equinox.simpleconfigurator.version>1.4.0</equinox.simpleconfigurator.version>
         <apache.felix.gogo.command.version>0.10.0.v201209301215</apache.felix.gogo.command.version>
         <apache.felix.gogo.runtime.version>0.10.0.v201209301036</apache.felix.gogo.runtime.version>
         <apache.felix.gogo.shell.version>0.10.0.v201212101605</apache.felix.gogo.shell.version>
@@ -1739,11 +1739,11 @@
         <equinox.launcher.version>1.3.0.v20140415-2008</equinox.launcher.version>
         <equinox.preferences.version>3.5.200.v20140224-1527</equinox.preferences.version>
         <equinox.registry.version>3.5.400.v20140428-1507</equinox.registry.version>
-        <equinox.simpleconfigurator.manipulator.version>2.0.0.v20131217-1203
+        <equinox.simpleconfigurator.manipulator.version>2.2.0
         </equinox.simpleconfigurator.manipulator.version>
         <equinox.util.version>1.0.500.v20130404-1337</equinox.util.version>
         <org.eclipse.equinox.cm.version>1.1.0.v20131021-1936</org.eclipse.equinox.cm.version>
-        <org.snakeyaml.version>1.31</org.snakeyaml.version>
+        <org.snakeyaml.version>1.33</org.snakeyaml.version>
         <org.wso2.eclipse.osgi.version>3.4.0.v20140312-2051</org.wso2.eclipse.osgi.version>
         <junit.version>4.10</junit.version>
         <apache.commons.text.version>1.1</apache.commons.text.version>
@@ -1787,11 +1787,11 @@
         <osgi.service.tracker.import.version.range>[1.5.1, 2.0.0)</osgi.service.tracker.import.version.range>
 
         <!-- Dependencies -->
-        <carbon.kernel.version>5.2.18-SNAPSHOT</carbon.kernel.version> <!-- TODO release and bump -->
+        <carbon.kernel.version>5.2.18</carbon.kernel.version> <!-- TODO release and bump -->
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
 
         <netty.version>4.1.74.Final</netty.version>
-        <org.wso2.transport.http.netty.version>6.3.24</org.wso2.transport.http.netty.version>
+        <org.wso2.transport.http.netty.version>6.3.39</org.wso2.transport.http.netty.version>
         <commons-vfs2.wso2.version>2.2-wso2v1</commons-vfs2.wso2.version>
         <carbon.transport.package.import.version.range>[6.0.0, 7.0.0)</carbon.transport.package.import.version.range>
 
@@ -1802,7 +1802,7 @@
         <carbon.deployment.export.version>5.2.0</carbon.deployment.export.version>
 
         <carbon.datasources.version>1.1.11</carbon.datasources.version>
-        <carbon.metrics.version>2.3.15</carbon.metrics.version>
+        <carbon.metrics.version>2.3.16</carbon.metrics.version>
         <carbon.jndi.version>1.0.5</carbon.jndi.version>
 
         <carbon.cache.version>1.1.3</carbon.cache.version>
@@ -1823,14 +1823,14 @@
         <hikari.version>3.3.1</hikari.version>
 
         <!-- json dependencies -->
-        <gson.version>2.8.5</gson.version>
+        <gson.version>2.9.1</gson.version>
         <gson.import.version.range>[2.7, 2.8.0)</gson.import.version.range>
         <jayway.jsonpath.version>2.2.0</jayway.jsonpath.version>
         <jayway.jsonpath.import.version.range>[2.2.0,2.3.0)</jayway.jsonpath.import.version.range>
         <tapestry.json.orbit.version>5.4.1.wso2v1</tapestry.json.orbit.version>
 
         <!-- xml depependencies -->
-        <orbit.version.axiom>1.2.20</orbit.version.axiom>
+        <orbit.version.axiom>1.4.0</orbit.version.axiom>
         <saxon.wso2.version>9.7.0.wso2v1</saxon.wso2.version>
         <saxon.import.version.range>[9.7.0.wso2v1,9.8.0)</saxon.import.version.range>
         <javax.mail.version>1.4</javax.mail.version>
@@ -1839,7 +1839,7 @@
         <commons.logging.version>1.2</commons.logging.version>
         <geronimo.activation>1.1</geronimo.activation>
         <geronimo.stax>1.0.1</geronimo.stax>
-        <mime4j.version>0.7.2</mime4j.version>
+        <mime4j.version>0.8.1</mime4j.version>
 
         <!--pax-exam dependencies-->
         <javax.inject.version>1</javax.inject.version>
@@ -1862,7 +1862,7 @@
         <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.8.7-SNAPSHOT</msf4j.version>
+        <msf4j.version>2.8.7</msf4j.version>
         <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
         <com.fasterxml.jackson.core.version>2.13.4</com.fasterxml.jackson.core.version>
         <com.fasterxml.jackson.databind.version>2.13.4</com.fasterxml.jackson.databind.version>
@@ -1919,17 +1919,17 @@
 
         <curator-test.version>2.7.1</curator-test.version>
         <zookeeper.version>3.4.0</zookeeper.version>
-        <commons-io.version>2.5</commons-io.version>
+        <commons-io.version>2.11.0.wso2v1</commons-io.version>
+        <open.tracing.version>0.31.0</open.tracing.version>
+
         <org.snakeyaml.import.version.range>[1.17.0,2.0.0)</org.snakeyaml.import.version.range>
         <org.wso2.carbon.datasource.version.range>[1.0.0, 2.0.0)</org.wso2.carbon.datasource.version.range>
         <javax.ws.rs.version.range>[2.0.0, 3.0.0)</javax.ws.rs.version.range>
         <javax.websocket.version.range>[1.1.0, 2.0.0)</javax.websocket.version.range>
         <slf4j.version.range>[1.7,2)</slf4j.version.range>
-        <org.yaml.snakeyaml.version.range>[1.0.0, 2.0.0)</org.yaml.snakeyaml.version.range>
         <gson.version.range>[2.5.0, 3.0.0)</gson.version.range>
         <ojdbc6.version>12.1.0.1-atlassian-hosted</ojdbc6.version>
 
-        <open.tracing.version>0.31.0</open.tracing.version>
 
         <!-- jms test dependencies version-->
         <siddhi.io.jms.version>2.0.2</siddhi.io.jms.version>

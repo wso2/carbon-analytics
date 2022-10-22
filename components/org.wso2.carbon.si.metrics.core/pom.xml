@@ -118,7 +118,7 @@
                             org.wso2.carbon.si.metrics.prometheus.reporter.*
                         </Export-Package>
                         <Import-Package>
-                            org.yaml.snakeyaml.*; version="${org.yaml.snakeyaml.version.range}",
+                            org.yaml.snakeyaml.*; version="${org.snakeyaml.import.version.range}",
                             *;resolution:=optional
                         </Import-Package>
                         <Private-Package>

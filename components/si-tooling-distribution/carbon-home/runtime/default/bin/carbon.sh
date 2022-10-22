@@ -275,8 +275,8 @@ if [ $java_version_formatted -le 0108 ]; then
     JAVA_VER_BASED_OPTS="-Djava.endorsed.dirs=$JAVA_ENDORSED_DIRS"
 fi
 
-if [ $java_version_formatted -ge 1100 ] ; then
-    JAVA_VER_BASED_OPTS="--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens java.rmi/sun.rmi.transport=ALL-UNNAMED"
+if [ $java_version_formatted -ge 1700 ] ; then
+    JAVA_VER_BASED_OPTS="--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens java.rmi/sun.rmi.transport=ALL-UNNAMED"
 fi
 
 while [ "$status" = "$START_EXIT_STATUS" ]

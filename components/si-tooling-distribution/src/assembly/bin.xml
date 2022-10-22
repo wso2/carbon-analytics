@@ -130,6 +130,11 @@
             <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
+            <directory>target/javax</directory>
+            <outputDirectory>bin/bootstrap</outputDirectory>
+            <fileMode>644</fileMode>
+        </fileSet>
+        <fileSet>
             <directory>target/extensions</directory>
             <outputDirectory>lib</outputDirectory>
             <fileMode>644</fileMode>
