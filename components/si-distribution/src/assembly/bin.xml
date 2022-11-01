@@ -169,7 +169,7 @@
             <fileMode>644</fileMode>
         </file>
         <file>
-            <source>carbon-home/runtime/default/bin/carbon.bat</source> <!-- TODO Accomodate changes from sh script -->
+            <source>carbon-home/runtime/default/bin/carbon.bat</source>
             <outputDirectory>wso2/server/bin/</outputDirectory>
             <filtered>true</filtered>
             <fileMode>644</fileMode>
