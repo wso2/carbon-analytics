@@ -120,7 +120,7 @@
                                     <symbolicName>commons-io</symbolicName>
                                     <version>${commons.io.version}</version>
                                 </bundle>
-                                <bundle> <!-- TODO log appender removal -->
+                                <bundle> 
                                     <symbolicName>org.wso2.carbon.editor.log.appender</symbolicName>
                                     <version>${project.version}</version>
                                 </bundle>
