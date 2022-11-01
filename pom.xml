@@ -211,31 +211,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- TODO commenting cz running on Java8 -->
-<!--            <plugin>&lt;!&ndash; Overridden from parent pom to exclude generated sources &ndash;&gt;-->
-<!--                <groupId>com.github.spotbugs</groupId>-->
-<!--                <artifactId>spotbugs-maven-plugin</artifactId>-->
-<!--                <version>${maven.spotbugsplugin.version}</version>-->
-<!--                <configuration>-->
-<!--                    <effort>Max</effort>-->
-<!--                    <threshold>Medium</threshold>-->
-<!--                    <xmlOutput>true</xmlOutput>-->
-<!--                    <spotbugsXmlOutputDirectory>${project.build.directory}/findbugs</spotbugsXmlOutputDirectory>-->
-<!--                    &lt;!&ndash;Exclude sources&ndash;&gt;-->
-<!--                    <excludeFilterFile>${mavan.findbugsplugin.exclude.file}</excludeFilterFile>-->
-<!--                </configuration>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>analyze-compile</id>-->
-<!--                        <phase>compile</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>check</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
