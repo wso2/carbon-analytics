@@ -207,10 +207,6 @@
                                     <!--<symbolicName>org.apache.logging.log4j.core</symbolicName>-->
                                     <!--<version>${log4j.version}</version>-->
                                 <!--</bundle>-->
-<!--                                <bundle>-->
-<!--                                    <symbolicName>slf4j.api</symbolicName>-->
-<!--                                    <version>${slf4j.version}</version>-->
-<!--                                </bundle>-->
                                 <bundle>
                                     <symbolicName>org.apache.logging.log4j.slf4j-impl</symbolicName>
                                     <version>${log4j.version}</version>
