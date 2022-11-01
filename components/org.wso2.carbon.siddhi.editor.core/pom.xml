@@ -127,6 +127,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-api</artifactId>
+            <version>${orbit.version.axiom}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-impl</artifactId>
         </dependency>
         <dependency>
@@ -333,7 +338,8 @@
                                     jni.*,
                                     jersey.repackaged.com.*,
                                     com.jayway.jsonpath.*,
-                                    net.minidev.*
+                                    net.minidev.*,
+                                    org.apache.axiom.om.*
                                 </Private-Package>
                                 <Export-Package>
                                     org.wso2.carbon.siddhi.editor.core.*

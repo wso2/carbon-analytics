@@ -212,10 +212,11 @@ elif [ "$CMD" = "version" ]; then
 fi
 
 # ---------- Handle the SSL Issue with proper JDK version --------------------
-jdk_18=`$JAVA_HOME/bin/java -version 2>&1 | grep "1.[8]"`
-if [ "$jdk_18" = "" ]; then
+java_version=$("$JAVACMD" -version 2>&1 | awk -F '"' '/version/ {print $2}')
+java_version_formatted=$(echo "$java_version" | awk -F. '{printf("%02d%02d",$1,$2);}')
+if [ $java_version_formatted -lt 0108 ] || [ $java_version_formatted -gt 1700 ]; then
    echo " Starting WSO2 Carbon (in unsupported JDK)"
-   echo " [ERROR] CARBON is supported only on JDK 1.8"
+   echo " [ERROR] CARBON is supported only between JDK 1.8 and 17"
 fi
 
 CARBON_XBOOTCLASSPATH=""
@@ -248,7 +249,9 @@ if $cygwin; then
   CARBON_HOME=`cygpath --absolute --windows "$CARBON_HOME"`
   RUNTIME_HOME=`cygpath --absolute --windows "$RUNTIME_HOME"`
   CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
-  JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
+  if [ $java_version_formatted -le 0108 ]; then
+    JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
+  fi
   CARBON_CLASSPATH=`cygpath --path --windows "$CARBON_CLASSPATH"`
   CARBON_XBOOTCLASSPATH=`cygpath --path --windows "$CARBON_XBOOTCLASSPATH"`
 fi
@@ -267,6 +270,15 @@ status=$START_EXIT_STATUS
 #To monitor a Carbon server in remote JMX mode on linux host machines, set the below system property.
 #   -Djava.rmi.server.hostname="your.IP.goes.here"
 
+JAVA_VER_BASED_OPTS=""
+if [ $java_version_formatted -le 0108 ]; then
+    JAVA_VER_BASED_OPTS="-Djava.endorsed.dirs=$JAVA_ENDORSED_DIRS"
+fi
+
+if [ $java_version_formatted -ge 1700 ] ; then
+    JAVA_VER_BASED_OPTS="--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens java.rmi/sun.rmi.transport=ALL-UNNAMED"
+fi
+
 while [ "$status" = "$START_EXIT_STATUS" ]
 do
     $JAVACMD \
@@ -276,7 +288,7 @@ do
     -XX:HeapDumpPath="$RUNTIME_HOME/logs/heap-dump.hprof" \
     $JAVA_OPTS \
     -classpath "$CARBON_CLASSPATH" \
-    -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" \
+    $JAVA_VER_BASED_OPTS \
     -Djava.io.tmpdir="$CARBON_HOME/tmp" \
     -Dcarbon.registry.root=/ \
     -Djava.command="$JAVACMD" \
@@ -284,12 +296,14 @@ do
     -Dwso2.runtime.path="$RUNTIME_HOME" \
     -Dwso2.runtime="$RUNTIME" \
     -Djava.util.logging.config.file="$RUNTIME_HOME/bin/bootstrap/logging.properties" \
+    -Djava.security.egd=file:/dev/./urandom \
+    -Dfile.encoding=UTF8 \
     -Djavax.net.ssl.keyStore="$CARBON_HOME/resources/security/wso2carbon.jks" \
     -Djavax.net.ssl.keyStorePassword="wso2carbon" \
     -Djavax.net.ssl.trustStore="$CARBON_HOME/resources/security/client-truststore.jks" \
     -Djavax.net.ssl.trustStorePassword="wso2carbon" \
-    -Djava.security.egd=file:/dev/./urandom \
-    -Dfile.encoding=UTF8 \
+    -Dorg.ops4j.pax.logging.logReaderEnabled=false \
+    -Dorg.ops4j.pax.logging.eventAdminEnabled=false \
     org.wso2.carbon.launcher.Main $*
     status=$?
 done

@@ -159,7 +159,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>commons-io</groupId>
+            <groupId>commons-io.wso2</groupId>
             <artifactId>commons-io</artifactId>
             <scope>test</scope>
         </dependency>
@@ -225,6 +225,7 @@
                         <version>2.18.1</version>
                         <configuration>
                             <skipTests>true</skipTests>
+                            <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -441,6 +442,7 @@
                         <version>2.18.1</version>
                         <configuration>
                             <skipTests>true</skipTests>
+                            <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -608,6 +610,7 @@
                         <version>2.18.1</version>
                         <configuration>
                             <skipTests>true</skipTests>
+                            <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -824,6 +827,7 @@
                         <version>2.18.1</version>
                         <configuration>
                             <skipTests>true</skipTests>
+                            <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
                         </configuration>
                     </plugin>
                     <plugin>

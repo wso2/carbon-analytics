@@ -37,7 +37,7 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.siddhi.editor.core</artifactId>
         </dependency>
-        <dependency>
+        <dependency> 
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.editor.log.appender</artifactId>
         </dependency>
@@ -61,7 +61,7 @@
 
     <build>
         <plugins>
-            <plugin>
+            <plugin> 
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <inherited>false</inherited>
@@ -120,21 +120,13 @@
                                     <symbolicName>commons-io</symbolicName>
                                     <version>${commons.io.version}</version>
                                 </bundle>
-                                <bundle>
+                                <bundle> 
                                     <symbolicName>org.wso2.carbon.editor.log.appender</symbolicName>
                                     <version>${project.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>encoder</symbolicName>
                                     <version>${owasp.encoder.version}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.apache.ws.commons.axiom.axiom-api</symbolicName>
-                                    <version>${orbit.version.axiom}</version>
-                                </bundle>
-                                <bundle>
-                                    <symbolicName>org.apache.ws.commons.axiom.axiom-impl</symbolicName>
-                                    <version>${orbit.version.axiom}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>jaxen</symbolicName>

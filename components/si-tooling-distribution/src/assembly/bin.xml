@@ -130,6 +130,11 @@
             <fileMode>644</fileMode>
         </fileSet>
         <fileSet>
+            <directory>target/javax</directory>
+            <outputDirectory>bin/bootstrap</outputDirectory>
+            <fileMode>644</fileMode>
+        </fileSet>
+        <fileSet>
             <directory>target/extensions</directory>
             <outputDirectory>lib</outputDirectory>
             <fileMode>644</fileMode>
@@ -159,6 +164,18 @@
         <file>
             <source>carbon-home/bin/version.txt</source>
             <outputDirectory>bin/</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
+        <file> <!-- TODO Accomodate changes to bat script -->
+            <source>carbon-home/runtime/default/bin/carbon.bat</source>
+            <outputDirectory>wso2/server/bin/</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
+        <file>
+            <source>carbon-home/runtime/default/bin/carbon.sh</source>
+            <outputDirectory>wso2/server/bin/</outputDirectory>
             <filtered>true</filtered>
             <fileMode>644</fileMode>
         </file>
