@@ -415,7 +415,6 @@
                 <groupId>org.wso2.carbon.maven</groupId>
                 <artifactId>carbon-feature-plugin</artifactId>
                 <version>${carbon.feature.plugin.version}</version>
-                <!-- TODO commented bcz running in Java8 -->
                 <executions>
                     <execution>
                         <id>p2-repo-generation</id>
