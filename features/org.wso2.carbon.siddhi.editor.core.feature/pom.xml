@@ -37,7 +37,7 @@
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.siddhi.editor.core</artifactId>
         </dependency>
-        <dependency> <!-- TODO log appender removal -->
+        <dependency> 
             <groupId>org.wso2.carbon.analytics</groupId>
             <artifactId>org.wso2.carbon.editor.log.appender</artifactId>
         </dependency>
