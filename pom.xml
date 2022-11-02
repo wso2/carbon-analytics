@@ -1724,11 +1724,11 @@
         <osgi.service.tracker.import.version.range>[1.5.1, 2.0.0)</osgi.service.tracker.import.version.range>
 
         <!-- Dependencies -->
-        <carbon.kernel.version>5.2.18</carbon.kernel.version> <!-- TODO release and bump -->
+        <carbon.kernel.version>5.3.0-alpha</carbon.kernel.version> <!-- TODO release and bump -->
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
 
         <netty.version>4.1.74.Final</netty.version>
-        <org.wso2.transport.http.netty.version>6.3.39</org.wso2.transport.http.netty.version>
+        <org.wso2.transport.http.netty.version>6.3.40</org.wso2.transport.http.netty.version>
         <commons-vfs2.wso2.version>2.2-wso2v1</commons-vfs2.wso2.version>
         <carbon.transport.package.import.version.range>[6.0.0, 7.0.0)</carbon.transport.package.import.version.range>
 
@@ -1738,7 +1738,7 @@
         <carbon.deployment.version>5.2.1</carbon.deployment.version>
         <carbon.deployment.export.version>5.2.0</carbon.deployment.export.version>
 
-        <carbon.datasources.version>1.1.11</carbon.datasources.version>
+        <carbon.datasources.version>1.1.13</carbon.datasources.version>
         <carbon.metrics.version>2.3.16</carbon.metrics.version>
         <carbon.jndi.version>1.0.5</carbon.jndi.version>
 
