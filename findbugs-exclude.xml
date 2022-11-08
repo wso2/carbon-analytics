@@ -85,6 +85,34 @@
         <Class name="org.wso2.carbon.streaming.integrator.core.persistence.IncrementalFileSystemPersistenceStore" />
         <Bug pattern="NP_NULL_PARAM_DEREF" />
     </Match>
+    <Match>
+        <Class name="org.wso2.carbon.streaming.integrator.core.internal.asyncapi.ServiceCatalogueApiHelper"/>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.streaming.integrator.core.persistence.DBPersistenceStore"/>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.streaming.integrator.core.persistence.IncrementalDBPersistenceStore"/>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.streaming.integrator.core.siddhi.error.handler.DBErrorStore"/>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.event.simulator.core.internal.generator.database.util.DatabaseConnector"/>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.event.simulator.core.internal.util.SimulationConfigUploader"/>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
+    </Match>
+    <Match>
+        <Class name="org.wso2.carbon.siddhi.editor.core.util.errorhandler.ErrorHandlerApiHelper"/>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
+    </Match>
 
     <!--<Match>-->
         <!--<Package name="~org\.wso2\.siddhi\.query\.api.*"/>-->

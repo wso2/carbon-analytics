@@ -41,6 +41,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+@PowerMockIgnore("jdk.internal.reflect.*")
 @PrepareForTest(StreamProcessorDataHolder.class)
 public class DBPersistenceStoreTest extends PowerMockTestCase {
 

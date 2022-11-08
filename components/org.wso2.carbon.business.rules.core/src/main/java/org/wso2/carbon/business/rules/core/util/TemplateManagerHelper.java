@@ -23,6 +23,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplate;
 import org.wso2.carbon.business.rules.core.bean.RuleTemplateProperty;
 import org.wso2.carbon.business.rules.core.bean.Template;
@@ -466,8 +467,8 @@ public class TemplateManagerHelper {
      * @throws TemplateManagerHelperException
      */
     public static Map<String, String> getScriptGeneratedVariables(String script) throws RuleTemplateScriptException {
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("JavaScript");
+        NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
+        ScriptEngine engine = factory.getScriptEngine();
         ScriptContext scriptContext = new SimpleScriptContext();
         scriptContext.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE);
         try {
