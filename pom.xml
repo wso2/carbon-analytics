@@ -276,6 +276,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven.javadoc.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <!--This parameter disables doclint-->
+                            <doclint>none</doclint>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <source>1.8</source>
+                    <attach>true</attach>
+                    <additionalJOption>-Xdoclint:none</additionalJOption>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -1907,5 +1929,6 @@
         <maven.spotbugsplugin.version>3.1.10</maven.spotbugsplugin.version>
         <openjdk.nashorn.version>15.2</openjdk.nashorn.version>
         <maven.jar.plugin.version>3.2.2</maven.jar.plugin.version>
+        <maven.javadoc.plugin.version>3.4.1</maven.javadoc.plugin.version>
     </properties>
 </project>
