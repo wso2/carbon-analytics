@@ -1187,7 +1187,7 @@
         "version": "3.3.2",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/com/datastax/cassandra/cassandra-driver-core/3.3.2/cassandra-driver-core-3.3.2.jar"
+          "url": "https://repo1.maven.org/maven2/com/datastax/cassandra/cassandra-driver-core/3.11.3/cassandra-driver-core-3.11.3.jar"
         },
         "usages": [
           {
