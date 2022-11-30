@@ -1655,10 +1655,10 @@
 
     <properties>
         <carbon.analytics.version>3.0.66-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>5.1.25</siddhi.version>
-        <siddhi.bundle.version>5.1.25</siddhi.bundle.version>
+        <siddhi.version>5.1.26</siddhi.version>
+        <siddhi.bundle.version>5.1.26</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.1.60</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.1.63</carbon.analytics-common.version>
         <log4j.version>2.17.1</log4j.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[3.0.0, 4.0.0)</carbon.analytics.version.range>
@@ -1749,7 +1749,7 @@
         <osgi.service.tracker.import.version.range>[1.5.1, 2.0.0)</osgi.service.tracker.import.version.range>
 
         <!-- Dependencies -->
-        <carbon.kernel.version>5.3.0-alpha</carbon.kernel.version> <!-- TODO release and bump -->
+        <carbon.kernel.version>5.3.0</carbon.kernel.version>
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
 
         <netty.version>4.1.74.Final</netty.version>
@@ -1763,8 +1763,8 @@
         <carbon.deployment.version>5.2.1</carbon.deployment.version>
         <carbon.deployment.export.version>5.2.0</carbon.deployment.export.version>
 
-        <carbon.datasources.version>1.1.13</carbon.datasources.version>
-        <carbon.metrics.version>2.3.16</carbon.metrics.version>
+        <carbon.datasources.version>1.1.14</carbon.datasources.version>
+        <carbon.metrics.version>2.3.17</carbon.metrics.version>
         <carbon.jndi.version>1.0.5</carbon.jndi.version>
 
         <carbon.cache.version>1.1.3</carbon.cache.version>
@@ -1775,7 +1775,7 @@
         <carbon.securevault.version>5.0.13</carbon.securevault.version>
 
         <!-- Clustering Dependencies -->
-        <carbon.coordination.version>2.1.9</carbon.coordination.version>
+        <carbon.coordination.version>2.1.7</carbon.coordination.version>
 
         <slf4j.version>1.7.12</slf4j.version>
         <slf4j.logging.package.import.version.range>[1.7.1, 2.0.0)
@@ -1867,14 +1867,14 @@
         <!--Siddhi Extension Versions-->
 
         <siddhi.io.tcp.version>3.0.6</siddhi.io.tcp.version>
-        <siddhi.io.email.version>2.0.7</siddhi.io.email.version>
-        <siddhi.io.http.version>2.3.5</siddhi.io.http.version>
+        <siddhi.io.email.version>2.0.8</siddhi.io.email.version>
+        <siddhi.io.http.version>2.3.6</siddhi.io.http.version>
 
         <siddhi.map.json.version>5.2.3</siddhi.map.json.version>
         <siddhi.map.binary.version>2.1.1</siddhi.map.binary.version>
         <siddhi.map.xml.version>5.2.2</siddhi.map.xml.version>
 
-        <siddhi.store.rdbms.version>7.0.15</siddhi.store.rdbms.version>
+        <siddhi.store.rdbms.version>7.0.17</siddhi.store.rdbms.version>
         <siddhi.store.solr.version>2.0.0</siddhi.store.solr.version>
 
         <zkclient.version>0.10</zkclient.version>
