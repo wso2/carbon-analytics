@@ -27,6 +27,7 @@ import org.wso2.carbon.streaming.integrator.core.internal.util.SiddhiAppProcesso
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -178,7 +179,12 @@ public class ConfigReader {
      */
     public Map getNodes() {
         if (configs != null && configs.get(DEPLOYMENT_CONFIGS) != null) {
-            return (Map) ((List) configs.get(DEPLOYMENT_CONFIGS)).get(0);
+            List nodeList = (List) configs.get(DEPLOYMENT_CONFIGS);
+            Map nodeMap = new LinkedHashMap();
+            for(Object node: nodeList) {
+                nodeMap.putAll((Map) node);
+            }
+            return nodeMap;
         }
         return null;
     }
