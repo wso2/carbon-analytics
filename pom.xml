@@ -1817,7 +1817,7 @@
         <guava.version>31.1-jre</guava.version>
         <guava.bundle.version>31.1.0.jre</guava.bundle.version>
         <guava.failureaccess.version>1.0.1</guava.failureaccess.version>
-        <quartz.version>2.3.0.wso2v3</quartz.version>
+        <quartz.version>2.3.2.wso2v1</quartz.version>
         <mchange.version>0.9.5.5</mchange.version>
         <metrics.version>3.2.5</metrics.version>
         <commons-lang3.version>3.3.2</commons-lang3.version>
