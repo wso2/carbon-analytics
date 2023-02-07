@@ -1637,15 +1637,15 @@
     "extension": {
       "name": "wso2event",
       "displayName": "WSO2 Event",
-      "version": "5.0.1"
+      "version": "5.0.2"
     },
     "dependencies": [
       {
         "name": "siddhi-io-wso2event",
-        "version": "5.0.1",
+        "version": "5.0.2",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/io/wso2event/siddhi-io-wso2event/5.0.1/siddhi-io-wso2event-5.0.1.jar"
+          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/io/wso2event/siddhi-io-wso2event/5.0.2/siddhi-io-wso2event-5.0.2.jar"
         },
         "usages": [
           {
@@ -1657,10 +1657,10 @@
       },
       {
         "name": "siddhi-map-wso2event",
-        "version": "5.0.1",
+        "version": "5.0.3",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/map/wso2event/siddhi-map-wso2event/5.0.2/siddhi-map-wso2event-5.0.2.jar"
+          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/map/wso2event/siddhi-map-wso2event/5.0.3/siddhi-map-wso2event-5.0.3.jar"
         },
         "usages": [
           {
