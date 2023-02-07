@@ -78,7 +78,7 @@
             <artifactId>json</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.org.antlr</groupId>
+            <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
         </dependency>
         <dependency>
@@ -190,7 +190,7 @@
                                     <version>${carbon.analytics.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>antlr4-runtime</symbolicName>
+                                    <symbolicName>org.antlr.antlr4-runtime</symbolicName>
                                     <version>${antlr4.runtime.version}</version>
                                 </bundle>
                                 <bundle>
