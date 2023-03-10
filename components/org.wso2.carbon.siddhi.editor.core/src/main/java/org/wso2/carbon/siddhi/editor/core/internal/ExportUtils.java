@@ -105,8 +105,8 @@ public class ExportUtils {
     private static final String KUBERNETES_README_FILE_NAME = "K8S-README.md";
     private static final String GENERIC_README_FILE_NAME = "README.md";
     private static final String KUBERNETES_FILE_NAME = "siddhi-process.yaml";
-    private static final String JARS_DIR = "jars" + File.separator;
-    private static final String BUNDLE_DIR = "bundles" + File.separator;
+    private static final String JARS_DIR = ".jars" + File.separator;
+    private static final String BUNDLE_DIR = ".bundles" + File.separator;
     private static final String APPS_DIR = "siddhi-files" + File.separator;
     private static final String CONFIG_FILE = "configurations.yaml";
     private static final String EXPORT_TYPE_KUBERNETES = "kubernetes";
