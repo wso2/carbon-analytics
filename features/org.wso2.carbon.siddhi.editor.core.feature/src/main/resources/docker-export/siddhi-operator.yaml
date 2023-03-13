@@ -7,7 +7,7 @@ metadata:
 data:
   siddhiHome: /home/wso2carbon/wso2si/
   siddhiProfile: server
-  siddhiImage: wso2/wso2si:4.1.0
+  siddhiImage: docker.wso2.com/wso2si:4.2.0.0
   autoIngressCreation: "true"
   # ingressTLS: siddhi-tls
 ---
