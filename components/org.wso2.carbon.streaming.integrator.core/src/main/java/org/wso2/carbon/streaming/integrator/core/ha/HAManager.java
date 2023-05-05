@@ -219,11 +219,6 @@ public class HAManager {
             //change the system clock to work with event time
             enableEventTimeClock(true);
             startSiddhiAppRuntimeWithoutSources();
-            try {
-                eventListMapManager.trimAndSendToInputHandler();
-            } catch (InterruptedException e) {
-                log.warn("Error in sending events to input handler." + e.getMessage());
-            }
             log.info("Successfully playback all the events");
             for (SourceHandler sourceHandler : sourceHandlerManager.getRegsiteredSourceHandlers().values()) {
                 try {
@@ -272,6 +267,12 @@ public class HAManager {
             log.info("Registered record table handlers set to active ");
 
             startSiddhiAppRuntimeSources();
+
+            try {
+                eventListMapManager.trimAndSendToInputHandler();
+            } catch (InterruptedException e) {
+                log.warn("Error in sending events to input handler." + e.getMessage());
+            }
 
             //start the databridge servers
             List<ServerEventListener> listeners = StreamProcessorDataHolder.getServerListeners();
