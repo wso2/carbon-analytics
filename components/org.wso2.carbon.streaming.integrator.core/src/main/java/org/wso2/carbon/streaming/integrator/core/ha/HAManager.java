@@ -371,17 +371,20 @@ public class HAManager {
         SiddhiManager siddhiManager = StreamProcessorDataHolder.getSiddhiManager();
 
         siddhiAppDataMap.forEach((siddhiAppName, siddhiAppData) -> {
-
-            SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiAppData.getSiddhiApp());
-            Set<String> streamNames = siddhiAppRuntime.getStreamDefinitionMap().keySet();
-            Map<String, InputHandler> inputHandlerMap =
-                    new ConcurrentHashMap<String, InputHandler>(streamNames.size());
-            for (String streamName : streamNames) {
-                inputHandlerMap.put(streamName, siddhiAppRuntime.getInputHandler(streamName));
+            try {
+                SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiAppData.getSiddhiApp());
+                Set<String> streamNames = siddhiAppRuntime.getStreamDefinitionMap().keySet();
+                Map<String, InputHandler> inputHandlerMap = new ConcurrentHashMap<String, InputHandler>(
+                        streamNames.size());
+                for (String streamName : streamNames) {
+                    inputHandlerMap.put(streamName, siddhiAppRuntime.getInputHandler(streamName));
+                }
+                siddhiAppData.setInputHandlerMap(inputHandlerMap);
+                siddhiAppData.setActive(true);
+                siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
+            } catch (Exception e) {
+                log.error("Failed to create Siddhi App runtime for the Siddhi app: " + siddhiAppName, e);
             }
-            siddhiAppData.setInputHandlerMap(inputHandlerMap);
-            siddhiAppData.setActive(true);
-            siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
         });
     }
 
