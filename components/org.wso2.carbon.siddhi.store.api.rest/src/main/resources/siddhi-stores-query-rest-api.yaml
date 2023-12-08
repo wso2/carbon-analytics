@@ -48,7 +48,45 @@ paths:
             $ref: '#/definitions/ApiResponse'
         '405':
           description: Invalid input
+  /stores/initAgg:
+    post:
+      tags:
+        - store
+      summary: Submit a Siddhi query and get the result records from a store
+      description: ''
+      operationId: query
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: >-
+            Query object which contains the query which returns the store
+            records
+          required: true
+          schema:
+            $ref: '#/definitions/query'
+      responses:
+        '200':
+          description: 'OK, query was successfully submitted'
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '405':
+          description: Invalid input
 definitions:
+  initAggregationDTO:
+    type: object
+    required:
+      - string
+    properties:
+      appName:
+        description: "Name of the siddhi app in which the aggregation resides"
+        type: string
+      aggName:
+        description: "Name of the Aggregation to be initialized"
+        type: string
   query:
     type: object
     required:

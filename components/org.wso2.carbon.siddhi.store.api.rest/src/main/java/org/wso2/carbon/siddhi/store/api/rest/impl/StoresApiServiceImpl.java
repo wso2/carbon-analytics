@@ -19,6 +19,11 @@
 
 package org.wso2.carbon.siddhi.store.api.rest.impl;
 
+import io.siddhi.core.SiddhiAppRuntimeImpl;
+import io.siddhi.core.aggregation.AggregationRuntime;
+import io.siddhi.core.event.ComplexEvent;
+import io.siddhi.core.event.ComplexEventChunk;
+import io.siddhi.core.event.stream.StreamEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.siddhi.store.api.rest.NotFoundException;
@@ -29,6 +34,7 @@ import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
 import org.wso2.carbon.siddhi.store.api.rest.model.Record;
 import org.wso2.carbon.siddhi.store.api.rest.model.RecordDetail;
+import org.wso2.carbon.siddhi.store.api.rest.model.InitAggregationDTO;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.event.Event;
@@ -45,6 +51,34 @@ import java.util.Map;
 public class StoresApiServiceImpl extends StoresApiService {
 
     private static final Logger log = LoggerFactory.getLogger(StoresApiServiceImpl.class);
+
+    @Override
+    public Response initAgg(InitAggregationDTO body) throws NotFoundException {
+        SiddhiAppRuntimeService siddhiAppRuntimeService =
+                SiddhiStoreDataHolder.getInstance().getSiddhiAppRuntimeService();
+        Map<String, SiddhiAppRuntime> siddhiAppRuntimes = siddhiAppRuntimeService.getActiveSiddhiAppRuntimes();
+        SiddhiAppRuntimeImpl siddhiAppRuntime = (SiddhiAppRuntimeImpl) siddhiAppRuntimes.get(body.getAppName());
+        if (siddhiAppRuntime == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+                    "Siddhi Runtime could not be found for app : " + body.getAggName())).build();
+        }
+        AggregationRuntime aggregationRuntime = siddhiAppRuntime.getAggregationMap().get(body.getAggName());
+        if (aggregationRuntime == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ApiResponseMessage(ApiResponseMessage
+                    .ERROR, "Aggregation Runtime could not be found for" + body.getAggName())).build();
+        }
+        aggregationRuntime.getIncrementalExecutorsInitialiser().initialiseExecutors();
+        ComplexEventChunk<StreamEvent> timerStreamEventChunk = new ComplexEventChunk<>();
+        StreamEvent streamEvent = new StreamEvent(0, 0, 0);
+        streamEvent.setType(ComplexEvent.Type.TIMER);
+        streamEvent.setTimestamp(System.currentTimeMillis() + 31556952000l);
+        timerStreamEventChunk.add(streamEvent);
+        siddhiAppRuntime.getAggregationMap().get(body.getAggName()).initialiseExecutors(true);
+        siddhiAppRuntime.getAggregationMap().get(body.getAggName()).processEvents(timerStreamEventChunk);
+        return Response.status(Response.Status.OK).entity(new ApiResponseMessage(ApiResponseMessage.INFO,
+                "Aggregation initiated for " + body.getAggName())).build();
+    }
+
     @Override
     public Response query(Query body) throws NotFoundException {
         if (body.getQuery() == null || body.getQuery().isEmpty()) {

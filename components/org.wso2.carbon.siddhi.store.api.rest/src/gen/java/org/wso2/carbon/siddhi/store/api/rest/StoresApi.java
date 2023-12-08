@@ -30,6 +30,7 @@ import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.siddhi.store.api.rest.factories.StoresApiServiceFactory;
 import org.wso2.carbon.siddhi.store.api.rest.model.ModelApiResponse;
 import org.wso2.carbon.siddhi.store.api.rest.model.Query;
+import org.wso2.carbon.siddhi.store.api.rest.model.InitAggregationDTO;
 import org.wso2.carbon.streaming.integrator.common.HAStateChangeListener;
 import org.wso2.carbon.streaming.integrator.common.SiddhiAppRuntimeService;
 
@@ -62,6 +63,24 @@ public class StoresApi implements HAStateChangeListener {
     private static MicroservicesRunner microservicesRunner;
     private static volatile boolean microserviceActive;
     private static final String ROOT_CONFIG_ELEMENT = "siddhi.stores.query.api";
+
+    @POST
+    @Path("/initAgg")
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Submit Siddhi app & aggregation name to initizalize it externally",
+         notes = "", response = ModelApiResponse.class, tags = {"store",})
+    @io.swagger.annotations.ApiResponses(value = {
+         @io.swagger.annotations.ApiResponse(code = 200, message = "OK, Request was successfully submitted",
+                 response = ModelApiResponse.class),
+            @io.swagger.annotations.ApiResponse(code = 405, message = "Invalid input",
+                 response = ModelApiResponse
+                         .class)})
+     public Response initAgg(@ApiParam(value = "Object which contains app and the aggregation to be initialized",
+            required = true) InitAggregationDTO body)
+            throws NotFoundException {
+     return delegate.initAgg(body);
+      }
 
     @POST
     @Path("/query")
