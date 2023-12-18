@@ -67,11 +67,11 @@ public class StoresApiServiceImpl extends StoresApiService {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ApiResponseMessage(ApiResponseMessage
                     .ERROR, "Aggregation Runtime could not be found for" + body.getAggName())).build();
         }
-        aggregationRuntime.getIncrementalExecutorsInitialiser().initialiseExecutors();
+
         ComplexEventChunk<StreamEvent> timerStreamEventChunk = new ComplexEventChunk<>();
         StreamEvent streamEvent = new StreamEvent(0, 0, 0);
         streamEvent.setType(ComplexEvent.Type.TIMER);
-        streamEvent.setTimestamp(System.currentTimeMillis() + 31556952000l);
+        streamEvent.setTimestamp(System.currentTimeMillis());
         timerStreamEventChunk.add(streamEvent);
         siddhiAppRuntime.getAggregationMap().get(body.getAggName()).initialiseExecutors(true);
         siddhiAppRuntime.getAggregationMap().get(body.getAggName()).processEvents(timerStreamEventChunk);
