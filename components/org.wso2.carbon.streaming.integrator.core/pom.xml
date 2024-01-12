@@ -302,6 +302,7 @@
             org.wso2.carbon.database.query.manager.*; version="${carbon.analytics-common.version.range}",
             javax.management.*,
             javax.ws.rs.*;version="${javax.ws.rs.version.range}",
+            com.zaxxer.*;version="${hikaricp.version.range}",
             *;resolution:=optional
         </import.package>
         <carbon.component>
