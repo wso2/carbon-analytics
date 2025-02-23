@@ -147,8 +147,12 @@ public class Utils {
         JsonArray logFiles = new JsonArray();
         try (DirectoryStream<Path> paths = Files.newDirectoryStream(logDirPath, "*.log")) {
             for (Path path : paths) {
+                Path fileName = path.getFileName();
+                if (fileName == null) {
+                    continue;
+                }
                 JsonObject logfileObject = new JsonObject();
-                logfileObject.addProperty("FileName", path.getFileName().toString());
+                logfileObject.addProperty("FileName", fileName.toString());
                 logfileObject.addProperty("Size", getFileSize(path.toFile()));
                 logFiles.add(logfileObject);
             }
