@@ -33,6 +33,10 @@ public abstract class SiddhiAppsApiService {
 
     public abstract Response siddhiAppsAppNameDelete(String appName, Request request) throws NotFoundException;
 
+    public abstract Response siddhiAppsAppActivate(String appName, Request request) throws NotFoundException;
+
+    public abstract Response siddhiAppsAppDeactivate(String appName, Request request) throws NotFoundException;
+
     public abstract Response siddhiAppsAppNameGet(String appName, Request request) throws NotFoundException;
 
     public abstract Response siddhiAppsAppNameStatusGet(String appName, Request request) throws NotFoundException;
@@ -63,6 +67,18 @@ public abstract class SiddhiAppsApiService {
             NotFoundException;
 
     public abstract Response siddhiAppsElementsGet(String appName, Request request) throws NotFoundException;
+
+    public abstract Response siddhiAppsSourcesGet(Request request);
+
+    public abstract Response siddhiAppsSinksGet(Request request);
+
+    public abstract Response siddhiAppsQueriesGet(Request request);
+
+    public abstract Response siddhiAppsTablesGet(Request request);
+
+    public abstract Response siddhiAppsWindowsGet(Request request);
+
+    public abstract Response siddhiAppsAggregationsGet(Request request);
 
     public abstract Response siddhiAppExistsGet(String siddhiApp, Request request) throws NotFoundException;
 

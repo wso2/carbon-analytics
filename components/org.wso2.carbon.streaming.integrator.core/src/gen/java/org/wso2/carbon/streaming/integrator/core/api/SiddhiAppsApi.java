@@ -155,6 +155,50 @@ public class SiddhiAppsApi implements Microservice {
         return delegate.siddhiAppsAppNameDelete(appName, request);
     }
 
+    @PUT
+    @Path("/activate/{appName}")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Activates the Siddhi Application.", notes = "Activates the currently" +
+            " deactivated Siddhi Application with the name specified. Path param of **appName** determines name of the " +
+            "Siddhi application. ", response = InlineResponse400.class, tags = {"Artifact",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Application is successfully activated.",
+                    response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 400, message = "The Siddhi Application name provided is " +
+                    "invalid.", response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application is not found.",
+                    response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = InlineResponse400.class)})
+    public Response siddhiAppsAppActivate(
+            @Context Request request,
+            @ApiParam(value = "The name of the Siddhi Application", required = true)
+            @PathParam("appName") String appName) throws NotFoundException {
+        return delegate.siddhiAppsAppActivate(appName, request);
+    }
+
+    @PUT
+    @Path("/deactivate/{appName}")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Deactivates the Siddhi Application.", notes = "Deactivates the currently" +
+            " deployed Siddhi Application with the name specified. Path param of **appName** determines name of the " +
+            "Siddhi application. ", response = InlineResponse400.class, tags = {"Artifact",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Application is successfully deactivated.",
+                    response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 400, message = "The Siddhi Application name provided is " +
+                    "invalid.", response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application is not found.",
+                    response = InlineResponse400.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
+                    response = InlineResponse400.class)})
+    public Response siddhiAppsAppDeactivate(
+            @Context Request request,
+            @ApiParam(value = "The name of the Siddhi Application", required = true)
+            @PathParam("appName") String appName) throws NotFoundException {
+        return delegate.siddhiAppsAppDeactivate(appName, request);
+    }
+
     @GET
     @Path("/{appName}")
     @Produces({"application/json"})
@@ -302,6 +346,90 @@ public class SiddhiAppsApi implements Microservice {
             @ApiParam(value = "The name of the Siddhi Application", required = true)
             @PathParam("appName") String appName) throws NotFoundException {
         return delegate.siddhiAppsElementsGet(appName, request);
+    }
+
+    @GET
+    @Path("/sources")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Fetches the sources of the Siddhi Applications.",
+            notes = "Fetches the sources of the Siddhi Application. ", response = InlineResponse200.class,
+            tags = {"Artifact",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Applications  sources data are " +
+                    "successfully retrieved.", response = InlineResponse200.class)})
+    public Response siddhiAppsSourcesGet(
+            @Context Request request){
+        return delegate.siddhiAppsSourcesGet(request);
+    }
+
+    @GET
+    @Path("/sinks")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Fetches the sinks of the Siddhi Applications.",
+            notes = "Fetches the sinks of the Siddhi Applications. ", response = InlineResponse200.class,
+            tags = {"Artifact",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Applications sinks data are " +
+                    "successfully retrieved.", response = InlineResponse200.class)})
+    public Response siddhiAppsSinksGet(
+            @Context Request request) {
+        return delegate.siddhiAppsSinksGet(request);
+    }
+
+    @GET
+    @Path("/queries")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Fetches the queries of the Siddhi Applications.",
+            notes = "Fetches the queries of the Siddhi Applications. ", response = InlineResponse200.class,
+            tags = {"Artifact",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Applications query data are " +
+                    "successfully retrieved.", response = InlineResponse200.class)})
+    public Response siddhiAppsQueriesGet(
+            @Context Request request) {
+        return delegate.siddhiAppsQueriesGet(request);
+    }
+
+    @GET
+    @Path("/tables")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Fetches the tables of the Siddhi Applications.",
+            notes = "Fetches the tables of the Siddhi Application. ", response = InlineResponse200.class,
+            tags = {"Artifact",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Applications tables are " +
+                    "successfully retrieved.", response = InlineResponse200.class)})
+    public Response siddhiAppsTablesGet(
+            @Context Request request) {
+        return delegate.siddhiAppsTablesGet(request);
+    }
+
+    @GET
+    @Path("/windows")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Fetches the windows of the Siddhi Applications.",
+            notes = "Fetches the windows of the Siddhi Applications. ", response = InlineResponse200.class,
+            tags = {"Artifact",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Applications windows data are " +
+                    "successfully retrieved.", response = InlineResponse200.class)})
+    public Response siddhiAppsWindowsGet(
+            @Context Request request) throws NotFoundException {
+        return delegate.siddhiAppsWindowsGet(request);
+    }
+
+    @GET
+    @Path("/aggregations")
+    @Produces({"application/json"})
+    @io.swagger.annotations.ApiOperation(value = "Fetches the aggregations of the Siddhi Applications.",
+            notes = "Fetches the aggregations of the Siddhi Applications. ", response = InlineResponse200.class,
+            tags = {"Artifact",})
+    @io.swagger.annotations.ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Applications aggregations data are " +
+                    "successfully retrieved.", response = InlineResponse200.class)})
+    public Response siddhiAppsAggregationsGet(
+            @Context Request request) {
+        return delegate.siddhiAppsAggregationsGet(request);
     }
 
     @GET

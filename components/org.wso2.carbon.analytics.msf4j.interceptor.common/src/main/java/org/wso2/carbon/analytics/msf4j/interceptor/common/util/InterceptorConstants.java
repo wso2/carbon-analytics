@@ -22,6 +22,7 @@ package org.wso2.carbon.analytics.msf4j.interceptor.common.util;
  */
 public class InterceptorConstants {
     public static final String PROPERTY_USERNAME = "username";
+    public static final String ACCESS_TOKEN = "Access_Token";
 
     public static final String BEARER_PREFIX = "Bearer";
     public static final String BASIC_PREFIX = "Basic";
