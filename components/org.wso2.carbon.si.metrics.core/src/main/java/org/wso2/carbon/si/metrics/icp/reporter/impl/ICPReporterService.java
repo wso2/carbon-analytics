@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
-import org.wso2.carbon.analytics.msf4j.interceptor.common.ICPAuthenticationInterceptor;
+import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.si.metrics.icp.reporter.utils.Constants;
 import org.wso2.carbon.si.metrics.icp.reporter.utils.Utils;
 import org.wso2.carbon.si.metrics.icp.reporter.utils.HttpUtils;
@@ -49,7 +49,7 @@ import javax.ws.rs.core.Response;
         immediate = true
 )
 @Path("/management")
-@RequestInterceptor(ICPAuthenticationInterceptor.class)
+@RequestInterceptor(AuthenticationInterceptor.class)
 public class ICPReporterService implements Microservice {
 
     private final String siddhiApiHostName;
