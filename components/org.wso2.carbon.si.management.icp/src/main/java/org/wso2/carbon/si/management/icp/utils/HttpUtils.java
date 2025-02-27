@@ -16,7 +16,7 @@
  * under the License.
  *
  */
-package org.wso2.carbon.si.metrics.icp.reporter.utils;
+package org.wso2.carbon.si.management.icp.utils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -28,6 +28,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
@@ -35,6 +36,7 @@ import org.apache.http.util.EntityUtils;
 import org.wso2.msf4j.Request;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Utilities to execute http requests.
@@ -87,13 +89,14 @@ public class HttpUtils {
         }
     }
 
-    public static CloseableHttpResponse doPut(String accessToken, String url) {
+    public static CloseableHttpResponse doPut(String accessToken, String url, JsonObject payload) {
         final HttpPut httpPut = new HttpPut(url);
 
         String authHeader = BEARER + accessToken;
         httpPut.setHeader(Constants.ACCEPT, Constants.HEADER_VALUE_APPLICATION_JSON);
-        httpPut.setHeader(Constants.ACCEPT, Constants.HEADER_VALUE_APPLICATION_JSON);
         httpPut.setHeader(AUTHORIZATION, authHeader);
+        HttpEntity httpEntity = new ByteArrayEntity(payload.toString().getBytes(StandardCharsets.UTF_8));
+        httpPut.setEntity(httpEntity);
 
         try {
             CloseableHttpClient httpClient = getHttpClient();

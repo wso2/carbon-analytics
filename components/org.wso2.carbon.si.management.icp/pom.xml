@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
   ~
   ~ WSO2 Inc. licenses this file to you under the Apache License,
   ~ Version 2.0 (the "License"); you may not use this file except
@@ -16,18 +16,19 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>3.0.71-SNAPSHOT</version>
+        <version>3.0.69</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.si.metrics.core</artifactId>
-    <name>WSO2 Carbon - Siddhi Metrics Core</name>
+    <artifactId>org.wso2.carbon.si.management.icp</artifactId>
+    <name>WSO2 Carbon - Streaming Integrator ICP</name>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -39,14 +40,6 @@
         <dependency>
             <groupId>io.siddhi</groupId>
             <artifactId>siddhi-query-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.siddhi</groupId>
-            <artifactId>siddhi-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.siddhi</groupId>
-            <artifactId>siddhi-query-compiler</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.metrics</groupId>
@@ -61,36 +54,30 @@
             <artifactId>org.apache.felix.scr.annotations</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-
-        <!--Prometheus-->
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>simpleclient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>simpleclient_dropwizard</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>simpleclient_httpserver</artifactId>
+            <groupId>org.json.wso2</groupId>
+            <artifactId>json</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.msf4j</groupId>
             <artifactId>msf4j-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics</groupId>
+            <artifactId>org.wso2.carbon.analytics.msf4j.interceptor.common</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
         </dependency>
     </dependencies>
 
@@ -113,17 +100,15 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-                            org.wso2.carbon.si.metrics.core.*,
-                            io.prometheus.client.*,
-                            org.wso2.carbon.si.metrics.prometheus.reporter.*
+                            org.wso2.carbon.si.management.icp.*,
+                            net.minidev.*,
+                            org.apache.http.*,
+                            org.apache.commons.text.*
                         </Export-Package>
                         <Import-Package>
                             org.yaml.snakeyaml.*; version="${org.snakeyaml.import.version.range}",
                             *;resolution:=optional
                         </Import-Package>
-                        <Private-Package>
-                            io.prometheus.client.*,
-                        </Private-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
@@ -168,4 +153,10 @@
             </plugin>
         </plugins>
     </build>
+    <properties>
+        <carbon.component>
+            osgi.service; objectClass="org.wso2.msf4j.Microservice"; serviceCount="1"
+        </carbon.component>
+    </properties>
+
 </project>

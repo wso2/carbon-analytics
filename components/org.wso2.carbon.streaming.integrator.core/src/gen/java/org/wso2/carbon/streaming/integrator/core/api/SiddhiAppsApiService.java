@@ -33,9 +33,7 @@ public abstract class SiddhiAppsApiService {
 
     public abstract Response siddhiAppsAppNameDelete(String appName, Request request) throws NotFoundException;
 
-    public abstract Response siddhiAppsAppActivate(String appName, Request request) throws NotFoundException;
-
-    public abstract Response siddhiAppsAppDeactivate(String appName, Request request) throws NotFoundException;
+    public abstract Response siddhiAppsSetState(String appName, String body, Request request) throws NotFoundException;
 
     public abstract Response siddhiAppsAppNameGet(String appName, Request request) throws NotFoundException;
 

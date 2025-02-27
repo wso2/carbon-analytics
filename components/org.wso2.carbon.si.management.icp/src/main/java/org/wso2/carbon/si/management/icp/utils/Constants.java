@@ -16,7 +16,7 @@
  * under the License.
  *
  */
-package org.wso2.carbon.si.metrics.icp.reporter.utils;
+package org.wso2.carbon.si.management.icp.utils;
 
 public final class Constants {
 
@@ -72,7 +72,17 @@ public final class Constants {
     public static final String DETAILS = "details";
     public static final String ENABLED = "Enabled";
     public static final String DISABLED = "Disabled";
-
+    // hearbeat component
     public static final String HEADER_VALUE_APPLICATION_JSON = "application/json";
     public static final String ACCEPT = "Accept";
+    public static final String PRODUCT_SI = "si";
+    public static final String PRODUCT = "product";
+    public static final String GROUP_ID = "groupId";
+    public static final String NODE_ID = "nodeId";
+    public static final String INTERVAL = "interval";
+    public static final String MGT_API_URL = "mgtApiUrl";
+    public static final String CONTENT_TYPE = "Content-type";
+    public static final String MANAGEMENT = "management";
+    public static final String HEARTBEAT = "heartbeat";
+    public static final String ACTION = "action";
 }

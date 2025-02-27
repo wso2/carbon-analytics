@@ -16,7 +16,7 @@
  * under the License.
  *
  */
-package org.wso2.carbon.si.metrics.icp.reporter.impl;
+package org.wso2.carbon.si.management.icp.impl;
 
 import com.google.gson.JsonObject;
 import org.apache.commons.logging.Log;
@@ -31,9 +31,14 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
-import org.wso2.carbon.si.metrics.icp.reporter.utils.Constants;
-import org.wso2.carbon.si.metrics.icp.reporter.utils.HttpUtils;
+import org.wso2.carbon.si.management.icp.utils.Constants;
+import org.wso2.carbon.si.management.icp.utils.HttpUtils;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +46,6 @@ import java.util.concurrent.TimeUnit;
 public class ICPHeartbeatComponent {
 
     private static final Log log = LogFactory.getLog(ICPHeartbeatComponent.class);
-    private final String PRODUCT_SI = "si";
     private final String dashboardURL;
     private final int heartbeatInterval;
     private final String groupId;
@@ -55,23 +59,22 @@ public class ICPHeartbeatComponent {
     }
 
     public void invokeHeartbeatExecutorService() {
-        String heartbeatApiUrl = dashboardURL + "/heartbeat";
-        String mgtApiUrl = DataHolder.getInstance().getSiddhiHost() + "management" + Constants.SLASH;
+        String heartbeatApiUrl = dashboardURL + Constants.SLASH + Constants.HEARTBEAT;
+        String mgtApiUrl = DataHolder.getInstance().getSiddhiHost() + Constants.MANAGEMENT + Constants.SLASH;
         final HttpPost httpPost = new HttpPost(heartbeatApiUrl);
 
         JsonObject heartbeatPayload = new JsonObject();
-        heartbeatPayload.addProperty("product", PRODUCT_SI);
-        heartbeatPayload.addProperty("groupId", groupId);
-        heartbeatPayload.addProperty("nodeId", nodeId);
-        heartbeatPayload.addProperty("interval", heartbeatInterval);
-        heartbeatPayload.addProperty("mgtApiUrl", mgtApiUrl);
+        heartbeatPayload.addProperty(Constants.PRODUCT, Constants.PRODUCT_SI);
+        heartbeatPayload.addProperty(Constants.GROUP_ID, groupId);
+        heartbeatPayload.addProperty(Constants.NODE_ID, nodeId);
+        heartbeatPayload.addProperty(Constants.INTERVAL, heartbeatInterval);
+        heartbeatPayload.addProperty(Constants.MGT_API_URL, mgtApiUrl);
 
-        httpPost.setHeader("Accept", Constants.HEADER_VALUE_APPLICATION_JSON);
-        httpPost.setHeader("Content-type", Constants.HEADER_VALUE_APPLICATION_JSON);
+        httpPost.setHeader(Constants.ACCEPT, Constants.HEADER_VALUE_APPLICATION_JSON);
+        httpPost.setHeader(Constants.CONTENT_TYPE, Constants.HEADER_VALUE_APPLICATION_JSON);
 
         ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         Runnable runnableTask = () -> {
-
             try (CloseableHttpClient client = HttpClients.custom().setSSLSocketFactory(
                     new SSLConnectionSocketFactory(
                             SSLContexts.custom().loadTrustMaterial(null,
@@ -86,8 +89,12 @@ public class ICPHeartbeatComponent {
                 } else {
                     log.error("Error occurred while sending the heartbeat.");
                 }
-            } catch (Exception e) {
-                log.info("Error occurred while processing the heartbeat.", e);
+            } catch (KeyStoreException | NoSuchAlgorithmException | KeyManagementException e) {
+                log.error("SSL configuration error: {}", e);
+            } catch (UnsupportedEncodingException e) {
+                log.error("Error encoding heartbeat payload: {}", e);
+            } catch (IOException e) {
+                log.error("I/O error while sending heartbeat: {}", e);
             }
         };
         scheduledExecutorService.scheduleAtFixedRate(runnableTask, 1, heartbeatInterval, TimeUnit.SECONDS);

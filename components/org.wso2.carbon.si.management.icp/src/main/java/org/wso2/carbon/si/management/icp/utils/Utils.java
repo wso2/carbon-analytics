@@ -16,14 +16,15 @@
  * under the License.
  *
  */
-package org.wso2.carbon.si.metrics.icp.reporter.utils;
+package org.wso2.carbon.si.management.icp.utils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.apache.commons.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.si.metrics.icp.reporter.impl.ArtifactType;
+import org.wso2.carbon.si.management.icp.impl.ArtifactType;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,67 +32,68 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class Utils {
 
     private static final Logger log = LoggerFactory.getLogger(Utils.class);
-    private static final Map<ArtifactType, Map<String, String>> FUNCTION_MAP = new HashMap<>();
+    private static final EnumMap<ArtifactType, EnumMap<ICPKey, SiddhiAppApiKey>> FUNCTION_MAP =
+            new EnumMap<>(ArtifactType.class);
 
     static {
-        Map<String, String> SIDDHI_APP_MAP = new HashMap<>();
-        SIDDHI_APP_MAP.put(Constants.NAME, Constants.APP_NAME);
-        SIDDHI_APP_MAP.put(Constants.STATUS, Constants.STATUS);
-        SIDDHI_APP_MAP.put(Constants.AGE, Constants.AGE);
-        SIDDHI_APP_MAP.put(Constants.STATS_ENABLED, Constants.IS_STAT_ENABLED);
+        EnumMap<ICPKey, SiddhiAppApiKey> SIDDHI_APP_MAP = new EnumMap<>(ICPKey.class);
+        SIDDHI_APP_MAP.put(ICPKey.NAME, SiddhiAppApiKey.APP_NAME);
+        SIDDHI_APP_MAP.put(ICPKey.STATUS, SiddhiAppApiKey.STATUS);
+        SIDDHI_APP_MAP.put(ICPKey.AGE, SiddhiAppApiKey.AGE);
+        SIDDHI_APP_MAP.put(ICPKey.STATS_ENABLED, SiddhiAppApiKey.IS_STAT_ENABLED);
         FUNCTION_MAP.put(ArtifactType.SIDDHI_APPS, SIDDHI_APP_MAP);
 
-        Map<String, String> SOURCE_MAP = new HashMap<>();
-        SOURCE_MAP.put(Constants.NAME, Constants.OUTPUT_STREAM_ID);
-        SOURCE_MAP.put(Constants.TYPE, Constants.INPUT_STREAM_ID);
-        SOURCE_MAP.put(Constants.APP_NAME, Constants.APP_NAME);
-        SOURCE_MAP.put(Constants.STATUS, Constants.IS_ACTIVE);
+        EnumMap<ICPKey, SiddhiAppApiKey> SOURCE_MAP = new EnumMap<>(ICPKey.class);
+        SOURCE_MAP.put(ICPKey.NAME, SiddhiAppApiKey.OUTPUT_STREAM_ID);
+        SOURCE_MAP.put(ICPKey.TYPE, SiddhiAppApiKey.INPUT_STREAM_ID);
+        SOURCE_MAP.put(ICPKey.APP_NAME, SiddhiAppApiKey.APP_NAME);
+        SOURCE_MAP.put(ICPKey.STATUS, SiddhiAppApiKey.IS_ACTIVE);
         FUNCTION_MAP.put(ArtifactType.SOURCES, SOURCE_MAP);
 
-        Map<String, String> SINK_MAP = new HashMap<>();
-        SINK_MAP.put(Constants.NAME, Constants.INPUT_STREAM_ID);
-        SINK_MAP.put(Constants.TYPE, Constants.OUTPUT_STREAM_ID);
-        SINK_MAP.put(Constants.APP_NAME, Constants.APP_NAME);
-        SINK_MAP.put(Constants.STATUS, Constants.IS_ACTIVE);
+        EnumMap<ICPKey, SiddhiAppApiKey> SINK_MAP = new EnumMap<>(ICPKey.class);
+        SINK_MAP.put(ICPKey.NAME, SiddhiAppApiKey.INPUT_STREAM_ID);
+        SINK_MAP.put(ICPKey.TYPE, SiddhiAppApiKey.OUTPUT_STREAM_ID);
+        SINK_MAP.put(ICPKey.APP_NAME, SiddhiAppApiKey.APP_NAME);
+        SINK_MAP.put(ICPKey.STATUS, SiddhiAppApiKey.IS_ACTIVE);
         FUNCTION_MAP.put(ArtifactType.SINKS, SINK_MAP);
 
-        Map<String, String> QUERY_MAP = new HashMap<>();
-        QUERY_MAP.put(Constants.NAME, Constants.QUERY_NAME);
-        QUERY_MAP.put(Constants.INPUT_STREAM, Constants.INPUT_STREAM_ID);
-        QUERY_MAP.put(Constants.OUTPUT_STREAM, Constants.OUTPUT_STREAM_ID);
-        QUERY_MAP.put(Constants.APP_NAME, Constants.APP_NAME);
-        QUERY_MAP.put(Constants.QUERY, Constants.QUERY);
-        QUERY_MAP.put(Constants.STATUS, Constants.IS_ACTIVE);
+        EnumMap<ICPKey, SiddhiAppApiKey> QUERY_MAP = new EnumMap<>(ICPKey.class);
+        QUERY_MAP.put(ICPKey.NAME, SiddhiAppApiKey.QUERY_NAME);
+        QUERY_MAP.put(ICPKey.INPUT_STREAM, SiddhiAppApiKey.INPUT_STREAM_ID);
+        QUERY_MAP.put(ICPKey.OUTPUT_STREAM, SiddhiAppApiKey.OUTPUT_STREAM_ID);
+        QUERY_MAP.put(ICPKey.APP_NAME, SiddhiAppApiKey.APP_NAME);
+        QUERY_MAP.put(ICPKey.QUERY, SiddhiAppApiKey.QUERY);
+        QUERY_MAP.put(ICPKey.STATUS, SiddhiAppApiKey.IS_ACTIVE);
         FUNCTION_MAP.put(ArtifactType.QUERIES, QUERY_MAP);
 
-        Map<String, String> TABLE_MAP = new HashMap<>();
-        TABLE_MAP.put(Constants.NAME, Constants.TABLE_ID);
-        TABLE_MAP.put(Constants.APP_NAME, Constants.APP_NAME);
-        TABLE_MAP.put(Constants.STATUS, Constants.IS_ACTIVE);
+        EnumMap<ICPKey, SiddhiAppApiKey> TABLE_MAP = new EnumMap<>(ICPKey.class);
+        TABLE_MAP.put(ICPKey.NAME, SiddhiAppApiKey.TABLE_ID);
+        TABLE_MAP.put(ICPKey.APP_NAME, SiddhiAppApiKey.APP_NAME);
+        TABLE_MAP.put(ICPKey.STATUS, SiddhiAppApiKey.IS_ACTIVE);
         FUNCTION_MAP.put(ArtifactType.TABLES, TABLE_MAP);
 
-        Map<String, String> WINDOW_MAP = new HashMap<>();
-        WINDOW_MAP.put(Constants.NAME, Constants.WINDOW_ID);
-        WINDOW_MAP.put(Constants.APP_NAME, Constants.APP_NAME);
-        WINDOW_MAP.put(Constants.STATUS, Constants.IS_ACTIVE);
+        EnumMap<ICPKey, SiddhiAppApiKey> WINDOW_MAP = new EnumMap<>(ICPKey.class);
+        WINDOW_MAP.put(ICPKey.NAME, SiddhiAppApiKey.WINDOW_ID);
+        WINDOW_MAP.put(ICPKey.APP_NAME, SiddhiAppApiKey.APP_NAME);
+        WINDOW_MAP.put(ICPKey.STATUS, SiddhiAppApiKey.IS_ACTIVE);
         FUNCTION_MAP.put(ArtifactType.WINDOWS, WINDOW_MAP);
 
-        Map<String, String> AGGREGATION_MAP = new HashMap<>();
-        AGGREGATION_MAP.put(Constants.NAME, Constants.OUTPUT_STREAM_ID);
-        AGGREGATION_MAP.put(Constants.INPUT_STREAM, Constants.INPUT_STREAM_ID);
-        AGGREGATION_MAP.put(Constants.APP_NAME, Constants.APP_NAME);
-        AGGREGATION_MAP.put(Constants.STATUS, Constants.IS_ACTIVE);
+        EnumMap<ICPKey, SiddhiAppApiKey> AGGREGATION_MAP = new EnumMap<>(ICPKey.class);
+        AGGREGATION_MAP.put(ICPKey.NAME, SiddhiAppApiKey.OUTPUT_STREAM_ID);
+        AGGREGATION_MAP.put(ICPKey.INPUT_STREAM, SiddhiAppApiKey.INPUT_STREAM_ID);
+        AGGREGATION_MAP.put(ICPKey.APP_NAME, SiddhiAppApiKey.APP_NAME);
+        AGGREGATION_MAP.put(ICPKey.STATUS, SiddhiAppApiKey.IS_ACTIVE);
         FUNCTION_MAP.put(ArtifactType.AGGREGATIONS, AGGREGATION_MAP);
     }
 
     public static JsonObject transformArtifacts(JsonArray artifacts, ArtifactType artifactType) {
-        Map<String, String> mapping = FUNCTION_MAP.get(artifactType);
+        EnumMap<ICPKey, SiddhiAppApiKey> mapping = FUNCTION_MAP.get(artifactType);
         JsonArray transformedArtifacts = new JsonArray(artifacts.size());
 
         for (JsonElement element : artifacts) {
@@ -99,7 +101,8 @@ public class Utils {
             JsonObject details = transformArtifactDetails(artifact, mapping, artifactType);
 
             JsonObject transformedArtifact = new JsonObject();
-            transformedArtifact.addProperty(Constants.NAME, artifact.get(mapping.get(Constants.NAME)).getAsString());
+            transformedArtifact.addProperty(Constants.NAME,
+                    artifact.get(mapping.get(ICPKey.NAME).getValue()).getAsString());
             transformedArtifact.add(Constants.DETAILS, details);
             transformedArtifacts.add(transformedArtifact);
         }
@@ -108,13 +111,13 @@ public class Utils {
         return response;
     }
 
-    private static JsonObject transformArtifactDetails(JsonObject artifact, Map<String, String> mapping,
+    private static JsonObject transformArtifactDetails(JsonObject artifact, EnumMap<ICPKey, SiddhiAppApiKey> mapping,
                                                        ArtifactType artifactType) {
         JsonObject details = new JsonObject();
 
-        for (Map.Entry<String, String> entry : mapping.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
+        for (Map.Entry<ICPKey, SiddhiAppApiKey> entry : mapping.entrySet()) {
+            String key = entry.getKey().getValue();
+            String value = entry.getValue().getValue();
 
             if (key.equals(Constants.STATUS) && artifactType != ArtifactType.SIDDHI_APPS) {
                 details.addProperty(Constants.STATUS, getStatusString(artifact.get(Constants.IS_ACTIVE)));
@@ -128,12 +131,13 @@ public class Utils {
     }
 
     private static void extractAnnotationDetails(JsonObject jsonObject, JsonObject details) {
-        if (!jsonObject.has(Constants.ANNOTATION_ELEMENTS) || !jsonObject.get(Constants.ANNOTATION_ELEMENTS).isJsonObject()) {
+        if (!jsonObject.has(Constants.ANNOTATION_ELEMENTS) ||
+                !jsonObject.get(Constants.ANNOTATION_ELEMENTS).isJsonObject()) {
             return;
         }
         JsonObject annotationElements = jsonObject.getAsJsonObject(Constants.ANNOTATION_ELEMENTS);
         annotationElements.entrySet().forEach(entry ->
-                details.addProperty(convertToCamelCase(entry.getKey()), entry.getValue().getAsString())
+                details.addProperty(capitalizeAndRemoveDots(entry.getKey()), entry.getValue().getAsString())
         );
     }
 
@@ -179,13 +183,8 @@ public class Utils {
         return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
 
-    private static String convertToCamelCase(String value) {
-        String[] parts = value.split("\\.");
-        for (int i = 1; i < parts.length; i++) {
-            String part = parts[i];
-            parts[i] = Character.toUpperCase(part.charAt(0)) + part.substring(1);
-        }
-        return String.join("", parts);
+    private static String capitalizeAndRemoveDots(String value) {
+        return WordUtils.capitalizeFully(value, '.').replaceAll("\\.", " ");
     }
 
     private static String getStatusString(JsonElement element) {

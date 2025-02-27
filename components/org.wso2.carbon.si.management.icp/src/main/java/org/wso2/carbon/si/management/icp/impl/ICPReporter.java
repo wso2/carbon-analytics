@@ -16,7 +16,7 @@
  * under the License.
  *
  */
-package org.wso2.carbon.si.metrics.icp.reporter.impl;
+package org.wso2.carbon.si.management.icp.impl;
 
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
@@ -59,7 +59,8 @@ public class ICPReporter extends AbstractReporter {
                 .filter(metricFilter)
                 .build();
 
-        ICPHeartbeatComponent icpHeartbeatComponent = new ICPHeartbeatComponent(dashboardURL, heartbeatInterval, groupId, nodeId);
+        ICPHeartbeatComponent
+                icpHeartbeatComponent = new ICPHeartbeatComponent(dashboardURL, heartbeatInterval, groupId, nodeId);
         icpHeartbeatComponent.invokeHeartbeatExecutorService();
         log.info("ICP Reported Server has successfully connected at " + DataHolder.getInstance().getSiddhiHost());
     }

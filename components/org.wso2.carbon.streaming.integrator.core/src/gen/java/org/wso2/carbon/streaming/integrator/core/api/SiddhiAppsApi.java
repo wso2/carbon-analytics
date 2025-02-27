@@ -156,7 +156,7 @@ public class SiddhiAppsApi implements Microservice {
     }
 
     @PUT
-    @Path("/activate/{appName}")
+    @Path("/{appName}")
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Activates the Siddhi Application.", notes = "Activates the currently" +
             " deactivated Siddhi Application with the name specified. Path param of **appName** determines name of the " +
@@ -170,33 +170,12 @@ public class SiddhiAppsApi implements Microservice {
                     response = InlineResponse400.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
                     response = InlineResponse400.class)})
-    public Response siddhiAppsAppActivate(
+    public Response siddhiAppsSetState(
             @Context Request request,
-            @ApiParam(value = "The name of the Siddhi Application", required = true)
-            @PathParam("appName") String appName) throws NotFoundException {
-        return delegate.siddhiAppsAppActivate(appName, request);
-    }
-
-    @PUT
-    @Path("/deactivate/{appName}")
-    @Produces({"application/json"})
-    @io.swagger.annotations.ApiOperation(value = "Deactivates the Siddhi Application.", notes = "Deactivates the currently" +
-            " deployed Siddhi Application with the name specified. Path param of **appName** determines name of the " +
-            "Siddhi application. ", response = InlineResponse400.class, tags = {"Artifact",})
-    @io.swagger.annotations.ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "The Siddhi Application is successfully deactivated.",
-                    response = InlineResponse400.class),
-            @io.swagger.annotations.ApiResponse(code = 400, message = "The Siddhi Application name provided is " +
-                    "invalid.", response = InlineResponse400.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The Siddhi Application is not found.",
-                    response = InlineResponse400.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "An unexpected error occured.",
-                    response = InlineResponse400.class)})
-    public Response siddhiAppsAppDeactivate(
-            @Context Request request,
-            @ApiParam(value = "The name of the Siddhi Application", required = true)
-            @PathParam("appName") String appName) throws NotFoundException {
-        return delegate.siddhiAppsAppDeactivate(appName, request);
+            @PathParam("appName") String appName,
+            @ApiParam(value = "The name of the Siddhi Application", required = true) String body)
+            throws NotFoundException {
+        return delegate.siddhiAppsSetState(appName, body, request);
     }
 
     @GET

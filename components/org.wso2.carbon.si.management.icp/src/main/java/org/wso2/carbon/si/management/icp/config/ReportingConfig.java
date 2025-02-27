@@ -16,7 +16,7 @@
  * under the License.
  *
  */
-package org.wso2.carbon.si.metrics.icp.reporter.config;
+package org.wso2.carbon.si.management.icp.config;
 
 import org.wso2.carbon.metrics.core.reporter.ReporterBuilder;
 

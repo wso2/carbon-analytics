@@ -90,6 +90,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     private static final String PERMISSION_APP_NAME = "SAPP";
     private static final String MANAGE_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.manage";
     private static final String VIEW_SIDDHI_APP_PERMISSION_STRING = "siddhiApp.view";
+    public static final String ACTIVATE = "activate";
+    public static final String ACTION = "action";
 
     private static String getUserName(Request request) {
         Object username = request.getProperty("username");
@@ -217,30 +219,12 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         return Response.status(status).entity(jsonString).build();
     }
 
-    public Response siddhiAppDeactivate(String appName) throws NotFoundException {
-        String jsonString;
-        Map<String, SiddhiAppData> siddhiAppMap =
-                StreamProcessorDataHolder.getStreamProcessorService().getSiddhiAppMap();
-        if (!siddhiAppMap.containsKey(appName)) {
-            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
-                    "There is no Siddhi App exist " +
-                            "with provided name : " + appName));
-            return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
+    public Response siddhiAppsSetState(String appName, String payload) throws NotFoundException {
+        Map<String, Object> payloadMap = new Gson().fromJson(payload, Map.class);
+        if (payloadMap.get(ACTION).equals(ACTIVATE)) {
+            return siddhiAppActivate(appName);
         }
-
-        try {
-            String siddhiAppString = siddhiAppMap.get(appName).getSiddhiApp();
-            SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppString);
-            SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiApp);
-            siddhiAppRuntime.shutdown();
-            siddhiAppMap.get(appName).setActive(false);
-            return Response.status(Response.Status.OK).build();
-        } catch (Exception e) {
-            jsonString = new Gson().
-                    toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.VALIDATION_ERROR,
-                            e.getMessage()));
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
-        }
+        return siddhiAppDeactivate(appName);
     }
 
     public Response siddhiAppActivate(String appName) throws NotFoundException {
@@ -272,6 +256,33 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
         }
     }
+
+    public Response siddhiAppDeactivate(String appName) throws NotFoundException {
+        String jsonString;
+        Map<String, SiddhiAppData> siddhiAppMap =
+                StreamProcessorDataHolder.getStreamProcessorService().getSiddhiAppMap();
+        if (!siddhiAppMap.containsKey(appName)) {
+            jsonString = new Gson().toJson(new ApiResponseMessage(ApiResponseMessage.NOT_FOUND,
+                    "There is no Siddhi App exist " +
+                            "with provided name : " + appName));
+            return Response.status(Response.Status.NOT_FOUND).entity(jsonString).build();
+        }
+
+        try {
+            String siddhiAppString = siddhiAppMap.get(appName).getSiddhiApp();
+            SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppString);
+            SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiApp);
+            siddhiAppRuntime.shutdown();
+            siddhiAppMap.get(appName).setActive(false);
+            return Response.status(Response.Status.OK).build();
+        } catch (Exception e) {
+            jsonString = new Gson().
+                    toJson(new ApiResponseMessageWithCode(ApiResponseMessageWithCode.VALIDATION_ERROR,
+                            e.getMessage()));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(jsonString).build();
+        }
+    }
+
 
     public Response siddhiAppsAppNameGet(String appName) throws NotFoundException {
 
@@ -1199,27 +1210,14 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     }
 
     @Override
-    public Response siddhiAppsAppDeactivate(String appFileName, Request request) throws NotFoundException {
+    public Response siddhiAppsSetState(String appName, String body, Request request) throws NotFoundException {
 
         if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
                 Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("Insufficient permissions to deactivate Siddhi " +
-                            "App").build();
-        }
-        return siddhiAppDeactivate(appFileName);
-
-    }
-
-    @Override
-    public Response siddhiAppsAppActivate(String appFileName, Request request) throws NotFoundException {
-
-        if (getUserName(request) != null && !getPermissionProvider().hasPermission(getUserName(request), new
-                Permission(PERMISSION_APP_NAME, MANAGE_SIDDHI_APP_PERMISSION_STRING))) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to activate Siddhi " +
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Insufficient permissions to enable/disable Siddhi " +
                     "App").build();
         }
-        return siddhiAppActivate(appFileName);
+        return siddhiAppsSetState(appName, body);
 
     }
 

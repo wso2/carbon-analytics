@@ -16,11 +16,11 @@
  * under the License.
  *
  */
-package org.wso2.carbon.si.metrics.icp.reporter.impl;
+package org.wso2.carbon.si.management.icp.impl;
 
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
-import org.wso2.carbon.si.metrics.icp.reporter.utils.Constants;
+import org.wso2.carbon.si.management.icp.utils.Constants;
 import org.wso2.transport.http.netty.contract.config.ListenerConfiguration;
 import org.wso2.transport.http.netty.contract.config.TransportsConfiguration;
 

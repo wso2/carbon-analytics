@@ -16,7 +16,7 @@
  * under the License.
  *
  */
-package org.wso2.carbon.si.metrics.icp.reporter.config;
+package org.wso2.carbon.si.management.icp.config;
 
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.metrics.core.config.model.ReporterConfig;
 import org.wso2.carbon.metrics.core.reporter.ReporterBuilder;
-import org.wso2.carbon.si.metrics.icp.reporter.impl.ICPReporter;
+import org.wso2.carbon.si.management.icp.impl.ICPReporter;
 
 import java.util.Optional;
 

@@ -29,6 +29,7 @@ public class InterceptorConstants {
 
     public static final String HTTP_STRICT_TRANSPORT_SECURITY_HEADER = "Strict-Transport-Security";
 
+    // The ICP Management API Path.
     public static final String MANAGEMENT_LOGIN_URI = "/management/login";
 
     private InterceptorConstants() {

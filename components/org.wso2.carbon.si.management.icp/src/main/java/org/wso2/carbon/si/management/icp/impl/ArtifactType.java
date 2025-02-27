@@ -16,7 +16,7 @@
  * under the License.
  *
  */
-package org.wso2.carbon.si.metrics.icp.reporter.impl;
+package org.wso2.carbon.si.management.icp.impl;
 
 public enum ArtifactType {
     SIDDHI_APPS("siddhi-apps"),

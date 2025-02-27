@@ -16,22 +16,28 @@
  * under the License.
  *
  */
-package org.wso2.carbon.si.metrics.icp.reporter.config;
+package org.wso2.carbon.si.management.icp.utils;
 
-import org.wso2.carbon.config.annotation.Configuration;
-import org.wso2.carbon.config.annotation.Element;
+public enum SiddhiAppApiKey {
+    OUTPUT_STREAM_ID(Constants.OUTPUT_STREAM_ID),
+    INPUT_STREAM_ID(Constants.INPUT_STREAM_ID),
+    APP_NAME(Constants.APP_NAME),
+    IS_ACTIVE(Constants.IS_ACTIVE),
+    QUERY_NAME(Constants.QUERY_NAME),
+    QUERY(Constants.QUERY),
+    TABLE_ID(Constants.TABLE_ID),
+    WINDOW_ID(Constants.WINDOW_ID),
+    STATUS(Constants.STATUS),
+    AGE(Constants.AGE),
+    IS_STAT_ENABLED(Constants.IS_STAT_ENABLED);
 
-/**
- * Configuration for Metrics.
- */
-@Configuration(namespace = "metrics.icp", description = "ICP reporter config")
-public class ICPMetricsConfig {
+    private final String value;
 
-    @Element(description = "Enable Metrics Configuration")
-    private final ReportingConfig reporting = new ReportingConfig();
-
-    public ReportingConfig getReporting() {
-        return reporting;
+    SiddhiAppApiKey(String value) {
+        this.value = value;
     }
 
+    public String getValue() {
+        return value;
+    }
 }

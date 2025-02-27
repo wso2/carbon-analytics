@@ -16,7 +16,7 @@
  * under the License.
  *
  */
-package org.wso2.carbon.si.metrics.icp.reporter.impl;
+package org.wso2.carbon.si.management.icp.impl;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -25,9 +25,9 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
-import org.wso2.carbon.si.metrics.icp.reporter.utils.Constants;
-import org.wso2.carbon.si.metrics.icp.reporter.utils.Utils;
-import org.wso2.carbon.si.metrics.icp.reporter.utils.HttpUtils;
+import org.wso2.carbon.si.management.icp.utils.Constants;
+import org.wso2.carbon.si.management.icp.utils.HttpUtils;
+import org.wso2.carbon.si.management.icp.utils.Utils;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
@@ -35,8 +35,8 @@ import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 import java.io.IOException;
 import java.nio.file.Files;
 import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -108,10 +108,10 @@ public class ICPReporterService implements Microservice {
                                                  JsonObject body) {
         String appName = body.get(Constants.NAME).getAsString();
         boolean shouldActivate = body.get(Constants.ACTIVATE).getAsBoolean();
-        String url = siddhiApiHostName + (shouldActivate ? Constants.ACTIVATE : Constants.DEACTIVATE)
-                + Constants.SLASH + appName;
-        String accessToken = (String) request.getProperty(Constants.REQUEST_ACCESS_TOKEN);
-        try (CloseableHttpResponse response = HttpUtils.doPut(accessToken, url)) {
+        String url = siddhiApiHostName + appName;
+        JsonObject payload = new JsonObject();
+        payload.addProperty(Constants.ACTION, (shouldActivate ? Constants.ACTIVATE : Constants.DEACTIVATE));
+        try (CloseableHttpResponse response = HttpUtils.doPut(HttpUtils.extractAuthToken(request), url, payload)) {
             if (response.getStatusLine().getStatusCode() == 200) {
                 return Response.ok().build();
             }

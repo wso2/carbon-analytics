@@ -16,7 +16,7 @@
  * under the License.
  *
  */
-package org.wso2.carbon.si.metrics.icp.reporter;
+package org.wso2.carbon.si.management.icp;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -30,9 +30,9 @@ import org.wso2.carbon.metrics.core.MetricManagementService;
 import org.wso2.carbon.metrics.core.MetricService;
 import org.wso2.carbon.metrics.core.reporter.ReporterBuildException;
 import org.wso2.carbon.metrics.core.spi.MetricsExtension;
-import org.wso2.carbon.si.metrics.icp.reporter.config.ICPMetricsConfig;
-import org.wso2.carbon.si.metrics.icp.reporter.config.ICPReporterConfig;
-import org.wso2.carbon.si.metrics.icp.reporter.impl.DataHolder;
+import org.wso2.carbon.si.management.icp.config.ICPMetricsConfig;
+import org.wso2.carbon.si.management.icp.config.ICPReporterConfig;
+import org.wso2.carbon.si.management.icp.impl.DataHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ import java.util.Set;
  * * Metrics Extension to support ICP Reporter.
  */
 @Component(
-        name = "org.wso2.carbon.si.metrics.icp.reporter.ICPMetricsExtension",
+        name = "org.wso2.carbon.si.management.icp.ICPMetricsExtension",
         service = MetricsExtension.class
 )
 public class ICPMetricsExtension implements MetricsExtension {

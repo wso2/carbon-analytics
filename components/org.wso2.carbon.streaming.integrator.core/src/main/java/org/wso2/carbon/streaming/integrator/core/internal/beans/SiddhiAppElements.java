@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Bean class to hold the elements of siddhi application.
+ * Bean class which represent an element of a siddhi application.
  */
 public class SiddhiAppElements {
     private String appName;
