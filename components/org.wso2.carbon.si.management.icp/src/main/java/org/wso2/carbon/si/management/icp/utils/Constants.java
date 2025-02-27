@@ -20,10 +20,9 @@ package org.wso2.carbon.si.management.icp.utils;
 
 public final class Constants {
 
-    public static final String WSO_2_TRANSPORT_HTTP = "wso2.transport.http";
+    public static final String WSO2_TRANSPORT_HTTP = "wso2.transport.http";
     public static final String ACCESS_TOKEN = "AccessToken";
     public static final String REQUEST_ACCESS_TOKEN = "Access_Token";
-    public static final String STATISTICS = "statistics";
     public static final String ACTIVATE = "activate";
     public static final String DEACTIVATE = "deactivate";
     // configurations

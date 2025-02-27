@@ -18,6 +18,8 @@
  */
 package org.wso2.carbon.si.management.icp.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.si.management.icp.utils.Constants;
@@ -29,6 +31,7 @@ import java.util.Set;
 public class DataHolder {
 
     private static DataHolder instance = new DataHolder();
+    private static final Logger logger = LoggerFactory.getLogger(DataHolder.class);
     private String siddhiHost = "https://localhost:9443/";
 
     private DataHolder() {
@@ -43,14 +46,21 @@ public class DataHolder {
         return instance;
     }
 
-    public void loadHttpsListenerConfig(ConfigProvider configProvider) throws ConfigurationException {
-        TransportsConfiguration transportsConfiguration =
-                configProvider.getConfigurationObject(Constants.WSO_2_TRANSPORT_HTTP, TransportsConfiguration.class);
-        Set<ListenerConfiguration> listenerConfigurations = transportsConfiguration.getListenerConfigurations();
-        for (ListenerConfiguration config : listenerConfigurations) {
-            if (config.getId().equals(Constants.MSF4J_HTTPS)) {
-                siddhiHost = Constants.HTTPS + config.getHost() + Constants.COLON + config.getPort() + Constants.SLASH;
+    public void loadHttpsListenerConfig(ConfigProvider configProvider) {
+        try {
+            TransportsConfiguration transportsConfiguration =
+                    configProvider.getConfigurationObject(Constants.WSO2_TRANSPORT_HTTP, TransportsConfiguration.class);
+            Set<ListenerConfiguration> listenerConfigurations = transportsConfiguration.getListenerConfigurations();
+            for (ListenerConfiguration config : listenerConfigurations) {
+                if (config.getId().equals(Constants.MSF4J_HTTPS)) {
+                    siddhiHost =
+                            Constants.HTTPS + config.getHost() + Constants.COLON + config.getPort() + Constants.SLASH;
+                }
             }
+        } catch (ConfigurationException e) {
+            logger.warn(
+                    "Error loading MSF4J HTTPS Configuration. Starting ICP Reporter Service with default parameters.",
+                    e);
         }
     }
 

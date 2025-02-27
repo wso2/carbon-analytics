@@ -57,12 +57,12 @@ public class ICPMetricsExtension implements MetricsExtension {
         try {
             icpMetricsConfig
                     = configProvider.getConfigurationObject(ICPMetricsConfig.class);
-            DataHolder.getInstance().loadHttpsListenerConfig(configProvider);
         } catch (ConfigurationException e) {
             logger.warn("Error loading Metrics Configuration. Starting ICP Reporter " +
                     "with default parameters.", e);
             icpMetricsConfig = new ICPMetricsConfig();
         }
+        DataHolder.getInstance().loadHttpsListenerConfig(configProvider);
         Set<ICPReporterConfig> icpReporterConfigs = icpMetricsConfig.getReporting().getICP();
         if (icpReporterConfigs != null) {
             icpReporterConfigs.forEach(reporterConfig -> {
@@ -70,7 +70,7 @@ public class ICPMetricsExtension implements MetricsExtension {
                             metricManagementService.addReporter(reporterConfig);
                             reporterNames.add(reporterConfig.getName());
                         } catch (ReporterBuildException e) {
-                            logger.warn("Failed to start icp reporter '" + reporterConfig.getName() + "'.", e);
+                            logger.error("Failed to start icp reporter '" + reporterConfig.getName() + "'.", e);
                         }
                     }
             );

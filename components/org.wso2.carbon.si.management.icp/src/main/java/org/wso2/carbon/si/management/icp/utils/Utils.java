@@ -21,6 +21,7 @@ package org.wso2.carbon.si.management.icp.utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -173,14 +174,7 @@ public class Utils {
     }
 
     private static String getFileSize(File file) {
-        long bytes = file.length();
-        int unit = 1024;
-        if (bytes < unit) {
-            return bytes + " B";
-        }
-        int exp = (int) (Math.log(bytes) / Math.log(unit));
-        char pre = "KMGTPE".charAt(exp - 1);
-        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+        return FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(file));
     }
 
     private static String capitalizeAndRemoveDots(String value) {

@@ -119,7 +119,7 @@ public class AuthenticationInterceptor implements RequestInterceptor {
                                 return false;
                             }
                             request.setProperty(InterceptorConstants.PROPERTY_USERNAME, userName);
-                            if (request.getUri().equals(InterceptorConstants.MANAGEMENT_LOGIN_URI)) {
+                            if (InterceptorConstants.MANAGEMENT_LOGIN_URI.equals(request.getUri())) {
                                 request.setProperty(InterceptorConstants.ACCESS_TOKEN,
                                         loginValues.get(InterceptorConstants.ACCESS_TOKEN));
                             }
