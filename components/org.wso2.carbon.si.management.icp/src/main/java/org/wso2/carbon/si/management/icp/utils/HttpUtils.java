@@ -18,104 +18,54 @@
  */
 package org.wso2.carbon.si.management.icp.utils;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
-import org.wso2.msf4j.Request;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.List;
+import javax.ws.rs.core.Response;
 
 /**
  * Utilities to execute http requests.
  */
 public class HttpUtils {
 
-    private static final String AUTHORIZATION = "Authorization";
-    private static final String BEARER = "Bearer ";
-
     private HttpUtils() {
     }
 
-    public static String extractAuthToken(Request request) {
-        String authorizationHeader = request.getHeader(AUTHORIZATION);
-        if (authorizationHeader != null) {
-            String[] parts = authorizationHeader.split(" ", 2);
-            if (parts.length == 2) {
-                return parts[1];
-            }
+    public static JsonArray convertToJsonArray(Response response) {
+        Object entity = response.getEntity();
+
+        if (!(entity instanceof List<?>)) {
+            return new JsonArray();
         }
-        return "";
-    }
-
-    public static JsonArray getArtifactList(Request request, String basePath, String resource) {
-        String accessToken = extractAuthToken(request);
-        CloseableHttpResponse artifactDetails = HttpUtils.doGet(accessToken, basePath + resource);
-        return getJsonArray(artifactDetails);
-    }
-
-    public static JsonObject getArtifactObject(Request request, String basePath, String resource) {
-        String accessToken = extractAuthToken(request);
-        CloseableHttpResponse artifactDetails = HttpUtils.doGet(accessToken, basePath + resource);
-        return getJsonResponse(artifactDetails);
-    }
-
-    private static CloseableHttpResponse doGet(String accessToken, String url) {
-        try {
-            final HttpGet httpGet = new HttpGet(url);
-
-            String authHeader = BEARER + accessToken;
-            httpGet.setHeader(Constants.ACCEPT, Constants.HEADER_VALUE_APPLICATION_JSON);
-            httpGet.setHeader(AUTHORIZATION, authHeader);
-
-            CloseableHttpClient httpClient = getHttpClient();
-            return httpClient.execute(httpGet);
-        } catch (IOException e) {
-            throw new RuntimeException("Error occurred while sending get http request.", e);
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while creating http get request." + 400 + e.getCause());
+        JsonArray payload = new JsonArray();
+        Gson gson = new Gson();
+        for (Object obj : (List<?>) entity) {
+            payload.add(gson.toJsonTree(obj));
         }
+        return payload;
     }
 
-    public static CloseableHttpResponse doPut(String accessToken, String url, JsonObject payload) {
-        final HttpPut httpPut = new HttpPut(url);
-
-        String authHeader = BEARER + accessToken;
-        httpPut.setHeader(Constants.ACCEPT, Constants.HEADER_VALUE_APPLICATION_JSON);
-        httpPut.setHeader(AUTHORIZATION, authHeader);
-        HttpEntity httpEntity = new ByteArrayEntity(payload.toString().getBytes(StandardCharsets.UTF_8));
-        httpPut.setEntity(httpEntity);
-
-        try {
-            CloseableHttpClient httpClient = getHttpClient();
-            return httpClient.execute(httpPut);
-        } catch (IOException e) {
-            throw new RuntimeException("Error occurred while sending http put request.", e);
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while creating http put request." + 400 + e.getCause());
+    public static JsonObject convertToJsonObject(Response response) {
+        Object entity = response.getEntity();
+        Gson gson = new Gson();
+        JsonElement element = gson.toJsonTree(entity);
+        if (element.isJsonObject()) {
+            return element.getAsJsonObject();
         }
+        return new JsonObject();
     }
 
     public static JsonObject getJsonResponse(CloseableHttpResponse response) {
         String stringResponse = getStringResponse(response);
         return JsonParser.parseString(stringResponse).getAsJsonObject();
-    }
-
-    private static JsonArray getJsonArray(CloseableHttpResponse response) {
-        String stringResponse = getStringResponse(response);
-        return JsonParser.parseString(stringResponse).getAsJsonArray();
     }
 
     private static String getStringResponse(CloseableHttpResponse response) {
@@ -131,11 +81,5 @@ public class HttpUtils {
                 throw new RuntimeException("Error occurred while closing Http response", e);
             }
         }
-    }
-
-    private static CloseableHttpClient getHttpClient() throws Exception {
-        return HttpClients.custom().setSSLSocketFactory(new SSLConnectionSocketFactory(
-                SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build(),
-                NoopHostnameVerifier.INSTANCE)).build();
     }
 }

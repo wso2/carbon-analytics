@@ -21,13 +21,15 @@ package org.wso2.carbon.si.management.icp.impl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.swagger.annotations.ApiParam;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.wso2.carbon.analytics.msf4j.interceptor.common.AuthenticationInterceptor;
 import org.wso2.carbon.si.management.icp.utils.Constants;
 import org.wso2.carbon.si.management.icp.utils.HttpUtils;
 import org.wso2.carbon.si.management.icp.utils.Utils;
+import org.wso2.carbon.streaming.integrator.core.api.NotFoundException;
+import org.wso2.carbon.streaming.integrator.core.api.SiddhiAppsApiService;
+import org.wso2.carbon.streaming.integrator.core.factories.SiddhiAppsApiServiceFactory;
 import org.wso2.msf4j.Microservice;
 import org.wso2.msf4j.Request;
 import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
@@ -52,11 +54,10 @@ import javax.ws.rs.core.Response;
 @RequestInterceptor(AuthenticationInterceptor.class)
 public class ICPReporterService implements Microservice {
 
-    private final String siddhiApiHostName;
+    private final SiddhiAppsApiService siddhiAppsApiService;
 
     public ICPReporterService() {
-        this.siddhiApiHostName =
-                DataHolder.getInstance().getSiddhiHost() + ArtifactType.SIDDHI_APPS.getValue() + Constants.SLASH;
+        this.siddhiAppsApiService = SiddhiAppsApiServiceFactory.getSiddhiAppsApi();
     }
 
     @GET
@@ -89,15 +90,21 @@ public class ICPReporterService implements Microservice {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSiddhiApplications(@Context Request request,
                                           @QueryParam("siddhiApp") String appName) {
-        if (appName == null) {
-            JsonArray jsonResponse = HttpUtils.getArtifactList(request, siddhiApiHostName, Constants.STATISTICS);
-            return Response.ok(Utils.transformArtifacts(jsonResponse, ArtifactType.SIDDHI_APPS)).build();
+        try {
+            if (appName == null) {
+                JsonArray jsonResponse =
+                        HttpUtils.convertToJsonArray(siddhiAppsApiService.siddhiAppsStatisticsGet(null, request));
+                return Response.ok(Utils.transformArtifacts(jsonResponse, ArtifactType.SIDDHI_APPS)).build();
+            }
 
+            JsonObject jsonResponse =
+                    HttpUtils.convertToJsonObject(siddhiAppsApiService.siddhiAppsAppNameGet(appName, request));
+            JsonObject response = new JsonObject();
+            response.addProperty(Constants.CONFIGURATION, jsonResponse.get(Constants.CONTENT).getAsString());
+            return Response.ok(response).build();
+        } catch (NotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
-        JsonObject jsonResponse = HttpUtils.getArtifactObject(request, siddhiApiHostName, appName);
-        JsonObject response = new JsonObject();
-        response.addProperty(Constants.CONFIGURATION, jsonResponse.get(Constants.CONTENT).getAsString());
-        return Response.ok(response).build();
     }
 
     @POST
@@ -108,24 +115,25 @@ public class ICPReporterService implements Microservice {
                                                  JsonObject body) {
         String appName = body.get(Constants.NAME).getAsString();
         boolean shouldActivate = body.get(Constants.ACTIVATE).getAsBoolean();
-        String url = siddhiApiHostName + appName;
         JsonObject payload = new JsonObject();
         payload.addProperty(Constants.ACTION, (shouldActivate ? Constants.ACTIVATE : Constants.DEACTIVATE));
-        try (CloseableHttpResponse response = HttpUtils.doPut(HttpUtils.extractAuthToken(request), url, payload)) {
-            if (response.getStatusLine().getStatusCode() == 200) {
+        try {
+            Response response = siddhiAppsApiService.siddhiAppsSetState(appName, payload.toString(), request);
+            if (response.getStatus() == 200) {
                 return Response.ok().build();
             }
             return Response.serverError().build();
-        } catch (IOException e) {
-            return Response.serverError().build();
+        } catch (NotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
+
     }
 
     @GET
     @Path("/sources")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSource(@Context Request request) {
-        JsonArray jsonResponse = HttpUtils.getArtifactList(request, siddhiApiHostName, ArtifactType.SOURCES.getValue());
+        JsonArray jsonResponse = HttpUtils.convertToJsonArray(siddhiAppsApiService.siddhiAppsSourcesGet(request));
         return Response.ok(Utils.transformArtifacts(jsonResponse, ArtifactType.SOURCES)).build();
     }
 
@@ -133,7 +141,7 @@ public class ICPReporterService implements Microservice {
     @Path("/sinks")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSink(@Context Request request) {
-        JsonArray jsonResponse = HttpUtils.getArtifactList(request, siddhiApiHostName, ArtifactType.SINKS.getValue());
+        JsonArray jsonResponse = HttpUtils.convertToJsonArray(siddhiAppsApiService.siddhiAppsSinksGet(request));
         return Response.ok(Utils.transformArtifacts(jsonResponse, ArtifactType.SINKS)).build();
     }
 
@@ -141,7 +149,7 @@ public class ICPReporterService implements Microservice {
     @Path("/queries")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getQuery(@Context Request request) {
-        JsonArray jsonResponse = HttpUtils.getArtifactList(request, siddhiApiHostName, ArtifactType.QUERIES.getValue());
+        JsonArray jsonResponse = HttpUtils.convertToJsonArray(siddhiAppsApiService.siddhiAppsQueriesGet(request));
         return Response.ok(Utils.transformArtifacts(jsonResponse, ArtifactType.QUERIES)).build();
     }
 
@@ -149,7 +157,7 @@ public class ICPReporterService implements Microservice {
     @Path("/stores")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getStores(@Context Request request) {
-        JsonArray jsonResponse = HttpUtils.getArtifactList(request, siddhiApiHostName, ArtifactType.TABLES.getValue());
+        JsonArray jsonResponse = HttpUtils.convertToJsonArray(siddhiAppsApiService.siddhiAppsTablesGet(request));
         return Response.ok(Utils.transformArtifacts(jsonResponse, ArtifactType.TABLES)).build();
     }
 
@@ -157,7 +165,7 @@ public class ICPReporterService implements Microservice {
     @Path("/windows")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getWindow(@Context Request request) {
-        JsonArray jsonResponse = HttpUtils.getArtifactList(request, siddhiApiHostName, ArtifactType.WINDOWS.getValue());
+        JsonArray jsonResponse = HttpUtils.convertToJsonArray(siddhiAppsApiService.siddhiAppsWindowsGet(request));
         return Response.ok(Utils.transformArtifacts(jsonResponse, ArtifactType.WINDOWS)).build();
     }
 
@@ -165,8 +173,7 @@ public class ICPReporterService implements Microservice {
     @Path("/aggregations")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAggregation(@Context Request request) {
-        JsonArray jsonResponse =
-                HttpUtils.getArtifactList(request, siddhiApiHostName, ArtifactType.AGGREGATIONS.getValue());
+        JsonArray jsonResponse = HttpUtils.convertToJsonArray(siddhiAppsApiService.siddhiAppsAggregationsGet(request));
         return Response.ok(Utils.transformArtifacts(jsonResponse, ArtifactType.AGGREGATIONS)).build();
     }
 
