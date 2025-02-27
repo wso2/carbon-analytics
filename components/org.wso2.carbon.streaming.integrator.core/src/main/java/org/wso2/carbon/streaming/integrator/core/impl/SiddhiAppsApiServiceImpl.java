@@ -240,14 +240,13 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
 
         SiddhiAppData siddhiAppData = siddhiAppMap.get(appName);
         try {
-            String siddhiAppString = siddhiAppMap.get(appName).getSiddhiApp();
-            SiddhiApp siddhiApp = SiddhiCompiler.parse(String.valueOf(siddhiAppString));
-            SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiApp);
+            SiddhiAppRuntime siddhiAppRuntime = siddhiAppData.getSiddhiAppRuntime();
             if (siddhiAppData.isActive()) {
                 return Response.status(Response.Status.OK).build();
             }
             siddhiAppRuntime.start();
-            siddhiAppMap.get(appName).setActive(true);
+            siddhiAppData.setSiddhiAppRuntime(siddhiAppRuntime);
+            siddhiAppData.setActive(true);
             return Response.status(Response.Status.OK).build();
         } catch (Exception e) {
             jsonString = new Gson().
@@ -269,9 +268,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
         }
 
         try {
-            String siddhiAppString = siddhiAppMap.get(appName).getSiddhiApp();
-            SiddhiApp siddhiApp = SiddhiCompiler.parse(siddhiAppString);
-            SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiApp);
+            SiddhiAppRuntime siddhiAppRuntime =
+                    StreamProcessorDataHolder.getSiddhiManager().getSiddhiAppRuntime(appName);
             siddhiAppRuntime.shutdown();
             siddhiAppMap.get(appName).setActive(false);
             return Response.status(Response.Status.OK).build();
@@ -625,9 +623,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                 }
             }
             boolean isActive = siddhiAppData.isActive();
-            loadAggregarionData(siddhiApp, siddhiAppRuntime, listOfSiddhiAppElements, siddhiAppString, appName, isActive);
-            loadSources(siddhiApp, siddhiAppRuntime, listOfSiddhiAppElements, siddhiAppString, appName, isActive);
-            loadSinks(siddhiApp, siddhiAppRuntime, listOfSiddhiAppElements, siddhiAppString, appName, isActive);
+            loadAggregationData(siddhiAppRuntime, listOfSiddhiAppElements, siddhiAppString, appName, isActive);
+            loadSources(siddhiAppRuntime, listOfSiddhiAppElements, siddhiAppString, appName, isActive);
+            loadSinks(siddhiAppRuntime, listOfSiddhiAppElements, siddhiAppString, appName, isActive);
             return Response.ok().entity(listOfSiddhiAppElements).build();
         }
 
@@ -645,9 +643,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             SiddhiAppData siddhiAppDataValue = siddhiAppData.getValue();
             String siddhiAppString = siddhiAppDataValue.getSiddhiApp();
             try {
-                SiddhiApp siddhiApp = SiddhiCompiler.parse(String.valueOf(siddhiAppString));
-                SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiApp);
-                loadSources(siddhiApp, siddhiAppRuntime, listOfSiddhiAppSources, siddhiAppString, appName,
+                SiddhiAppRuntime siddhiAppRuntime = siddhiAppDataValue.getSiddhiAppRuntime();
+                loadSources(siddhiAppRuntime, listOfSiddhiAppSources, siddhiAppString, appName,
                         siddhiAppDataValue.isActive());
             } catch (Exception e) {
                 continue;
@@ -665,9 +662,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             SiddhiAppData siddhiAppDataValue = siddhiAppData.getValue();
             String siddhiAppString = siddhiAppDataValue.getSiddhiApp();
             try {
-                SiddhiApp siddhiApp = SiddhiCompiler.parse(String.valueOf(siddhiAppString));
-                SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiApp);
-                loadSinks(siddhiApp, siddhiAppRuntime, listOfSiddhiAppSinks, siddhiAppString, appName,
+                SiddhiAppRuntime siddhiAppRuntime = siddhiAppDataValue.getSiddhiAppRuntime();
+                loadSinks(siddhiAppRuntime, listOfSiddhiAppSinks, siddhiAppString, appName,
                         siddhiAppDataValue.isActive());
             } catch (Exception e) {
                 continue;
@@ -685,9 +681,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             SiddhiAppData siddhiAppDataValue = siddhiAppData.getValue();
             String siddhiAppString = siddhiAppDataValue.getSiddhiApp();
             try {
-                SiddhiApp siddhiApp = SiddhiCompiler.parse(String.valueOf(siddhiAppString));
-                SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiApp);
-                loadQueries(siddhiApp, siddhiAppRuntime, listOfSiddhiAppQueries, siddhiAppString, appName,
+                SiddhiAppRuntime siddhiAppRuntime = siddhiAppDataValue.getSiddhiAppRuntime();
+                loadQueries(siddhiAppRuntime, listOfSiddhiAppQueries, siddhiAppString, appName,
                         siddhiAppDataValue.isActive());
             } catch (Exception e) {
                 continue;
@@ -705,9 +700,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             SiddhiAppData siddhiAppDataValue = siddhiAppData.getValue();
             String siddhiAppString = siddhiAppDataValue.getSiddhiApp();
             try {
-                SiddhiApp siddhiApp = SiddhiCompiler.parse(String.valueOf(siddhiAppString));
-                SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiApp);
-                loadTables(siddhiApp, siddhiAppRuntime, listOfSiddhiAppTables, siddhiAppString, appName,
+                SiddhiAppRuntime siddhiAppRuntime = siddhiAppDataValue.getSiddhiAppRuntime();
+                loadTables(siddhiAppRuntime, listOfSiddhiAppTables, siddhiAppString, appName,
                         siddhiAppDataValue.isActive());
             } catch (Exception e) {
                 continue;
@@ -725,9 +719,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             SiddhiAppData siddhiAppDataValue = siddhiAppData.getValue();
             String siddhiAppString = siddhiAppDataValue.getSiddhiApp();
             try {
-                SiddhiApp siddhiApp = SiddhiCompiler.parse(String.valueOf(siddhiAppString));
-                SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiApp);
-                loadWindows(siddhiApp, siddhiAppRuntime, listOfSiddhiAppWindows, siddhiAppString, appName,
+                SiddhiAppRuntime siddhiAppRuntime = siddhiAppDataValue.getSiddhiAppRuntime();
+                loadWindows(siddhiAppRuntime, listOfSiddhiAppWindows, siddhiAppString, appName,
                         siddhiAppDataValue.isActive());
             } catch (Exception e) {
                 continue;
@@ -745,9 +738,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
             SiddhiAppData siddhiAppDataValue = siddhiAppData.getValue();
             String siddhiAppString = siddhiAppDataValue.getSiddhiApp();
             try {
-                SiddhiApp siddhiApp = SiddhiCompiler.parse(String.valueOf(siddhiAppString));
-                SiddhiAppRuntime siddhiAppRuntime = new SiddhiManager().createSiddhiAppRuntime(siddhiApp);
-                loadAggregarionData(siddhiApp, siddhiAppRuntime, listOfSiddhiAppAggregations, siddhiAppString, appName,
+                SiddhiAppRuntime siddhiAppRuntime = siddhiAppDataValue.getSiddhiAppRuntime();
+                loadAggregationData(siddhiAppRuntime, listOfSiddhiAppAggregations, siddhiAppString, appName,
                         siddhiAppDataValue.isActive());
             } catch (Exception e) {
                 continue;
@@ -965,8 +957,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     /**
      * Obtains information of all the Aggregations.
      */
-    private void loadAggregarionData(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
+    private void loadAggregationData(SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
             streams, String appData, String appName, boolean active) {
+        SiddhiApp siddhiApp = siddhiAppRuntime.getSiddhiApp();
         for (AggregationDefinition aggregationDefinition : siddhiApp.getAggregationDefinitionMap().values()) {
             SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
             siddhiAppElements.setAppName(appName);
@@ -1042,8 +1035,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     /**
      * Load source related data
      */
-    private void loadSources(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
+    private void loadSources(SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
             listOfSiddhiAppElements, String siddhiAppString, String appName, boolean active) {
+        SiddhiApp siddhiApp = siddhiAppRuntime.getSiddhiApp();
         for (List<Source> sources : siddhiAppRuntime.getSources()) {
             for (Source source : sources) {
                 SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
@@ -1054,9 +1048,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                             siddhiAppElements.setOutputStreamId(source.getStreamDefinition().getId());
                             siddhiAppElements.setInputStreamId(source.getType());
                             siddhiAppElements.setInputStreamType(Constants.SOURCE_TYPE);
-                            loadOutputData(siddhiApp, siddhiAppRuntime, source.getStreamDefinition().getId(),
-                                    siddhiAppString,
-                                    siddhiAppElements);
+                            loadOutputData(siddhiApp, siddhiAppRuntime,
+                                    source.getStreamDefinition().getId(), siddhiAppString, siddhiAppElements);
                             siddhiAppElements.setInputStreamSiddhiApp(getDefinition(annotation, siddhiAppString));
                             siddhiAppElements.setIsActive(String.valueOf(active));
                         } else if (element.getKey() != null) {
@@ -1072,8 +1065,9 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     /**
      * Load sink related data
      */
-    private void loadSinks(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
+    private void loadSinks(SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
             listOfSiddhiAppElements, String siddhiAppString, String appName, boolean active) {
+        SiddhiApp siddhiApp = siddhiAppRuntime.getSiddhiApp();
         for (List<Sink> sinks : siddhiAppRuntime.getSinks()) {
             for (Sink sink : sinks) {
                 SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
@@ -1082,9 +1076,8 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
                         if (Objects.equals(element.getValue(), sink.getType())) {
                             siddhiAppElements.setAppName(appName);
                             siddhiAppElements.setInputStreamId(sink.getStreamDefinition().getId());
-                            loadInputData(siddhiApp, siddhiAppRuntime, sink.getStreamDefinition().getId(),
-                                    siddhiAppString,
-                                    siddhiAppElements);
+                            loadInputData(siddhiApp, siddhiAppRuntime,
+                                    sink.getStreamDefinition().getId(), siddhiAppString, siddhiAppElements);
                             siddhiAppElements.setOutputStreamId(sink.getType());
                             siddhiAppElements.setOutputStreamType(Constants.SINK_TYPE);
                             siddhiAppElements.setOutputStreamSiddhiApp(getDefinition(annotation, siddhiAppString));
@@ -1102,7 +1095,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     /**
      * Load query related data
      */
-    private void loadQueries(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
+    private void loadQueries(SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
             listOfSiddhiAppElements, String siddhiAppString, String appName, boolean active) {
         for (QueryRuntime queryRuntime : siddhiAppRuntime.getQueries()) {
             QueryRuntimeImpl queryRutimeImpl = (QueryRuntimeImpl) queryRuntime;
@@ -1122,7 +1115,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     /**
      * Load table related data
      */
-    private void loadTables(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
+    private void loadTables(SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
             listOfSiddhiAppElements, String siddhiAppString, String appName, boolean active) {
         for (Table table : siddhiAppRuntime.getTables()) {
             SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
@@ -1139,7 +1132,7 @@ public class SiddhiAppsApiServiceImpl extends SiddhiAppsApiService {
     /**
      * Load window related data
      */
-    private void loadWindows(SiddhiApp siddhiApp, SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
+    private void loadWindows(SiddhiAppRuntime siddhiAppRuntime, List<SiddhiAppElements>
             listOfSiddhiAppElements, String siddhiAppString, String appName, boolean active) {
         for (Window window : siddhiAppRuntime.getWindows()) {
             SiddhiAppElements siddhiAppElements = new SiddhiAppElements();
