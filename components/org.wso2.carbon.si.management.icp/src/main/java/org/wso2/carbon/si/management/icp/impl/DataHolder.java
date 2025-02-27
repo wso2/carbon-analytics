@@ -26,6 +26,9 @@ import org.wso2.carbon.si.management.icp.utils.Constants;
 import org.wso2.transport.http.netty.contract.config.ListenerConfiguration;
 import org.wso2.transport.http.netty.contract.config.TransportsConfiguration;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Set;
 
 public class DataHolder {
@@ -53,11 +56,12 @@ public class DataHolder {
             Set<ListenerConfiguration> listenerConfigurations = transportsConfiguration.getListenerConfigurations();
             for (ListenerConfiguration config : listenerConfigurations) {
                 if (config.getId().equals(Constants.MSF4J_HTTPS)) {
-                    siddhiHost =
-                            Constants.HTTPS + config.getHost() + Constants.COLON + config.getPort() + Constants.SLASH;
+                    URI uri = new URI(Constants.HTTPS, null, config.getHost(), config.getPort(), Constants.SLASH, null,
+                            null);
+                    siddhiHost = uri.toURL().toString();
                 }
             }
-        } catch (ConfigurationException e) {
+        } catch (ConfigurationException | URISyntaxException | MalformedURLException e) {
             logger.warn(
                     "Error loading MSF4J HTTPS Configuration. Starting ICP Reporter Service with default parameters.",
                     e);

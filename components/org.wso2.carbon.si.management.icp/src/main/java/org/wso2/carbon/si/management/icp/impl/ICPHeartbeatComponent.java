@@ -36,6 +36,9 @@ import org.wso2.carbon.si.management.icp.utils.HttpUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -59,10 +62,18 @@ public class ICPHeartbeatComponent {
     }
 
     public void invokeHeartbeatExecutorService() {
-        String heartbeatApiUrl = dashboardURL + Constants.SLASH + Constants.HEARTBEAT;
-        String mgtApiUrl = DataHolder.getInstance().getSiddhiHost() + Constants.MANAGEMENT + Constants.SLASH;
-        final HttpPost httpPost = new HttpPost(heartbeatApiUrl);
+        String heartbeatApiUrl;
+        String mgtApiUrl;
+        try {
+            heartbeatApiUrl = new URI(dashboardURL).resolve(Constants.HEARTBEAT).toURL().toString();
+            mgtApiUrl =
+                    new URI(DataHolder.getInstance().getSiddhiHost()).resolve(Constants.MANAGEMENT).toURL().toString();
+        } catch (MalformedURLException | URISyntaxException e) {
+            log.error("Error while generating the URL to send heartbeat information", e);
+            return;
+        }
 
+        final HttpPost httpPost = new HttpPost(heartbeatApiUrl);
         JsonObject heartbeatPayload = new JsonObject();
         heartbeatPayload.addProperty(Constants.PRODUCT, Constants.PRODUCT_SI);
         heartbeatPayload.addProperty(Constants.GROUP_ID, groupId);

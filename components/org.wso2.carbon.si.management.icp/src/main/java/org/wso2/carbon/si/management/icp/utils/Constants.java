@@ -49,8 +49,7 @@ public final class Constants {
     public static final String NAME = "name";
     public static final String SLASH = "/";
     public static final String MSF4J_HTTPS = "msf4j-https";
-    public static final String HTTPS = "https://";
-    public static final String COLON = ":";
+    public static final String HTTPS = "https";
     // attributes
     public static final String STATUS = "status";
     public static final String AGE = "age";
@@ -81,7 +80,7 @@ public final class Constants {
     public static final String INTERVAL = "interval";
     public static final String MGT_API_URL = "mgtApiUrl";
     public static final String CONTENT_TYPE = "Content-type";
-    public static final String MANAGEMENT = "management";
-    public static final String HEARTBEAT = "heartbeat";
+    public static final String MANAGEMENT = "management/";
+    public static final String HEARTBEAT = "api/heartbeat";
     public static final String ACTION = "action";
 }
