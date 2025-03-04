@@ -1504,6 +1504,36 @@
           }
         ],
         "lookupRegex": "siddhi([_-])io([_-])hl7([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
+      },
+      {
+        "name": "hapi-hl7overhttp-2.4",
+        "version": "2.4",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/ca/uhn/hapi/hapi-hl7overhttp/2.4/hapi-hl7overhttp-2.4.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "hapi([_-])hl7overhttp([_-])[0-9]+.[0-9]+.jar"
+      },
+      {
+        "name": "hapi",
+        "version": "2.4.0.wso2v2",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://maven.wso2.org/nexus/content/repositories/public/ca/uhn/hapi/wso2/hapi/2.4.0.wso2v2/hapi-2.4.0.wso2v2.jar"
+        },
+        "usages": [
+          {
+            "type": "BUNDLE",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "hapi([_-])[0-9]+.[0-9]+.[0-9]+.wso2v2.jar"
       }
     ]
   },
