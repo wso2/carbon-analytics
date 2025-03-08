@@ -42,6 +42,7 @@
         <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.business.rules.web</module>
         <module>components/org.wso2.carbon.si.coordination.listener</module>
+        <module>components/org.wso2.carbon.si.management.icp</module>
         <module>components/org.wso2.carbon.si.metrics.core</module>
         <module>components/org.wso2.carbon.streaming.integrator.statistics</module>
         <module>components/org.wso2.carbon.siddhi.store.api.rest</module>
