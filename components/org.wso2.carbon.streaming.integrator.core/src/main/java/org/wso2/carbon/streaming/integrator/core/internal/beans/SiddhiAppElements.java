@@ -20,12 +20,14 @@ package org.wso2.carbon.streaming.integrator.core.internal.beans;
 
 import io.siddhi.query.api.execution.partition.PartitionType;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Bean class to hold the elements of siddhi application.
+ * Bean class which represent an element of a siddhi application.
  */
 public class SiddhiAppElements {
+    private String appName;
     private String inputStreamType;
     private String outputStreamType;
     private String inputStreamId;
@@ -46,6 +48,10 @@ public class SiddhiAppElements {
     private String sink;
     private String sinkStream;
     private String sinkSiddhiApp;
+    private String tableId;
+    private String windowId;
+    private String isActive;
+    private HashMap<String, String> annotationElements = new HashMap<>();
 
     public String getPartitions() {
         return partitions;
@@ -216,4 +222,45 @@ public class SiddhiAppElements {
     public void setSinkSiddhiApp(String sinkSiddhiApp) {
         this.sinkSiddhiApp = sinkSiddhiApp;
     }
+
+    public String getTableId() {
+        return tableId;
+    }
+
+    public void setTableId(String tableId) {
+        this.tableId = tableId;
+    }
+
+    public String getWindowId() {
+        return windowId;
+    }
+
+    public void setWindowId(String windowId) {
+        this.windowId = windowId;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public String getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(String isActive) {
+        this.isActive = isActive;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public void addAnnotationElement(String key, String value) {
+        this.annotationElements.put(key, value);
+    }
+
+    public HashMap<String, String> getAnnotationElements() {
+        return annotationElements;
+    }
+
 }
