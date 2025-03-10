@@ -114,9 +114,15 @@ public class ICPReporterService implements Microservice {
                                                  @ApiParam(value = "Siddhi Application", required = true)
                                                  JsonObject body) {
         String appName = body.get(Constants.NAME).getAsString();
-        boolean shouldActivate = body.get(Constants.ACTIVATE).getAsBoolean();
+        if (!body.has(Constants.ACTION)) {
+            return Response.notModified().build();
+        }
+        String action = body.get(Constants.ACTION).getAsString();
+        if (!action.equals(Constants.ACTIVATE) && !action.equals(Constants.DEACTIVATE)) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         JsonObject payload = new JsonObject();
-        payload.addProperty(Constants.ACTION, (shouldActivate ? Constants.ACTIVATE : Constants.DEACTIVATE));
+        payload.addProperty(Constants.ACTION, action);
         try {
             Response response = siddhiAppsApiService.siddhiAppsSetState(appName, payload.toString(), request);
             if (response.getStatus() == 200) {
@@ -126,7 +132,6 @@ public class ICPReporterService implements Microservice {
         } catch (NotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-
     }
 
     @GET
