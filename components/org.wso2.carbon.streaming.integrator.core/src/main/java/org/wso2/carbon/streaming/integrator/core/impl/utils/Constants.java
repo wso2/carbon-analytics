@@ -33,6 +33,7 @@ public class Constants {
     public static final String DEFAULT_QUERY_NAME = "query";
     public static final String SOURCE_TYPE = "Source";
     public static final String SINK_TYPE = "Sink";
+    public static final String QUERY_TYPE = "Query";
     public static final String HA = "HA";
     public static final String PERIOD = ".";
 }

@@ -42,6 +42,7 @@
         <module>components/org.wso2.carbon.business.rules.core</module>
         <module>components/org.wso2.carbon.business.rules.web</module>
         <module>components/org.wso2.carbon.si.coordination.listener</module>
+        <module>components/org.wso2.carbon.si.management.icp</module>
         <module>components/org.wso2.carbon.si.metrics.core</module>
         <module>components/org.wso2.carbon.streaming.integrator.statistics</module>
         <module>components/org.wso2.carbon.siddhi.store.api.rest</module>
@@ -72,6 +73,7 @@
         <module>features/org.wso2.carbon.analytics.msf4j.interceptor.common.feature</module>
         <module>features/org.wso2.carbon.health.check.core.feature</module>
         <module>features/org.wso2.siddhi.parser.service.feature</module>
+        <module>features/org.wso2.carbon.si.management.icp.feature</module>
 
         <module>components/si-tooling-distribution</module>
         <module>components/si-distribution</module>
@@ -890,6 +892,12 @@
                 <version>${carbon.metrics.version}</version>
                 <type>zip</type>
             </dependency>
+             <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.si.management.icp.feature</artifactId>
+                <version>${carbon.analytics.version}</version>
+                <type>zip</type>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.metrics</groupId>
                 <artifactId>org.wso2.carbon.metrics.jdbc.core.feature</artifactId>
@@ -1441,6 +1449,11 @@
                 <groupId>org.wso2.carbon.metrics</groupId>
                 <artifactId>org.wso2.carbon.metrics.core</artifactId>
                 <version>${carbon.metrics.version}</version>
+            </dependency>
+             <dependency>
+                <groupId>org.wso2.carbon.analytics</groupId>
+                <artifactId>org.wso2.carbon.si.management.icp</artifactId>
+                <version>${carbon.analytics.version}</version>
             </dependency>
 
             <!-- Feign Dependencies -->
