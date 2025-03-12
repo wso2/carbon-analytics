@@ -36,6 +36,7 @@ import org.wso2.carbon.siddhi.editor.core.exception.KubernetesGenerationExceptio
 import org.wso2.carbon.siddhi.editor.core.util.Constants;
 import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.Property;
@@ -717,7 +718,7 @@ public class ExportUtils {
 
             SiddhiProcess siddhiProcess = new SiddhiProcess(siddhiProcessSpec);
 
-            Representer representer = new Representer() {
+            Representer representer = new Representer(new DumperOptions()) {
                 @Override
                 protected NodeTuple representJavaBeanProperty(
                         Object javaBean, Property property, Object propertyValue, Tag customTag) {
@@ -830,7 +831,7 @@ public class ExportUtils {
             if (toolingConfigMap.get(SIDDHI_NAMESPACE) != null) {
                 runnerConfigMap.put(SIDDHI_NAMESPACE, toolingConfigMap.get(SIDDHI_NAMESPACE));
             }
-            Representer representer = new Representer();
+            Representer representer = new Representer(new DumperOptions());
             representer.addClassTag(SiddhiProcess.class, Tag.MAP);
             DumperOptions options = new DumperOptions();
             options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
@@ -848,7 +849,7 @@ public class ExportUtils {
      */
     private KubernetesConfig getKubernetesConfigs(String kubernetesConfigString) {
         CustomClassLoaderConstructor customClassLoaderConstructor = new
-                CustomClassLoaderConstructor(this.getClass().getClassLoader());
+                CustomClassLoaderConstructor(this.getClass().getClassLoader(), new LoaderOptions());
         Yaml kubernetesConfigYaml = new Yaml(customClassLoaderConstructor);
         KubernetesConfig kubernetesConfig = kubernetesConfigYaml.loadAs(
                 kubernetesConfigString,

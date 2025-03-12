@@ -5,6 +5,7 @@ import org.wso2.carbon.data.provider.rdbms.bean.RDBMSDataProviderConfBean;
 import org.wso2.carbon.database.query.manager.QueryProvider;
 import org.wso2.carbon.database.query.manager.config.Queries;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
@@ -63,7 +64,7 @@ public class RDBMSQueryManager {
 
     private RDBMSDataProviderConfBean readYamlContent(InputStream yamlContent) {
         Yaml yaml = new Yaml(new CustomClassLoaderConstructor(RDBMSDataProviderConfBean.class,
-                RDBMSDataProviderConfBean.class.getClassLoader()));
+                RDBMSDataProviderConfBean.class.getClassLoader(), new LoaderOptions()));
         yaml.setBeanAccess(BeanAccess.FIELD);
         return yaml.loadAs(yamlContent, RDBMSDataProviderConfBean.class);
     }

@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.metrics.core.reporter.impl.AbstractReporter;
 import org.wso2.carbon.si.metrics.prometheus.reporter.config.CustomMapperConfig;
 import org.wso2.carbon.si.metrics.prometheus.reporter.config.CustomMappingBuilder;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
@@ -80,7 +81,7 @@ public class PrometheusReporter extends AbstractReporter {
         try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(MAPPINGS_RESOURCE_FILE)) {
 
             Yaml yaml = new Yaml(new CustomClassLoaderConstructor(PrometheusMetricsLabelsMapper.class,
-                    PrometheusMetricsLabelsMapper.class.getClassLoader()));
+                    PrometheusMetricsLabelsMapper.class.getClassLoader(), new LoaderOptions()));
             yaml.setBeanAccess(BeanAccess.FIELD);
             PrometheusMetricsLabelsMapper metricsLabelsMapping = yaml.loadAs(inputStream,
                                                                                 PrometheusMetricsLabelsMapper.class);
