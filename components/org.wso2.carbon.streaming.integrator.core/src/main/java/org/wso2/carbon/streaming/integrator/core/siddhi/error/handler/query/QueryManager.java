@@ -24,6 +24,7 @@ import org.wso2.carbon.database.query.manager.QueryProvider;
 import org.wso2.carbon.database.query.manager.config.Queries;
 import org.wso2.carbon.database.query.manager.exception.QueryMappingNotAvailableException;
 import org.wso2.carbon.streaming.integrator.core.persistence.beans.PersistenceStoreConfigs;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
@@ -85,7 +86,7 @@ public class QueryManager {
 
     private PersistenceStoreConfigs readYamlContent(InputStream yamlContent) {
         Yaml yaml = new Yaml(new CustomClassLoaderConstructor(PersistenceStoreConfigs.class,
-                PersistenceStoreConfigs.class.getClassLoader()));
+                PersistenceStoreConfigs.class.getClassLoader(), new LoaderOptions()));
         yaml.setBeanAccess(BeanAccess.FIELD);
         return yaml.loadAs(yamlContent, PersistenceStoreConfigs.class);
     }
