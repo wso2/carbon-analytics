@@ -3,7 +3,7 @@
     "extension": {
       "name": "kafka",
       "displayName": "Kafka",
-      "version": "5.0.16"
+      "version": "5.0.19"
     },
     "identifier": {
       "alternativeTypes": ["kafkaMultiDC"]
@@ -11,10 +11,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-kafka",
-        "version": "5.0.16",
+        "version": "5.0.19",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.16/siddhi-io-kafka-5.0.16.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.19/siddhi-io-kafka-5.0.19.jar"
         },
         "usages": [
           {
@@ -416,7 +416,7 @@
     "extension": {
       "name": "cdc-mysql",
       "displayName": "Change Data Capture - MySQL",
-      "version": "2.0.11"
+      "version": "2.0.17"
     },
     "identifier": {
       "type": "cdc",
@@ -426,10 +426,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.11",
+        "version": "2.0.17",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.11/siddhi-io-cdc-2.0.11.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
         },
         "usages": [
           {
@@ -461,7 +461,7 @@
     "extension": {
       "name": "cdc-oracle",
       "displayName": "Change Data Capture - Oracle",
-      "version": "2.0.11"
+      "version": "2.0.17"
     },
     "identifier": {
       "type": "cdc",
@@ -471,10 +471,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.11",
+        "version": "2.0.17",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.11/siddhi-io-cdc-2.0.11.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
         },
         "usages": [
           {
@@ -521,7 +521,7 @@
     "extension": {
       "name": "cdc-postgresql",
       "displayName": "Change Data Capture - PostgreSQL",
-      "version": "2.0.11"
+      "version": "2.0.17"
     },
     "identifier": {
       "type": "cdc",
@@ -531,10 +531,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.11",
+        "version": "2.0.17",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.11/siddhi-io-cdc-2.0.11.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
         },
         "usages": [
           {
@@ -566,7 +566,7 @@
     "extension": {
       "name": "cdc-mssql",
       "displayName": "Change Data Capture - MS SQL",
-      "version": "2.0.11"
+      "version": "2.0.17"
     },
     "identifier": {
       "type": "cdc",
@@ -576,10 +576,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.11",
+        "version": "2.0.17",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.11/siddhi-io-cdc-2.0.11.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
         },
         "usages": [
           {
@@ -611,7 +611,7 @@
     "extension": {
       "name": "cdc-mongodb",
       "displayName": "Change Data Capture - Mongo DB",
-      "version": "2.0.11"
+      "version": "2.0.17"
     },
     "identifier": {
       "type": "cdc",
@@ -621,10 +621,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.11",
+        "version": "2.0.17",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.11/siddhi-io-cdc-2.0.11.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
         },
         "usages": [
           {
@@ -635,11 +635,11 @@
         "lookupRegex": "siddhi([_-])io([_-])cdc([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
-        "name": "mongo-java-driver",
-        "version": "3.4.2",
+        "name": "mongodb-driver-sync",
+        "version": "4.9.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.2/mongo-java-driver-3.4.2.jar"
+          "url": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/4.9.1/mongodb-driver-sync-4.9.1.jar"
         },
         "usages": [
           {
@@ -647,7 +647,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mongo([_-])java([_-])driver([_-])3.4.2(.*).jar"
+        "lookupRegex": "mongodb([_-])driver([_-])sync([_-])4.9.1(.*).jar"
       }
     ]
   },
@@ -756,15 +756,15 @@
     "extension": {
       "name": "nats",
       "displayName": "NATS",
-      "version": "2.0.14"
+      "version": "2.0.15"
     },
     "dependencies": [
       {
         "name": "siddhi-io-nats",
-        "version": "2.0.14",
+        "version": "2.0.15",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/nats/siddhi-io-nats/2.0.14/siddhi-io-nats-2.0.14.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/nats/siddhi-io-nats/2.0.15/siddhi-io-nats-2.0.15.jar"
         },
         "usages": [
           {
@@ -839,10 +839,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-grpc",
-        "version": "1.0.12",
+        "version": "1.0.13",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/grpc/siddhi-io-grpc/1.0.12/siddhi-io-grpc-1.0.12.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/grpc/siddhi-io-grpc/1.0.13/siddhi-io-grpc-1.0.13.jar"
         },
         "usages": [
           {
@@ -889,15 +889,15 @@
     "extension": {
       "name": "mongodb",
       "displayName": "MongoDB",
-      "version": "2.1.4"
+      "version": "3.0.0"
     },
     "dependencies": [
       {
         "name": "siddhi-store-mongodb",
-        "version": "2.1.4",
+        "version": "3.0.0",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/mongodb/siddhi-store-mongodb/2.1.4/siddhi-store-mongodb-2.1.4.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/store/mongodb/siddhi-store-mongodb/3.0.0/siddhi-store-mongodb-3.0.0.jar"
         },
         "usages": [
           {
@@ -908,11 +908,11 @@
         "lookupRegex": "siddhi([_-])store([_-])mongodb([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
-        "name": "mongo-java-driver",
-        "version": "3.4.2",
+        "name": "mongodb-driver-sync",
+        "version": "4.9.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.2/mongo-java-driver-3.4.2.jar"
+          "url": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/4.9.1/mongodb-driver-sync-4.9.1.jar"
         },
         "usages": [
           {
@@ -920,7 +920,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mongo([_-])java([_-])driver([_-])3.4.2(.*).jar"
+        "lookupRegex": "mongodb([_-])driver([_-])sync([_-])4.9.1(.*).jar"
       }
     ]
   },
@@ -939,10 +939,10 @@
     "dependencies": [
       {
         "name": "siddhi-store-rdbms",
-        "version": "7.0.15",
+        "version": "7.0.19",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.15/siddhi-store-rdbms-7.0.15.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.19/siddhi-store-rdbms-7.0.19.jar"
         },
         "usages": [
           {
@@ -974,7 +974,7 @@
     "extension": {
       "name": "rdbms-mssql",
       "displayName": "RDBMS - MS SQL",
-      "version": "7.0.15"
+      "version": "7.0.19"
     },
     "identifier": {
       "type": "rdbms",
@@ -984,10 +984,10 @@
     "dependencies": [
       {
         "name": "siddhi-store-rdbms",
-        "version": "7.0.15",
+        "version": "7.0.19",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.15/siddhi-store-rdbms-7.0.15.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.19/siddhi-store-rdbms-7.0.19.jar"
         },
         "usages": [
           {
@@ -1029,10 +1029,10 @@
     "dependencies": [
       {
         "name": "siddhi-store-rdbms",
-        "version": "7.0.15",
+        "version": "7.0.19",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.15/siddhi-store-rdbms-7.0.15.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.19/siddhi-store-rdbms-7.0.19.jar"
         },
         "usages": [
           {
@@ -1074,10 +1074,10 @@
     "dependencies": [
       {
         "name": "siddhi-store-rdbms",
-        "version": "7.0.15",
+        "version": "7.0.19",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.15/siddhi-store-rdbms-7.0.15.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.19/siddhi-store-rdbms-7.0.19.jar"
         },
         "usages": [
           {
@@ -1164,15 +1164,15 @@
     "extension": {
       "name": "cassandra",
       "displayName": "Cassandra",
-      "version": "2.0.0"
+      "version": "2.0.1"
     },
     "dependencies": [
       {
         "name": "siddhi-store-cassandra",
-        "version": "2.0.0",
+        "version": "2.0.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/org/wso2/extension/siddhi/store/cassandra/siddhi-store-cassandra/2.0.0/siddhi-store-cassandra-2.0.0.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/org/wso2/extension/siddhi/store/cassandra/siddhi-store-cassandra/2.0.1/siddhi-store-cassandra-2.0.1.jar"
         },
         "usages": [
           {
@@ -1264,7 +1264,7 @@
         "version": "2.3.5",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/http/siddhi-io-http/2.3.5/siddhi-io-http-2.3.5.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/http/siddhi-io-http/2.3.5/siddhi-io-http-2.3.5.jar"
         },
         "usages": [
           {
@@ -1281,7 +1281,7 @@
     "extension": {
       "name": "file",
       "displayName": "File",
-      "version": "2.0.18"
+      "version": "2.0.25"
     },
     "identifier": {
       "alternativeTypes": ["fileeventlistener"]
@@ -1289,10 +1289,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-file",
-        "version": "2.0.16",
+        "version": "2.0.25",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/file/siddhi-io-file/2.0.18/siddhi-io-file-2.0.18.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/file/siddhi-io-file/2.0.25/siddhi-io-file-2.0.25.jar"
         },
         "usages": [
           {
@@ -1314,7 +1314,7 @@
     "dependencies": [
       {
         "name": "siddhi-io-tcp",
-        "version": "3.0.5",
+        "version": "3.0.6",
         "download": {
           "autoDownloadable": true,
           "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/tcp/siddhi-io-tcp/3.0.6/siddhi-io-tcp-3.0.6.jar"
@@ -1339,10 +1339,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-email",
-        "version": "2.0.7",
+        "version": "2.0.8",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/email/siddhi-io-email/2.0.7/siddhi-io-email-2.0.7.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/email/siddhi-io-email/2.0.8/siddhi-io-email-2.0.8.jar"
         },
         "usages": [
           {
@@ -1359,15 +1359,15 @@
     "extension": {
       "name": "rabbitmq",
       "displayName": "RabbitMQ",
-      "version": "3.0.7"
+      "version": "3.0.8"
     },
     "dependencies": [
       {
         "name": "siddhi-io-rabbitmq",
-        "version": "3.0.7",
+        "version": "3.0.8",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/rabbitmq/siddhi-io-rabbitmq/3.0.7/siddhi-io-rabbitmq-3.0.7.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/rabbitmq/siddhi-io-rabbitmq/3.0.8/siddhi-io-rabbitmq-3.0.8.jar"
         },
         "usages": [
           {
@@ -1384,15 +1384,15 @@
     "extension": {
       "name": "mqtt",
       "displayName": "MQTT",
-      "version": "3.0.1"
+      "version": "3.0.4"
     },
     "dependencies": [
       {
         "name": "siddhi-io-mqtt",
-        "version": "3.0.0",
+        "version": "3.0.4",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/mqtt/siddhi-io-mqtt/3.0.1/siddhi-io-mqtt-3.0.1.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/mqtt/siddhi-io-mqtt/3.0.4/siddhi-io-mqtt-3.0.4.jar"
         },
         "usages": [
           {
@@ -1592,15 +1592,15 @@
     "extension": {
       "name": "s3",
       "displayName": "Amazon S3",
-      "version": "1.0.4"
+      "version": "1.0.5"
     },
     "dependencies": [
       {
         "name": "siddhi-io-s3",
-        "version": "1.0.3",
+        "version": "1.0.5",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/s3/siddhi-io-s3/1.0.4/siddhi-io-s3-1.0.4.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/s3/siddhi-io-s3/1.0.5/siddhi-io-s3-1.0.5.jar"
         },
         "usages": [
           {

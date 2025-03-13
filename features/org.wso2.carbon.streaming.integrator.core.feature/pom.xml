@@ -62,8 +62,20 @@
             <artifactId>gson</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
+            <groupId>org.wso2.orbit.com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>accessors-smart</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.apache.tapestry</groupId>
@@ -225,8 +237,20 @@
                                     <version>${gson.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>com.jayway.jsonpath.json-path</symbolicName>
+                                    <symbolicName>json-path</symbolicName>
                                     <version>${jayway.jsonpath.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>net.minidev.json-smart</symbolicName>
+                                    <version>${net.minidev.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>net.minidev.accessors-smart</symbolicName>
+                                    <version>${accessors.smart.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.objectweb.asm</symbolicName>
+                                    <version>${asm.version}</version>
                                 </bundle>
                                 <bundle>
                                     <symbolicName>tapestry-json</symbolicName>
