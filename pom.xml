@@ -1784,7 +1784,7 @@
         <osgi.service.tracker.import.version.range>[1.5.1, 2.0.0)</osgi.service.tracker.import.version.range>
 
         <!-- Dependencies -->
-        <carbon.kernel.version>5.3.1</carbon.kernel.version>
+        <carbon.kernel.version>5.3.2</carbon.kernel.version>
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
 
         <netty.version>4.1.118.Final</netty.version>
@@ -1906,7 +1906,7 @@
 
         <siddhi.io.tcp.version>3.0.6</siddhi.io.tcp.version>
         <siddhi.io.email.version>2.0.8</siddhi.io.email.version>
-        <siddhi.io.http.version>2.3.6</siddhi.io.http.version>
+        <siddhi.io.http.version>2.3.7</siddhi.io.http.version>
 
         <siddhi.map.json.version>5.2.5</siddhi.map.json.version>
         <siddhi.map.binary.version>2.1.1</siddhi.map.binary.version>
