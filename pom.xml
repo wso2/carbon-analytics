@@ -493,11 +493,6 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>slf4j.wso2</groupId>
-                <artifactId>slf4j</artifactId>
-                <version>${wso2.slf4j.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.eclipse.platform</groupId>
                 <artifactId>org.eclipse.equinox.simpleconfigurator</artifactId>
                 <version>${equinox.simpleconfigurator.version}</version>
@@ -1722,7 +1717,6 @@
         <okhttp.version>4.12.0.wso2v2</okhttp.version>
         <okio.version>3.9.0.wso2v1</okio.version>
         <apache.commons.io.version>2.4</apache.commons.io.version>
-        <wso2.slf4j.version>1.5.10.wso2v1</wso2.slf4j.version>
         <equinox.osgi.services.version>3.4.0.v20140312-2051</equinox.osgi.services.version>
         <pax.logging.log4j2.version>2.1.0-wso2v3</pax.logging.log4j2.version>
         <pax.logging.api.version>2.1.0-wso2v3</pax.logging.api.version>
