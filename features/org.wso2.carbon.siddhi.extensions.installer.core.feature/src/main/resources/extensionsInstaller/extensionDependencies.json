@@ -894,10 +894,10 @@
     "dependencies": [
       {
         "name": "siddhi-store-mongodb",
-        "version": "3.0.0",
+        "version": "3.0.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/store/mongodb/siddhi-store-mongodb/3.0.0/siddhi-store-mongodb-3.0.0.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/store/mongodb/siddhi-store-mongodb/3.0.1/siddhi-store-mongodb-3.0.1.jar"
         },
         "usages": [
           {
@@ -921,6 +921,21 @@
           }
         ],
         "lookupRegex": "mongodb([_-])driver([_-])sync([_-])4.9.1(.*).jar"
+      },
+      {
+        "name": "mongodb-driver-core",
+        "version": "4.9.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-core/4.9.1/mongodb-driver-core-4.9.1.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "mongodb([_-])driver([_-])core([_-])4.9.1(.*).jar"
       }
     ]
   },
@@ -1261,10 +1276,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-http",
-        "version": "2.3.5",
+        "version": "2.3.7",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/http/siddhi-io-http/2.3.5/siddhi-io-http-2.3.5.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/http/siddhi-io-http/2.3.7/siddhi-io-http-2.3.7.jar"
         },
         "usages": [
           {
