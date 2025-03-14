@@ -1688,6 +1688,13 @@
         </dependencies>
     </dependencyManagement>
 
+    <repositories>
+        <repository>
+            <id>restlet-repository</id>
+            <url>https://maven.restlet.talend.com</url>
+        </repository>
+    </repositories>
+
     <properties>
         <carbon.analytics.version>3.0.71-SNAPSHOT</carbon.analytics.version>
         <siddhi.version>5.1.31</siddhi.version>
