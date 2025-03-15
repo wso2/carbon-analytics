@@ -140,6 +140,22 @@
                                     <symbolicName>jaxen</symbolicName>
                                     <version>${jaxen.version}</version>
                                 </bundle>
+                                <bundle>
+                                    <symbolicName>json-path</symbolicName>
+                                    <version>${jayway.jsonpath.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>net.minidev.json-smart</symbolicName>
+                                    <version>${net.minidev.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>net.minidev.accessors-smart</symbolicName>
+                                    <version>${accessors.smart.version}</version>
+                                </bundle>
+                                <bundle>
+                                    <symbolicName>org.objectweb.asm</symbolicName>
+                                    <version>${asm.version}</version>
+                                </bundle>
                             </bundles>
                         </configuration>
                     </execution>
