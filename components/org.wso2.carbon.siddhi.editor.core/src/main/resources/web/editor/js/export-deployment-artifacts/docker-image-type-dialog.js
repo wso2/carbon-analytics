@@ -23,7 +23,7 @@ define(['require', 'lodash', 'jquery', 'version'],
             this.dockerNameMissingErrorMessage = options.templateHeader.find("#k8s-path-missing-docker-build-type-error-message");
             this.dockerNameInUpperError = options.templateHeader.find("#k8s-path-missing-docker-build-type-upper-error");
             this.templateContainer = options.templateHeader;
-            this.dockerImageNameForm = options.templateHeader.find('#k8s-path-docker-image-name-form');
+            this.dockerImageNameForm = options.templateHeader.find('#file-name-for-docker-parent');
         };
 
         DockerImageTypeDialog.prototype.constructor = DockerImageTypeDialog;
@@ -37,8 +37,8 @@ define(['require', 'lodash', 'jquery', 'version'],
                 if (preBuiltImage) {
                     self.dockerImageNameForm.show();
                     self.templateContainer.find("#docker-image-type-tobuild").prop("checked", false);
-                    if (self.dockerImageNameForm.find("#built-docker-image-name-input-field").val() == "") {
-                        self.dockerImageNameForm.find("#built-docker-image-name-input-field").val("docker.wso2.com/wso2si:4.2.0.0");
+                    if (self.dockerImageNameForm.find("#file-name-for-docker").val() == "") {
+                        self.dockerImageNameForm.find("#file-name-for-docker").val("docker.wso2.com/wso2si:4.2.0.0");
                     }
                 } else {
                     self.dockerImageNameForm.hide();
@@ -48,8 +48,8 @@ define(['require', 'lodash', 'jquery', 'version'],
                 }
             });
 
-            self.dockerImageNameForm.find("#built-docker-image-name-input-field").on('input', function() {
-                var imageName = self.dockerImageNameForm.find("#built-docker-image-name-input-field").val();
+            self.dockerImageNameForm.find("#file-name-for-docker").on('input', function() {
+                var imageName = self.dockerImageNameForm.find("#file-name-for-docker").val();
                 var isExistingImage = self.templateContainer.find("#docker-image-type-existing").is(":checked");
                 if (isExistingImage) {
                     var upperCase = new RegExp('[A-Z]');
@@ -69,7 +69,7 @@ define(['require', 'lodash', 'jquery', 'version'],
             var self = this;
             var templateKeyValue = {};
             templateKeyValue["isExistingImage"] = self.templateContainer.find("#docker-image-type-existing").is(":checked");
-            templateKeyValue["imageName"] = self.dockerImageNameForm.find("#built-docker-image-name-input-field").val();
+            templateKeyValue["imageName"] = self.dockerImageNameForm.find("#file-name-for-docker").val();
             templateKeyValue["userName"] = "";
             templateKeyValue["password"] = "";
             templateKeyValue["email"] = "";
@@ -81,7 +81,7 @@ define(['require', 'lodash', 'jquery', 'version'],
         DockerImageTypeDialog.prototype.validateDockerTypeConfig = function () {
             var self = this;
             var isExistingImage = self.templateContainer.find("#docker-image-type-existing").is(":checked");
-            var imageName = self.dockerImageNameForm.find("#built-docker-image-name-input-field").val();
+            var imageName = self.dockerImageNameForm.find("#file-name-for-docker").val();
             if (isExistingImage) {
                 var upperCase = new RegExp('[A-Z]');
                 if (imageName === null || imageName == "") {
