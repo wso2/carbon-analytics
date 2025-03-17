@@ -14,7 +14,7 @@
         "version": "5.0.19",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.19/siddhi-io-kafka-5.0.19.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.19/siddhi-io-kafka-5.0.19.jar"
         },
         "usages": [
           {
@@ -429,7 +429,7 @@
         "version": "2.0.17",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
         },
         "usages": [
           {
@@ -474,7 +474,7 @@
         "version": "2.0.17",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
         },
         "usages": [
           {
@@ -534,7 +534,7 @@
         "version": "2.0.17",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
         },
         "usages": [
           {
@@ -579,7 +579,7 @@
         "version": "2.0.17",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
         },
         "usages": [
           {
@@ -624,7 +624,7 @@
         "version": "2.0.17",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
         },
         "usages": [
           {
@@ -842,7 +842,7 @@
         "version": "1.0.13",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/grpc/siddhi-io-grpc/1.0.13/siddhi-io-grpc-1.0.13.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/grpc/siddhi-io-grpc/1.0.13/siddhi-io-grpc-1.0.13.jar"
         },
         "usages": [
           {
@@ -957,7 +957,7 @@
         "version": "7.0.19",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.19/siddhi-store-rdbms-7.0.19.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.19/siddhi-store-rdbms-7.0.19.jar"
         },
         "usages": [
           {
@@ -1002,7 +1002,7 @@
         "version": "7.0.19",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.19/siddhi-store-rdbms-7.0.19.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.19/siddhi-store-rdbms-7.0.19.jar"
         },
         "usages": [
           {
@@ -1047,7 +1047,7 @@
         "version": "7.0.19",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.19/siddhi-store-rdbms-7.0.19.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.19/siddhi-store-rdbms-7.0.19.jar"
         },
         "usages": [
           {
@@ -1092,7 +1092,7 @@
         "version": "7.0.19",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.19/siddhi-store-rdbms-7.0.19.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/store/rdbms/siddhi-store-rdbms/7.0.19/siddhi-store-rdbms-7.0.19.jar"
         },
         "usages": [
           {
@@ -1307,7 +1307,7 @@
         "version": "2.0.25",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/file/siddhi-io-file/2.0.25/siddhi-io-file-2.0.25.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/file/siddhi-io-file/2.0.25/siddhi-io-file-2.0.25.jar"
         },
         "usages": [
           {
