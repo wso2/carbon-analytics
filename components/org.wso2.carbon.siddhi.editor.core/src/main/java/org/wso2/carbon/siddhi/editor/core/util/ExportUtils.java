@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.siddhi.editor.core.internal;
+package org.wso2.carbon.siddhi.editor.core.util;
 
 import io.siddhi.core.stream.input.source.Source;
 import org.slf4j.Logger;
@@ -33,8 +33,7 @@ import org.wso2.carbon.siddhi.editor.core.commons.kubernetes.SiddhiProcessSpec;
 import org.wso2.carbon.siddhi.editor.core.commons.request.ExportAppsRequest;
 import org.wso2.carbon.siddhi.editor.core.exception.DockerGenerationException;
 import org.wso2.carbon.siddhi.editor.core.exception.KubernetesGenerationException;
-import org.wso2.carbon.siddhi.editor.core.util.Constants;
-import org.wso2.carbon.siddhi.editor.core.util.SourceEditorUtils;
+import org.wso2.carbon.siddhi.editor.core.internal.EditorDataHolder;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -127,7 +126,7 @@ public class ExportUtils {
     private String zipFileName = "siddhi-docker.zip";
     private String zipFileRoot = "siddhi-docker" + File.separator;
 
-    ExportUtils(
+    public ExportUtils(
             ConfigProvider configProvider,
             ExportAppsRequest exportAppsRequest,
             String exportType
@@ -138,7 +137,7 @@ public class ExportUtils {
         this.exportType = exportType;
     }
 
-    ExportUtils(ConfigProvider configProvider) {
+    public ExportUtils(ConfigProvider configProvider) {
 
         this.configProvider = configProvider;
     }
@@ -196,7 +195,7 @@ public class ExportUtils {
 
         if (exportAppsRequest.getDockerConfiguration() != null) {
             UUID uuid = UUID.randomUUID();
-            tempDockerDirectoryPath = Paths.get(RESOURCES_DIR, uuid.toString());
+            tempDockerDirectoryPath = Paths.get(Constants.RUNTIME_PATH, RESOURCES_DIR, uuid.toString());
             if (!Files.exists(tempDockerDirectoryPath)) {
                 if (!new File(tempDockerDirectoryPath.toString()).mkdir()) {
                     throw new DockerGenerationException(
