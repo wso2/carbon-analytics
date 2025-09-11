@@ -298,6 +298,8 @@ do
     -Djava.util.logging.config.file="$RUNTIME_HOME/bin/bootstrap/logging.properties" \
     -Djava.security.egd=file:/dev/./urandom \
     -Dfile.encoding=UTF8 \
+    -Djdk.util.zip.disableZip64ExtraFieldValidation=true \
+    -Djdk.nio.zipfs.allowDotZipEntry=true \
     -Djavax.net.ssl.keyStore="$CARBON_HOME/resources/security/wso2carbon.jks" \
     -Djavax.net.ssl.keyStorePassword="wso2carbon" \
     -Djavax.net.ssl.trustStore="$CARBON_HOME/resources/security/client-truststore.jks" \

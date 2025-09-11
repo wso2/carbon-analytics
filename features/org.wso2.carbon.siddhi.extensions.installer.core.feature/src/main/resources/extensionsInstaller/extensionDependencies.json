@@ -1424,15 +1424,15 @@
     "extension": {
       "name": "sqs",
       "displayName": "Amazon SQS",
-      "version": "3.0.0"
+      "version": "3.0.2"
     },
     "dependencies": [
       {
         "name": "siddhi-io-sqs",
-        "version": "3.0.1",
+        "version": "3.0.2",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/sqs/siddhi-io-sqs/3.0.1/siddhi-io-sqs-3.0.1.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/sqs/siddhi-io-sqs/3.0.2/siddhi-io-sqs-3.0.2.jar"
         },
         "usages": [
           {
