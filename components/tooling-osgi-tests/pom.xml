@@ -1130,8 +1130,10 @@
                                         <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
                                             <classpath path="${project.build.directory}" />
                                         </taskdef>
+                                        <available file="${project.build.directory}/jacoco.exec"
+                                                   property="jacoco.exec.exists"/>
                                         <!-- OSGi Test coverage only enabled for org.wso2.carbon.stream.core module-->
-                                        <jacoco:report>
+                                        <jacoco:report xmlns:if="ant:if" if:set="jacoco.exec.exists">
                                             <executiondata>
                                                 <file file="${project.build.directory}/jacoco.exec" />
                                             </executiondata>

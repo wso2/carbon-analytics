@@ -253,10 +253,10 @@
                                     <symbolicName>io.dropwizard.metrics.core</symbolicName>
                                     <version>${metrics.version}</version>
                                 </bundle>
-                                <bundle>
-                                    <symbolicName>org.apache.commons.lang3</symbolicName>
-                                    <version>${commons-lang3.version}</version>
-                                </bundle>
+                                <!-- commons-lang3 3.18.0 is a Multi-Release JAR which P2/Equinox
+                                     cannot index. It is shipped via lib/launcher/ instead (see
+                                     maven-dependency-plugin copy below), making it available on
+                                     the system classpath. -->
                             </bundles>
                         </configuration>
                     </execution>

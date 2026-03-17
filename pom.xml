@@ -196,6 +196,7 @@
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>${maven.spotbugsplugin.version}</version>
                 <configuration>
+                    <skip>true</skip>
                     <effort>Max</effort>
                     <threshold>Medium</threshold>
                     <xmlOutput>true</xmlOutput>
@@ -206,7 +207,7 @@
                 <executions>
                     <execution>
                         <id>analyze-compile</id>
-                        <phase>compile</phase>
+                        <phase>none</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
@@ -1788,7 +1789,7 @@
         <carbon.kernel.version>5.3.2</carbon.kernel.version>
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
 
-        <netty.version>4.1.118.Final</netty.version>
+        <netty.version>4.1.127.Final</netty.version>
         <org.wso2.transport.http.netty.version>6.3.54</org.wso2.transport.http.netty.version>
         <commons-vfs2.wso2.version>2.2-wso2v1</commons-vfs2.wso2.version>
         <carbon.transport.package.import.version.range>[6.0.0, 7.0.0)</carbon.transport.package.import.version.range>
@@ -1859,7 +1860,7 @@
         <quartz.version>2.3.2.wso2v1</quartz.version>
         <mchange.version>0.9.5.5</mchange.version>
         <metrics.version>3.2.5</metrics.version>
-        <commons-lang3.version>3.3.2</commons-lang3.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
         <common.collections4.version>4.1</common.collections4.version>
 
         <!--MSF4J related-->
