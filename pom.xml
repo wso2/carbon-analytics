@@ -1626,7 +1626,11 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec-http</artifactId>
                 <version>${netty.version}</version>
-                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec-http2</artifactId>
+                <version>${netty.version}</version>
             </dependency>
             <dependency>
                 <groupId>xerces</groupId>

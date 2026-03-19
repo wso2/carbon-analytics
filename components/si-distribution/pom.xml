@@ -180,6 +180,14 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.pax.exam.feature</artifactId>
             <type>zip</type>
@@ -411,6 +419,32 @@
                             <outputDirectory>${project.build.directory}/javax</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-netty-patch</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>io.netty</groupId>
+                                    <artifactId>netty-codec-http2</artifactId>
+                                    <version>${netty.version}</version>
+                                    <type>jar</type>
+                                    <destFileName>io.netty.codec-http2_${netty.version}.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>io.netty</groupId>
+                                    <artifactId>netty-codec-http</artifactId>
+                                    <version>${netty.version}</version>
+                                    <type>jar</type>
+                                    <destFileName>io.netty.codec-http_${netty.version}.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/plugins-patch</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -876,11 +910,52 @@
                     <execution>
                         <phase>package</phase>
                         <configuration>
-                            <tasks>
+                            <target>
+                                <!-- Mark all bundles as resolved -->
                                 <replace dir="target/carbon-analytics/wso2" token="false" value="true">
                                     <include name="**/bundles.info" />
                                 </replace>
-                            </tasks>
+
+                                <!-- Delete old jars from plugins/ -->
+                                <delete file="target/carbon-analytics/wso2/lib/plugins/org.apache.commons.lang3_3.4.0.jar" />
+                                <delete file="target/carbon-analytics/wso2/lib/plugins/io.netty.codec-http2_4.1.118.Final.jar" />
+                                <delete file="target/carbon-analytics/wso2/lib/plugins/io.netty.codec-http_4.1.118.Final.jar" />
+
+                                <!-- Copy new netty-codec-http2 and netty-codec-http jars into plugins/ -->
+                                <copy todir="target/carbon-analytics/wso2/lib/plugins" overwrite="true">
+                                    <fileset dir="target/plugins-patch">
+                                        <include name="io.netty.codec-http2_${netty.version}.jar" />
+                                        <include name="io.netty.codec-http_${netty.version}.jar" />
+                                    </fileset>
+                                </copy>
+
+                                <!-- Update netty-codec-http2 version in bundles.info -->
+                                <replaceregexp flags="g" byline="true">
+                                    <regexp pattern="io\.netty\.codec-http2,4\.1\.118\.Final,\.\./lib/plugins/io\.netty\.codec-http2_4\.1\.118\.Final\.jar" />
+                                    <substitution expression="io.netty.codec-http2,4.1.127.Final,../lib/plugins/io.netty.codec-http2_4.1.127.Final.jar" />
+                                    <fileset dir="target/carbon-analytics/wso2">
+                                        <include name="**/bundles.info" />
+                                    </fileset>
+                                </replaceregexp>
+
+                                <!-- Update netty-codec-http version in bundles.info -->
+                                <replaceregexp flags="g" byline="true">
+                                    <regexp pattern="io\.netty\.codec-http,4\.1\.118\.Final,\.\./lib/plugins/io\.netty\.codec-http_4\.1\.118\.Final\.jar" />
+                                    <substitution expression="io.netty.codec-http,4.1.127.Final,../lib/plugins/io.netty.codec-http_4.1.127.Final.jar" />
+                                    <fileset dir="target/carbon-analytics/wso2">
+                                        <include name="**/bundles.info" />
+                                    </fileset>
+                                </replaceregexp>
+
+                                <!-- Remove commons-lang3 3.4.0 line from bundles.info -->
+                                <replaceregexp flags="gm">
+                                    <regexp pattern="org\.apache\.commons\.lang3,3\.4\.0,\.\./lib/plugins/org\.apache\.commons\.lang3_3\.4\.0\.jar,4,true\r?\n" />
+                                    <substitution expression="" />
+                                    <fileset dir="target/carbon-analytics/wso2">
+                                        <include name="**/bundles.info" />
+                                    </fileset>
+                                </replaceregexp>
+                            </target>
                         </configuration>
                         <goals>
                             <goal>run</goal>
