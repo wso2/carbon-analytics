@@ -1229,8 +1229,8 @@
 
             <!--Dependencies for database feed simulation begins here-->
             <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
                 <version>${mysql.connector.version}</version>
             </dependency>
             <dependency>
@@ -1763,10 +1763,10 @@
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.1.71-alpha</carbon.analytics-common.version>
         <log4j.version>2.24.3</log4j.version>
-        <nimbus.jose.jwt.version>9.37.4</nimbus.jose.jwt.version>
-        <bouncycastle.version>1.78.1</bouncycastle.version>
-        <commons.compress.version>1.26.0</commons.compress.version>
-        <woodstox.core.version>6.7.0</woodstox.core.version>
+        <nimbus.jose.jwt.version>10.9</nimbus.jose.jwt.version>
+        <bouncycastle.version>1.83</bouncycastle.version>
+        <commons.compress.version>1.28.0</commons.compress.version>
+        <woodstox.core.version>7.1.1</woodstox.core.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
         <carbon.analytics.version.range>[3.0.0, 4.0.0)</carbon.analytics.version.range>
         <com.spotify.docker.client.version>8.16.0</com.spotify.docker.client.version>
@@ -1949,7 +1949,7 @@
         <apache.commons.fileupload.version>1.6.0</apache.commons.fileupload.version>
         <fabricator.wso2v1.version>2.1.4.wso2v1</fabricator.wso2v1.version>
         <generex.wso2v1.version>1.0.0.wso2v1</generex.wso2v1.version>
-        <mysql.connector.version>5.1.49</mysql.connector.version>
+        <mysql.connector.version>8.0.33</mysql.connector.version>
         <google.collections.version>1.0</google.collections.version>
         <project.scm.id>my-scm-server</project.scm.id>
         <libthrift.wso2.imp.pkg.version.range>[0.16.0.wso2v1, 1.0.0)</libthrift.wso2.imp.pkg.version.range>

@@ -18,7 +18,6 @@ package org.wso2.carbon.siddhi.editor.core.internal;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.log4j.helpers.LogLog;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,7 +120,7 @@ public class EditorConsoleService implements WebSocketEndpoint {
                     String jsonString = getJsonString(logEvent);
                     webSocketConnection.pushText(jsonString);
                 } catch (IOException e) {
-                    LogLog.error("Editor Console Appender cannot publish log event, " + e.getMessage(), e);
+                    LOGGER.error("Editor Console Appender cannot publish log event, " + e.getMessage(), e);
                 }
             }
         }
@@ -146,7 +145,7 @@ public class EditorConsoleService implements WebSocketEndpoint {
             } catch (Exception e) {
                 // Preserve interrupt status
                 Thread.currentThread().interrupt();
-                LogLog.error("LogEventAppender cannot publish log events, " + e.getMessage(), e);
+                LOGGER.error("LogEventAppender cannot publish log events, " + e.getMessage(), e);
             }
         }
 
