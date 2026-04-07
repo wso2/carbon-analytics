@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>3.0.77-SNAPSHOT</version>
+        <version>3.0.77-alpha</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -97,8 +97,8 @@
             <artifactId>org.wso2.carbon.container</artifactId>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
