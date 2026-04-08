@@ -1719,12 +1719,12 @@
             <!-- Vulnerability fix: override transitive bouncycastle -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
+                <artifactId>bcprov-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpkix-jdk15on</artifactId>
+                <artifactId>bcpkix-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
             <!-- Vulnerability fix: override transitive commons-compress -->
@@ -1761,8 +1761,8 @@
         <siddhi.version>5.1.32-SNAPSHOT</siddhi.version>
         <siddhi.bundle.version>5.1.32-SNAPSHOT</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.1.70-SNAPSHOT</carbon.analytics-common.version>
-        <log4j.version>2.24.3</log4j.version>
+        <carbon.analytics-common.version>6.1.71-SNAPSHOT</carbon.analytics-common.version>
+        <log4j.version>2.25.4</log4j.version>
         <nimbus.jose.jwt.version>10.9</nimbus.jose.jwt.version>
         <bouncycastle.version>1.83</bouncycastle.version>
         <commons.compress.version>1.28.0</commons.compress.version>
@@ -1788,8 +1788,8 @@
         <okio.version>3.9.0.wso2v1</okio.version>
         <apache.commons.io.version>2.4</apache.commons.io.version>
         <equinox.osgi.services.version>3.4.0.v20140312-2051</equinox.osgi.services.version>
-        <pax.logging.log4j2.version>2.1.0-wso2v3</pax.logging.log4j2.version>
-        <pax.logging.api.version>2.1.0-wso2v3</pax.logging.api.version>
+        <pax.logging.log4j2.version>2.2.9-wso2v2</pax.logging.log4j2.version>
+        <pax.logging.api.version>2.2.9-wso2v2</pax.logging.api.version>
         <pax.exam.container.native.version>4.6.0</pax.exam.container.native.version>
         <pax.url.aether.version>1.6.0</pax.url.aether.version>
         <org.jacoco.ant.version>0.8.3</org.jacoco.ant.version>
@@ -1926,11 +1926,11 @@
         <quartz.version>2.3.2.wso2v1</quartz.version>
         <mchange.version>0.12.0</mchange.version>
         <metrics.version>3.2.5</metrics.version>
-        <commons-lang3.version>3.17.0</commons-lang3.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
         <common.collections4.version>4.4</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.8.12</msf4j.version>
+        <msf4j.version>2.8.14-SNAPSHOT</msf4j.version>
         <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
         <com.fasterxml.jackson.core.version>2.18.6</com.fasterxml.jackson.core.version>
         <com.fasterxml.jackson.databind.version>2.18.6</com.fasterxml.jackson.databind.version>
