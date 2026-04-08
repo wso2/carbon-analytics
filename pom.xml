@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.77-alpha</version>
+    <version>3.0.77-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.streaming.integrator.common</module>
@@ -1757,11 +1757,11 @@
     </repositories>
 
     <properties>
-        <carbon.analytics.version>3.0.77-alpha</carbon.analytics.version>
-        <siddhi.version>5.1.32-alpha</siddhi.version>
-        <siddhi.bundle.version>5.1.32-alpha</siddhi.bundle.version>
+        <carbon.analytics.version>3.0.77-SNAPSHOT</carbon.analytics.version>
+        <siddhi.version>5.1.32-SNAPSHOT</siddhi.version>
+        <siddhi.bundle.version>5.1.32-SNAPSHOT</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.1.71-alpha</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.1.70-SNAPSHOT</carbon.analytics-common.version>
         <log4j.version>2.24.3</log4j.version>
         <nimbus.jose.jwt.version>10.9</nimbus.jose.jwt.version>
         <bouncycastle.version>1.83</bouncycastle.version>
