@@ -121,7 +121,7 @@ public class DBPersistenceStoreTestcase {
                 copyCarbonYAMLOption(),
                 copyOracleJDBCJar(),
                 CarbonDistributionOption.copyOSGiLibBundle(maven(
-                        "mysql", "mysql-connector-java").versionAsInProject()),
+                        "com.mysql", "mysql-connector-j").versionAsInProject()),
                 CarbonDistributionOption.copyOSGiLibBundle(maven(
                         "org.postgresql", "postgresql").versionAsInProject()),
                 CarbonDistributionOption.copyOSGiLibBundle(maven(
