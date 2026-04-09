@@ -1177,7 +1177,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>${com.fasterxml.jackson.core.version}</version>
+                <version>${com.fasterxml.jackson.annotations.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger</groupId>
@@ -1752,7 +1752,7 @@
         <siddhi.version>5.1.32</siddhi.version>
         <siddhi.bundle.version>5.1.32</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.1.71-SNAPSHOT</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.1.73-SNAPSHOT</carbon.analytics-common.version>
         <log4j.version>2.25.4</log4j.version>
         <log4j.orbit.version>2.25.4.wso2v1</log4j.orbit.version>
         <nimbus.jose.jwt.version>10.9</nimbus.jose.jwt.version>
@@ -1803,7 +1803,7 @@
         <equinox.simpleconfigurator.manipulator.version>2.2.0</equinox.simpleconfigurator.manipulator.version>
         <equinox.util.version>1.0.500.v20130404-1337</equinox.util.version>
         <org.eclipse.equinox.cm.version>1.1.0.v20131021-1936</org.eclipse.equinox.cm.version>
-        <org.snakeyaml.version>2.2</org.snakeyaml.version>
+        <org.snakeyaml.version>2.6</org.snakeyaml.version>
         <org.wso2.eclipse.osgi.version>3.4.0.v20140312-2051</org.wso2.eclipse.osgi.version>
         <junit.version>4.10</junit.version>
         <apache.commons.text.version>1.1</apache.commons.text.version>
@@ -1922,11 +1922,12 @@
         <common.collections4.version>4.4</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.8.12</msf4j.version>
+        <msf4j.version>2.8.14-SNAPSHOT</msf4j.version>
         <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
-        <com.fasterxml.jackson.core.version>2.18.6</com.fasterxml.jackson.core.version>
-        <com.fasterxml.jackson.databind.version>2.18.6</com.fasterxml.jackson.databind.version>
-        <com.fasterxml.jackson.core.version.range>[2.15.0, 2.20.0)</com.fasterxml.jackson.core.version.range>
+        <com.fasterxml.jackson.core.version>2.21.2</com.fasterxml.jackson.core.version>
+        <com.fasterxml.jackson.annotations.version>2.21</com.fasterxml.jackson.annotations.version>
+        <com.fasterxml.jackson.databind.version>2.21.2</com.fasterxml.jackson.databind.version>
+        <com.fasterxml.jackson.core.version.range>[2.15.0, 2.22.0)</com.fasterxml.jackson.core.version.range>
         <io.swagger.version>1.6.7</io.swagger.version>
         <javax.ws.rs-api.version>2.0</javax.ws.rs-api.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
