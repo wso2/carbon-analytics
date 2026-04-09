@@ -1651,14 +1651,6 @@
                         <artifactId>jackson-annotations</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>org.bouncycastle</groupId>
-                        <artifactId>bcprov-jdk15on</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.bouncycastle</groupId>
-                        <artifactId>bcpkix-jdk15on</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.apache.commons</groupId>
                         <artifactId>commons-compress</artifactId>
                     </exclusion>
@@ -1716,17 +1708,6 @@
                 <artifactId>nimbus-jose-jwt</artifactId>
                 <version>${nimbus.jose.jwt.version}</version>
             </dependency>
-            <!-- Vulnerability fix: override transitive bouncycastle -->
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpkix-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
-            </dependency>
             <!-- Vulnerability fix: override transitive commons-compress -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1762,9 +1743,8 @@
         <siddhi.bundle.version>5.1.32</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.1.70</carbon.analytics-common.version>
-        <log4j.version>2.25.4/log4j.version>
+        <log4j.version>2.25.4</log4j.version>
         <nimbus.jose.jwt.version>10.9</nimbus.jose.jwt.version>
-        <bouncycastle.version>1.83</bouncycastle.version>
         <commons.compress.version>1.28.0</commons.compress.version>
         <woodstox.core.version>7.1.1</woodstox.core.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
@@ -1852,7 +1832,7 @@
         <osgi.service.tracker.import.version.range>[1.5.1, 2.0.0)</osgi.service.tracker.import.version.range>
 
         <!-- Dependencies -->
-        <carbon.kernel.version>5.3.2</carbon.kernel.version>
+        <carbon.kernel.version>5.3.3</carbon.kernel.version>
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
 
         <netty.version>4.1.132.Final</netty.version>
@@ -1863,7 +1843,7 @@
         <carbon.messaging.version>3.0.3</carbon.messaging.version>
         <carbon.messaging.package.import.version.range>[0.0.0, 4.0.0)</carbon.messaging.package.import.version.range>
 
-        <carbon.deployment.version>5.2.1</carbon.deployment.version>
+        <carbon.deployment.version>5.2.3</carbon.deployment.version>
         <carbon.deployment.export.version>5.2.0</carbon.deployment.export.version>
 
         <carbon.datasources.version>1.1.18</carbon.datasources.version>
@@ -1946,7 +1926,7 @@
         <owasp.encoder.version>1.2.0.wso2v2</owasp.encoder.version>
         <apache.httpcomponents.version>4.3.1.wso2v1</apache.httpcomponents.version>
         <apache.commons.csv.version>1.4</apache.commons.csv.version>
-        <apache.commons.fileupload.version>1.6.0</apache.commons.fileupload.version>
+        <apache.commons.fileupload.version>1.5</apache.commons.fileupload.version>
         <fabricator.wso2v1.version>2.1.4.wso2v1</fabricator.wso2v1.version>
         <generex.wso2v1.version>1.0.0.wso2v1</generex.wso2v1.version>
         <mysql.connector.version>8.0.33</mysql.connector.version>
