@@ -1651,14 +1651,6 @@
                         <artifactId>jackson-annotations</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>org.bouncycastle</groupId>
-                        <artifactId>bcprov-jdk15on</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.bouncycastle</groupId>
-                        <artifactId>bcpkix-jdk15on</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.apache.commons</groupId>
                         <artifactId>commons-compress</artifactId>
                     </exclusion>
@@ -1716,17 +1708,6 @@
                 <artifactId>nimbus-jose-jwt</artifactId>
                 <version>${nimbus.jose.jwt.version}</version>
             </dependency>
-            <!-- Vulnerability fix: override transitive bouncycastle -->
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpkix-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
-            </dependency>
             <!-- Vulnerability fix: override transitive commons-compress -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1764,7 +1745,6 @@
         <carbon.analytics-common.version>6.1.70</carbon.analytics-common.version>
         <log4j.version>2.24.3</log4j.version>
         <nimbus.jose.jwt.version>10.9</nimbus.jose.jwt.version>
-        <bouncycastle.version>1.83</bouncycastle.version>
         <commons.compress.version>1.28.0</commons.compress.version>
         <woodstox.core.version>7.1.1</woodstox.core.version>
         <carbon.analytics-common.version.range>[6.0.66, 6.2.0)</carbon.analytics-common.version.range>
