@@ -1637,28 +1637,6 @@
                 <artifactId>docker-client</artifactId>
                 <classifier>shaded</classifier>
                 <version>${com.spotify.docker.client.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.core</groupId>
-                        <artifactId>jackson-databind</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.core</groupId>
-                        <artifactId>jackson-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.core</groupId>
-                        <artifactId>jackson-annotations</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.commons</groupId>
-                        <artifactId>commons-compress</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.google.guava</groupId>
-                        <artifactId>guava</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>net.minidev</groupId>
@@ -1912,8 +1890,8 @@
         <!--MSF4J related-->
         <msf4j.version>2.8.12</msf4j.version>
         <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
-        <com.fasterxml.jackson.core.version>2.18.6</com.fasterxml.jackson.core.version>
-        <com.fasterxml.jackson.databind.version>2.18.6</com.fasterxml.jackson.databind.version>
+        <com.fasterxml.jackson.core.version>2.16.0</com.fasterxml.jackson.core.version>
+        <com.fasterxml.jackson.databind.version>2.16.0</com.fasterxml.jackson.databind.version>
         <com.fasterxml.jackson.core.version.range>[2.15.0, 2.20.0)</com.fasterxml.jackson.core.version.range>
         <io.swagger.version>1.6.7</io.swagger.version>
         <javax.ws.rs-api.version>2.0</javax.ws.rs-api.version>
