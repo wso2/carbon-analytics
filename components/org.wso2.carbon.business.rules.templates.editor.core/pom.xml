@@ -116,7 +116,6 @@
                             <executable>${npm.executable}</executable>
                             <arguments>
                                 <argument>install</argument>
-                                <argument>--legacy-peer-deps</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -134,7 +133,6 @@
                             <arguments>
                                 <argument>install</argument>
                                 <argument>rimraf</argument>
-                                <argument>--legacy-peer-deps</argument>
                             </arguments>
                         </configuration>
                     </execution>
