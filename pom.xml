@@ -1749,10 +1749,10 @@
 
     <properties>
         <carbon.analytics.version>3.0.77-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>5.1.33-SNAPSHOT</siddhi.version>
-        <siddhi.bundle.version>5.1.33-SNAPSHOT</siddhi.bundle.version>
+        <siddhi.version>5.1.33</siddhi.version>
+        <siddhi.bundle.version>5.1.33</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.1.73-SNAPSHOT</carbon.analytics-common.version>
+        <carbon.analytics-common.version>6.1.73</carbon.analytics-common.version>
         <log4j.version>2.25.4</log4j.version>
         <log4j.orbit.version>2.25.4.wso2v1</log4j.orbit.version>
         <nimbus.jose.jwt.version>10.9</nimbus.jose.jwt.version>
@@ -1779,7 +1779,7 @@
         <okio.version>3.9.0.wso2v1</okio.version>
         <apache.commons.io.version>2.4</apache.commons.io.version>
         <equinox.osgi.services.version>3.4.0.v20140312-2051</equinox.osgi.services.version>
-        <pax.logging.log4j2.version>2.2.9-wso2v2</pax.logging.log4j2.version>
+        <pax.logging.log4j2.version>2.2.9-wso2v3</pax.logging.log4j2.version>
         <pax.logging.api.version>2.2.9-wso2v2</pax.logging.api.version>
         <pax.exam.container.native.version>4.6.0</pax.exam.container.native.version>
         <pax.url.aether.version>1.6.0</pax.url.aether.version>
@@ -1846,7 +1846,7 @@
         <carbon.kernel.version>5.3.3</carbon.kernel.version>
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
 
-        <netty.version>4.1.132.Final</netty.version>
+        <netty.version>4.1.133.Final</netty.version>
         <org.wso2.transport.http.netty.version>6.3.54</org.wso2.transport.http.netty.version>
         <commons-vfs2.wso2.version>2.2-wso2v1</commons-vfs2.wso2.version>
         <carbon.transport.package.import.version.range>[6.0.0, 7.0.0)</carbon.transport.package.import.version.range>
@@ -1866,7 +1866,7 @@
         <carbon.utils.version>2.1.1</carbon.utils.version>
         <carbon.config.version>2.1.17</carbon.config.version>
         <carbon.config.version.range>[2.1.5, 3.0.0)</carbon.config.version.range>
-        <carbon.securevault.version>5.0.22-SNAPSHOT</carbon.securevault.version>
+        <carbon.securevault.version>5.0.22</carbon.securevault.version>
 
         <!-- Clustering Dependencies -->
         <carbon.coordination.version>2.1.10</carbon.coordination.version>
@@ -1922,7 +1922,7 @@
         <common.collections4.version>4.4</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.8.14-SNAPSHOT</msf4j.version>
+        <msf4j.version>2.9.0</msf4j.version>
         <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
         <com.fasterxml.jackson.core.version>2.21.2</com.fasterxml.jackson.core.version>
         <com.fasterxml.jackson.annotations.version>2.21</com.fasterxml.jackson.annotations.version>
