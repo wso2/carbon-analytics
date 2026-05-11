@@ -390,6 +390,16 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.orbit.version}</version>
+            </dependency>
             <!-- OSGi test -->
             <dependency>
                 <groupId>org.awaitility</groupId>
@@ -1167,7 +1177,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>${com.fasterxml.jackson.core.version}</version>
+                <version>${com.fasterxml.jackson.annotations.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger</groupId>
@@ -1717,11 +1727,12 @@
 
     <properties>
         <carbon.analytics.version>3.0.78-SNAPSHOT</carbon.analytics.version>
-        <siddhi.version>5.1.32</siddhi.version>
-        <siddhi.bundle.version>5.1.32</siddhi.bundle.version>
+        <siddhi.version>5.1.33</siddhi.version>
+        <siddhi.bundle.version>5.1.33</siddhi.bundle.version>
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
-        <carbon.analytics-common.version>6.1.70</carbon.analytics-common.version>
-        <log4j.version>2.22.1</log4j.version>
+        <carbon.analytics-common.version>6.1.73</carbon.analytics-common.version>
+        <log4j.version>2.25.4</log4j.version>
+        <log4j.orbit.version>2.25.4.wso2v1</log4j.orbit.version>
         <nimbus.jose.jwt.version>10.9</nimbus.jose.jwt.version>
         <commons.compress.version>1.28.0</commons.compress.version>
         <woodstox.core.version>7.1.1</woodstox.core.version>
@@ -1746,8 +1757,8 @@
         <okio.version>3.9.0.wso2v1</okio.version>
         <apache.commons.io.version>2.4</apache.commons.io.version>
         <equinox.osgi.services.version>3.4.0.v20140312-2051</equinox.osgi.services.version>
-        <pax.logging.log4j2.version>2.1.0-wso2v3</pax.logging.log4j2.version>
-        <pax.logging.api.version>2.1.0-wso2v3</pax.logging.api.version>
+        <pax.logging.log4j2.version>2.2.9-wso2v3</pax.logging.log4j2.version>
+        <pax.logging.api.version>2.2.9-wso2v2</pax.logging.api.version>
         <pax.exam.container.native.version>4.6.0</pax.exam.container.native.version>
         <pax.url.aether.version>1.6.0</pax.url.aether.version>
         <org.jacoco.ant.version>0.8.3</org.jacoco.ant.version>
@@ -1770,7 +1781,7 @@
         <equinox.simpleconfigurator.manipulator.version>2.2.0</equinox.simpleconfigurator.manipulator.version>
         <equinox.util.version>1.0.500.v20130404-1337</equinox.util.version>
         <org.eclipse.equinox.cm.version>1.1.0.v20131021-1936</org.eclipse.equinox.cm.version>
-        <org.snakeyaml.version>2.2</org.snakeyaml.version>
+        <org.snakeyaml.version>2.6</org.snakeyaml.version>
         <org.wso2.eclipse.osgi.version>3.4.0.v20140312-2051</org.wso2.eclipse.osgi.version>
         <junit.version>4.10</junit.version>
         <apache.commons.text.version>1.1</apache.commons.text.version>
@@ -1813,7 +1824,7 @@
         <carbon.kernel.version>5.3.3</carbon.kernel.version>
         <carbon.kernel.package.import.version.range>[5.2.6, 6.0.0)</carbon.kernel.package.import.version.range>
 
-        <netty.version>4.1.132.Final</netty.version>
+        <netty.version>4.1.133.Final</netty.version>
         <org.wso2.transport.http.netty.version>6.3.54</org.wso2.transport.http.netty.version>
         <commons-vfs2.wso2.version>2.2-wso2v1</commons-vfs2.wso2.version>
         <carbon.transport.package.import.version.range>[6.0.0, 7.0.0)</carbon.transport.package.import.version.range>
@@ -1833,7 +1844,7 @@
         <carbon.utils.version>2.1.1</carbon.utils.version>
         <carbon.config.version>2.1.17</carbon.config.version>
         <carbon.config.version.range>[2.1.5, 3.0.0)</carbon.config.version.range>
-        <carbon.securevault.version>5.0.20</carbon.securevault.version>
+        <carbon.securevault.version>5.0.22</carbon.securevault.version>
 
         <!-- Clustering Dependencies -->
         <carbon.coordination.version>2.1.10</carbon.coordination.version>
@@ -1884,15 +1895,17 @@
         <quartz.version>2.3.2.wso2v1</quartz.version>
         <mchange.version>0.12.0</mchange.version>
         <metrics.version>3.2.5</metrics.version>
-        <commons-lang3.version>3.17.0</commons-lang3.version>
+        <commons-lang3.version>3.20.0</commons-lang3.version>
+        <commons-lang3.orbit.version>3.20.0.wso2v1</commons-lang3.orbit.version>
         <common.collections4.version>4.4</common.collections4.version>
 
         <!--MSF4J related-->
-        <msf4j.version>2.8.12</msf4j.version>
+        <msf4j.version>2.9.0</msf4j.version>
         <msf4j.import.version.range>[2.7.0, 3.0.0)</msf4j.import.version.range>
-        <com.fasterxml.jackson.core.version>2.16.0</com.fasterxml.jackson.core.version>
-        <com.fasterxml.jackson.databind.version>2.16.0</com.fasterxml.jackson.databind.version>
-        <com.fasterxml.jackson.core.version.range>[2.15.0, 2.20.0)</com.fasterxml.jackson.core.version.range>
+        <com.fasterxml.jackson.core.version>2.21.2</com.fasterxml.jackson.core.version>
+        <com.fasterxml.jackson.annotations.version>2.21</com.fasterxml.jackson.annotations.version>
+        <com.fasterxml.jackson.databind.version>2.21.2</com.fasterxml.jackson.databind.version>
+        <com.fasterxml.jackson.core.version.range>[2.15.0, 2.22.0)</com.fasterxml.jackson.core.version.range>
         <io.swagger.version>1.6.7</io.swagger.version>
         <javax.ws.rs-api.version>2.0</javax.ws.rs-api.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
