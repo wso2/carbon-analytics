@@ -395,11 +395,7 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.orbit.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.orbit.org.apache.logging.log4j</groupId>
-                <artifactId>log4j-api</artifactId>
-                <version>${log4j.orbit.version}</version>
-            </dependency>
+
             <!-- OSGi test -->
             <dependency>
                 <groupId>org.awaitility</groupId>
@@ -1732,7 +1728,6 @@
         <siddhi.version.range>[5.0.0, 6.0.0)</siddhi.version.range>
         <carbon.analytics-common.version>6.1.73</carbon.analytics-common.version>
         <log4j.version>2.25.4</log4j.version>
-        <log4j.orbit.version>2.25.4.wso2v1</log4j.orbit.version>
         <nimbus.jose.jwt.version>10.9</nimbus.jose.jwt.version>
         <commons.compress.version>1.28.0</commons.compress.version>
         <woodstox.core.version>7.1.1</woodstox.core.version>

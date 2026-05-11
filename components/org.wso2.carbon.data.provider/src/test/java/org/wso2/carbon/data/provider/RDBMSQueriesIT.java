@@ -75,7 +75,9 @@ public class RDBMSQueriesIT {
     @AfterClass
     public static void shutdown() {
         log.info("== RDBMS Queries tests completed ==");
-        microservicesRunner.stop();
+        if (microservicesRunner != null) {
+            microservicesRunner.stop();
+        }
     }
 
     @BeforeMethod
