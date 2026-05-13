@@ -3,7 +3,7 @@
     "extension": {
       "name": "kafka",
       "displayName": "Kafka",
-      "version": "5.0.19"
+      "version": "5.0.21"
     },
     "identifier": {
       "alternativeTypes": ["kafkaMultiDC"]
@@ -11,10 +11,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-kafka",
-        "version": "5.0.19",
+        "version": "5.0.21",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.19/siddhi-io-kafka-5.0.19.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.21/siddhi-io-kafka-5.0.21.jar"
         },
         "usages": [
           {
@@ -416,7 +416,7 @@
     "extension": {
       "name": "cdc-mysql",
       "displayName": "Change Data Capture - MySQL",
-      "version": "2.0.17"
+      "version": "2.1.1"
     },
     "identifier": {
       "type": "cdc",
@@ -426,10 +426,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.17",
+        "version": "2.1.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.1.1/siddhi-io-cdc-2.1.1.jar"
         },
         "usages": [
           {
@@ -461,7 +461,7 @@
     "extension": {
       "name": "cdc-oracle",
       "displayName": "Change Data Capture - Oracle",
-      "version": "2.0.17"
+      "version": "2.1.1"
     },
     "identifier": {
       "type": "cdc",
@@ -471,10 +471,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.17",
+        "version": "2.1.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.1.1/siddhi-io-cdc-2.1.1.jar"
         },
         "usages": [
           {
@@ -521,7 +521,7 @@
     "extension": {
       "name": "cdc-postgresql",
       "displayName": "Change Data Capture - PostgreSQL",
-      "version": "2.0.17"
+      "version": "2.1.1"
     },
     "identifier": {
       "type": "cdc",
@@ -531,10 +531,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.17",
+        "version": "2.1.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.1.1/siddhi-io-cdc-2.1.1.jar"
         },
         "usages": [
           {
@@ -566,7 +566,7 @@
     "extension": {
       "name": "cdc-mssql",
       "displayName": "Change Data Capture - MS SQL",
-      "version": "2.0.17"
+      "version": "2.1.1"
     },
     "identifier": {
       "type": "cdc",
@@ -576,10 +576,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.17",
+        "version": "2.1.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.1.1/siddhi-io-cdc-2.1.1.jar"
         },
         "usages": [
           {
@@ -611,7 +611,7 @@
     "extension": {
       "name": "cdc-mongodb",
       "displayName": "Change Data Capture - Mongo DB",
-      "version": "2.0.17"
+      "version": "2.1.1"
     },
     "identifier": {
       "type": "cdc",
@@ -621,10 +621,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.0.17",
+        "version": "2.1.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.0.17/siddhi-io-cdc-2.0.17.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.1.1/siddhi-io-cdc-2.1.1.jar"
         },
         "usages": [
           {
@@ -1296,7 +1296,7 @@
     "extension": {
       "name": "file",
       "displayName": "File",
-      "version": "2.0.25"
+      "version": "2.0.28"
     },
     "identifier": {
       "alternativeTypes": ["fileeventlistener"]
@@ -1304,10 +1304,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-file",
-        "version": "2.0.25",
+        "version": "2.0.28",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/file/siddhi-io-file/2.0.25/siddhi-io-file-2.0.25.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/file/siddhi-io-file/2.0.28/siddhi-io-file-2.0.28.jar"
         },
         "usages": [
           {
