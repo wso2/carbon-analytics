@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.analytics</groupId>
         <artifactId>org.wso2.carbon.analytics.parent</artifactId>
-        <version>3.0.77-SNAPSHOT</version>
+        <version>3.0.79-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -94,7 +94,7 @@
             <artifactId>metrics-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
+            <groupId>org.wso2.orbit.org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
@@ -128,9 +128,9 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.apache.commons</groupId>
+                                    <groupId>org.wso2.orbit.org.apache.commons</groupId>
                                     <artifactId>commons-lang3</artifactId>
-                                    <version>${commons-lang3.version}</version>
+                                    <version>${commons-lang3.orbit.version}</version>
                                     <outputDirectory>${project.build.directory}/lib/launcher</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
@@ -254,8 +254,8 @@
                                     <version>${metrics.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>org.apache.commons.lang3</symbolicName>
-                                    <version>${commons-lang3.version}</version>
+                                    <symbolicName>commons-lang3</symbolicName>
+                                    <version>${commons-lang3.orbit.version}</version>
                                 </bundle>
                             </bundles>
                         </configuration>

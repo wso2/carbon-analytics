@@ -58,6 +58,7 @@ import java.util.Map;
 
 public class RDBMSQueriesIT {
     private static final Log log = LogFactory.getLog(RDBMSQueriesIT.class);
+    private static MicroservicesRunner microservicesRunner;
     private final int sleepTime = 10000;
     private final String host = "localhost";
     private final String port = "9090";
@@ -66,7 +67,7 @@ public class RDBMSQueriesIT {
     @BeforeClass
     public void startTest() {
         log.info("== RDBMS Queries tests started ==");
-        MicroservicesRunner microservicesRunner = new MicroservicesRunner();
+        microservicesRunner = new MicroservicesRunner();
         microservicesRunner.deployWebSocketEndpoint(new DataProviderEndPoint());
         microservicesRunner.start();
     }
@@ -74,6 +75,9 @@ public class RDBMSQueriesIT {
     @AfterClass
     public static void shutdown() {
         log.info("== RDBMS Queries tests completed ==");
+        if (microservicesRunner != null) {
+            microservicesRunner.stop();
+        }
     }
 
     @BeforeMethod
