@@ -416,7 +416,7 @@
     "extension": {
       "name": "cdc-mysql",
       "displayName": "Change Data Capture - MySQL",
-      "version": "2.1.1"
+      "version": "2.2.0"
     },
     "identifier": {
       "type": "cdc",
@@ -426,10 +426,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.1.1",
+        "version": "2.2.0",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.1.1/siddhi-io-cdc-2.1.1.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.2.0/siddhi-io-cdc-2.2.0.jar"
         },
         "usages": [
           {
@@ -440,11 +440,11 @@
         "lookupRegex": "siddhi([_-])io([_-])cdc([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
-        "name": "mysql-connector-java",
-        "version": "8.0.18",
+        "name": "mysql-connector-j",
+        "version": "9.5.0",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.18/mysql-connector-java-8.0.18.jar"
+          "url": "https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/9.5.0/mysql-connector-j-9.5.0.jar"
         },
         "usages": [
           {
@@ -452,7 +452,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mysql([_-])connector([_-])java([_-])8.0.18(.*).jar"
+        "lookupRegex": "mysql([_-])connector([_-])j([_-])9.5.0(.*).jar"
       }
     ]
   },
@@ -461,7 +461,7 @@
     "extension": {
       "name": "cdc-oracle",
       "displayName": "Change Data Capture - Oracle",
-      "version": "2.1.1"
+      "version": "2.2.0"
     },
     "identifier": {
       "type": "cdc",
@@ -471,10 +471,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.1.1",
+        "version": "2.2.0",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.1.1/siddhi-io-cdc-2.1.1.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.2.0/siddhi-io-cdc-2.2.0.jar"
         },
         "usages": [
           {
@@ -485,11 +485,11 @@
         "lookupRegex": "siddhi([_-])io([_-])cdc([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
-        "name": "ojdbc8",
-        "version": "12.2.0.1",
+        "name": "ojdbc11",
+        "version": "23.26.3.0.0",
         "download": {
           "autoDownloadable": false,
-          "instructions": "1. Download the jar from: 'https://maven.xwiki.org/externals/com/oracle/jdbc/ojdbc8/12.2.0.1/ojdbc8-12.2.0.1.jar'<br/>2. Navigate to 'carbon_home/bin' and use the command './spi-provider.sh oracle.jdbc.OracleDriver java.sql.Driver downloaded/path/to/jar/ojdbc8.jar'.<br/>3. Place the bundle to carbon_home/lib"
+          "instructions": "1. Download the jar from: 'https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc11/23.26.3.0.0/ojdbc11-23.26.3.0.0.jar'<br/>2. Navigate to 'carbon_home/bin' and use the command './spi-provider.sh oracle.jdbc.OracleDriver java.sql.Driver downloaded/path/to/jar/ojdbc11-23.26.3.0.0.jar'.<br/>3. Place the bundle to carbon_home/lib"
         },
         "usages": [
           {
@@ -497,14 +497,14 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "ojdbc8([_-])12.2.0.1(.*).jar"
+        "lookupRegex": "ojdbc11([_-])23.26.3.0.0(.*).jar"
       },
       {
         "name": "xstreams",
-        "version": "12.2.0.1",
+        "version": "23.26.3.0.0",
         "download": {
           "autoDownloadable": false,
-          "instructions": "1. Download relevant instant client zip from 'https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html'.<br/>2. Unzip it and locate 'xstreams.jar'.<br/>3. Navigate to 'carbon_home/bin' and convert it to bundle using the command './jartobundle.sh source/dir/xstreams.jar carbon_home/lib'.<br/>&nbsp;Only for Linux, use './jni-provider.sh source/dir/xstreams.jar carbon_home/lib clntsh'."
+          "instructions": "1. Download the Oracle Instant Client 23.26.3.0.0 package from 'https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html'.<br/>2. Unzip it and locate 'xstreams.jar'.<br/>3. Navigate to 'carbon_home/bin' and convert it to bundle using the command './jartobundle.sh source/dir/xstreams.jar carbon_home/lib'.<br/>&nbsp;Only for Linux, use './jni-provider.sh source/dir/xstreams.jar carbon_home/lib clntsh'."
         },
         "usages": [
           {
@@ -512,7 +512,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "ojdbc8([_-])12.2.0.1(.*).jar"
+        "lookupRegex": "xstreams(.*).jar"
       }
     ]
   },
@@ -521,7 +521,7 @@
     "extension": {
       "name": "cdc-postgresql",
       "displayName": "Change Data Capture - PostgreSQL",
-      "version": "2.1.1"
+      "version": "2.2.0"
     },
     "identifier": {
       "type": "cdc",
@@ -531,10 +531,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.1.1",
+        "version": "2.2.0",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.1.1/siddhi-io-cdc-2.1.1.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.2.0/siddhi-io-cdc-2.2.0.jar"
         },
         "usages": [
           {
@@ -546,10 +546,10 @@
       },
       {
         "name": "postgresql",
-        "version": "42.2.10",
+        "version": "42.7.13",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.10/postgresql-42.2.10.jar"
+          "url": "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.13/postgresql-42.7.13.jar"
         },
         "usages": [
           {
@@ -557,7 +557,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "postgresql([_-])42.2.10(.*).jar"
+        "lookupRegex": "postgresql([_-])42.7.13(.*).jar"
       }
     ]
   },
@@ -566,7 +566,7 @@
     "extension": {
       "name": "cdc-mssql",
       "displayName": "Change Data Capture - MS SQL",
-      "version": "2.1.1"
+      "version": "2.2.0"
     },
     "identifier": {
       "type": "cdc",
@@ -576,10 +576,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.1.1",
+        "version": "2.2.0",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.1.1/siddhi-io-cdc-2.1.1.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.2.0/siddhi-io-cdc-2.2.0.jar"
         },
         "usages": [
           {
@@ -591,10 +591,10 @@
       },
       {
         "name": "mssql-jdbc",
-        "version": "8.2.1.jre8",
+        "version": "12.10.2.jre11",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/8.2.1.jre8/mssql-jdbc-8.2.1.jre8.jar"
+          "url": "https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/12.10.2.jre11/mssql-jdbc-12.10.2.jre11.jar"
         },
         "usages": [
           {
@@ -602,7 +602,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mssql([_-])jdbc([_-])8.2.1.jre8(.*).jar"
+        "lookupRegex": "mssql([_-])jdbc([_-])12.10.2.jre11(.*).jar"
       }
     ]
   },
@@ -611,7 +611,7 @@
     "extension": {
       "name": "cdc-mongodb",
       "displayName": "Change Data Capture - Mongo DB",
-      "version": "2.1.1"
+      "version": "2.2.0"
     },
     "identifier": {
       "type": "cdc",
@@ -621,10 +621,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-cdc",
-        "version": "2.1.1",
+        "version": "2.2.0",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.1.1/siddhi-io-cdc-2.1.1.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/cdc/siddhi-io-cdc/2.2.0/siddhi-io-cdc-2.2.0.jar"
         },
         "usages": [
           {
@@ -636,10 +636,10 @@
       },
       {
         "name": "mongodb-driver-sync",
-        "version": "4.9.1",
+        "version": "5.11.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/4.9.1/mongodb-driver-sync-4.9.1.jar"
+          "url": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/5.11.1/mongodb-driver-sync-5.11.1.jar"
         },
         "usages": [
           {
@@ -647,7 +647,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mongodb([_-])driver([_-])sync([_-])4.9.1(.*).jar"
+        "lookupRegex": "mongodb([_-])driver([_-])sync([_-])5.11.1(.*).jar"
       }
     ]
   },
@@ -939,10 +939,10 @@
       },
       {
         "name": "mongodb-driver-sync",
-        "version": "4.9.1",
+        "version": "5.11.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/4.9.1/mongodb-driver-sync-4.9.1.jar"
+          "url": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/5.11.1/mongodb-driver-sync-5.11.1.jar"
         },
         "usages": [
           {
@@ -950,14 +950,14 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mongodb([_-])driver([_-])sync([_-])4.9.1(.*).jar"
+        "lookupRegex": "mongodb([_-])driver([_-])sync([_-])5.11.1(.*).jar"
       },
       {
         "name": "mongodb-driver-core",
-        "version": "4.9.1",
+        "version": "5.11.1",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-core/4.9.1/mongodb-driver-core-4.9.1.jar"
+          "url": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-core/5.11.1/mongodb-driver-core-5.11.1.jar"
         },
         "usages": [
           {
@@ -965,7 +965,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mongodb([_-])driver([_-])core([_-])4.9.1(.*).jar"
+        "lookupRegex": "mongodb([_-])driver([_-])core([_-])5.11.1(.*).jar"
       }
     ]
   },
@@ -998,11 +998,11 @@
         "lookupRegex": "siddhi([_-])store([_-])rdbms([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
-        "name": "mysql-connector-java",
-        "version": "8.0.18",
+        "name": "mysql-connector-j",
+        "version": "9.5.0",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.18/mysql-connector-java-8.0.18.jar"
+          "url": "https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/9.5.0/mysql-connector-j-9.5.0.jar"
         },
         "usages": [
           {
@@ -1010,7 +1010,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mysql([_-])connector([_-])java([_-])8.0.18(.*).jar"
+        "lookupRegex": "mysql([_-])connector([_-])j([_-])9.5.0(.*).jar"
       }
     ]
   },
@@ -1044,10 +1044,10 @@
       },
       {
         "name": "mssql-jdbc",
-        "version": "8.2.1.jre8",
+        "version": "12.10.2.jre11",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/8.2.1.jre8/mssql-jdbc-8.2.1.jre8.jar"
+          "url": "https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/12.10.2.jre11/mssql-jdbc-12.10.2.jre11.jar"
         },
         "usages": [
           {
@@ -1055,7 +1055,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "mssql([_-])jdbc([_-])8.2.1.jre8(.*).jar"
+        "lookupRegex": "mssql([_-])jdbc([_-])12.10.2.jre11(.*).jar"
       }
     ]
   },
@@ -1089,10 +1089,10 @@
       },
       {
         "name": "postgresql",
-        "version": "42.2.10",
+        "version": "42.7.13",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.10/postgresql-42.2.10.jar"
+          "url": "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.13/postgresql-42.7.13.jar"
         },
         "usages": [
           {
@@ -1100,7 +1100,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "postgresql([_-])42.2.10(.*).jar"
+        "lookupRegex": "postgresql([_-])42.7.13(.*).jar"
       }
     ]
   },
@@ -1133,11 +1133,11 @@
         "lookupRegex": "siddhi([_-])store([_-])rdbms([_-])[0-9]+.[0-9]+.[\\.0-9]+.jar"
       },
       {
-        "name": "ojdbc8",
-        "version": "12.2.0.1",
+        "name": "ojdbc11",
+        "version": "23.26.3.0.0",
         "download": {
           "autoDownloadable": false,
-          "instructions": "1. Download the jar from: 'https://maven.xwiki.org/externals/com/oracle/jdbc/ojdbc8/12.2.0.1/ojdbc8-12.2.0.1.jar'<br/>2. Navigate to 'carbon_home/bin' and use the command './spi-provider.sh oracle.jdbc.OracleDriver java.sql.Driver downloaded/path/to/jar/ojdbc8.jar'.<br/>3. Place the bundle to carbon_home/lib"
+          "instructions": "1. Download the jar from: 'https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc11/23.26.3.0.0/ojdbc11-23.26.3.0.0.jar'<br/>2. Navigate to 'carbon_home/bin' and use the command './spi-provider.sh oracle.jdbc.OracleDriver java.sql.Driver downloaded/path/to/jar/ojdbc11-23.26.3.0.0.jar'.<br/>3. Place the bundle to carbon_home/lib"
         },
         "usages": [
           {
@@ -1145,7 +1145,7 @@
             "usedBy": "RUNTIME"
           }
         ],
-        "lookupRegex": "ojdbc8([_-])12.2.0.1(.*).jar"
+        "lookupRegex": "ojdbc11([_-])23.26.3.0.0(.*).jar"
       }
     ]
   },
