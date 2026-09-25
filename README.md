@@ -21,7 +21,7 @@ This project contains compontents which implements common functionalities used i
 
 ## How to build from the source
 ### Prerequisites
-* Java 8 or above
+* Java 11 or above
 * [Apache Maven](https://maven.apache.org/download.cgi#) 3.x.x
 * [Node.js](https://nodejs.org/en/) 8.x.x or above
 ### Steps
