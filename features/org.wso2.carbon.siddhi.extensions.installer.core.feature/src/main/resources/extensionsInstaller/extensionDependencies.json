@@ -648,6 +648,51 @@
           }
         ],
         "lookupRegex": "mongodb([_-])driver([_-])sync([_-])5.11.1(.*).jar"
+      },
+      {
+        "name": "mongodb-driver-core",
+        "version": "5.11.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-core/5.11.1/mongodb-driver-core-5.11.1.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "mongodb([_-])driver([_-])core([_-])5.11.1(.*).jar"
+      },
+      {
+        "name": "bson",
+        "version": "5.11.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/mongodb/bson/5.11.1/bson-5.11.1.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "bson([_-])5.11.1(.*).jar"
+      },
+      {
+        "name": "bson-record-codec",
+        "version": "5.11.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/mongodb/bson-record-codec/5.11.1/bson-record-codec-5.11.1.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "bson([_-])record([_-])codec([_-])5.11.1(.*).jar"
       }
     ]
   },
@@ -919,15 +964,15 @@
     "extension": {
       "name": "mongodb",
       "displayName": "MongoDB",
-      "version": "3.0.0"
+      "version": "3.1.0"
     },
     "dependencies": [
       {
         "name": "siddhi-store-mongodb",
-        "version": "3.0.1",
+        "version": "3.1.0",
         "download": {
           "autoDownloadable": true,
-          "url": "https://github.com/siddhi-io/siddhi-store-mongodb/releases/download/v3.0.1/siddhi-store-mongodb-3.0.1.jar"
+          "url": "https://github.com/siddhi-io/siddhi-store-mongodb/releases/download/v3.1.0/siddhi-store-mongodb-3.1.0.jar"
         },
         "usages": [
           {
@@ -966,6 +1011,36 @@
           }
         ],
         "lookupRegex": "mongodb([_-])driver([_-])core([_-])5.11.1(.*).jar"
+      },
+      {
+        "name": "bson",
+        "version": "5.11.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/mongodb/bson/5.11.1/bson-5.11.1.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "bson([_-])5.11.1(.*).jar"
+      },
+      {
+        "name": "bson-record-codec",
+        "version": "5.11.1",
+        "download": {
+          "autoDownloadable": true,
+          "url": "https://repo1.maven.org/maven2/org/mongodb/bson-record-codec/5.11.1/bson-record-codec-5.11.1.jar"
+        },
+        "usages": [
+          {
+            "type": "JAR",
+            "usedBy": "RUNTIME"
+          }
+        ],
+        "lookupRegex": "bson([_-])record([_-])codec([_-])5.11.1(.*).jar"
       }
     ]
   },
