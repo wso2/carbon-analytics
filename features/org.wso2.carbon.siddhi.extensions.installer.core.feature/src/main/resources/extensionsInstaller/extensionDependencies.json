@@ -11,10 +11,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-kafka",
-        "version": "5.0.21",
+        "version": "5.0.22",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.21/siddhi-io-kafka-5.0.21.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.22/siddhi-io-kafka-5.0.22.jar"
         },
         "usages": [
           {
