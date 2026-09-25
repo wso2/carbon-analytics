@@ -972,7 +972,7 @@
         "version": "3.1.0",
         "download": {
           "autoDownloadable": true,
-          "url": "https://github.com/siddhi-io/siddhi-store-mongodb/releases/download/v3.1.0/siddhi-store-mongodb-3.1.0.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/store/mongodb/siddhi-store-mongodb/3.1.0/siddhi-store-mongodb-3.1.0.jar"
         },
         "usages": [
           {
