@@ -1942,7 +1942,7 @@
         <siddhi.io.email.version>2.0.8</siddhi.io.email.version>
         <siddhi.io.http.version>2.3.7</siddhi.io.http.version>
 
-        <siddhi.map.json.version>5.2.5</siddhi.map.json.version>
+        <siddhi.map.json.version>5.2.6-SNAPSHOT</siddhi.map.json.version>
         <siddhi.map.binary.version>2.1.1</siddhi.map.binary.version>
         <siddhi.map.xml.version>5.2.2</siddhi.map.xml.version>
 
