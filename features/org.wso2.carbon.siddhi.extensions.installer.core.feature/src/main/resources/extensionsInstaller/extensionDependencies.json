@@ -1420,7 +1420,7 @@
     "extension": {
       "name": "file",
       "displayName": "File",
-      "version": "2.0.28"
+      "version": "2.0.29"
     },
     "identifier": {
       "alternativeTypes": ["fileeventlistener"]
@@ -1428,10 +1428,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-file",
-        "version": "2.0.28",
+        "version": "2.0.29",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/file/siddhi-io-file/2.0.28/siddhi-io-file-2.0.28.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/file/siddhi-io-file/2.0.29/siddhi-io-file-2.0.29.jar"
         },
         "usages": [
           {
