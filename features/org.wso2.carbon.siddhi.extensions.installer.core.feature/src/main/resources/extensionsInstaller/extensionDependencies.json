@@ -1400,10 +1400,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-http",
-        "version": "2.3.7",
+        "version": "2.3.8",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/http/siddhi-io-http/2.3.7/siddhi-io-http-2.3.7.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/http/siddhi-io-http/2.3.8/siddhi-io-http-2.3.8.jar"
         },
         "usages": [
           {
