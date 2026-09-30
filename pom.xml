@@ -1940,7 +1940,7 @@
 
         <siddhi.io.tcp.version>3.0.6</siddhi.io.tcp.version>
         <siddhi.io.email.version>2.0.8</siddhi.io.email.version>
-        <siddhi.io.http.version>2.3.7</siddhi.io.http.version>
+        <siddhi.io.http.version>2.3.8-SNAPSHOT</siddhi.io.http.version>
 
         <siddhi.map.json.version>5.2.6-SNAPSHOT</siddhi.map.json.version>
         <siddhi.map.binary.version>2.1.1</siddhi.map.binary.version>
