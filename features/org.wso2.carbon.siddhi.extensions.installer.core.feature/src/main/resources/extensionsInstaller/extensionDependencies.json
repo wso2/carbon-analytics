@@ -3,7 +3,7 @@
     "extension": {
       "name": "kafka",
       "displayName": "Kafka",
-      "version": "5.0.21"
+      "version": "5.0.23"
     },
     "identifier": {
       "alternativeTypes": ["kafkaMultiDC"]
@@ -11,10 +11,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-kafka",
-        "version": "5.0.22",
+        "version": "5.0.23",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.22/siddhi-io-kafka-5.0.22.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/kafka/siddhi-io-kafka/5.0.23/siddhi-io-kafka-5.0.23.jar"
         },
         "usages": [
           {
@@ -890,7 +890,7 @@
     "extension": {
       "name": "grpc",
       "displayName": "gRPC",
-      "version": "1.0.14"
+      "version": "1.0.15"
     },
     "identifier": {
       "alternativeTypes": [
@@ -1383,7 +1383,7 @@
     "extension": {
       "name": "http",
       "displayName": "HTTP Transport",
-      "version": "2.3.4"
+      "version": "2.3.8"
     },
     "identifier": {
       "alternativeTypes": [
