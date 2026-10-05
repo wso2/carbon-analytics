@@ -124,6 +124,12 @@ rules:
       - update
       - patch
   - apiGroups:
+      - siddhi.io
+    resources:
+      - siddhiprocesses/finalizers
+    verbs:
+      - update
+  - apiGroups:
       - nats.io
     resources:
       - natsclusters
