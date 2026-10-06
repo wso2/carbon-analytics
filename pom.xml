@@ -1672,9 +1672,9 @@
                 <version>${prometheus.simpleclient.httpserver.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.org.apache.commons</groupId>
+                <groupId>org.apache.commons</groupId>
                 <artifactId>commons-vfs2</artifactId>
-                <version>${commons-vfs2.wso2.version}</version>
+                <version>${commons-vfs2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
@@ -1821,7 +1821,7 @@
 
         <netty.version>4.1.133.Final</netty.version>
         <org.wso2.transport.http.netty.version>6.3.54</org.wso2.transport.http.netty.version>
-        <commons-vfs2.wso2.version>2.2-wso2v1</commons-vfs2.wso2.version>
+        <commons-vfs2.version>2.10.0</commons-vfs2.version>
         <carbon.transport.package.import.version.range>[6.0.0, 7.0.0)</carbon.transport.package.import.version.range>
 
         <carbon.messaging.version>3.0.3</carbon.messaging.version>
