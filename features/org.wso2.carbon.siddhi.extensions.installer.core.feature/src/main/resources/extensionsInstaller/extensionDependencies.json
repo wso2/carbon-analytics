@@ -1498,15 +1498,15 @@
     "extension": {
       "name": "rabbitmq",
       "displayName": "RabbitMQ",
-      "version": "3.0.9-SNAPSHOT"
+      "version": "3.0.9"
     },
     "dependencies": [
       {
         "name": "siddhi-io-rabbitmq",
-        "version": "3.0.9-SNAPSHOT",
+        "version": "3.0.9",
         "download": {
           "autoDownloadable": true,
-          "url": "https://maven.wso2.org/nexus/content/repositories/snapshots/io/siddhi/extension/io/rabbitmq/siddhi-io-rabbitmq/3.0.9-SNAPSHOT/siddhi-io-rabbitmq-3.0.9-SNAPSHOT.jar"
+          "url": "https://maven.wso2.org/nexus/content/repositories/releases/io/siddhi/extension/io/rabbitmq/siddhi-io-rabbitmq/3.0.9/siddhi-io-rabbitmq-3.0.9.jar"
         },
         "usages": [
           {
