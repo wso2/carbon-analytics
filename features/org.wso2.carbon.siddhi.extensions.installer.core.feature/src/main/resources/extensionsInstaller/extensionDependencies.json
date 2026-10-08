@@ -890,7 +890,7 @@
     "extension": {
       "name": "grpc",
       "displayName": "gRPC",
-      "version": "1.0.15"
+      "version": "1.0.16"
     },
     "identifier": {
       "alternativeTypes": [
@@ -903,10 +903,10 @@
     "dependencies": [
       {
         "name": "siddhi-io-grpc",
-        "version": "1.0.15",
+        "version": "1.0.16",
         "download": {
           "autoDownloadable": true,
-          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/grpc/siddhi-io-grpc/1.0.15/siddhi-io-grpc-1.0.15.jar"
+          "url": "https://repo1.maven.org/maven2/io/siddhi/extension/io/grpc/siddhi-io-grpc/1.0.16/siddhi-io-grpc-1.0.16.jar"
         },
         "usages": [
           {
