@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.EnumMap;
@@ -152,6 +153,9 @@ public class Utils {
         JsonArray logFiles = new JsonArray();
         try (DirectoryStream<Path> paths = Files.newDirectoryStream(logDirPath, "*.log")) {
             for (Path path : paths) {
+                if (!Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)) {
+                    continue;
+                }
                 Path fileName = path.getFileName();
                 if (fileName == null) {
                     continue;
@@ -171,6 +175,38 @@ public class Utils {
 
     public static Path getLogDirectoryPath(String carbonHome) {
         return Paths.get(carbonHome, Constants.WSO2, Constants.SERVER, Constants.LOGS);
+    }
+
+    public static Path resolveLogFilePath(String carbonHome, String fileName) throws IOException {
+        if (fileName == null || fileName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Log file path cannot be empty");
+        }
+
+        Path requestedPath = Paths.get(fileName);
+        if (requestedPath.isAbsolute()) {
+            throw new IllegalArgumentException("Log file path must be relative");
+        }
+
+        Path logDirectory = getLogDirectoryPath(carbonHome).toRealPath();
+        Path candidatePath = logDirectory.resolve(requestedPath).normalize();
+        if (!candidatePath.startsWith(logDirectory)) {
+            throw new IllegalArgumentException("Log file path is outside the log directory");
+        }
+
+        Path currentPath = logDirectory;
+        for (Path pathElement : logDirectory.relativize(candidatePath)) {
+            currentPath = currentPath.resolve(pathElement);
+            if (Files.isSymbolicLink(currentPath)) {
+                throw new IllegalArgumentException("Log file path cannot contain symbolic links");
+            }
+        }
+
+        Path realFilePath = candidatePath.toRealPath();
+        if (!realFilePath.startsWith(logDirectory) ||
+                !Files.isRegularFile(realFilePath, LinkOption.NOFOLLOW_LINKS)) {
+            throw new IllegalArgumentException("Log file path does not identify a regular file in the log directory");
+        }
+        return realFilePath;
     }
 
     private static String getFileSize(File file) {
