@@ -20,5 +20,9 @@ under the License.
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="wso2-test-suite">
-
+    <test name="ICP management tests">
+        <classes>
+            <class name="org.wso2.carbon.si.management.icp.utils.UtilsTest"/>
+        </classes>
+    </test>
 </suite>

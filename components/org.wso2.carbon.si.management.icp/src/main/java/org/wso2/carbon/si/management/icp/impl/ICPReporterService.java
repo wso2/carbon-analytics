@@ -36,6 +36,9 @@ import org.wso2.msf4j.interceptor.annotation.RequestInterceptor;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.StandardOpenOption;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -184,8 +187,7 @@ public class ICPReporterService implements Microservice {
 
     @GET
     @Path("/logs")
-    public Response getLogs(@Context Request request, @QueryParam("file") String fileName)
-            throws IOException {
+    public Response getLogs(@Context Request request, @QueryParam("file") String fileName) {
         if (fileName == null) {
             return Response.ok(Utils.getLogFileList()).build();
         }
@@ -194,8 +196,17 @@ public class ICPReporterService implements Microservice {
         if (carbonHome == null) {
             return Response.serverError().build();
         }
-        return Response.ok(Files.newInputStream(Utils.getLogDirectoryPath(carbonHome).resolve(fileName)))
-                .type(MediaType.TEXT_PLAIN).build();
+        try {
+            java.nio.file.Path logFilePath = Utils.resolveLogFilePath(carbonHome, fileName);
+            return Response.ok(Files.newInputStream(logFilePath, StandardOpenOption.READ, LinkOption.NOFOLLOW_LINKS))
+                    .type(MediaType.TEXT_PLAIN).build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } catch (NoSuchFileException e) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } catch (IOException e) {
+            return Response.serverError().build();
+        }
     }
 
 }
